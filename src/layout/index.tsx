@@ -1,5 +1,6 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
+import { css } from '../css';
 
 type BaseLayoutProps = {
   children: Child;
@@ -13,10 +14,15 @@ export const BaseLayout = ({
   <!DOCTYPE html>
   <html>
     <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>${title}</title>
-      <script src="https://cdn.tailwindcss.com"></script>
+
+      <style>
+        ${css}
+      </style>
     </head>
-    <body class="bg-gray-100 min-h-screen">
+    <body class="bg-neutral-content min-h-screen">
       ${children}
     </body>
   </html>
