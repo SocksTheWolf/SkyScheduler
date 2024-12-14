@@ -2,13 +2,20 @@
   "name": "my-sky",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "generate": "drizzle-kit generate:sqlite",
+    "migrate:local": "wrangler d1 migrate --local",
+    "migrate:prod": "wrangler d1 migrate --remote"
   },
   "dependencies": {
-    "hono": "^4.6.13"
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.38.2",
+    "hono": "^4.6.13",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241112.0",
+    "drizzle-kit": "^0.30.1",
     "wrangler": "^3.88.0"
   }
 }

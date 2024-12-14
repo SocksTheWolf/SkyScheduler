@@ -1,0 +1,5 @@
+AUTH_PASSWORD=your-secure-password-here
+JWT_SECRET=your-jwt-secret-here
+
+BSKY_USERNAME=
+BSKY_PASSWORD=

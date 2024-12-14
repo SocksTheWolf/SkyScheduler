@@ -1,5 +1,5 @@
 name = "my-sky"
-main = "src/index.ts"
+main = "src/index.tsx"
 compatibility_date = "2024-12-13"
 compatibility_flags = [ "nodejs_compat" ]
 
@@ -7,14 +7,14 @@ compatibility_flags = [ "nodejs_compat" ]
 enabled = true
 head_sampling_rate = 1
 
+[[d1_databases]]
+binding = "DB"
+database_name = "my-sky-db"
+database_id = "60c35f6e-1583-4faf-a692-0c28401ee272"
+
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
 # bucket_name = "my-bucket"
-
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "my-database"
-# database_id = ""
 
 # [ai]
 # binding = "AI"
