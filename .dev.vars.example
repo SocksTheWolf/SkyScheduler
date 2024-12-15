@@ -1,5 +1,4 @@
-AUTH_PASSWORD=your-secure-password-here
-JWT_SECRET=your-jwt-secret-token-here
-
+AUTH_PASSWORD=login-password-you-prefer
+JWT_SECRET=random-jwt-secret-token-here
 BSKY_USERNAME=
 BSKY_PASSWORD=
