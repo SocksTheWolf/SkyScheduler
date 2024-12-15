@@ -4,9 +4,9 @@ import DashboardLayout from "../layout/dashboard-layout";
 export default function Homepage() {
   return (
     <DashboardLayout title="Dashboard - Social Media Scheduler">
-      <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(100vh-2rem)]">
+      <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(100vh-2rem)] overflow-y-auto">
 
-        <form id="postForm" class="flex flex-col h-full overflow-y-auto">
+        <form id="postForm" class="flex flex-col h-full">
           <h1 class="text-2xl font-bold mb-6">Schedule New Post</h1>
           <label class="form-control mb-4 flex-1 flex flex-col">
             <div class="label">

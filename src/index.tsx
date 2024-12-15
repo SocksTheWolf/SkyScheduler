@@ -106,6 +106,14 @@ app.get("/posts", authMiddleware, async (c) => {
   return c.json(allPosts);
 });
 
+app.post("/posts/:id/delete", authMiddleware, async (c) => {
+  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const { id } = c.req.param();
+  await db.delete(posts).where(eq(posts.id, parseInt(id)));
+
+  return c.redirect("/dashboard?deleted=true");
+});
+
 // Root route with login form
 app.get("/", (c) => {
   return c.html(<Home />);
