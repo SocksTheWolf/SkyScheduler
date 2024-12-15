@@ -4,7 +4,7 @@ import { verify, sign } from "hono/jwt";
 import { z } from "zod";
 import { isAfter } from "date-fns";
 import { getCookie } from 'hono/cookie';
-import { and, eq } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 
 import { posts } from "./db/schema";
 import Home from "./pages/homepage";
@@ -136,7 +136,7 @@ export default {
       // round current time to nearest hour
       currentTime.setMinutes(0, 0, 0);
 
-      const scheduledPosts = await db.select().from(posts).where(and(eq(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
+      const scheduledPosts = await db.select().from(posts).where(and(lte(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
 
       if (scheduledPosts.length === 0) {
         console.log("No scheduled posts found for current time");

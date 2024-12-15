@@ -10,8 +10,8 @@ export const schedulePost = async (env: Bindings, content: string) => {
   });
 
   await agent.login({
-    identifier: env.BLUESKY_USERNAME,
-    password: env.BLUESKY_PASSWORD,
+    identifier: env.BSKY_USERNAME,
+    password: env.BSKY_PASSWORD,
   });
 
   const rt = new RichText({
@@ -63,8 +63,6 @@ export const schedulePost = async (env: Bindings, content: string) => {
     const response = await agent.post(postRecord);
     posts.push(response);
   }
-
-
 
   console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);
   return null;
