@@ -15,11 +15,11 @@ export default function DashboardLayout({
   return (
     <BaseLayout title={title}>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-screen">
-        <div class="h-screen overflow-y-auto hidden sm:flex flex-col px-4 py-6">
+        <div class="h-screen hidden sm:flex flex-col px-4 py-6">
           <h1 class="text-lg font-bold">MySky manager</h1>
           <p class="text-sm">Schedule Bluesky posts effortlessly.</p>
           <br />
-          <div id="posts" class="flex flex-col gap-4 flex-1 px-1">
+          <div id="posts" class="flex flex-col gap-4 flex-1 px-1 pb-2 overflow-y-auto">
 
           </div>
 
@@ -27,7 +27,7 @@ export default function DashboardLayout({
             <a href="/logout" class="btn btn-accent btn-outline btn-sm w-full">Logout</a>
           </div>
         </div>
-        <div class="h-screen overflow-y-auto md:col-span-2 lg:col-span-3">
+        <div class="h-screen md:col-span-2 lg:col-span-3">
           {children}
         </div>
       </div>

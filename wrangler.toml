@@ -11,6 +11,8 @@ head_sampling_rate = 1
 binding = "DB"
 database_name = "my-sky-db"
 database_id = "60c35f6e-1583-4faf-a692-0c28401ee272"
+migrations_table = "migrations"
+migrations_dir = "migrations"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"

@@ -4,16 +4,13 @@ import { verify, sign } from "hono/jwt";
 import { z } from "zod";
 import { isAfter } from "date-fns";
 import { getCookie } from 'hono/cookie';
+import { and, eq } from "drizzle-orm";
 
 import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
-
-type Bindings = {
-  DB: D1Database;
-  JWT_SECRET: string;
-  AUTH_PASSWORD: string;
-};
+import { schedulePost } from "./utils/scheduler";
+import { Bindings } from "./types";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -122,9 +119,28 @@ app.get("/dashboard", authMiddleware, (c) => {
 });
 
 export default {
-  scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+  scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
+    // Cron Task
     const task = async () => {
-      // Cron Task
+      // Get all scheduled posts for current time
+      const db: DrizzleD1Database = drizzle(env.DB);
+      const currentTime = new Date();
+      // round current time to nearest hour
+      currentTime.setMinutes(0, 0, 0);
+
+      const scheduledPosts = await db.select().from(posts).where(and(eq(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
+
+      if (scheduledPosts.length === 0) {
+        console.log("No scheduled posts found for current time");
+        return
+      }
+
+      scheduledPosts.forEach(async (post) => {
+        ctx.waitUntil((async () => {
+          await schedulePost(env, post.content)
+          await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
+        })());
+      });
     };
     ctx.waitUntil(task());
   },
