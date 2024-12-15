@@ -60,7 +60,7 @@ export default function DashboardLayout({
                     </button>
                   </form>
                 </div>
-                <p class="text-sm text-gray-500 mt-1">Scheduled for: \${formatDate(post.scheduledDate)}</p>
+                <p class="text-sm text-gray-500 mt-1">\${post.posted ? 'Posted on:' : 'Scheduled for:'} \${formatDate(post.scheduledDate)}</p>
               </div>
             \`).join('');
 

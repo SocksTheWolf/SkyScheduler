@@ -4,7 +4,7 @@ import { verify, sign } from "hono/jwt";
 import { z } from "zod";
 import { isAfter } from "date-fns";
 import { getCookie } from 'hono/cookie';
-import { and, eq, lte } from "drizzle-orm";
+import { and, eq, lte, desc } from "drizzle-orm";
 
 import { posts } from "./db/schema";
 import Home from "./pages/homepage";
@@ -101,7 +101,7 @@ app.post("/posts", authMiddleware, async (c) => {
 // Get all posts
 app.get("/posts", authMiddleware, async (c) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const allPosts = await db.select().from(posts).all();
+  const allPosts = await db.select().from(posts).orderBy(desc(posts.scheduledDate)).all();
 
   return c.json(allPosts);
 });
