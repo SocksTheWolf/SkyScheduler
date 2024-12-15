@@ -14,9 +14,7 @@ database_id = "60c35f6e-1583-4faf-a692-0c28401ee272"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+[triggers]
+# Schedule cron triggers:
+crons = [ "0 * * * *" ] # at the start of every hour
 
-# [ai]
-# binding = "AI"
