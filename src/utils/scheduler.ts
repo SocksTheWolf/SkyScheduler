@@ -1,9 +1,10 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { Bindings } from '../types';
+import { Bindings, Post, PostLabel, EmbedData } from '../types';
 
 const MAX_LENGTH = 300;
+const MAX_EMBEDS = 4;
 
-export const schedulePost = async (env: Bindings, content: string) => {
+export const schedulePost = async (env: Bindings, content: Post) => {
   // Post to Bluesky
   const agent = new AtpAgent({
     service: new URL('https://bsky.social'),
@@ -15,7 +16,7 @@ export const schedulePost = async (env: Bindings, content: string) => {
   });
 
   const rt = new RichText({
-    text: content,
+    text: content.text,
   });
 
   await rt.detectFacets(agent);
@@ -25,21 +26,68 @@ export const schedulePost = async (env: Bindings, content: string) => {
 
   let currentPost = '';
   let currentPostLength = 0;
+  let currentEmbedIndex = 0;
   const posts = [];
+
+  const postSegment = async (data: string) => {
+    let postRecord = {
+      $type: 'app.bsky.feed.post',
+      text: data,
+      facets: rt.facets,
+      createdAt: new Date().toISOString(),
+    };
+    if (content.label != PostLabel.None) {
+      let contentStr = "";
+      switch (content.label) {
+        case PostLabel.Adult:
+          contentStr = "porn";
+        break;
+        case PostLabel.Graphic:
+          contentStr = "graphic-media";
+        break;
+        case PostLabel.Nudity:
+          contentStr = "nudity";
+        break;
+        case PostLabel.Suggestive:
+          contentStr = "sexual";
+        break;
+      }
+      (postRecord as any).labels = {
+        "$type": "com.atproto.label.defs#selfLabels",
+        "values": [{"val": contentStr}]
+      };
+    }
+
+    // Upload any images to this post
+    if (content.embeds?.length) {
+      let imagesArray = [];
+      for (; currentEmbedIndex < MAX_EMBEDS && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex) {
+        const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
+        const file = await env.R2.get(currentEmbed.content);
+        if (file) {
+          const uploadImg = await agent.uploadBlob(await file.blob(), {encoding: file.httpMetadata?.contentType });
+          imagesArray.push({"image": uploadImg.data.blob, "alt": currentEmbed.alt});
+        }
+      }
+      // Push the embed images into the post record.
+      if (imagesArray.length > 0) {
+        (postRecord as any).embed = {
+          "images": imagesArray,
+          "$type": "app.bsky.embed.images"
+        }
+      }
+    }
+
+    const response = await agent.post(postRecord);
+    posts.push(response);
+  };
 
   for (const segment of segments) {
     const segmentText = segment.text;
     if (currentPostLength + segmentText.length > MAX_LENGTH) {
       // Post the current segment and reset
       if (currentPost) {
-        const postRecord = {
-          $type: 'app.bsky.feed.post',
-          text: currentPost,
-          facets: rt.facets,
-          createdAt: new Date().toISOString(),
-        };
-        const response = await agent.post(postRecord);
-        posts.push(response);
+        await postSegment(currentPost);
         currentPost = '';
         currentPostLength = 0;
       }
@@ -54,14 +102,7 @@ export const schedulePost = async (env: Bindings, content: string) => {
 
   // Post the last segment if any
   if (currentPost) {
-    const postRecord = {
-      $type: 'app.bsky.feed.post',
-      text: currentPost,
-      facets: rt.facets,
-      createdAt: new Date().toISOString(),
-    };
-    const response = await agent.post(postRecord);
-    posts.push(response);
+    await postSegment(currentPost);
   }
 
   console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);

@@ -10,7 +10,7 @@ import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
-import { Bindings } from "./types";
+import { Bindings, Post } from "./types";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -82,6 +82,8 @@ app.post("/posts", authMiddleware, async (c) => {
     return c.json({ error: validation.error.format() }, 400);
   }
 
+  // TODO: handle the other content data here like images
+
   const { content, scheduledDate } = validation.data;
   const scheduleDate = new Date(scheduledDate);
 
@@ -109,6 +111,9 @@ app.get("/posts", authMiddleware, async (c) => {
 app.post("/posts/:id/delete", authMiddleware, async (c) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const { id } = c.req.param();
+
+  // TODO: Handle deleting images from R2 first.
+
   await db.delete(posts).where(eq(posts.id, parseInt(id)));
 
   return c.redirect("/dashboard?deleted=true");
@@ -145,7 +150,11 @@ export default {
 
       scheduledPosts.forEach(async (post) => {
         ctx.waitUntil((async () => {
-          await schedulePost(env, post.content)
+          const postData = (new Object() as Post);
+          postData.embeds = post.embedContent;
+          postData.label = post.contentLabel;
+          postData.text = post.content;
+          await schedulePost(env, postData);
           await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
         })());
       });
