@@ -3,6 +3,7 @@ main = "src/index.tsx"
 compatibility_date = "2024-12-13"
 compatibility_flags = [ "nodejs_compat" ]
 send_metrics = false
+# turn off preview urls to lower confusion
 preview_urls = false
 
 [observability]
@@ -24,3 +25,6 @@ bucket_name = "skyembeds"
 # Schedule cron triggers:
 crons = [ "0 * * * *" ] # at the start of every hour
 
+[vars]
+# The username of the account to login as, provided as a var so that it can be modified upon using the deploy with cloudflare button
+BSKY_USERNAME=""
