@@ -66,7 +66,7 @@ const createPostSchema = z.object({
   content: z.string().min(MIN_LENGTH).max(MAX_LENGTH),
   label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
   embeds: z.object({
-    content: z.string().url(),
+    content: z.string(),
     alt: z.string().max(MAX_ALT_TEXT)
   }).array().optional(),
   scheduledDate: z.string().refine((date) => {
@@ -121,7 +121,7 @@ app.post("/posts", authMiddleware, async (c) => {
 
   const validation = createPostSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ error: validation.error.format() }, 400);
+    return c.json({ error: validation.error.toString() }, 400);
   }
 
   const { content, scheduledDate, embeds, label } = validation.data;
