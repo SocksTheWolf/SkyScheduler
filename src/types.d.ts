@@ -13,15 +13,15 @@ export type EmbedData = {
 };
 
 export enum PostLabel {
-  None = 0,
-  Suggestive,
-  Nudity,
-  Adult,
-  Graphic
+  None = "None",
+  Suggestive = "Suggestive",
+  Nudity = "Nudity",
+  Adult = "Adult",
+  Graphic = "Graphic"
 };
 
 export type Post = {
   text: string;
   embeds?: EmbedData[];
-  label: PostLabel = PostLabel.None;
+  label: PostLabel;
 };
