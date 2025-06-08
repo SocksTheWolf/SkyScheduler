@@ -127,12 +127,6 @@ export default function Homepage() {
                 postObject.embeds.push(value)
               });
               postObject.label = document.getElementById("contentLabels").value;
-              // Clear the file data map
-              fileData.clear();
-              // Hide the selector
-              document.getElementById("content-label-selector").setAttribute("class", "hidden");
-              // Remove all data in the dropzone as well
-              fileDropzone.removeAllFiles();
             }
 
             const payload = JSON.stringify(postObject);
@@ -145,6 +139,13 @@ export default function Homepage() {
             const data = await response.json();
 
             if (response.ok) {
+              // Hide the selector
+              document.getElementById("content-label-selector").classList.add("hidden");
+              // Remove all data in the dropzone as well
+              fileDropzone.removeAllFiles();
+              // Clear the file data map
+              fileData.clear();
+              
               document.getElementById('success').classList.remove('hidden');
               document.getElementById('error').classList.add('hidden');
               document.getElementById('postForm').reset();
