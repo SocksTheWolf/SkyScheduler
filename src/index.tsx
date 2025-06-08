@@ -10,7 +10,8 @@ import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
-import { Bindings, Post, PostLabel, EmbedData } from "./types.d";
+import { deleteFromR2 } from "./utils/postDelete";
+import { Bindings, Post, PostLabel } from "./types.d";
 import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, FILE_SIZE_LIMIT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -203,6 +204,8 @@ export default {
           const postData = createPost(post);
           await schedulePost(env, postData);
           await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
+          // Delete any embeds if they exist.
+          await deleteFromR2(env, postData.embeds);
         })());
       });
     };
