@@ -160,7 +160,7 @@ export default function Homepage() {
             document.getElementById('success').classList.add('hidden');
           }
         });
-
+/*
         // roundup minutes
         function roundMinutes(date) {
           const minutes = date.getMinutes();
@@ -173,7 +173,7 @@ export default function Homepage() {
           const date = new Date(e.target.value);
           e.target.value = roundMinutes(date);
         });
-
+*/
         `}
       </script>
     </DashboardLayout>
