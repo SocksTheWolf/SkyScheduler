@@ -86,15 +86,18 @@ app.post("/upload", authMiddleware, async (c) => {
 
   if (!(file instanceof File)) {
     console.warn("Failed to upload", 400);
-    return c.json({"success": false, "data": null});
+    return c.json({"success": false, "msg": "data invalid"});
   }
+
+  // TODO: check file size limits (whatever bsky's file size limit is)
   const fileExt = file.name.split(".").pop();
   const fileName = `${uuidv4()}.${fileExt}`;
 
   const R2UploadRes = await c.env.R2.put(fileName, await file.arrayBuffer());
   if (R2UploadRes)
     return c.json({"success": true, "data": R2UploadRes.key});
-  return c.json({"success": false, "data": null});
+  else
+    return c.json({"success": false, "msg": "unable to push to R2"});
 });
 
 // Create post
