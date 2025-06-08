@@ -7,8 +7,8 @@
     "predeploy": "npm run generate-css",
     "deploy": "wrangler deploy --minify",
     "generate": "drizzle-kit generate",
-    "migrate:local": "wrangler d1 migrations apply my-sky-db --local",
-    "migrate:prod": "wrangler d1 migrations apply my-sky-db --remote"
+    "migrate:local": "wrangler d1 migrations apply skyposts --local",
+    "migrate:prod": "wrangler d1 migrations apply skyposts --remote"
   },
   "dependencies": {
     "@atproto/api": "^0.13.20",
