@@ -1,4 +1,4 @@
-name = "my-sky"
+name = "skyscheduler"
 main = "src/index.tsx"
 compatibility_date = "2024-12-13"
 compatibility_flags = [ "nodejs_compat" ]
@@ -9,8 +9,8 @@ head_sampling_rate = 1
 
 [[d1_databases]]
 binding = "DB"
-database_name = "my-sky-db"
-database_id = "60c35f6e-1583-4faf-a692-0c28401ee272"
+database_name = "skyposts"
+database_id = "90717d06-42ff-40de-91fc-f4b450b29600"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
