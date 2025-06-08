@@ -10,7 +10,8 @@ import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
-import { Bindings, Post, PostLabel, EmbedData } from "./types.d";
+import { deleteFromR2 } from "./utils/postDelete";
+import { Bindings, Post, PostLabel } from "./types.d";
 import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, FILE_SIZE_LIMIT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,6 +34,15 @@ async function authMiddleware(c: Context, next: any) {
   } catch (err) {
     return c.json({ error: "Invalid token" }, 401);
   }
+}
+
+// Quick function to help out with creating post objects
+function createPost(data: any) {
+    const postData: Post = (new Object() as Post);
+    postData.embeds = data.embedContent;
+    postData.label = data.contentLabel;
+    postData.text = data.content;
+    return postData;
 }
 
 // Login route
@@ -154,7 +164,11 @@ app.post("/posts/:id/delete", authMiddleware, async (c) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const { id } = c.req.param();
 
-  // TODO: Handle deleting images from R2 first.
+  const postQuery = await db.select().from(posts).where(eq(posts.id, parseInt(id))).all();
+  // If the post has not been posted, that means we still have files for it, so
+  // delete the files from R2
+  if (!postQuery[0].posted)
+    await deleteFromR2(c.env, createPost(postQuery[0]).embeds);
 
   await db.delete(posts).where(eq(posts.id, parseInt(id)));
 
@@ -190,19 +204,13 @@ export default {
         return
       }
 
-      const createPost = (data) => {
-          const postData: Post = (new Object() as Post);
-          postData.embeds = data.embedContent;
-          postData.label = data.contentLabel;
-          postData.text = data.content;
-          return postData;
-      }
-
       scheduledPosts.forEach(async (post) => {
         ctx.waitUntil((async () => {
           const postData = createPost(post);
           await schedulePost(env, postData);
           await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
+          // Delete any embeds if they exist.
+          await deleteFromR2(env, postData.embeds);
         })());
       });
     };
