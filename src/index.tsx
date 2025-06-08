@@ -36,6 +36,15 @@ async function authMiddleware(c: Context, next: any) {
   }
 }
 
+// Quick function to help out with creating post objects
+function createPost(data: any) {
+    const postData: Post = (new Object() as Post);
+    postData.embeds = data.embedContent;
+    postData.label = data.contentLabel;
+    postData.text = data.content;
+    return postData;
+}
+
 // Login route
 app.post("/login", async (c) => {
   const body = await c.req.json();
@@ -155,7 +164,11 @@ app.post("/posts/:id/delete", authMiddleware, async (c) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const { id } = c.req.param();
 
-  // TODO: Handle deleting images from R2 first.
+  const postQuery = await db.select().from(posts).where(eq(posts.id, parseInt(id))).all();
+  // If the post has not been posted, that means we still have files for it, so
+  // delete the files from R2
+  if (!postQuery[0].posted)
+    await deleteFromR2(c.env, createPost(postQuery[0]).embeds);
 
   await db.delete(posts).where(eq(posts.id, parseInt(id)));
 
@@ -189,14 +202,6 @@ export default {
       if (scheduledPosts.length === 0) {
         console.log("No scheduled posts found for current time");
         return
-      }
-
-      const createPost = (data) => {
-          const postData: Post = (new Object() as Post);
-          postData.embeds = data.embedContent;
-          postData.label = data.contentLabel;
-          postData.text = data.content;
-          return postData;
       }
 
       scheduledPosts.forEach(async (post) => {
