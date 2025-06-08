@@ -38,7 +38,7 @@ cp .dev.vars.example .dev.vars
 ```
 
 3. Configure your `.dev.vars` file with the following environment variables:
-   - `BSKY_USERNAME`: Your Bluesky account identifier (you won't have to do this if you've used the "Deploy with Cloudflare" badge above)
+   - `BSKY_USERNAME`: Your Bluesky account identifier
    - `BSKY_PASSWORD`: Your Bluesky account password
    - `AUTH_PASSWORD`: A secure password for authentication
    - `JWT_SECRET`: A secret key used for generating JWT tokens (You can create a secret using `openssl rand -hex 32` or from [JwtSecret](https://jwtsecret.com/generate) website)
