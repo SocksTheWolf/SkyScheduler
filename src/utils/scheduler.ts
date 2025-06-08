@@ -1,7 +1,9 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, PostLabel, EmbedData } from '../types';
+import truncate from "just-truncate";
 
 const MAX_LENGTH = 300;
+const MAX_ALT_TEXT = 2000;
 const MAX_EMBEDS = 4;
 
 export const schedulePost = async (env: Bindings, content: Post) => {
@@ -66,7 +68,10 @@ export const schedulePost = async (env: Bindings, content: Post) => {
         const file = await env.R2.get(currentEmbed.content);
         if (file) {
           const uploadImg = await agent.uploadBlob(await file.blob(), {encoding: file.httpMetadata?.contentType });
-          imagesArray.push({"image": uploadImg.data.blob, "alt": currentEmbed.alt});
+          imagesArray.push({
+            "image": uploadImg.data.blob, 
+            "alt": truncate(currentEmbed.alt, MAX_ALT_TEXT)
+          });
         }
       }
       // Push the embed images into the post record.
