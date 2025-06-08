@@ -12,19 +12,19 @@
     "migrate:all": "npm run migrate:local && npm run migrate:prod"
   },
   "dependencies": {
-    "@atproto/api": "^0.13.20",
+    "@atproto/api": "^0.13.35",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.38.2",
-    "hono": "^4.6.14",
+    "drizzle-orm": "^0.38.4",
+    "hono": "^4.7.11",
     "just-truncate": "^2.2.0",
     "uuid": "^11.1.0",
-    "zod": "^3.24.1"
+    "zod": "^3.25.56"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241205.0",
-    "daisyui": "^4.12.22",
+    "@cloudflare/workers-types": "^4.20250607.0",
+    "daisyui": "^4.12.24",
     "drizzle-kit": "^0.31.1",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^3.4.17",
     "wrangler": "^4.19.1"
   }
 }
