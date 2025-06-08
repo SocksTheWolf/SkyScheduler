@@ -21,6 +21,36 @@ export const BaseLayout = ({
       <style>
         ${css}
       </style>
+      <style>
+      .dz-size, .dz-filename {
+        display: block !important;
+      }
+
+      .dz-preview {
+        width: 20%;
+        grid-row: 1;
+      }
+
+      .dz-preview div {
+        display: inline-block;
+        position: relative;
+      }
+
+      .dz-preview div svg {
+        display: none !important;
+      }
+
+      .dz-preview button {
+        display: block;
+      }
+
+      #imageUploads {
+        display: grid;
+        grid-template-columns: 20% 20% 20% 20%;
+        grid-template-rows: 1fr 1fr;
+        grid-auto-columns: 100%;
+      }
+      </style>
     </head>
     <body class="bg-neutral-content min-h-screen">
       ${children}

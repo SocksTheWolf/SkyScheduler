@@ -14,6 +14,8 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <BaseLayout title={title}>
+      <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
+      <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-screen">
         <div class="h-screen hidden sm:flex flex-col px-4 py-6">
           <h1 class="text-lg font-bold">MySky manager</h1>
