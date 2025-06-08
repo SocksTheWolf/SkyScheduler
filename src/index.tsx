@@ -11,7 +11,7 @@ import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
 import { Bindings, Post, PostLabel, EmbedData } from "./types.d";
-import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH } from "./limits.d";
+import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, FILE_SIZE_LIMIT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -86,18 +86,32 @@ app.post("/upload", authMiddleware, async (c) => {
 
   if (!(file instanceof File)) {
     console.warn("Failed to upload", 400);
-    return c.json({"success": false, "msg": "data invalid"});
+    return c.json({"success": false, "error": "data invalid"}, 400);
   }
 
-  // TODO: check file size limits (whatever bsky's file size limit is)
+  // The file size limit for R2 without chunking
+  if (file.size > FILE_SIZE_LIMIT) {
+    return c.json({"success": false, "error": "max file size is 100MB"}, 400);
+  }
+  
   const fileExt = file.name.split(".").pop();
   const fileName = `${uuidv4()}.${fileExt}`;
 
   const R2UploadRes = await c.env.R2.put(fileName, await file.arrayBuffer());
   if (R2UploadRes)
-    return c.json({"success": true, "data": R2UploadRes.key});
+    return c.json({"success": true, "data": R2UploadRes.key, "originalName": file.name}, 200);
   else
-    return c.json({"success": false, "msg": "unable to push to R2"});
+    return c.json({"success": false, "error": "unable to push to R2"}, 501);
+});
+
+// Delete an upload
+app.delete("/upload", authMiddleware, async (c) => {
+  const data = await c.req.json();
+  const fileKey: string = data['key'];
+
+  // this can never fail
+  await c.env.R2.delete(fileKey);
+  return c.json({"success": true}, 200);
 });
 
 // Create post
