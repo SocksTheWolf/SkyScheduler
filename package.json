@@ -16,6 +16,7 @@
     "drizzle-orm": "^0.38.2",
     "hono": "^4.6.14",
     "just-truncate": "^2.2.0",
+    "uuid": "^11.1.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

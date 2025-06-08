@@ -10,7 +10,9 @@ import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
-import { Bindings, Post } from "./types";
+import { Bindings, Post, PostLabel, EmbedData } from "./types.d";
+import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH } from "./limits.d";
+import { v4 as uuidv4 } from 'uuid';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -61,7 +63,12 @@ app.get("/logout", (c) => {
 
 // Schema for post creation
 const createPostSchema = z.object({
-  content: z.string().min(1).max(300),
+  content: z.string().min(MIN_LENGTH).max(MAX_LENGTH),
+  label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
+  embeds: z.object({
+    content: z.string().url(),
+    alt: z.string().max(MAX_ALT_TEXT)
+  }).array().optional(),
   scheduledDate: z.string().refine((date) => {
     try {
       const parsed = new Date(date);
@@ -70,6 +77,24 @@ const createPostSchema = z.object({
       return false;
     }
   }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
+});
+
+// Create upload
+app.post("/upload", authMiddleware, async (c) => {
+  const formData = await c.req.parseBody();
+  const file = formData['file'];
+
+  if (!(file instanceof File)) {
+    console.warn("Failed to upload", 400);
+    return c.json({"success": false, "data": null});
+  }
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${uuidv4()}.${fileExt}`;
+
+  const R2UploadRes = await c.env.R2.put(fileName, await file.arrayBuffer());
+  if (R2UploadRes)
+    return c.json({"success": true, "data": R2UploadRes.key});
+  return c.json({"success": false, "data": null});
 });
 
 // Create post
@@ -82,9 +107,7 @@ app.post("/posts", authMiddleware, async (c) => {
     return c.json({ error: validation.error.format() }, 400);
   }
 
-  // TODO: handle the other content data here like images
-
-  const { content, scheduledDate } = validation.data;
+  const { content, scheduledDate, embeds, label } = validation.data;
   const scheduleDate = new Date(scheduledDate);
 
   // Ensure scheduled date is in the future
@@ -95,6 +118,8 @@ app.post("/posts", authMiddleware, async (c) => {
   await db.insert(posts).values({
     content,
     scheduledDate: scheduleDate,
+    embedContent: embeds,
+    contentLabel: label
   });
 
   return c.json({ message: "Post scheduled successfully" });
@@ -148,12 +173,17 @@ export default {
         return
       }
 
+      const createPost = (data) => {
+          const postData: Post = (new Object() as Post);
+          postData.embeds = data.embedContent;
+          postData.label = data.contentLabel;
+          postData.text = data.content;
+          return postData;
+      }
+
       scheduledPosts.forEach(async (post) => {
         ctx.waitUntil((async () => {
-          const postData = (new Object() as Post);
-          postData.embeds = post.embedContent;
-          postData.label = post.contentLabel;
-          postData.text = post.content;
+          const postData = createPost(post);
           await schedulePost(env, postData);
           await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
         })());

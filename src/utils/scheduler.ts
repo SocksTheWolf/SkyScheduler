@@ -1,10 +1,7 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, PostLabel, EmbedData } from '../types';
+import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
+import { Bindings, Post, PostLabel, EmbedData } from '../types.d';
 import truncate from "just-truncate";
-
-const MAX_LENGTH = 300;
-const MAX_ALT_TEXT = 2000;
-const MAX_EMBEDS = 4;
 
 export const schedulePost = async (env: Bindings, content: Post) => {
   // Post to Bluesky
@@ -72,6 +69,8 @@ export const schedulePost = async (env: Bindings, content: Post) => {
             "image": uploadImg.data.blob, 
             "alt": truncate(currentEmbed.alt, MAX_ALT_TEXT)
           });
+        } else {
+          console.warn(`Could not get the image ${currentEmbed.content} for post!`);
         }
       }
       // Push the embed images into the post record.
