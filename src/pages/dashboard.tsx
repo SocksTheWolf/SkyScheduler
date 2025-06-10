@@ -13,13 +13,13 @@ export default function Homepage() {
             <div class="label">
               <span class="label-text">Content</span>
             </div>
-            <textarea id="content" class="textarea textarea-bordered" rows={40} style="resize: none" placeholder="Post text here" required></textarea>
+            <textarea id="content" class="textarea textarea-bordered" rows={20} style="resize: none" placeholder="Post text here" required></textarea>
           </label>
 
           <div class="label">
             <span class="label-text">Images</span>
           </div>
-          <div class="form-control flex flex-1 h-60 w-full input input-bordered mb-2">
+          <div class="form-control flex h-60 w-full input input-bordered mb-2">
             <div class="h-full w-full gap-2 form-control input" id="imageUploads"></div>
           </div>
 
