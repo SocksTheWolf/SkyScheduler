@@ -54,6 +54,10 @@ export const BaseLayout = ({
       #imgArea {
         z-index: 10;
       }
+
+      .tooLong {
+        color: red;
+      }
       </style>
     </head>
     <body class="bg-neutral-content min-h-screen">

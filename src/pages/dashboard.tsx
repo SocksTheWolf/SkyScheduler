@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import DashboardLayout from "../layout/dashboard-layout";
-import { BSKY_MAX_HEIGHT, BSKY_MAX_WIDTH } from "../limits.d"
+import { BSKY_MAX_HEIGHT, BSKY_MAX_WIDTH, MAX_LENGTH } from "../limits.d"
 
 export default function Homepage() {
   return (
@@ -14,6 +14,7 @@ export default function Homepage() {
               <span class="label-text">Content</span>
             </div>
             <textarea id="content" class="textarea textarea-bordered" rows={20} style="resize: none" placeholder="Post text here" required></textarea>
+            <div id="count">0/{MAX_LENGTH}</div>
           </label>
 
           <div class="label">
@@ -152,11 +153,20 @@ export default function Homepage() {
           showNotification(true);
           fileDropzone.removeFile(file);
         });
-      `}
-      </script>
 
-      <script>
-        {html`
+        // Handle character counting
+        const charCounter = document.getElementById("count");
+        Countable.on(document.getElementById('content'), counter => {
+          charCounter.innerHTML = counter.all + "/" + ${MAX_LENGTH}; 
+          // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
+          // The other thing to note is that this app will attempt to split up long text into a tweet thread for you.
+          if (counter.all > ${MAX_LENGTH}) {
+            charCounter.classList.add('tooLong');
+          } else {
+            charCounter.classList.remove('tooLong');
+          }
+        });
+
         // Handle form submission
         document.getElementById('postForm').addEventListener('submit', async (e) => {
           e.preventDefault();
