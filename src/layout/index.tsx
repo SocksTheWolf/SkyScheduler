@@ -50,6 +50,10 @@ export const BaseLayout = ({
         grid-template-rows: 1fr 1fr;
         grid-auto-columns: 100%;
       }
+
+      #imgArea {
+        z-index: 10;
+      }
       </style>
     </head>
     <body class="bg-neutral-content min-h-screen">

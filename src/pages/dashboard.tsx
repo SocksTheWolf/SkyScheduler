@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import DashboardLayout from "../layout/dashboard-layout";
-import { FILE_SIZE_LIMIT } from "../limits.d"
+import { BSKY_MAX_HEIGHT, BSKY_MAX_WIDTH } from "../limits.d"
 
 export default function Homepage() {
   return (
@@ -19,7 +19,7 @@ export default function Homepage() {
           <div class="label">
             <span class="label-text">Images</span>
           </div>
-          <div class="form-control flex h-60 w-full input input-bordered mb-2">
+          <div class="form-control flex h-60 w-full input input-bordered mb-2" id="imgArea">
             <div class="h-full w-full gap-2 form-control input" id="imageUploads"></div>
           </div>
 
@@ -49,7 +49,7 @@ export default function Homepage() {
           </button>
         </form>
 
-        <div class="toast toast-bottom toast-end">
+        <div class="toast toast-bottom toast-end" onclick="hideAllNotifications()">
           <div id="error" class="alert alert-error text-sm text-white hidden">An error occurred</div>
           <div id="success" class="alert alert-success text-sm text-white hidden">Post scheduled successfully</div>
         </div>
@@ -57,16 +57,38 @@ export default function Homepage() {
 
       <script>
       {html`
+        var notificationTimeout = null;
+        function setErrorText(txt) {
+          document.getElementById('error').textContent = txt;
+        }
+        function hideAllNotifications() {
+          clearTimeout(notificationTimeout);
+          document.getElementById('error').classList.add('hidden');
+          document.getElementById('success').classList.add('hidden');
+        }
+        function showNotification(isError) {
+          clearTimeout(notificationTimeout);
+          if (isError) {
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('success').classList.add('hidden');
+            notificationTimeout = setTimeout(hideAllNotifications, 2000);
+          } else {
+            document.getElementById('success').classList.remove('hidden');
+            document.getElementById('error').classList.add('hidden');
+          }
+        }
+
         let fileData = new Map();
         let fileDropzone = new Dropzone("#imageUploads", { 
           url: "/upload", 
-          maxFilesize: 100, 
           autoProcessQueue: true,
+          resizeWidth: ${BSKY_MAX_WIDTH},
+          resizeHeight: ${BSKY_MAX_HEIGHT},
+          resizeMethod: "contain",
           acceptedFiles: "image/*"
         });
-        fileDropzone.on("addedfile", file => {
-          document.getElementById("content-label-selector").setAttribute("class", "");
 
+        fileDropzone.on("addedfile", file => {
           // Create the remove button
           var removeButton = Dropzone.createElement("<button class='btn-outline btn'>Remove file</button>");
           var addAltText = Dropzone.createElement("<button class='btn-outline btn mr-2'>Add Alt Text</button>");
@@ -75,10 +97,17 @@ export default function Homepage() {
             e.preventDefault();
             e.stopPropagation();
             var askUserData = prompt("What is the alt text?");
-            
-            let existingData = fileData.get(file.name);
-            existingData.alt = askUserData;
-            fileData.set(file.name, existingData);
+            if (askUserData !== "") {
+              console.log("Setting alt data on "+file.name);
+              try {
+                let existingData = fileData.get(file.name);
+                existingData.alt = askUserData;
+                fileData.set(file.name, existingData);
+              } catch(err) {
+                setErrorText("failed to set alt text for image, try again");
+                showNotification(true);
+              }
+            }
           });
 
           // Listen to the click event
@@ -86,7 +115,7 @@ export default function Homepage() {
             // Make sure the button click doesn't submit the form:
             e.preventDefault();
             e.stopPropagation();
-            
+
             // Remove the file
             fetch('/upload', {
                 method: 'DELETE',
@@ -100,8 +129,28 @@ export default function Homepage() {
           file.previewElement.appendChild(removeButton);
         });
         fileDropzone.on("success", function(file, response) {
+          // show the labels
+          document.getElementById("content-label-selector").setAttribute("class", "");
+
+          console.log("Adding "+file.name+" to the fileData map with size: "+response.fileSize+" at quality "+response.qualityLevel);
           fileData.set(file.name, {content: response.data, alt: ""});
+
+          try {
+            // attempt to rewrite the file size value as well
+            // TODO: Attempt to print out quality level as well???
+            file.previewElement.querySelectorAll("[data-dz-size]")[0].innerHTML = fileDropzone.filesize(response.fileSize);
+          }
+          catch (err) {
+            console.error(err);
+          }
+          
           this.createThumbnailFromUrl(file, response.data);
+        });
+
+        fileDropzone.on("error", function(file, msg) {
+          setErrorText("Error: "+file.name+" had error: '"+msg+"'");
+          showNotification(true);
+          fileDropzone.removeFile(file);
         });
       `}
       </script>
@@ -146,18 +195,15 @@ export default function Homepage() {
               // Clear the file data map
               fileData.clear();
               
-              document.getElementById('success').classList.remove('hidden');
-              document.getElementById('error').classList.add('hidden');
+              showNotification(false);
               document.getElementById('postForm').reset();
               loadPosts();
             } else {
-              document.getElementById('error').textContent = data.error?.message || data.error || 'An error occurred';
-              document.getElementById('error').classList.remove('hidden');
-              document.getElementById('success').classList.add('hidden');
+              setErrorText(data.error?.message || data.error || 'An error occurred');
+              showNotification(true);
             }
           } catch (err) {
-            document.getElementById('error').classList.remove('hidden');
-            document.getElementById('success').classList.add('hidden');
+            showNotification(true);
           }
         });
 /*

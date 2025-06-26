@@ -21,6 +21,9 @@ migrations_dir = "migrations"
 binding = "R2"
 bucket_name = "skyembeds"
 
+[images]
+binding = "IMAGES"
+
 [triggers]
 # Schedule cron triggers:
 crons = [ "0 * * * *" ] # at the start of every hour
@@ -28,3 +31,12 @@ crons = [ "0 * * * *" ] # at the start of every hour
 [vars]
 # The username of the account to login as, provided as a var so that it can be modified upon using the deploy with cloudflare button
 BSKY_USERNAME="socksthewolf.com"
+
+# If we should use cf image transforms
+USE_IMAGE_TRANSFORMS=true
+
+# how many image quality steps should we attempt
+MAX_IMAGE_QUALITY_STEPS=6
+
+# how much should the image quality go down per steps
+IMAGE_DEGRADE_PER_STEP=5

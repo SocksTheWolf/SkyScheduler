@@ -12,7 +12,7 @@ import Dashboard from "./pages/dashboard";
 import { schedulePost } from "./utils/scheduler";
 import { deleteFromR2 } from "./utils/postDelete";
 import { Bindings, Post, PostLabel } from "./types.d";
-import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, FILE_SIZE_LIMIT } from "./limits.d";
+import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -93,23 +93,71 @@ const createPostSchema = z.object({
 app.post("/upload", authMiddleware, async (c) => {
   const formData = await c.req.parseBody();
   const file = formData['file'];
+  let finalQualityLevel = 100;
 
   if (!(file instanceof File)) {
     console.warn("Failed to upload", 400);
     return c.json({"success": false, "error": "data invalid"}, 400);
   }
 
+  const originalName = file.name;
+  let finalFileSize = file.size;
+
   // The file size limit for R2 without chunking
-  if (file.size > FILE_SIZE_LIMIT) {
-    return c.json({"success": false, "error": "max file size is 100MB"}, 400);
+  if (file.size > R2_FILE_SIZE_LIMIT) {
+    return c.json({"success": false, "error": `max file size is ${R2_FILE_SIZE_LIMIT * TO_MB}MB`}, 400);
+  }
+
+  let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
+  // If the image is over the file size limit (we will resize the images client side via dropzonejs)
+  if (file.size > BSKY_FILE_SIZE_LIMIT) {
+    let failedToResize = true;
+
+    if (c.env.USE_IMAGE_TRANSFORMS) {
+      const degradePerStep:number = c.env.IMAGE_DEGRADE_PER_STEP;
+      var attempts:number = 1;
+      do {
+        const qualityLevel:number = 100 - degradePerStep*attempts;
+        const response = (
+          await c.env.IMAGES.input(await file.stream())
+            .transform({ quality: qualityLevel, metadata: "copyright" })
+            .output({ format: "image/jpeg" })
+        ).response();
+
+        // Break the responses into two streams so that we can read the data as both an info as well as the actual R2 upload
+        const [infoStream, dataStream] = await response.body.tee();
+
+        // Figure out how big of a transform this was
+        const transformInfo = await c.env.IMAGES.info(infoStream);
+        console.log(`Attempting quality level ${qualityLevel}% for ${file.name}, size: ${transformInfo.fileSize}`);
+
+        // If we make the file size less than the actual limit 
+        if (transformInfo.fileSize < BSKY_FILE_SIZE_LIMIT) {
+          console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
+          failedToResize = false;
+          // Set some extra variables
+          finalQualityLevel = qualityLevel;
+          finalFileSize = transformInfo.fileSize;
+          fileToProcess = dataStream;
+          break;
+        } else {
+          // Print how over the image was if we cannot properly resize it
+          console.log(`${originalName}: file size was ${transformInfo.fileSize} which is ${transformInfo.fileSize - BSKY_FILE_SIZE_LIMIT} over the appropriate size`);
+        }
+        ++attempts;
+      } while (attempts < c.env.MAX_IMAGE_QUALITY_STEPS);
+    }
+
+    if (failedToResize)
+      return c.json({"success": false, "originalName": originalName, "error": `image is too large for bsky, was ${file.size*TO_MB}MB and could not fit after ${c.env.MAX_IMAGE_QUALITY_STEPS} steps`});
   }
   
-  const fileExt = file.name.split(".").pop();
+  const fileExt = originalName.split(".").pop();
   const fileName = `${uuidv4()}.${fileExt}`;
 
-  const R2UploadRes = await c.env.R2.put(fileName, await file.arrayBuffer());
+  const R2UploadRes = await c.env.R2.put(fileName, fileToProcess);
   if (R2UploadRes)
-    return c.json({"success": true, "data": R2UploadRes.key, "originalName": file.name}, 200);
+    return c.json({"success": true, "data": R2UploadRes.key, "originalName": originalName, "qualityLevel": finalQualityLevel, "fileSize": finalFileSize}, 200);
   else
     return c.json({"success": false, "error": "unable to push to R2"}, 501);
 });
