@@ -91,8 +91,8 @@ export default function Homepage() {
 
         fileDropzone.on("addedfile", file => {
           // Create the remove button
-          var removeButton = Dropzone.createElement("<button class='btn-outline btn'>Remove file</button>");
-          var addAltText = Dropzone.createElement("<button class='btn-outline btn mr-2'>Add Alt Text</button>");
+          var removeButton = Dropzone.createElement("<button class='btn-outline btn-error btn' disabled>Remove file</button>");
+          var addAltText = Dropzone.createElement("<button class='btn-outline btn mr-2' disabled>Add Alt Text</button>");
           
           addAltText.addEventListener("click", function(e) {
             e.preventDefault();
@@ -135,6 +135,11 @@ export default function Homepage() {
 
           console.log("Adding "+file.name+" to the fileData map with size: "+response.fileSize+" at quality "+response.qualityLevel);
           fileData.set(file.name, {content: response.data, alt: ""});
+
+          // Make the buttons pressable
+          file.previewElement.querySelectorAll("button").forEach(el => {
+            el.removeAttribute("disabled");
+          });
 
           try {
             // attempt to rewrite the file size value as well

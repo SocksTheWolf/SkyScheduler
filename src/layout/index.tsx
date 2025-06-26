@@ -27,7 +27,7 @@ export const BaseLayout = ({
       }
 
       .dz-preview {
-        width: 20%;
+        width: 100%;
         grid-row: 1;
       }
 
@@ -41,7 +41,7 @@ export const BaseLayout = ({
       }
 
       .dz-preview button {
-        display: block;
+        display: inline-block;
       }
 
       #imageUploads {
