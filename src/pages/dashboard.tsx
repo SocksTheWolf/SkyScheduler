@@ -216,20 +216,13 @@ export default function Homepage() {
             showNotification(true);
           }
         });
-/*
-        // roundup minutes
-        function roundMinutes(date) {
-          const minutes = date.getMinutes();
-          const roundedMinutes = Math.ceil(minutes / 60) * 60;
-          date.setMinutes(roundedMinutes);
-          return date.toISOString().slice(0,16);
-        }
 
+        // rounddown minutes
         document.getElementById('scheduledDate').addEventListener('change', (e) => {
           const date = new Date(e.target.value);
-          e.target.value = roundMinutes(date);
+          date.setMinutes(0 - date.getTimezoneOffset());
+          e.target.value = date.toISOString().slice(0,16);
         });
-*/
         `}
       </script>
     </DashboardLayout>
