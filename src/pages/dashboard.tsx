@@ -71,11 +71,11 @@ export default function Homepage() {
           if (isError) {
             document.getElementById('error').classList.remove('hidden');
             document.getElementById('success').classList.add('hidden');
-            notificationTimeout = setTimeout(hideAllNotifications, 2000);
           } else {
             document.getElementById('success').classList.remove('hidden');
             document.getElementById('error').classList.add('hidden');
           }
+          notificationTimeout = setTimeout(hideAllNotifications, 2000);
         }
 
         let fileData = new Map();
