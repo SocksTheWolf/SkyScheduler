@@ -14,7 +14,7 @@ export default function Homepage() {
               <span class="label-text">Content</span>
             </div>
             <textarea id="content" class="textarea textarea-bordered" rows={20} style="resize: none" placeholder="Post text here" required></textarea>
-            <div id="count">0/{MAX_LENGTH}</div>
+            <div id="count" title="Any submissions with text over 300 characters will be automatically made into a thread with 300 characters per post">0/{MAX_LENGTH}</div>
           </label>
 
           <div class="label">
