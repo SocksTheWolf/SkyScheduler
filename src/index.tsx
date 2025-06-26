@@ -150,7 +150,8 @@ app.post("/upload", authMiddleware, async (c) => {
     }
 
     if (failedToResize)
-      return c.json({"success": false, "originalName": originalName, "error": `image is too large for bsky, was ${file.size*TO_MB}MB and could not fit after ${c.env.MAX_IMAGE_QUALITY_STEPS} steps`});
+      return c.json({"success": false, "originalName": originalName, "error": `image is too large for bsky, size is over by ${file.size - BSKY_FILE_SIZE_LIMIT}MB, 
+          with width ${imageMetaData.width} and height ${imageMetaData.height}`});
   }
   
   const fileExt = originalName.split(".").pop();
