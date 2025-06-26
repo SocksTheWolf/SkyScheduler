@@ -5,7 +5,6 @@ import { z } from "zod";
 import { isAfter } from "date-fns";
 import { getCookie } from 'hono/cookie';
 import { and, eq, lte, desc } from "drizzle-orm";
-
 import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
@@ -109,8 +108,10 @@ app.post("/upload", authMiddleware, async (c) => {
   }
 
   let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
-  // If the image is over the file size limit (we will resize the images client side via dropzonejs)
-  if (file.size > BSKY_FILE_SIZE_LIMIT) {
+  // We need to double check this image for various size information.
+  const imageMetaData = await c.env.IMAGES.info(await file.stream());
+  // If the image is over any bsky limits, we will need to resize it
+  if (file.size > BSKY_FILE_SIZE_LIMIT || imageMetaData.width > BSKY_MAX_WIDTH || imageMetaData.height > BSKY_MAX_HEIGHT) {
     let failedToResize = true;
 
     if (c.env.USE_IMAGE_TRANSFORMS) {
@@ -120,7 +121,7 @@ app.post("/upload", authMiddleware, async (c) => {
         const qualityLevel:number = 100 - degradePerStep*attempts;
         const response = (
           await c.env.IMAGES.input(await file.stream())
-            .transform({ quality: qualityLevel, metadata: "copyright" })
+            .transform({ width: BSKY_MAX_WIDTH, height: BSKY_MAX_HEIGHT, fit: "scale-down", quality: qualityLevel, metadata: "copyright" })
             .output({ format: "image/jpeg" })
         ).response();
 

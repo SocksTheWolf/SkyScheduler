@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import DashboardLayout from "../layout/dashboard-layout";
-import { BSKY_MAX_HEIGHT, BSKY_MAX_WIDTH, MAX_LENGTH } from "../limits.d"
+import { MAX_LENGTH } from "../limits.d"
 
 export default function Homepage() {
   return (
@@ -83,9 +83,6 @@ export default function Homepage() {
         let fileDropzone = new Dropzone("#imageUploads", { 
           url: "/upload", 
           autoProcessQueue: true,
-          resizeWidth: ${BSKY_MAX_WIDTH},
-          resizeHeight: ${BSKY_MAX_HEIGHT},
-          resizeMethod: "contain",
           acceptedFiles: "image/*"
         });
 
