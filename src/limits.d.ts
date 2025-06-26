@@ -10,6 +10,7 @@ export const BSKY_MAX_HEIGHT: number = 2000;
 export const BSKY_FILE_SIZE_LIMIT_IN_MB: number = 1;
 
 export const TO_MB: number = 1024 * 1024;
+export const TO_MiB: number = 1000 * 1000;
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
-export const BSKY_FILE_SIZE_LIMIT: number = BSKY_FILE_SIZE_LIMIT_IN_MB * TO_MB;
+export const BSKY_FILE_SIZE_LIMIT: number = BSKY_FILE_SIZE_LIMIT_IN_MB * TO_MiB;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * TO_MB;
