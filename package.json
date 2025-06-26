@@ -15,16 +15,16 @@
     "@atproto/api": "^0.13.35",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
-    "hono": "^4.7.11",
+    "hono": "^4.8.3",
     "just-truncate": "^2.2.0",
     "uuid": "^11.1.0",
-    "zod": "^3.25.56"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250607.0",
+    "@cloudflare/workers-types": "^4.20250620.0",
     "daisyui": "^4.12.24",
-    "drizzle-kit": "^0.31.1",
+    "drizzle-kit": "^0.31.2",
     "tailwindcss": "^3.4.17",
-    "wrangler": "^4.19.1"
+    "wrangler": "^4.21.2"
   }
 }
