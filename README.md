@@ -1,13 +1,11 @@
-# My Sky
+# SkyScheduler
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/apvarun/my-sky.svg?style=social&label=Stars)](https://github.com/apvarun/my-sky)
-[![GitHub issues](https://img.shields.io/github/issues/apvarun/my-sky.svg)](https://github.com/apvarun/my-sky/issues)
-[![Deploy to Cloudflare Workers](https://img.shields.io/badge/deploy-cloudflare_workers-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/apvarun/my-sky)
+[![Deploy to Cloudflare Workers](https://img.shields.io/badge/deploy-cloudflare_workers-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
 
 ## Overview
 
-My Sky is a lightweight Cloudflare Workers-based application that allows you to schedule posts to your Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
+SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you to schedule posts to your Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
 ## Features
 
@@ -15,6 +13,9 @@ My Sky is a lightweight Cloudflare Workers-based application that allows you to 
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
 - **Free Cloudflare Workers Deployment**: Utilize the free tier for hosting your scheduler
 - **Simple and Lightweight**: Minimal setup and easy to use
+- **Supports media posts**: Automatically handles content tagging and formating your media so that it looks the best on BSky. Image transforms via Cloudflare Images.
+- **Handles threading**: Post is over the 300 character limit? The system will autothread your posts for you
+- **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work.
 
 ## Getting Started
 
@@ -28,8 +29,8 @@ My Sky is a lightweight Cloudflare Workers-based application that allows you to 
 
 1. Clone the repository
 ```bash
-git clone https://github.com/apvarun/my-sky.git
-cd my-sky
+git clone https://github.com/socksthewolf/skyscheduler.git
+cd skyscheduler
 ```
 
 2. Copy environment variables template
@@ -74,7 +75,7 @@ Ensure you have configured the `.dev.vars` file with the necessary credentials a
 ## Project Structure
 
 ```
-my-sky/
+skyscheduler/
 ├── src/
 │   ├── db/
 │   ├── layout/
@@ -96,21 +97,7 @@ We welcome contributions!
 - Report bugs
 - Suggest enhancements
 - Submit pull requests
-- Improve documentation
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Cloudflare Workers
-- Bluesky Social
-
-## Support
-
-If you encounter any problems, please [open an issue](https://github.com/apvarun/my-sky/issues) on GitHub.
-
----
-
-<a href="https://www.buymeacoffee.com/apvarun" target="_blank" rel="noopener"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="40" width="145" alt="Buy Me A Coffee"></a>
