@@ -25,7 +25,14 @@ export enum PostLabel {
 };
 
 export type Post = {
+  postid: string;
+  user: string;
   text: string;
   embeds?: EmbedData[];
   label: PostLabel;
+};
+
+export type PostResponseObject = {
+  uri: string;
+  cid: string;
 };

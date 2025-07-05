@@ -9,7 +9,7 @@ type BaseLayoutProps = {
 
 export const BaseLayout = ({
   children,
-  title = "Social Media Scheduler"
+  title = "SkyScheduler"
 }: BaseLayoutProps) => html`
   <!DOCTYPE html>
   <html>

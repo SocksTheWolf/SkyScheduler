@@ -1,18 +1,13 @@
 import { Context, Env, Hono } from "hono";
-import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { verify, sign } from "hono/jwt";
-import { z } from "zod";
-import { isAfter } from "date-fns";
 import { getCookie } from 'hono/cookie';
-import { and, eq, lte, desc } from "drizzle-orm";
-import { posts } from "./db/schema";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
-import { schedulePost } from "./utils/scheduler";
-import { deleteFromR2 } from "./utils/postDelete";
-import { Bindings, Post, PostLabel } from "./types.d";
-import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "./limits.d";
+import { schedulePostTask } from "./utils/scheduler";
+import { Bindings } from "./types.d";
+import { R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
+import { createPost, deletePost, getPostsForUser } from "./utils/dbQuery";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -33,15 +28,6 @@ async function authMiddleware(c: Context, next: any) {
   } catch (err) {
     return c.json({ error: "Invalid token" }, 401);
   }
-}
-
-// Quick function to help out with creating post objects
-function createPost(data: any) {
-    const postData: Post = (new Object() as Post);
-    postData.embeds = data.embedContent;
-    postData.label = data.contentLabel;
-    postData.text = data.content;
-    return postData;
 }
 
 // Login route
@@ -70,25 +56,7 @@ app.get("/logout", (c) => {
   return c.redirect("/");
 });
 
-// Schema for post creation
-const createPostSchema = z.object({
-  content: z.string().min(MIN_LENGTH).max(MAX_LENGTH),
-  label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
-  embeds: z.object({
-    content: z.string(),
-    alt: z.string().max(MAX_ALT_TEXT)
-  }).array().optional(),
-  scheduledDate: z.string().refine((date) => {
-    try {
-      const parsed = new Date(date);
-      return !isNaN(parsed.getTime());
-    } catch {
-      return false;
-    }
-  }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
-});
-
-// Create upload
+// Create media upload
 app.post("/upload", authMiddleware, async (c) => {
   const formData = await c.req.parseBody();
   const file = formData['file'];
@@ -176,51 +144,23 @@ app.delete("/upload", authMiddleware, async (c) => {
 
 // Create post
 app.post("/posts", authMiddleware, async (c) => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
   const body = await c.req.json();
-
-  const validation = createPostSchema.safeParse(body);
-  if (!validation.success) {
-    return c.json({ error: validation.error.toString() }, 400);
+  const response = await createPost(c.env, body);
+  if (!response.ok) {
+    return c.json({message: response.msg}, 400);
   }
-
-  const { content, scheduledDate, embeds, label } = validation.data;
-  const scheduleDate = new Date(scheduledDate);
-
-  // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, new Date())) {
-    return c.json({ error: "Scheduled date must be in the future" }, 400);
-  }
-
-  await db.insert(posts).values({
-    content,
-    scheduledDate: scheduleDate,
-    embedContent: embeds,
-    contentLabel: label
-  });
-
   return c.json({ message: "Post scheduled successfully" });
 });
 
 // Get all posts
 app.get("/posts", authMiddleware, async (c) => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-  const allPosts = await db.select().from(posts).orderBy(desc(posts.scheduledDate)).all();
-
+  const allPosts = await getPostsForUser(c.env);
   return c.json(allPosts);
 });
 
 app.post("/posts/:id/delete", authMiddleware, async (c) => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
   const { id } = c.req.param();
-
-  const postQuery = await db.select().from(posts).where(eq(posts.id, parseInt(id))).all();
-  // If the post has not been posted, that means we still have files for it, so
-  // delete the files from R2
-  if (!postQuery[0].posted)
-    await deleteFromR2(c.env, createPost(postQuery[0]).embeds);
-
-  await db.delete(posts).where(eq(posts.id, parseInt(id)));
+  await deletePost(c.env, id);
 
   return c.redirect("/dashboard?deleted=true");
 });
@@ -233,38 +173,18 @@ app.get("/", (c) => {
 // Dashboard route
 app.get("/dashboard", authMiddleware, (c) => {
   return c.html(
-    <Dashboard />
+    <Dashboard c={c} />
   );
+});
+
+app.get("/cron", authMiddleware, (c) => {
+  schedulePostTask(c.env, c.executionCtx);
+  return c.text("ran");
 });
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
-    // Cron Task
-    const task = async () => {
-      // Get all scheduled posts for current time
-      const db: DrizzleD1Database = drizzle(env.DB);
-      const currentTime = new Date();
-      // round current time to nearest hour
-      currentTime.setMinutes(0, 0, 0);
-
-      const scheduledPosts = await db.select().from(posts).where(and(lte(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
-
-      if (scheduledPosts.length === 0) {
-        console.log("No scheduled posts found for current time");
-        return
-      }
-
-      scheduledPosts.forEach(async (post) => {
-        ctx.waitUntil((async () => {
-          const postData = createPost(post);
-          await schedulePost(env, postData);
-          await db.update(posts).set({ posted: true }).where(eq(posts.id, post.id));
-          // Delete any embeds if they exist.
-          await deleteFromR2(env, postData.embeds);
-        })());
-      });
-    };
-    ctx.waitUntil(task());
+    ctx.waitUntil(schedulePostTask(env, ctx));
   },
 
   fetch(request: Request, env: Env, ctx: ExecutionContext) {

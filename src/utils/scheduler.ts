@@ -1,7 +1,10 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
-import { Bindings, Post, PostLabel, EmbedData } from '../types.d';
+import { Bindings, Post, PostLabel, EmbedData, PostResponseObject } from '../types.d';
 import truncate from "just-truncate";
+import { getAllPostsForCurrentTime, updatePostData } from './dbQuery';
+import { createPostObject } from './helpers';
+import { deleteFromR2 } from './r2Query';
 
 export const schedulePost = async (env: Bindings, content: Post) => {
   // Post to Bluesky
@@ -9,6 +12,7 @@ export const schedulePost = async (env: Bindings, content: Post) => {
     service: new URL('https://bsky.social'),
   });
 
+  // TODO: Get the user data from the useruuid data field
   await agent.login({
     identifier: env.BSKY_USERNAME,
     password: env.BSKY_PASSWORD,
@@ -26,7 +30,7 @@ export const schedulePost = async (env: Bindings, content: Post) => {
   let currentPost = '';
   let currentPostLength = 0;
   let currentEmbedIndex = 0;
-  const posts = [];
+  const posts:PostResponseObject[] = [];
 
   const postSegment = async (data: string) => {
     let postRecord = {
@@ -110,5 +114,24 @@ export const schedulePost = async (env: Bindings, content: Post) => {
   }
 
   console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);
-  return null;
+  // store the first uri/cid
+  return posts[0];
 }
+
+export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
+  const scheduledPosts = await getAllPostsForCurrentTime(env);
+  if (scheduledPosts.length === 0) {
+    console.log("No scheduled posts found for current time");
+    return;
+  }
+
+  scheduledPosts.forEach(async (post) => {
+    ctx.waitUntil((async () => {
+      const postData = createPostObject(post);
+      const newPost: PostResponseObject = await schedulePost(env, postData);
+      await updatePostData(env, post.uuid, { posted: true, uri: newPost.uri, cid: newPost.cid });
+      // Delete any embeds if they exist.
+      await deleteFromR2(env, postData.embeds);
+    })());
+  });
+};

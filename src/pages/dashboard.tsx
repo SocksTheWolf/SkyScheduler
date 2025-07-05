@@ -1,10 +1,13 @@
 import { html } from "hono/html";
 import DashboardLayout from "../layout/dashboard-layout";
 import { MAX_LENGTH } from "../limits.d"
+import { Context } from "hono";
 
-export default function Homepage() {
+export default function Dashboard(props:any) {
+  const ctx: Context = props.c;
+
   return (
-    <DashboardLayout title="Dashboard - Social Media Scheduler">
+    <DashboardLayout title="Dashboard - SkyScheduler" ctx={ctx}>
       <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(75vh-2rem)] overflow-hidden">
 
         <form id="postForm" class="flex flex-col h-full">
@@ -209,7 +212,8 @@ export default function Homepage() {
               
               showNotification(false);
               document.getElementById('postForm').reset();
-              loadPosts();
+              // TODO: Reload page until react or handler set up?
+              //loadPosts();
             } else {
               setErrorText(data.error?.message || data.error || 'An error occurred');
               showNotification(true);

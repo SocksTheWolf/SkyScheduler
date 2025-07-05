@@ -3,7 +3,7 @@ import { BaseLayout } from "../layout";
 
 export default function Home() {
   return (
-    <BaseLayout title="Login - Social Media Scheduler">
+    <BaseLayout title="Login - SkyScheduler">
       <div class="grid place-items-center min-h-screen">
         <div class="card shadow-2xl bg-white p-8">
           <h1 class="text-2xl font-bold mb-6 text-center">Login to your portal</h1>

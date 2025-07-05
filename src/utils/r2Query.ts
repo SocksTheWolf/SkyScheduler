@@ -1,4 +1,4 @@
-import { Bindings, EmbedData } from '../types.d';
+import { Bindings, EmbedData } from '../types';
 
 export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
   if (embeds !== undefined) {

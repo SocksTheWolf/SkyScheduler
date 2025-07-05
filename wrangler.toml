@@ -13,7 +13,7 @@ head_sampling_rate = 1
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
-database_id = "90717d06-42ff-40de-91fc-f4b450b29600"
+database_id = "cbc2e17c-2715-4da0-adc9-3b072f175798"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
