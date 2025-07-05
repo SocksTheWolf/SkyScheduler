@@ -1,236 +1,30 @@
-import { html } from "hono/html";
-import DashboardLayout from "../layout/dashboard-layout";
-import { MAX_LENGTH } from "../limits.d"
 import { Context } from "hono";
+import PostCreation from "../layout/post";
+import { BaseLayout } from "../layout";
+import { ScheduledPostList } from "../layout/postList";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
 
   return (
-    <DashboardLayout title="Dashboard - SkyScheduler" ctx={ctx}>
-      <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(75vh-2rem)] overflow-hidden">
-
-        <form id="postForm" class="flex flex-col h-full">
-          <h1 class="text-2xl font-bold mb-6">Schedule New Post</h1>
-          <label class="form-control mb-4 flex flex-1 flex-col h-48">
-            <div class="label">
-              <span class="label-text">Content</span>
-            </div>
-            <textarea id="content" class="textarea textarea-bordered" rows={20} style="resize: none" placeholder="Post text here" required></textarea>
-            <div id="count" title="Any submissions with text over 300 characters will be automatically made into a thread with 300 characters per post">0/{MAX_LENGTH}</div>
-          </label>
-
-          <div class="label">
-            <span class="label-text">Images</span>
-          </div>
-          <div class="form-control flex h-60 w-full input input-bordered mb-2" id="imgArea">
-            <div class="h-full w-full gap-2 form-control input" id="imageUploads"></div>
-          </div>
-
-          <div id="content-label-selector" class="hidden">
-            <label class="input input-bordered flex items-center gap-2 mb-2">
-              Content Label
-              <select name="label" id="contentLabels">
-                <option value="None">None</option>
-                <option value="Suggestive">Suggestive</option>
-                <option value="Nudity">Nudity (non-sexual nudity)</option>
-                <option value="Adult">Adult (porn)</option>
-                <option value="Graphic">Graphic Media (gore/violence)</option>
-              </select>
-            </label>
+    <BaseLayout title="Dashboard - SkyScheduler">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-screen">
+        <div class="h-screen hidden sm:flex flex-col px-4 py-6">
+          <h1 class="text-lg font-bold">SkyScheduler manager</h1>
+          <p class="text-sm">Schedule Bluesky posts effortlessly.</p>
+          <br />
+          <div id="posts" class="flex flex-col gap-4 flex-1 px-1 pb-2 overflow-y-auto">
+            <ScheduledPostList ctx={ctx} />
           </div>
 
           <div>
-            <label class="input input-bordered flex items-center gap-2 mb-2">
-              Schedule Date
-              <input type="datetime-local" id="scheduledDate" class="grow" placeholder="" required />
-            </label>
-            <p class="text-sm mb-4 italic px-2 text-base-content">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
+            <a href="/logout" class="btn btn-accent btn-outline btn-sm w-full">Logout</a>
           </div>
-
-          <button type="submit" class="w-full btn btn-primary btn-outline mb-2">
-            Schedule Post
-          </button>
-        </form>
-
-        <div class="toast toast-bottom toast-end" onclick="hideAllNotifications()">
-          <div id="error" class="alert alert-error text-sm text-white hidden">An error occurred</div>
-          <div id="success" class="alert alert-success text-sm text-white hidden">Post scheduled successfully</div>
+        </div>
+        <div class="h-screen md:col-span-2 lg:col-span-3">
+          <PostCreation />
         </div>
       </div>
-
-      <script>
-      {html`
-        var notificationTimeout = null;
-        function setErrorText(txt) {
-          document.getElementById('error').textContent = txt;
-        }
-        function hideAllNotifications() {
-          clearTimeout(notificationTimeout);
-          document.getElementById('error').classList.add('hidden');
-          document.getElementById('success').classList.add('hidden');
-        }
-        function showNotification(isError) {
-          clearTimeout(notificationTimeout);
-          if (isError) {
-            document.getElementById('error').classList.remove('hidden');
-            document.getElementById('success').classList.add('hidden');
-          } else {
-            document.getElementById('success').classList.remove('hidden');
-            document.getElementById('error').classList.add('hidden');
-          }
-          notificationTimeout = setTimeout(hideAllNotifications, 2000);
-        }
-
-        let fileData = new Map();
-        let fileDropzone = new Dropzone("#imageUploads", { 
-          url: "/upload", 
-          autoProcessQueue: true,
-          acceptedFiles: "image/*"
-        });
-
-        fileDropzone.on("addedfile", file => {
-          // Create the remove button
-          var removeButton = Dropzone.createElement("<button class='btn-outline btn-error btn' disabled>Remove file</button>");
-          var addAltText = Dropzone.createElement("<button class='btn-outline btn mr-2' disabled>Add Alt Text</button>");
-          
-          addAltText.addEventListener("click", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var askUserData = prompt("What is the alt text?");
-            if (askUserData !== "") {
-              console.log("Setting alt data on "+file.name);
-              try {
-                let existingData = fileData.get(file.name);
-                existingData.alt = askUserData;
-                fileData.set(file.name, existingData);
-              } catch(err) {
-                setErrorText("failed to set alt text for image, try again");
-                showNotification(true);
-              }
-            }
-          });
-
-          // Listen to the click event
-          removeButton.addEventListener("click", function(e) {
-            // Make sure the button click doesn't submit the form:
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Remove the file
-            fetch('/upload', {
-                method: 'DELETE',
-                body: JSON.stringify({"key": fileData.get(file.name).content })
-            }).then(response => {
-              fileData.delete(file.name);
-              fileDropzone.removeFile(file);
-            });
-          });
-          file.previewElement.appendChild(addAltText);
-          file.previewElement.appendChild(removeButton);
-        });
-        fileDropzone.on("success", function(file, response) {
-          // show the labels
-          document.getElementById("content-label-selector").setAttribute("class", "");
-
-          console.log("Adding "+file.name+" to the fileData map with size: "+response.fileSize+" at quality "+response.qualityLevel);
-          fileData.set(file.name, {content: response.data, alt: ""});
-
-          // Make the buttons pressable
-          file.previewElement.querySelectorAll("button").forEach(el => {
-            el.removeAttribute("disabled");
-          });
-
-          try {
-            // attempt to rewrite the file size value as well
-            // TODO: Attempt to print out quality level as well???
-            file.previewElement.querySelectorAll("[data-dz-size]")[0].innerHTML = fileDropzone.filesize(response.fileSize);
-          }
-          catch (err) {
-            console.error(err);
-          }
-          
-          this.createThumbnailFromUrl(file, response.data);
-        });
-
-        fileDropzone.on("error", function(file, msg) {
-          setErrorText("Error: "+file.name+" had error: '"+msg+"'");
-          showNotification(true);
-          fileDropzone.removeFile(file);
-        });
-
-        // Handle character counting
-        const charCounter = document.getElementById("count");
-        Countable.on(document.getElementById('content'), counter => {
-          charCounter.innerHTML = counter.all + "/" + ${MAX_LENGTH}; 
-          // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
-          // The other thing to note is that this app will attempt to split up long text into a tweet thread for you.
-          if (counter.all > ${MAX_LENGTH}) {
-            charCounter.classList.add('tooLong');
-          } else {
-            charCounter.classList.remove('tooLong');
-          }
-        });
-
-        // Handle form submission
-        document.getElementById('postForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const content = document.getElementById('content').value;
-          const scheduledDate = document.getElementById('scheduledDate').value;
-
-          try {
-            let postObject = {
-                content,
-                scheduledDate: new Date(scheduledDate).toISOString()
-            };
-            // Only handle data here if we have images
-            if (fileData.size > 0) {
-              console.log("parsing images for upload");
-              postObject.embeds = [];
-              fileData.forEach((value, key) => {
-                postObject.embeds.push(value)
-              });
-              postObject.label = document.getElementById("contentLabels").value;
-            }
-
-            const payload = JSON.stringify(postObject);
-            console.log(payload);
-            const response = await fetch('/posts', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json' },
-              body: payload
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-              // Hide the selector
-              document.getElementById("content-label-selector").classList.add("hidden");
-              // Remove all data in the dropzone as well
-              fileDropzone.removeAllFiles();
-              // Clear the file data map
-              fileData.clear();
-              
-              showNotification(false);
-              document.getElementById('postForm').reset();
-              // TODO: Reload page until react or handler set up?
-              //loadPosts();
-            } else {
-              setErrorText(data.error?.message || data.error || 'An error occurred');
-              showNotification(true);
-            }
-          } catch (err) {
-            showNotification(true);
-          }
-        });
-
-        // rounddown minutes
-        document.getElementById('scheduledDate').addEventListener('change', (e) => {
-          const date = new Date(e.target.value);
-          date.setMinutes(0 - date.getTimezoneOffset());
-          e.target.value = date.toISOString().slice(0,16);
-        });
-        `}
-      </script>
-    </DashboardLayout>
+    </BaseLayout>
   );
 }

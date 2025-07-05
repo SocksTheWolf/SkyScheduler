@@ -10,6 +10,10 @@ preview_urls = false
 enabled = true
 head_sampling_rate = 1
 
+[assets]
+directory = "./assets/"
+run_worker_first = false
+
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
