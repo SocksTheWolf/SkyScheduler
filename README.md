@@ -22,7 +22,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 ### Prerequisites
 
 - Node.js (v20.x or later)
-- Package Manager (pnpm)
+- Package Manager (pnpm or npm)
 - Cloudflare Workers account
 
 ### Installation
