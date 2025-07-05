@@ -1,5 +1,5 @@
 {
-  "name": "my-sky",
+  "name": "skyscheduler",
   "scripts": {
     "generate-css": "node scripts/generate-css.mjs",
     "predev": "npm run generate-css",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250620.0",
     "daisyui": "^4.12.24",
-    "drizzle-kit": "^0.31.2",
+    "drizzle-kit": "^0.31.4",
     "tailwindcss": "^3.4.17",
     "wrangler": "^4.21.2"
   }
