@@ -5,13 +5,12 @@
 
 ## Overview
 
-SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you to schedule posts to your Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
+SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
 ## Features
 
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
-- **Free Cloudflare Workers Deployment**: Utilize the free tier for hosting your scheduler
 - **Simple and Lightweight**: Minimal setup and easy to use
 - **Supports media posts**: Automatically handles content tagging and formating your media so that it looks the best on BSky. Image transforms via Cloudflare Images.
 - **Handles threading**: Post is over the 300 character limit? The system will autothread your posts for you
@@ -23,7 +22,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - Node.js (v20.x or later)
 - Package Manager
-- Cloudflare Workers account
+- Cloudflare Pro Workers account
 
 ### Installation
 

@@ -47,8 +47,13 @@ app.all("/api/auth/*", async (c) => {
 
 // proxy the logout call because of course this wouldn't work properly anyways
 app.post("/logout", authMiddleware, async (c) => {
-  const auth = c.get("auth");
-  await auth.api.signOut(c.req.raw);
+  try {
+    const auth = c.get("auth");
+    await auth.api.signOut(c.req.raw);
+  } catch(err) {
+    console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
+  }
+
   // Redirect to home
   c.header("HX-Redirect", "/");
   return c.html("Success");
