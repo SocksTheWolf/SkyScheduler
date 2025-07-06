@@ -37,7 +37,6 @@ export const scheduleRepost = async (env: Bindings, content: Repost) => {
     bWasSuccess = false;
   }
 
-  await agent.logout();
   return bWasSuccess;
 };
 
@@ -155,7 +154,6 @@ export const schedulePost = async (env: Bindings, content: Post) => {
   }
 
   console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);
-  await agent.logout();
   // store the first uri/cid
   return posts[0];
 }
