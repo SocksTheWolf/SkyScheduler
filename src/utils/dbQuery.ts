@@ -32,14 +32,16 @@ export const getPostsForUser = async (c: Context) => {
 export const deletePost = async (env: Bindings, id:string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const postQuery = await db.select().from(posts).where(eq(posts.uuid, id)).all();
-  // If the post has not been posted, that means we still have files for it, so
-  // delete the files from R2
-  if (!postQuery[0].posted)
-    await deleteFromR2(env, createPostObject(postQuery[0]).embeds);
+  if (postQuery.length !== 0) {
+    // If the post has not been posted, that means we still have files for it, so
+    // delete the files from R2
+    if (!postQuery[0].posted)
+      await deleteFromR2(env, createPostObject(postQuery[0]).embeds);
 
-  await db.delete(posts).where(eq(posts.uuid, id));
-
-  // TODO: This also needs to delete any reposted enqueues.
+    await db.delete(posts).where(eq(posts.uuid, id));
+    return true;
+  }
+  return false;
 };
 
 export const createPost = async (c: Context, body:any) => {
@@ -79,6 +81,7 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
   return await db.select().from(posts).where(and(lte(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
 }
 
+// TODO: Test this function to make sure it outputs properly
 export const getAllRepostsForCurrentTime = async (env: Bindings) => {
   // Get all scheduled posts for current time
   const db: DrizzleD1Database = drizzle(env.DB);

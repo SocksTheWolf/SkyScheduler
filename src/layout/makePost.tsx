@@ -7,7 +7,6 @@ export default function PostCreation() {
       <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
       <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
       <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
-      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"></link>
       <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(75vh-2rem)] overflow-hidden">
         <form id="postForm" class="flex flex-col h-full">
           <h1 class="text-2xl font-bold mb-6">Schedule New Post</h1>
@@ -54,7 +53,7 @@ export default function PostCreation() {
           </button>
         </form>
       </div>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+      
       <script>
       {html`
         const MAX_LENGTH=${MAX_LENGTH};

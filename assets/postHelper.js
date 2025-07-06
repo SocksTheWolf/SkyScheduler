@@ -1,12 +1,3 @@
-function pushToast(msg, isSuccess) {
-  Toastify({
-    text: msg,
-    style: {
-      background: isSuccess ? 'green' : 'red'
-    }
-  }).showToast();
-}
-
 let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
   url: "/upload", 

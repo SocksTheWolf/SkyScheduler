@@ -41,7 +41,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             }
         ),
         secret: env?.BETTER_AUTH_SECRET,
-        baseURL: env?.BETTER_AUTH_URL,
+        baseURL: (env?.BETTER_AUTH_URL === "*") ? undefined : env?.BETTER_AUTH_URL,
         user: {
           additionalFields: {
             bskyAppPass: {
