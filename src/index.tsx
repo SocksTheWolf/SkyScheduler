@@ -21,7 +21,7 @@ const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 ///// Inline Middleware /////
 // CORS configuration for auth routes
 app.use("/api/auth/**", async (c, next) => {
-    const middleware = cors({
+  const middleware = cors({
       origin: c.env.BETTER_AUTH_URL,
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS"],
@@ -34,15 +34,24 @@ app.use("/api/auth/**", async (c, next) => {
 
 // Middleware to initialize auth instance for each request
 app.use("*", async (c, next) => {
-    const auth = createAuth(c.env, (c.req.raw as any).cf || {});
-    c.set("auth", auth);
-    await next();
+  const auth = createAuth(c.env, (c.req.raw as any).cf || {});
+  c.set("auth", auth);
+  await next();
 });
 
-// Handle auth for all betterauth as well.
-app.all("/api/auth/*", async c => {
-    const auth = c.get("auth");
-    return auth.handler(c.req.raw);
+// Handle auth for all better auth as well.
+app.all("/api/auth/*", async (c) => {
+  const auth = c.get("auth");
+  return auth.handler(c.req.raw);
+});
+
+// proxy the logout call because of course this wouldn't work properly anyways
+app.post("/logout", authMiddleware, async (c) => {
+  const auth = c.get("auth");
+  await auth.api.signOut(c.req.raw);
+  // Redirect to home
+  c.header("HX-Redirect", "/");
+  return c.html("Success");
 });
 
 // Create media upload
@@ -127,7 +136,7 @@ app.get("/start", async (c) => {
       bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
     }
   });
-  return c.html("finished");
+  return c.redirect("/");
 })
 
 export default {
