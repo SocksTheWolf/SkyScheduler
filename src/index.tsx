@@ -4,10 +4,12 @@ import { auth, createAuth } from "./auth";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePostTask } from "./utils/scheduler";
-import { Bindings } from "./types.d";
+import { Bindings, Post } from "./types.d";
 import { R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
-import { createPost, deletePost, doesAdminExist, getPostsForUser } from "./utils/dbQuery";
+import { createPost, deletePost, doesAdminExist, getPostById, getPostsForUser } from "./utils/dbQuery";
+import { createPostObject } from "./utils/helpers";
+import { makePost } from "./utils/bskyApi";
 
 type Variables = {
     auth: ReturnType<typeof createAuth>;
@@ -154,6 +156,12 @@ app.post("/posts", authMiddleware, async (c) => {
   const response = await createPost(c, body);
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
+  } else if (response.postNow) {
+    const postInfo = await getPostById(c.env, response.postId);
+    const postResponse = await makePost(c.env, createPostObject(postInfo[0]));
+    if (postResponse === false) {
+      return c.json({message: "Failed to post content immediately..."}, 400);
+    }
   }
   return c.json({ message: "Post scheduled successfully" });
 });
@@ -195,7 +203,7 @@ app.get("/start", async (c) => {
   const data = await c.get("auth").api.signUpEmail({
     body: {
       name: "admin",
-      email: "admin@admin.tld",
+      email: `${c.env.DEFAULT_ADMIN_USER}@skyscheduler.tld`,
       username: c.env.DEFAULT_ADMIN_USER,
       password: c.env.DEFAULT_ADMIN_PASS,
       bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS

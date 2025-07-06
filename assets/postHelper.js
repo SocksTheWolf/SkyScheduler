@@ -114,11 +114,13 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const content = document.getElementById('content').value;
   const scheduledDate = document.getElementById('scheduledDate').value;
+  const postNow = document.getElementById('postNow').checked;
 
   try {
     let postObject = {
         content,
-        scheduledDate: new Date(scheduledDate).toISOString()
+        scheduledDate: new Date(scheduledDate).toISOString(),
+        makePostNow: postNow
     };
     // Only handle data here if we have images
     if (fileData.size > 0) {

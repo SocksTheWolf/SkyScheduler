@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import PostCreation from "../layout/post";
+import PostCreation from "../layout/makePost";
 import { BaseLayout } from "../layout";
 import { ScheduledPostList } from "../layout/postList";
 

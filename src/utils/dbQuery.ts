@@ -49,11 +49,11 @@ export const createPost = async (c: Context, body:any) => {
     return { ok: false, msg: validation.error.toString() };
   }
 
-  const { content, scheduledDate, embeds, label } = validation.data;
+  const { content, scheduledDate, embeds, label, makePostNow } = validation.data;
   const scheduleDate = new Date(scheduledDate);
 
   // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, new Date())) {
+  if (!isAfter(scheduleDate, new Date()) && !makePostNow) {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 
@@ -66,7 +66,7 @@ export const createPost = async (c: Context, body:any) => {
     contentLabel: label,
     userId: c.get("user").id
   });
-  return { ok: true };
+  return { ok: true, postNow: makePostNow, postId: postUUID };
 };
 
 export const getAllPostsForCurrentTime = async (env: Bindings) => {
@@ -93,6 +93,11 @@ export const getAllRepostsForCurrentTime = async (env: Bindings) => {
 export const updatePostData = async (env: Bindings, id: string, newData:Object) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   await db.update(posts).set(newData).where(eq(posts.uuid, id));
+}
+
+export const getPostById = async(env: Bindings, id: string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  return await db.select().from(posts).where(eq(posts.uuid, id)).limit(1).all();
 }
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {

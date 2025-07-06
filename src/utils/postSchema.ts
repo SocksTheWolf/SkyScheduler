@@ -10,6 +10,7 @@ export const PostSchema = z.object({
     content: z.string(),
     alt: z.string().max(MAX_ALT_TEXT)
   }).array().optional(),
+  makePostNow: z.boolean().default(false),
   scheduledDate: z.string().refine((date) => {
     try {
       const parsed = new Date(date);

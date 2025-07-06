@@ -42,6 +42,8 @@ export default function PostCreation() {
             <label class="input input-bordered flex items-center gap-2 mb-2">
               Schedule Date
               <input type="datetime-local" id="scheduledDate" class="grow" placeholder="" required />
+              Make Post Now?
+              <input type="checkbox" class="grow" id="postNow" />
             </label>
             <p class="text-sm mb-4 italic px-2 text-base-content">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
           </div>
