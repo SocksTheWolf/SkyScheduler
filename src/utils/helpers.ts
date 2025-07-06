@@ -1,4 +1,4 @@
-import { Post } from "../types";
+import { Post, Repost } from "../types";
 
 export function createPostObject(data: any) {
     const postData: Post = (new Object() as Post);
@@ -9,3 +9,11 @@ export function createPostObject(data: any) {
     postData.text = data.content;
     return postData;
 }
+
+export function createRepostObject(data: any) {
+    const repostObj: Repost = (new Object() as Repost);
+    repostObj.cid = data.cid;
+    repostObj.uri = data.uri;
+    repostObj.userId = data.userId;
+    return repostObj;
+};

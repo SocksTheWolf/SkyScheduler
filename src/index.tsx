@@ -1,60 +1,66 @@
 import { Context, Env, Hono } from "hono";
-import { verify, sign } from "hono/jwt";
-import { getCookie } from 'hono/cookie';
+import { cors } from "hono/cors";
+import { auth, createAuth } from "./auth";
 import Home from "./pages/homepage";
 import Dashboard from "./pages/dashboard";
 import { schedulePostTask } from "./utils/scheduler";
 import { Bindings } from "./types.d";
 import { R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "./limits.d";
 import { v4 as uuidv4 } from 'uuid';
-import { createPost, deletePost, getPostsForUser } from "./utils/dbQuery";
+import { createPost, deletePost, doesAdminExist, getPostsForUser } from "./utils/dbQuery";
 
-const app = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+    auth: ReturnType<typeof createAuth>;
+};
 
-// Middleware to verify JWT
-async function authMiddleware(c: Context, next: any) {
-  const token = getCookie(c, 'token');
+const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
-  if (!token) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
+// CORS configuration for auth routes
+app.use(
+    "/api/auth/**",
+    cors({
+        origin: "*", // In production, replace with your actual domain
+        allowHeaders: ["Content-Type", "Authorization"],
+        allowMethods: ["POST", "GET", "OPTIONS"],
+        exposeHeaders: ["Content-Length"],
+        maxAge: 600,
+        credentials: true,
+    })
+);
 
-  try {
-    await verify(
-      token,
-      c.env.JWT_SECRET
-    );
+// Middleware to initialize auth instance for each request
+app.use("*", async (c, next) => {
+    const auth = createAuth(c.env, (c.req.raw as any).cf || {});
+    c.set("auth", auth);
     await next();
-  } catch (err) {
-    return c.json({ error: "Invalid token" }, 401);
+});
+
+app.all("/api/auth/*", async c => {
+    const auth = c.get("auth");
+    return auth.handler(c.req.raw);
+});
+
+// Middleware to verify authentication
+async function authMiddleware(c: Context, next: any) {
+  const auth = c.get("auth");
+  try {
+    const session = await auth.api.getSession({
+      headers: c.req.raw.headers
+    });
+    if (session?.session && session?.user) {
+      c.set("user", session.user);
+      c.set("session", session.session);
+      await next();
+      return;
+    }
   }
+  catch (err) {
+    console.error(`Failed to process authentication, got err: ${err}`);
+  }
+  c.set("user", null);
+  c.set("session", null);
+  return c.json({ error: "Unauthorized" }, 401);
 }
-
-// Login route
-app.post("/login", async (c) => {
-  const body = await c.req.json();
-  const password = body.password;
-
-  if (password !== c.env.AUTH_PASSWORD) {
-    return c.json({ error: "Invalid password" }, 401);
-  }
-
-  const payload = {
-    role: 'admin',
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // Token expires in 24h
-  }
-
-  const token = await sign(payload, c.env.JWT_SECRET, "HS256")
-
-  // Set JWT as an HTTP-only cookie
-  c.header("Set-Cookie", `token=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=86400`);
-  return c.json({ success: true });
-});
-
-app.get("/logout", (c) => {
-  c.header("Set-Cookie", `token=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0`);
-  return c.redirect("/");
-});
 
 // Create media upload
 app.post("/upload", authMiddleware, async (c) => {
@@ -145,7 +151,7 @@ app.delete("/upload", authMiddleware, async (c) => {
 // Create post
 app.post("/posts", authMiddleware, async (c) => {
   const body = await c.req.json();
-  const response = await createPost(c.env, body);
+  const response = await createPost(c, body);
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
   }
@@ -154,7 +160,7 @@ app.post("/posts", authMiddleware, async (c) => {
 
 // Get all posts
 app.get("/posts", authMiddleware, async (c) => {
-  const allPosts = await getPostsForUser(c.env);
+  const allPosts = await getPostsForUser(c);
   return c.json(allPosts);
 });
 
@@ -181,6 +187,22 @@ app.get("/cron", authMiddleware, (c) => {
   schedulePostTask(c.env, c.executionCtx);
   return c.text("ran");
 });
+
+app.get("/start", async (c) => {
+  if (await doesAdminExist(c))
+    return c.html("not found", 404);
+
+  const data = await c.get("auth").api.signUpEmail({
+    body: {
+      name: "admin",
+      email: "admin@admin.tld",
+      username: c.env.DEFAULT_ADMIN_USER,
+      password: c.env.DEFAULT_ADMIN_PASS,
+      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
+    }
+  });
+  return c.html("finished");
+})
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {

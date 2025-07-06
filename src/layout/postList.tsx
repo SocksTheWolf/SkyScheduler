@@ -46,7 +46,7 @@ type ScheduledPostListProps = {
 
 export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
-    const response:Object[]|null = await getPostsForUser(ctx?.env);
+    const response:Object[]|null = await getPostsForUser(ctx);
     if (response !== null) {
       if (response.length > 0) {
         return (

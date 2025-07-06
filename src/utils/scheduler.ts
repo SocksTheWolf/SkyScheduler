@@ -1,10 +1,45 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
-import { Bindings, Post, PostLabel, EmbedData, PostResponseObject } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject } from '../types.d';
 import truncate from "just-truncate";
-import { getAllPostsForCurrentTime, updatePostData } from './dbQuery';
-import { createPostObject } from './helpers';
+import { getAllPostsForCurrentTime, updatePostData, getBskyUserPassForId, getAllRepostsForCurrentTime } from './dbQuery';
+import { createPostObject, createRepostObject } from './helpers';
 import { deleteFromR2 } from './r2Query';
+
+export const scheduleRepost = async (env: Bindings, content: Repost) => {
+  let bWasSuccess = true;
+  const agent = new AtpAgent({
+    service: new URL('https://bsky.social'),
+  });
+
+  const loginCreds = await getBskyUserPassForId(env, content.userId);
+  const {user, pass} = loginCreds[0];
+  if (user === null || pass === null) {
+    console.error(`The username/pass for userid ${content.userId} is invalid!`);
+    return false;
+  }
+
+  await agent.login({
+    identifier: user,
+    password: pass,
+  });
+
+  try {
+    await agent.deleteRepost(content.uri);
+  } catch(err) {
+    console.error(`failed to unrepost post, may have never been reposted originally ${err}`);
+  }
+  
+  try {
+    await agent.repost(content.uri, content.cid);
+  } catch(err) {
+    console.error(`Failed to repost, got error ${err}`);
+    bWasSuccess = false;
+  }
+
+  await agent.logout();
+  return bWasSuccess;
+};
 
 export const schedulePost = async (env: Bindings, content: Post) => {
   // Post to Bluesky
@@ -12,10 +47,16 @@ export const schedulePost = async (env: Bindings, content: Post) => {
     service: new URL('https://bsky.social'),
   });
 
-  // TODO: Get the user data from the useruuid data field
+  const loginCreds = await getBskyUserPassForId(env, content.user);
+  const {user, pass} = loginCreds[0];
+  if (user === null || pass === null) {
+    console.error(`The username/pass for userid ${content.user} is invalid!`);
+    return null;
+  }
+
   await agent.login({
-    identifier: env.BSKY_USERNAME,
-    password: env.BSKY_PASSWORD,
+    identifier: user,
+    password: pass,
   });
 
   const rt = new RichText({
@@ -114,24 +155,41 @@ export const schedulePost = async (env: Bindings, content: Post) => {
   }
 
   console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);
+  await agent.logout();
   // store the first uri/cid
   return posts[0];
 }
 
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts = await getAllPostsForCurrentTime(env);
-  if (scheduledPosts.length === 0) {
-    console.log("No scheduled posts found for current time");
-    return;
+  const scheduledReposts = await getAllRepostsForCurrentTime(env);
+
+  // Push any posts
+  if (scheduledPosts.length !== 0) {
+    scheduledPosts.forEach(async (post) => {
+      ctx.waitUntil((async () => {
+        const postData: Post = createPostObject(post);
+        const newPost: PostResponseObject|null = await schedulePost(env, postData);
+        if (newPost !== null) {
+          await updatePostData(env, post.uuid, { posted: true, uri: newPost.uri, cid: newPost.cid });
+          // Delete any embeds if they exist.
+          await deleteFromR2(env, postData.embeds);
+        }
+      })());
+    });
   }
 
-  scheduledPosts.forEach(async (post) => {
-    ctx.waitUntil((async () => {
-      const postData = createPostObject(post);
-      const newPost: PostResponseObject = await schedulePost(env, postData);
-      await updatePostData(env, post.uuid, { posted: true, uri: newPost.uri, cid: newPost.cid });
-      // Delete any embeds if they exist.
-      await deleteFromR2(env, postData.embeds);
-    })());
-  });
+  // Push any reposts
+  if (scheduledReposts.length !== 0) {
+    scheduledReposts.forEach(async (post) => {
+      ctx.waitUntil((async () => {
+        const postData: Repost = createRepostObject(post);
+        const success = await scheduleRepost(env, postData);
+        if (success) {
+          // TODO: Delete the pending reposts from d1, needs a better way to track it, smh
+        }
+      })());
+    });
+  }
+
 };

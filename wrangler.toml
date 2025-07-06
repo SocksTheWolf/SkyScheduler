@@ -17,13 +17,17 @@ run_worker_first = false
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
-database_id = "cbc2e17c-2715-4da0-adc9-3b072f175798"
+database_id = "5553e724-4dfb-4771-9c08-3584da5855d1"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "skyembeds"
+
+[[kv_namespaces]]
+binding = "SKYSCHEDULER_KV"
+id = "0ecd892014ac47eea38c72be94586e7b"
 
 [images]
 binding = "IMAGES"
@@ -33,8 +37,8 @@ binding = "IMAGES"
 crons = [ "0 * * * *" ] # at the start of every hour
 
 [vars]
-# The username of the account to login as, provided as a var so that it can be modified upon using the deploy with cloudflare button
-BSKY_USERNAME="socksthewolf.com"
+# Where the auth endpoint is by default
+BETTER_AUTH_URL=""
 
 # If we should use cf image transforms
 USE_IMAGE_TRANSFORMS=true

@@ -1,11 +1,11 @@
-export type Bindings = {
+export interface Bindings {
   DB: D1Database;
   R2: R2Bucket;
-  IMAGES: Images;
-  JWT_SECRET: string;
-  AUTH_PASSWORD: string;
-  BSKY_USERNAME: string;
-  BSKY_PASSWORD: string;
+  KV: KVNamespace;
+  IMAGES: Images;  
+  DEFAULT_ADMIN_USER: string;
+  DEFAULT_ADMIN_PASS: string;
+  DEFAULT_ADMIN_BSKY_PASS: string;
   USE_IMAGE_TRANSFORMS: boolean;
   MAX_IMAGE_QUALITY_STEPS: number;
   IMAGE_DEGRADE_PER_STEP: number;
@@ -31,6 +31,12 @@ export type Post = {
   embeds?: EmbedData[];
   label: PostLabel;
 };
+
+export type Repost = {
+  uri: string;
+  cid: string;
+  userId: string;
+}
 
 export type PostResponseObject = {
   uri: string;

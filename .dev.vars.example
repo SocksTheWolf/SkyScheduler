@@ -1,4 +1,2 @@
-AUTH_PASSWORD=login-password-you-prefer
-JWT_SECRET=random-jwt-secret-token-here
-BSKY_USERNAME=
-BSKY_PASSWORD=
+BETTER_AUTH_SECRET=a-secret-for-better-auth
+BETTER_AUTH_URL=http://127.0.0.1:8787/

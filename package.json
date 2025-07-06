@@ -6,6 +6,9 @@
     "dev": "wrangler dev --live-reload",
     "predeploy": "npm run generate-css",
     "deploy": "wrangler deploy --minify",
+    "auth": "npm run auth:generate && npm run auth:format",
+    "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
+    "auth:format": "npx prettier --write src/db/auth.schema.ts",
     "generate": "drizzle-kit generate",
     "migrate:local": "wrangler d1 migrations apply skyposts --local",
     "migrate:prod": "wrangler d1 migrations apply skyposts --remote",
@@ -13,6 +16,8 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.35",
+    "better-auth": "^1.2.12",
+    "better-auth-cloudflare": "^0.2.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
     "hono": "^4.8.3",
@@ -24,6 +29,8 @@
     "@cloudflare/workers-types": "^4.20250620.0",
     "daisyui": "^4.12.24",
     "drizzle-kit": "^0.31.4",
+    "prettier": "^3.6.2",
+    "run-p": "^0.0.0",
     "tailwindcss": "^3.4.17",
     "wrangler": "^4.21.2"
   }

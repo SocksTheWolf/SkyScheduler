@@ -10,6 +10,11 @@ export default function Home() {
           <form id="loginForm" class="space-y-4">
 
             <label class="input input-bordered flex items-center gap-2 mb-4">
+              Bluesky Handle
+              <input type="text" id="username" class="grow" placeholder="" />
+            </label>
+
+            <label class="input input-bordered flex items-center gap-2 mb-4">
               Password
               <input type="password" id="password" class="grow" placeholder="" />
             </label>
@@ -26,23 +31,25 @@ export default function Home() {
         {html`
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
           e.preventDefault();
+          const username = document.getElementById('username').value;
           const password = document.getElementById('password').value;
           try {
-            const response = await fetch('/login', {
+            const response = await fetch('/api/auth/sign-in/username', {
               method: 'POST',
               headers: {'Content-Type': 'application/json' },
-              body: JSON.stringify({ password })
+              body: JSON.stringify({ "username": username, "password": password })
             });
 
             const data = await response.json();
             if (response.ok) {
               window.location.href = '/dashboard';
             } else {
-              document.getElementById('error').textContent = data.error;
+              document.getElementById('error').textContent = data.message;
               document.getElementById('error').classList.remove('hidden');
             }
           } catch (err) {
             document.getElementById('error').textContent = 'An error occurred';
+            console.error(err);
             document.getElementById('error').classList.remove('hidden');
           }
         });
