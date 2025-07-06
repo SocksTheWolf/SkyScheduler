@@ -16,17 +16,17 @@ type Variables = {
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
 // CORS configuration for auth routes
-app.use(
-    "/api/auth/**",
-    cors({
-        origin: "*", // In production, replace with your actual domain
-        allowHeaders: ["Content-Type", "Authorization"],
-        allowMethods: ["POST", "GET", "OPTIONS"],
-        exposeHeaders: ["Content-Length"],
-        maxAge: 600,
-        credentials: true,
-    })
-);
+app.use("/api/auth/**", async (c, next) => {
+    const middleware = cors({
+      origin: c.env.BETTER_AUTH_URL,
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["POST", "GET", "OPTIONS"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
+      credentials: true,
+  });
+  return middleware(c, next);
+});
 
 // Middleware to initialize auth instance for each request
 app.use("*", async (c, next) => {

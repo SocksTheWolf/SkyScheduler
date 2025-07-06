@@ -40,6 +40,8 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
                 },
             }
         ),
+        secret: env?.BETTER_AUTH_SECRET,
+        baseURL: env?.BETTER_AUTH_URL,
         user: {
           additionalFields: {
             bskyAppPass: {
@@ -54,7 +56,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             enabled: false
           }
         },
-                // Only add database adapter for CLI schema generation
+        // Only add database adapter for CLI schema generation
         ...(env
             ? {}
             : {

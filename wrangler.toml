@@ -37,8 +37,9 @@ binding = "IMAGES"
 crons = [ "0 * * * *" ] # at the start of every hour
 
 [vars]
-# Where the auth endpoint is by default
-BETTER_AUTH_URL=""
+# the domain and protocol that this application is hosted on
+# this value is also used for CORS
+BETTER_AUTH_URL="https://skyscheduler.socks-c56.workers.dev"
 
 # If we should use cf image transforms
 USE_IMAGE_TRANSFORMS=true

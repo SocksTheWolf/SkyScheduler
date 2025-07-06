@@ -9,6 +9,8 @@ export interface Bindings {
   USE_IMAGE_TRANSFORMS: boolean;
   MAX_IMAGE_QUALITY_STEPS: number;
   IMAGE_DEGRADE_PER_STEP: number;
+  BETTER_AUTH_SECRET: string;
+  BETTER_AUTH_URL: string;
 };
 
 export type EmbedData = {
