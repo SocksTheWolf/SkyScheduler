@@ -12,6 +12,7 @@ export default function Dashboard(props:any) {
         <div class="h-screen hidden sm:flex flex-col px-4 py-6">
           <h1 class="text-lg font-bold">SkyScheduler manager</h1>
           <p class="text-sm">Schedule Bluesky posts effortlessly.</p>
+          <button id="refresh-posts" hx-get="/refresh" hx-target="#posts" hx-swap="innerHTML" hx-trigger="click">Refresh Posts</button>
           <br />
           <div id="posts" class="flex flex-col gap-4 flex-1 px-1 pb-2 overflow-y-auto">
             <ScheduledPostList ctx={ctx} />

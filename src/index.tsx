@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createPost, deletePost, doesAdminExist, getPostById, getPostsForUser } from "./utils/dbQuery";
 import { createPostObject } from "./utils/helpers";
 import { makePost } from "./utils/bskyApi";
+import { ScheduledPostList } from "./layout/postList";
 
 type Variables = {
     auth: ReturnType<typeof createAuth>;
@@ -151,7 +152,7 @@ app.delete("/upload", authMiddleware, async (c) => {
 });
 
 // Create post
-app.post("/posts", authMiddleware, async (c) => {
+app.post("/post", authMiddleware, async (c) => {
   const body = await c.req.json();
   const response = await createPost(c, body);
   if (!response.ok) {
@@ -172,7 +173,8 @@ app.get("/posts", authMiddleware, async (c) => {
   return c.json(allPosts);
 });
 
-app.post("/posts/:id/delete", authMiddleware, async (c) => {
+// delete a post
+app.post("/post/:id/delete", authMiddleware, async (c) => {
   const { id } = c.req.param();
   await deletePost(c.env, id);
 
@@ -188,6 +190,12 @@ app.get("/", (c) => {
 app.get("/dashboard", authMiddleware, (c) => {
   return c.html(
     <Dashboard c={c} />
+  );
+});
+
+app.get("/refresh", authMiddleware, async (c) => {
+  return c.html(
+    <ScheduledPostList ctx={c} />
   );
 });
 

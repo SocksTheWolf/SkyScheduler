@@ -1,22 +1,10 @@
-var notificationTimeout = null;
-function setErrorText(txt) {
-  document.getElementById('error').textContent = txt;
-}
-function hideAllNotifications() {
-  clearTimeout(notificationTimeout);
-  document.getElementById('error').classList.add('hidden');
-  document.getElementById('success').classList.add('hidden');
-}
-function showNotification(isError) {
-  clearTimeout(notificationTimeout);
-  if (isError) {
-    document.getElementById('error').classList.remove('hidden');
-    document.getElementById('success').classList.add('hidden');
-  } else {
-    document.getElementById('success').classList.remove('hidden');
-    document.getElementById('error').classList.add('hidden');
-  }
-  notificationTimeout = setTimeout(hideAllNotifications, 2000);
+function pushToast(msg, isSuccess) {
+  Toastify({
+    text: msg,
+    style: {
+      background: isSuccess ? 'green' : 'red'
+    }
+  }).showToast();
 }
 
 let fileData = new Map();
@@ -42,8 +30,7 @@ fileDropzone.on("addedfile", file => {
         existingData.alt = askUserData;
         fileData.set(file.name, existingData);
       } catch(err) {
-        setErrorText("failed to set alt text for image, try again");
-        showNotification(true);
+        pushToast("failed to set alt text for image, try again", false);
       }
     }
   });
@@ -91,8 +78,7 @@ fileDropzone.on("success", function(file, response) {
 });
 
 fileDropzone.on("error", function(file, msg) {
-  setErrorText("Error: "+file.name+" had error: '"+msg+"'");
-  showNotification(true);
+  pushToast("Error: "+file.name+" had error: '"+msg+"'", false);
   fileDropzone.removeFile(file);
 });
 
@@ -133,14 +119,13 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     }
 
     const payload = JSON.stringify(postObject);
-    console.log(payload);
-    const response = await fetch('/posts', {
+    const response = await fetch('/post', {
       method: 'POST',
       headers: {'Content-Type': 'application/json' },
       body: payload
     });
     const data = await response.json();
-
+    
     if (response.ok) {
       // Hide the selector
       document.getElementById("content-label-selector").classList.add("hidden");
@@ -149,16 +134,20 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       // Clear the file data map
       fileData.clear();
       
-      showNotification(false);
+      if (postNow) {
+        pushToast("Post created!", true);
+      } else {
+        pushToast("Scheduled post successfully!", true);
+      }
+      
       document.getElementById('postForm').reset();
       // TODO: Reload page until react or handler set up?
-      //loadPosts();
+      document.getElementById("refresh-posts").click();
     } else {
-      setErrorText(data.error?.message || data.error || 'An error occurred');
-      showNotification(true);
+      pushToast(data.error?.message || data.error || data.message || 'An error occurred', false);
     }
   } catch (err) {
-    showNotification(true);
+    pushToast("An error occurred", false);
   }
 });
 
