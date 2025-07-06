@@ -5,6 +5,10 @@ let fileDropzone = new Dropzone("#imageUploads", {
   acceptedFiles: "image/*"
 });
 
+fileDropzone.on("reset", () => {
+  document.getElementById("content-label-selector").classList.add("hidden");
+});
+
 fileDropzone.on("addedfile", file => {
   // Create the remove button
   var removeButton = Dropzone.createElement("<button class='btn-outline btn-error btn' disabled>Remove file</button>");

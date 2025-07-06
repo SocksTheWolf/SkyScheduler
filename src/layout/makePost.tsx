@@ -38,13 +38,17 @@ export default function PostCreation() {
             </label>
           </div>
 
-          <div>
-            <label class="input input-bordered flex items-center gap-2 mb-2">
-              Schedule Date
-              <input type="datetime-local" id="scheduledDate" class="grow" placeholder="" required />
-              Make Post Now?
-              <input type="checkbox" class="grow" id="postNow" />
-            </label>
+          <div class="vstack">
+            <div class="hstack gap-3 input input-bordered flex items-center mb-2">
+              <label>
+                Schedule Date
+                <input type="datetime-local" id="scheduledDate" class="grow" placeholder="" required />
+              </label>
+              <label class="ms-auto">
+                Make Post Now?
+                <input type="checkbox" class="ml-3 grow" id="postNow" />
+              </label>
+            </div>
             <p class="text-sm mb-4 italic px-2 text-base-content">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
           </div>
 
