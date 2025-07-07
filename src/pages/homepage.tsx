@@ -14,11 +14,13 @@ export default function Home() {
             <label>
               Bluesky Handle
               <input type="text" id="username" placeholder="" />
+              <small>In the format of a custom domain or <code>socksthewolf.bsky.social</code></small>
             </label>
 
             <label>
-              Password
+              Dashboard Password
               <input type="password" id="password" placeholder="" />
+              <small><b>NOTE</b>: This is not a bsky app password!</small>
             </label>
 
             <button type="submit" class="w-full">

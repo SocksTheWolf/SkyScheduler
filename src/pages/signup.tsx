@@ -14,21 +14,25 @@ export default function Signup() {
             <label>
               Dashboard Password
               <input type="password" name="password" placeholder="" required />
+              <small>This is not your bsky app password, but a new password you'll use to login to the tool.</small>
             </label>
 
             <label>
               Bluesky Handle
               <input type="text" name="username" placeholder="" required />
+              <small>This is your bsky username, like <code>socksthewolf.bsky.social</code></small>
             </label>
 
             <label>
               App Password
               <input type="password" name="bskyAppPassword" placeholder="" required />
+              <small>If you need an app password, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a></small>
             </label>
 
             <label>
               Invite Key
               <input type="text" name="signupToken" placeholder="" required />
+              <small>This is an invite key to try to dissuade bots. You can ask for the maintainer's signup token</small>
             </label>
 
             <button type="submit" class="w-full">
@@ -37,9 +41,9 @@ export default function Signup() {
           </form>
           <footer>
             <center>
-              <center>
+              <small>
                 <a class="contrast outline" href="/">Go Back</a>
-              </center>
+              </small>
             </center>
           </footer>
         </article>
