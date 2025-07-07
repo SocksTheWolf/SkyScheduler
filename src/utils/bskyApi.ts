@@ -38,7 +38,7 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
   const loginResponse = await loginToBsky(agent, user, pass);
   if (!loginResponse) {
     // TODO: Probably should handle failure better here.
-    return;
+    return false;
   }
 
   try {
@@ -75,7 +75,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
   const loginResponse = await loginToBsky(agent, user, pass);
   if (!loginResponse) {
     // TODO: Probably should handle failure better here.
-    return;
+    return null;
   }
 
   const rt = new RichText({

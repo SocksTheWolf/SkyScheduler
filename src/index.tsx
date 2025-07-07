@@ -17,7 +17,7 @@ import { uploadFileR2 } from "./utils/r2Query";
 import { SignupSchema } from "./utils/signupSchema";
 
 type Variables = {
-    auth: ReturnType<typeof createAuth>;
+  auth: ReturnType<typeof createAuth>;
 };
 
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();

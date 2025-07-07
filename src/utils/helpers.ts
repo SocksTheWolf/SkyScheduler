@@ -20,7 +20,7 @@ export function createPostObject(data: any) {
     postData.uri = data.uri;
   if (data.cid)
     postData.cid = data.cid;
-  
+
   return postData;
 }
 
@@ -34,4 +34,8 @@ export function createRepostObject(data: any) {
 
 export function floorCurrentTime() {
   return startOfHour(new Date());
+}
+
+export function floorGivenTime(given:Date) {
+  return startOfHour(given);
 }

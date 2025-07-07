@@ -1,15 +1,16 @@
+import { Context } from "hono";
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import { and, eq, lte, inArray, desc, count, getTableColumns } from "drizzle-orm";
+import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts } from "../db/app.schema";
 import { users } from "../db/auth.schema";
-import { and, eq, lte, inArray, desc, count, getTableColumns } from "drizzle-orm";
-import { Bindings } from "../types";
-import { createPostObject, floorCurrentTime } from "./helpers";
-import { deleteFromR2 } from "./r2Query";
-import { isAfter, addHours, startOfHour } from "date-fns";
 import { PostSchema } from "./postSchema";
+import { Bindings } from "../types";
+
+import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
+import { deleteFromR2 } from "./r2Query";
+import { isAfter, addHours } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
-import { Context } from "hono";
-import { BatchItem } from "drizzle-orm/batch";
 
 export const doesUserExist = async (c: Context, username:string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -66,7 +67,7 @@ export const createPost = async (c: Context, body:any) => {
   }
 
   const { content, scheduledDate, embeds, label, makePostNow, repostData } = validation.data;
-  const scheduleDate = startOfHour((makePostNow) ? new Date() : new Date(scheduledDate));
+  const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, new Date()) && !makePostNow) {

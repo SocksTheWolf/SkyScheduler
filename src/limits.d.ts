@@ -3,9 +3,11 @@ export const MAX_LENGTH: number = 300;
 export const MAX_REPOST_INTERVAL: number = 11;
 
 export const MAX_EMBEDS: number = 4;
-// Alt text limit via https://github.com/bluesky-social/social-app/blob/bb760400feaf4bab668fc2532a4de64e6833200a/src/lib/constants.ts#L64
+// Alt text limit via 
+// https://github.com/bluesky-social/social-app/blob/bb760400feaf4bab668fc2532a4de64e6833200a/src/lib/constants.ts#L64
 export const MAX_ALT_TEXT: number = 2000;
-// Image limit values via https://github.com/bluesky-social/social-app/blob/bb760400feaf4bab668fc2532a4de64e6833200a/src/lib/constants.ts#L94
+// Image limit values via 
+// https://github.com/bluesky-social/social-app/blob/bb760400feaf4bab668fc2532a4de64e6833200a/src/lib/constants.ts#L94
 export const BSKY_MAX_WIDTH: number = 2000;
 export const BSKY_MAX_HEIGHT: number = 2000;
 export const BSKY_FILE_SIZE_LIMIT_IN_MB: number = 1;
