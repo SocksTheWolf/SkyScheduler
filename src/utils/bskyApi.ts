@@ -5,6 +5,23 @@ import { updatePostData, getBskyUserPassForId } from './dbQuery';
 import { deleteFromR2 } from './r2Query';
 import truncate from "just-truncate";
 
+const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
+  try {
+    const loginResponse = await agent.login({
+      identifier: user,
+      password: pass,
+    });
+    if (!loginResponse.success) {
+      console.warn(`could not login as user ${user}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`encountered exception on login for user ${user}, err ${err}`);
+  }
+  return false;
+}
+
 export const makeRepost = async (env: Bindings, content: Repost) => {
   let bWasSuccess = true;
   const agent = new AtpAgent({
@@ -18,10 +35,11 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
     return false;
   }
 
-  await agent.login({
-    identifier: user,
-    password: pass,
-  });
+  const loginResponse = await loginToBsky(agent, user, pass);
+  if (!loginResponse) {
+    // TODO: Probably should handle failure better here.
+    return;
+  }
 
   try {
     await agent.deleteRepost(content.uri);
@@ -52,10 +70,11 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
     return null;
   }
 
-  await agent.login({
-    identifier: user,
-    password: pass,
-  });
+  const loginResponse = await loginToBsky(agent, user, pass);
+  if (!loginResponse) {
+    // TODO: Probably should handle failure better here.
+    return;
+  }
 
   const rt = new RichText({
     text: content.text,
