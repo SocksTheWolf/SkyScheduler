@@ -4,40 +4,46 @@ import { BaseLayout } from "../layout";
 export default function Signup() {
   return (
     <BaseLayout title="Signup - SkyScheduler">
-      <div class="grid place-items-center min-h-screen">
-        <div class="card shadow-2xl bg-white dark:bg-gray-900 p-8">
-          <h1 class="text-2xl font-bold mb-6 text-center">Account Signup</h1>
-          <form id="loginForm" class="space-y-4">
-
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+      <br /><br />
+      <section class="container">
+        <article>
+          <header>
+            <center><h2>Account Signup</h2></center>
+          </header>
+          <form id="loginForm">
+            <label>
               Dashboard Password
-              <input type="password" name="password" class="grow" placeholder="" required />
+              <input type="password" name="password" placeholder="" required />
             </label>
 
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+            <label>
               Bluesky Handle
-              <input type="text" name="username" class="grow" placeholder="" required />
+              <input type="text" name="username" placeholder="" required />
             </label>
 
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+            <label>
               App Password
-              <input type="password" name="bskyAppPassword" class="grow" placeholder="" required />
+              <input type="password" name="bskyAppPassword" placeholder="" required />
             </label>
 
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+            <label>
               Invite Key
-              <input type="text" name="signupToken" class="grow" placeholder="" required />
+              <input type="text" name="signupToken" placeholder="" required />
             </label>
 
-            <button type="submit" class="w-full btn btn-primary btn-lg">
+            <button type="submit" class="w-full">
               Sign Up
             </button>
-            <br />
-            <center class="mt-2"><a href="/">Go Back</a></center>
           </form>
-        </div>
-      </div>
-
+          <footer>
+            <center>
+              <center>
+                <a class="contrast outline" href="/">Go Back</a>
+              </center>
+            </center>
+          </footer>
+        </article>
+      </section>
       <script>
         {html`
         document.getElementById('loginForm').addEventListener('submit', async (e) => {

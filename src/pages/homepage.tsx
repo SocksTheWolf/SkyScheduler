@@ -4,34 +4,34 @@ import { BaseLayout } from "../layout";
 export default function Home() {
   return (
     <BaseLayout title="Login - SkyScheduler">
-      <div class="grid place-items-center min-h-screen">
-        <div class="card shadow-2xl bg-white dark:bg-gray-900 p-8">
-          <h1 class="text-2xl font-bold mb-6 text-center">Login to portal</h1>
-          <form id="loginForm" class="space-y-4">
-
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+      <br /><br />
+      <section class="container">
+        <article>
+          <header>
+            <center><h2>Login to portal</h2></center>
+          </header>
+          <form id="loginForm">
+            <label>
               Bluesky Handle
-              <input type="text" id="username" class="grow" placeholder="" />
+              <input type="text" id="username" placeholder="" />
             </label>
 
-            <label class="input input-bordered flex items-center gap-2 mb-4">
+            <label>
               Password
-              <input type="password" id="password" class="grow" placeholder="" />
+              <input type="password" id="password" placeholder="" />
             </label>
 
-            <button type="submit" class="w-full btn btn-primary btn-lg">
+            <button type="submit" class="w-full">
               Login
             </button>
           </form>
-          <br />
-          <div class="vstack mt-3">
+          <footer>
             <center>
-              <a href="/signup" class="btn btn-outline-info">Sign-up</a>
+              <a href="/signup" class="contrast outline">Sign-up</a>
             </center>
-          </div>
-        </div>
-      </div>
-
+          </footer>
+        </article>
+      </section>
       <script>
         {html`
         document.getElementById('loginForm').addEventListener('submit', async (e) => {

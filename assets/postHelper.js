@@ -14,9 +14,9 @@ fileDropzone.on("reset", () => {
 });
 
 fileDropzone.on("addedfile", file => {
-  // Create the remove button
-  var removeButton = Dropzone.createElement("<button class='btn-outline btn-error btn' disabled>Remove file</button>");
-  var addAltText = Dropzone.createElement("<button class='btn-outline btn mr-2' disabled>Add Alt Text</button>");
+  var buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
+  var removeButton = Dropzone.createElement("<button class='outline btn-error' disabled><small>Remove file</small></button>");
+  var addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
   
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
@@ -50,8 +50,9 @@ fileDropzone.on("addedfile", file => {
       fileDropzone.removeFile(file);
     });
   });
-  file.previewElement.appendChild(addAltText);
-  file.previewElement.appendChild(removeButton);
+  buttonHolder.appendChild(addAltText);
+  buttonHolder.appendChild(removeButton);
+  file.previewElement.appendChild(buttonHolder);
 });
 fileDropzone.on("success", function(file, response) {
   // show the labels
