@@ -1,4 +1,5 @@
 import { Env, Hono } from "hono";
+import { every } from 'hono/combine'
 import { cors } from "hono/cors";
 import { auth, createAuth } from "./auth";
 import { Bindings } from "./types.d";
@@ -164,15 +165,15 @@ app.post("/signup", async (c) => {
   }
   return c.json({ok: false, msg: "unknown error occurred"});
 });
-/*
-app.get("/cron", authMiddleware, (c) => {
+
+app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
   schedulePostTask(c.env, c.executionCtx);
   return c.text("ran");
-});*/
+});
 
 app.get("/start", async (c) => {
   if (await doesAdminExist(c))
-    return c.html("not found", 404);
+    return c.html("already created", 501);
 
   const data = await c.get("auth").api.signUpEmail({
     body: {

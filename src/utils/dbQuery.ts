@@ -85,7 +85,7 @@ export const createPost = async (c: Context, body:any) => {
   }
 
   // TODO: Check success better here
-  const batchResponse = await db.batch(dbOperations);
+  await db.batch(dbOperations);
   return { ok: true, postNow: makePostNow, postId: postUUID };
 };
 

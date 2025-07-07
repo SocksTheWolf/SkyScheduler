@@ -19,6 +19,8 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
         }
       })());
     });
+  } else {
+    console.log("no posts scheduled for this time");
   }
 
   // Push any reposts
@@ -33,5 +35,7 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
       })());
     });
     ctx.waitUntil(deleteAllRepostsBeforeCurrentTime(env));
+  } else {
+    console.log("no reposts scheduled for this time");
   }
 };

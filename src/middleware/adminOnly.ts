@@ -4,8 +4,6 @@ import { Context } from "hono";
 // the auth middleware first.
 export async function adminOnlyMiddleware(c: Context, next: any) {
   const user = c.get("user");
-  console.log(user);
-
   if (user.username === c.env.DEFAULT_ADMIN_USER) {
     await next();
     return;
