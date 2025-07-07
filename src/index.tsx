@@ -100,6 +100,7 @@ app.post("/post", authMiddleware, async (c) => {
 
 // Get all posts
 app.get("/posts", authMiddleware, async (c) => {
+  c.header("HX-Trigger-After-Swap", "timeSidebar");
   return c.html(
     <ScheduledPostList ctx={c} />
   );

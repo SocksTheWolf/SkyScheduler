@@ -2,15 +2,6 @@ import { Context } from "hono";
 import { html, raw } from "hono/html";
 import { getPostsForUser } from "../utils/dbQuery";
 
-function formatDate(date:string) {
-  return new Date(date).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-  });
-}
-
 type ScheduledPostProps = {
   id: string;
   content: string;
@@ -34,7 +25,7 @@ export function ScheduledPost({
           </svg>
         </button>`)}
     </div>
-    <p class="text-sm text-gray-500 mt-1">${posted ? 'Posted on:' : 'Scheduled for:'} ${formatDate(scheduledDate)}</p>
+    <p class="text-sm text-gray-500 mt-1">${posted ? 'Posted on:' : 'Scheduled for:'} <span class="timestamp">${scheduledDate}</span></p>
   </div>`;
 };
 

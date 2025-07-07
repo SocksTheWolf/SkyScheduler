@@ -7,6 +7,25 @@ function pushToast(msg, isSuccess) {
   }).showToast();
 }
 
+function formatDate(date) {
+  return new Date(date).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+  });
+}
+
+function updateAllTimes() {
+  document.querySelectorAll(".timestamp").forEach(el => {
+    el.innerHTML = formatDate(el.innerHTML);
+  });
+}
+
 document.addEventListener("showDeleteMsg", function(evt) {
   pushToast("Post deleted", true);
+});
+
+document.addEventListener("timeSidebar", function(ev) {
+  updateAllTimes();
 });

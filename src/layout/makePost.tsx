@@ -88,6 +88,7 @@ export default function PostCreation() {
       <script>
       {html`
         const MAX_LENGTH=${MAX_LENGTH};
+        updateAllTimes();
       `}
       </script>
       <script src="/postHelper.js"></script>
