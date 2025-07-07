@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { MAX_LENGTH } from "../limits.d"
+import { MAX_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d"
 
 export default function PostCreation() {
   return (
@@ -7,7 +7,7 @@ export default function PostCreation() {
       <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
       <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
       <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
-      <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 h-[calc(75vh-2rem)] overflow-hidden">
+      <div class="p-6 border rounded-xl bg-white my-4 mx-4 sm:ml-0 overflow-hidden" style="height: calc(90vh - 2rem)">
         <form id="postForm" class="flex flex-col h-full">
           <h1 class="text-2xl font-bold mb-6">Schedule New Post</h1>
           <label class="form-control mb-4 flex flex-1 flex-col h-48">
@@ -38,8 +38,11 @@ export default function PostCreation() {
             </label>
           </div>
 
+          <div class="label">
+            <span class="label-text">Scheduling</span>
+          </div>
           <div class="vstack">
-            <div class="hstack gap-3 input input-bordered flex items-center mb-2">
+            <div class="hstack mb-2 gap-3 input input-bordered flex items-center">
               <label>
                 Schedule Date
                 <input type="datetime-local" id="scheduledDate" class="grow" placeholder="" required />
@@ -52,7 +55,31 @@ export default function PostCreation() {
             <p class="text-sm mb-4 italic px-2 text-base-content">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
           </div>
 
-          <button type="submit" class="w-full btn btn-primary btn-outline mb-2">
+          <div class="label">
+            <span class="label-text">Reposting</span>
+          </div>
+          <div class="vstack gap-3 input input-bordered flex items-center mb-2">
+            <label class="border pl-2">
+              Should Repost <input class="mr-2" type="checkbox" id="makeReposts" />
+            </label>
+            <div id="repostScheduleSimple">
+                Repost this every 
+                <select id="hoursInterval" class="ml-2 mr-2" disabled>
+                  {[...Array(24)].map((x, i) => {
+                    if (i == 0) return;
+                    return (<option value={i}>{i}</option>);
+                  })}
+                </select> hours 
+                <select id="timesInterval" class="ml-2 mr-2" disabled>
+                  {[...Array(MAX_REPOST_INTERVAL)].map((x, i) => {
+                    if (i == 0) return;
+                    return (<option value={i}>{i}</option>);
+                  })}
+                </select> times from the post time.
+            </div>
+          </div>
+
+          <button type="submit" class="w-full btn btn-primary btn-outline mt-2 mb-2">
             Schedule Post
           </button>
         </form>

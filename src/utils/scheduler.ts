@@ -1,7 +1,7 @@
 
 import { Bindings, Post, Repost } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
-import { getAllPostsForCurrentTime, getAllRepostsForCurrentTime } from './dbQuery';
+import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime } from './dbQuery';
 import { createPostObject, createRepostObject } from './helpers';
 
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
@@ -28,10 +28,10 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
         const postData: Repost = createRepostObject(post);
         const success = await makeRepost(env, postData);
         if (success) {
-          // TODO: Delete the pending reposts from d1, needs a better way to track it, smh
+          console.log(`Reposted ${post.uri} successfully!`);
         }
       })());
     });
+    ctx.waitUntil(deleteAllRepostsBeforeCurrentTime(env));
   }
-
 };

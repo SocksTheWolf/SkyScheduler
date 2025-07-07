@@ -1,14 +1,15 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { posts, reposts } from "../db/app.schema";
 import { users } from "../db/auth.schema";
-import { and, eq, lte, desc } from "drizzle-orm";
+import { and, eq, lte, inArray, desc } from "drizzle-orm";
 import { Bindings } from "../types";
-import { createPostObject } from "./helpers";
+import { createPostObject, floorCurrentTime } from "./helpers";
 import { deleteFromR2 } from "./r2Query";
-import { isAfter } from "date-fns";
+import { isAfter, addHours, setMinutes } from "date-fns";
 import { PostSchema } from "./postSchema";
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from "hono";
+import { BatchItem } from "drizzle-orm/batch";
 
 export const doesAdminExist = async (c: Context) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -51,8 +52,8 @@ export const createPost = async (c: Context, body:any) => {
     return { ok: false, msg: validation.error.toString() };
   }
 
-  const { content, scheduledDate, embeds, label, makePostNow } = validation.data;
-  const scheduleDate = new Date(scheduledDate);
+  const { content, scheduledDate, embeds, label, makePostNow, repostData } = validation.data;
+  const scheduleDate = (makePostNow) ? setMinutes(new Date(), 0) : new Date(scheduledDate);
 
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, new Date()) && !makePostNow) {
@@ -60,37 +61,53 @@ export const createPost = async (c: Context, body:any) => {
   }
 
   const postUUID = uuidv4();
-  await db.insert(posts).values({
-    content,
-    uuid: postUUID,
-    scheduledDate: scheduleDate,
-    embedContent: embeds,
-    contentLabel: label,
-    userId: c.get("user").id
-  });
+  let dbOperations:BatchItem<"sqlite">[] = [
+    db.insert(posts).values({
+        content,
+        uuid: postUUID,
+        scheduledDate: scheduleDate,
+        embedContent: embeds,
+        contentLabel: label,
+        userId: c.get("user").id
+    })
+  ];
+  if (repostData) {
+    for (var i = 1; i <= repostData.times; ++i) {
+      dbOperations.push(db.insert(reposts).values({
+        uuid: postUUID,
+        scheduledDate: addHours(scheduleDate, i*repostData.hours)
+      }));
+    }
+  }
+
+  // TODO: Check success better here
+  const batchResponse = await db.batch(dbOperations);
   return { ok: true, postNow: makePostNow, postId: postUUID };
 };
 
 export const getAllPostsForCurrentTime = async (env: Bindings) => {
   // Get all scheduled posts for current time
   const db: DrizzleD1Database = drizzle(env.DB);
-  const currentTime = new Date();
-  // round current time to nearest hour
-  currentTime.setMinutes(0, 0, 0);
+  const currentTime: Date = floorCurrentTime();
 
   return await db.select().from(posts).where(and(lte(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
 }
 
-// TODO: Test this function to make sure it outputs properly
-export const getAllRepostsForCurrentTime = async (env: Bindings) => {
-  // Get all scheduled posts for current time
+export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
+  // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
-  const currentTime = new Date();
-  // round current time to nearest hour
-  currentTime.setMinutes(0, 0, 0);
+  const query = db.select({uuid: reposts.uuid}).from(reposts).where(lte(reposts.scheduledDate, givenDate));
+  return await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId }).from(posts).where(inArray(posts.uuid, query)).all();
+}
 
-  const repostBlock = await db.$with("queued").as(db.select({uuid: reposts.uuid}).from(reposts).where(lte(reposts.scheduledDate, currentTime)));
-  return await db.with(repostBlock).select({uri: posts.uri, cid: posts.cid, userId: posts.userId}).from(posts).all();
+export const getAllRepostsForCurrentTime = async (env: Bindings) => {
+  return await getAllRepostsForGivenTime(env, floorCurrentTime());
+}
+
+export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const currentTime = floorCurrentTime();
+  await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime));
 }
 
 export const updatePostData = async (env: Bindings, id: string, newData:Object) => {

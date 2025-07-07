@@ -1,3 +1,7 @@
+const repostCheckbox = document.getElementById("makeReposts");
+const postNowCheckbox = document.getElementById('postNow');
+const scheduledDate = document.getElementById('scheduledDate');
+
 let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
   url: "/upload", 
@@ -94,15 +98,25 @@ Countable.on(document.getElementById('content'), counter => {
 document.getElementById('postForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const content = document.getElementById('content').value;
-  const scheduledDate = document.getElementById('scheduledDate').value;
-  const postNow = document.getElementById('postNow').checked;
-
+  const postNow = postNowCheckbox.checked;
+  const scheduledDateVal = scheduledDate.value;
   try {
     let postObject = {
         content,
-        scheduledDate: new Date(scheduledDate).toISOString(),
-        makePostNow: postNow
+        scheduledDate: postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString(),
+        makePostNow: postNow,
+        repostData: undefined
     };
+
+    console.log(postObject);
+    // Add repost data if we should be making reposts
+    if (repostCheckbox.checked) {
+      postObject.repostData = {
+        hours: document.getElementById("hoursInterval").value,
+        times: document.getElementById("timesInterval").value
+      };
+    }
+
     // Only handle data here if we have images
     if (fileData.size > 0) {
       console.log("parsing images for upload");
@@ -135,8 +149,9 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
         pushToast("Scheduled post successfully!", true);
       }
       
+      setSelectDisable(true);
+      scheduledDate.setAttribute("required", true);
       document.getElementById('postForm').reset();
-      // TODO: Reload page until react or handler set up?
       document.getElementById("refresh-posts").click();
     } else {
       pushToast(data.error?.message || data.error || data.message || 'An error occurred', false);
@@ -147,8 +162,28 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
 });
 
 // rounddown minutes
-document.getElementById('scheduledDate').addEventListener('change', (e) => {
-  const date = new Date(e.target.value);
+scheduledDate.addEventListener('change', (e) => {
+  const date = new Date(scheduledDate.value);
   date.setMinutes(0 - date.getTimezoneOffset());
-  e.target.value = date.toISOString().slice(0,16);
+  scheduledDate.value = date.toISOString().slice(0,16);
+});
+
+function setSelectDisable(disable) {
+  document.querySelectorAll("select").forEach((el) => {
+    if (disable)
+      el.setAttribute("disabled", true);
+    else
+      el.removeAttribute("disabled");
+  });
+}
+
+repostCheckbox.addEventListener('click', (e) => {
+  setSelectDisable(!repostCheckbox.checked);
+});
+
+postNowCheckbox.addEventListener('click', (e) => {
+  if (postNowCheckbox.checked)
+    scheduledDate.removeAttribute("required");
+  else
+    scheduledDate.setAttribute("required", true);
 });

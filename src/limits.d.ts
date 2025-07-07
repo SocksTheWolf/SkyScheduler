@@ -1,5 +1,6 @@
 export const MIN_LENGTH: number = 1;
 export const MAX_LENGTH: number = 300;
+export const MAX_REPOST_INTERVAL: number = 11;
 
 export const MAX_EMBEDS: number = 4;
 // Alt text limit via https://github.com/bluesky-social/social-app/blob/bb760400feaf4bab668fc2532a4de64e6833200a/src/lib/constants.ts#L64
