@@ -18,7 +18,11 @@ function formatDate(date) {
 
 function updateAllTimes() {
   document.querySelectorAll(".timestamp").forEach(el => {
+    if (el.hasAttribute("corrected"))
+      return;
+    
     el.innerHTML = formatDate(el.innerHTML);
+    el.setAttribute("corrected", true);
   });
 }
 
