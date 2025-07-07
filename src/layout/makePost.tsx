@@ -7,8 +7,8 @@ export default function PostCreation() {
       <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
       <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
       <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
-      <div class="p-6 border rounded-xl shadow-xl ring ring-gray-900/5 dark:shadow-gray-700 bg-white dark:bg-gray-800 my-4 mx-4 sm:ml-0 overflow-hidden" style="height: calc(90vh - 2rem)">
-        <form id="postForm" class="flex flex-col h-full">
+      <div class="p-6 border rounded-xl shadow-xl ring ring-gray-900/5 dark:shadow-gray-700 pb-2 bg-white dark:bg-gray-800 my-4 mx-4 sm:ml-0" style="height: calc(90vh - 2rem)">
+        <form id="postForm" class="sm:container md:mx-auto flex flex-col h-full">
           <h1 class="text-2xl font-bold mb-6">Schedule New Post</h1>
           <label class="form-control mb-4 flex flex-1 flex-col h-48">
             <div class="label">
@@ -21,8 +21,8 @@ export default function PostCreation() {
           <div class="label">
             <span class="label-text">Images</span>
           </div>
-          <div class="form-control flex h-60 w-full input input-bordered mb-2" id="imgArea">
-            <div class="h-full w-full gap-2 form-control" id="imageUploads"></div>
+          <div class="form-control flex h-60 input input-bordered mb-2" id="imgArea">
+            <div class="h-full gap-2 form-control min-h-20" id="imageUploads"></div>
           </div>
 
           <div id="content-label-selector" class="hidden">
@@ -41,11 +41,11 @@ export default function PostCreation() {
           <div class="label">
             <span class="label-text">Scheduling</span>
           </div>
-          <div class="vstack">
-            <div class="rounded-lg dark:bg-gray-950 px-2 py-2 shadow-xl ring ring-gray-900/5 hstack mb-2 gap-3 flex">
-              <label class="label">
+          <div class="vstack block">
+            <div class="rounded-lg dark:bg-gray-950 px-2 py-2 shadow-xl ring ring-gray-900/5 hstack mb-2 gap-3 md:flex">
+              <label class="label sm:block">
                 Schedule Date
-                <input type="datetime-local" id="scheduledDate" class="input grow" placeholder="" required />
+                <input type="datetime-local" id="scheduledDate" class="input sm:block md:grow" placeholder="" required />
               </label>
               <label class="ms-auto label">
                 Make Post Now?
@@ -53,17 +53,17 @@ export default function PostCreation() {
                 
               </label>
             </div>
-            <p class="text-sm mb-4 italic px-2 text-base-content">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
+            <p class="text-sm mb-4 italic px-2 text-base-content text-wrap">You can schedule posts in the future, hourly. Minutes are rounded down.</p>
           </div>
 
           <div class="label">
             <span class="label-text">Reposting</span>
           </div>
-          <div class="rounded-lg dark:bg-gray-950 px-2 py-4 shadow-xl ring ring-gray-900/5 hstack mb-2 gap-3 flex">
+          <div class="block rounded-lg dark:bg-gray-950 px-2 py-4 shadow-xl ring ring-gray-900/5 hstack mb-2 gap-3 md:flex">
             <label class="label pl-2">
               <input class="mr-2 checkbox-xs" type="checkbox" id="makeReposts" /> Should Repost? 
             </label>
-            <div class="ms-auto label" id="repostScheduleSimple">
+            <div class="ms-auto label text-wrap" id="repostScheduleSimple">
                 Repost this every 
                 <select id="hoursInterval" class="ml-2 mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" disabled>
                   {[...Array(24)].map((x, i) => {

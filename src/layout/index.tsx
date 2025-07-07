@@ -18,9 +18,8 @@ export const BaseLayout = ({
       <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"></link>
       <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-      <script type="text/javascript" src="/main.js"></script>
       <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-      <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+      <script type="text/javascript" src="/main.js"></script>
       <title>${title}</title>
 
       <style>
@@ -60,13 +59,20 @@ export const BaseLayout = ({
       .tooLong {
         color: red;
       }
-      .input, .textarea {
-        width: unset !important;
+
+      @media screen and (min-width: 795px) 
+      {
+        .input, .textarea {
+          width: unset !important;
+        }
       }
+
       </style>
     </head>
     <body class="dark:bg-gray-950 bg-neutral-content min-h-screen">
       ${children}
     </body>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </html>
 `;
