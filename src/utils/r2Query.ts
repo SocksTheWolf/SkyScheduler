@@ -3,13 +3,14 @@ import { R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_M
 import { v4 as uuidv4 } from 'uuid';
 
 export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
-  if (embeds !== undefined) {
+  if (embeds !== undefined && embeds.length > 0) {
     let itemsToDelete:string[] = [];
     embeds.forEach(async (data) => {
       console.log(`Deleting ${data.content}...`);
       itemsToDelete.push(data.content);
     });
-    await env.R2.delete(itemsToDelete);
+    if (itemsToDelete.length > 0)
+      await env.R2.delete(itemsToDelete);
   }
 };
 
