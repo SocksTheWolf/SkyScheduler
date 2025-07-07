@@ -28,6 +28,7 @@ fileDropzone.on("addedfile", file => {
         let existingData = fileData.get(file.name);
         existingData.alt = askUserData;
         fileData.set(file.name, existingData);
+        addAltText.classList.add("btn-success");
       } catch(err) {
         pushToast("failed to set alt text for image, try again", false);
       }
