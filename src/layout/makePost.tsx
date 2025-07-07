@@ -4,19 +4,19 @@ import { MAX_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d"
 export default function PostCreation() {
   return (
   <section>
+    <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
+    <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
+    <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
     <article>
-      <header>
-        <h4>Schedule New Post</h4>
-      </header>
-      <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
-      <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
-      <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
-      <div>
-        <form id="postForm">
+      <form id="postForm">
+        <header>
+          <h4>Schedule New Post</h4>
+        </header>
+        <div>
           <article>
             <header>Post Content</header>
             <section>
-              <textarea id="content" rows={10} style="resize: none" placeholder="Post text here" required></textarea>
+              <textarea id="content" rows={8} style="resize: none" placeholder="Post text here" required></textarea>
               <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into a thread with {MAX_LENGTH} characters per post</small>
             </section>
             <footer>
@@ -24,14 +24,14 @@ export default function PostCreation() {
             </footer>
           </article>
 
-          <article>
-            <header>Images</header>
+          <details>
+            <summary role="button" class="secondary outline">Post Media</summary>
             <section>
-            <div id="imgArea">
-              <div id="imageUploads" class="dropzone">
-                <center class="dz-message">Drag or click here to upload images</center>
+              <div id="imgArea">
+                <div id="imageUploads" class="dropzone">
+                  <center class="dz-message">Drag or click here to upload images</center>
+                </div>
               </div>
-            </div>
             </section>
             <section id="content-label-selector" class="hidden">
               <header>Content Label</header>
@@ -44,10 +44,10 @@ export default function PostCreation() {
               </select>
               <small>Remember to set the appropriate content label for your content</small>
             </section>
-          </article>
+          </details>
 
-          <article>
-            <header>Scheduling</header>
+          <details open>
+            <summary role="button" class="outline secondary">Post Scheduling</summary>
             <section>
               Schedule Date
               <input type="datetime-local" id="scheduledDate" placeholder="" required />
@@ -61,10 +61,10 @@ export default function PostCreation() {
                 <i>You can schedule posts in the future, hourly. Time is floored to the lowest hour.</i>
               </small>
             </footer>
-          </article>
+          </details>
 
-          <article>
-            <header>Reposting</header>
+          <details>
+            <summary role="button" class="secondary outline">Reposting</summary>
             <section>
               <input type="checkbox" id="makeReposts" /> Should Repost? 
             </section>
@@ -83,15 +83,14 @@ export default function PostCreation() {
                   })}
                 </select> times from its posting.
             </center>
-          </article>
-        </form>
-      </div>
-      <footer>
-        <button type="submit" class="w-full primary">
-          Schedule Post
-        </button>
-      </footer>
-      
+          </details>
+        </div>
+        <footer>
+          <button type="submit" class="w-full primary">
+            Schedule Post
+          </button>
+        </footer>
+      </form>
       <script>
       {html`
         const MAX_LENGTH=${MAX_LENGTH};

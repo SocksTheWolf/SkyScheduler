@@ -59,7 +59,7 @@
 
 .max-width-50 {
   max-width: 100%;
-  grid-column: auto / span;
+  grid-column: auto / span 1;
 }
 
 .mainContent {
@@ -67,7 +67,7 @@
 }
 
 #posts {
-  max-height: 69vh;
+  max-height: 60dvh;
   overflow-y: auto;
   overflow-x: hidden;
 }
