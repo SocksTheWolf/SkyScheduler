@@ -118,6 +118,9 @@ app.post("/post/:id/delete", authMiddleware, async (c) => {
 
 // Root route with login form
 app.get("/", (c) => {
+  if (c.get("user") !== null)
+    return c.redirect("/dashboard");
+
   return c.html(<Home />);
 });
 
