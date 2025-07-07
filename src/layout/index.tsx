@@ -1,6 +1,5 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
-import { css } from '../css';
 
 type BaseLayoutProps = {
   children: Child;
@@ -12,7 +11,7 @@ export const BaseLayout = ({
   title = "SkyScheduler"
 }: BaseLayoutProps) => html`
   <!DOCTYPE html>
-  <html>
+  <html data-theme="dark">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,11 +19,10 @@ export const BaseLayout = ({
       <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
       <script type="text/javascript" src="/main.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+      <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
       <title>${title}</title>
 
-      <style>
-        ${css}
-      </style>
       <style>
       .dz-size, .dz-filename {
         display: block !important;
@@ -36,7 +34,7 @@ export const BaseLayout = ({
       }
 
       .dz-preview div {
-        display: inline-block;
+        /*display: inline-block;*/
         position: relative;
       }
 
@@ -62,9 +60,12 @@ export const BaseLayout = ({
       .tooLong {
         color: red;
       }
+      .input, .textarea {
+        width: unset !important;
+      }
       </style>
     </head>
-    <body class="bg-neutral-content min-h-screen">
+    <body class="dark:bg-gray-700 bg-neutral-content min-h-screen">
       ${children}
     </body>
   </html>

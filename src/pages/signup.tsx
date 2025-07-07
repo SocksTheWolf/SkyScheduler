@@ -5,7 +5,7 @@ export default function Signup() {
   return (
     <BaseLayout title="Signup - SkyScheduler">
       <div class="grid place-items-center min-h-screen">
-        <div class="card shadow-2xl bg-white p-8">
+        <div class="card shadow-2xl bg-white dark:bg-gray-900 p-8">
           <h1 class="text-2xl font-bold mb-6 text-center">Account Signup</h1>
           <form id="loginForm" class="space-y-4">
 

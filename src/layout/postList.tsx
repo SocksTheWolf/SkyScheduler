@@ -16,7 +16,7 @@ export function ScheduledPost({
   scheduledDate
 } : ScheduledPostProps) {
   return html`
-  <div class="border border-gray-200 rounded px-3 py-2 bg-white">
+  <div class="border border-gray-300 rounded px-3 py-2 bg-white dark:bg-gray-500">
     <div class="flex gap-2 items-center">
       <p class="text-gray-800 flex-1 truncate">${content}</p>
       ${posted ? '' : raw(`<button type="submit" hx-post="/post/${id}/delete" hx-target="#posts" hx-swap="innerHTML" hx-trigger="click" class="btn btn-sm btn-error btn-outline px-1 py-0.5">
@@ -25,7 +25,7 @@ export function ScheduledPost({
           </svg>
         </button>`)}
     </div>
-    <p class="text-sm text-gray-500 mt-1">${posted ? 'Posted on:' : 'Scheduled for:'} <span class="timestamp">${scheduledDate}</span></p>
+    <p class="text-sm text-gray-500 dark:text-gray-900 mt-1">${posted ? 'Posted on:' : 'Scheduled for:'} <span class="timestamp">${scheduledDate}</span></p>
   </div>`;
 };
 
