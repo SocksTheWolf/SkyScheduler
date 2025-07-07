@@ -11,10 +11,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { Context } from "hono";
 import { BatchItem } from "drizzle-orm/batch";
 
-export const doesAdminExist = async (c: Context) => {
+export const doesUserExist = async (c: Context, username:string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const result = await db.select().from(users).where(eq(users.name, "admin")).limit(1).all();
+  const result = await db.select().from(users).where(eq(users.name, username)).limit(1).all();
   return result.length > 0;
+}
+
+export const doesAdminExist = async (c: Context) => {
+  return await doesUserExist(c, "admin");
 }
 
 export const getPostsForUser = async (c: Context) => {

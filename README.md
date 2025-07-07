@@ -9,6 +9,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 ## Features
 
+- **Multiple user/account handling**: Have your friends also be able to post and repost stuff automatically! Wow!
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
 - **Simple and Lightweight**: Minimal setup and easy to use
@@ -43,6 +44,7 @@ cp .dev.vars.example .dev.vars
    - `DEFAULT_ADMIN_USER` - the admin username (this should be a bsky handle)
    - `DEFAULT_ADMIN_PASS` - the admin password
    - `DEFAULT_ADMIN_BSKY_PASS` - the admin default app password
+   - `SIGNUP_TOKEN_SECRET` - the invite code/password for this app.
 
 These settings should reflect the same sort of values that you would set for your BetterAuth install.
 

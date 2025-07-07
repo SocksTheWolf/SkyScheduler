@@ -3,14 +3,17 @@ import { cors } from "hono/cors";
 import { auth, createAuth } from "./auth";
 import { Bindings } from "./types.d";
 import Home from "./pages/homepage";
+import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import { schedulePostTask } from "./utils/scheduler";
-import { createPost, deletePost, doesAdminExist, getAllRepostsForCurrentTime, getAllRepostsForGivenTime, getPostById } from "./utils/dbQuery";
+import { createPost, deletePost, doesAdminExist, doesUserExist, getPostById } from "./utils/dbQuery";
 import { createPostObject } from "./utils/helpers";
 import { makePost } from "./utils/bskyApi";
 import { ScheduledPostList } from "./layout/postList";
 import { authMiddleware } from "./middleware/auth";
+import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { uploadFileR2 } from "./utils/r2Query";
+import { SignupSchema } from "./utils/signupSchema";
 
 type Variables = {
     auth: ReturnType<typeof createAuth>;
@@ -123,10 +126,48 @@ app.get("/dashboard", authMiddleware, (c) => {
   );
 });
 
+// Signup route
+app.get("/signup", (c) => {
+  return c.html(<Signup />);
+});
+
+app.post("/signup", async (c) => {
+  const body = await c.req.json();
+  const validation = SignupSchema.safeParse(body);
+  if (!validation.success) {
+    return c.json({ ok: false, msg: validation.error.toString() }, 400);
+  }
+
+  const { signupToken, username, password, bskyAppPassword } = validation.data;
+  if (await doesUserExist(c, username)) {
+    return c.json({ok: false, msg: "user already exists"}, 401);
+  }
+
+  if (signupToken !== c.env.SIGNUP_TOKEN_SECRET) {
+    return c.json({ok: false, msg: "invalid signup token value"}, 400);
+  }
+
+  // create the user
+  const createUser = await c.get("auth").api.signUpEmail({
+    body: {
+      name: username,
+      email: `${username}@skyscheduler.tld`,
+      username: username,
+      password: password,
+      bskyAppPass: bskyAppPassword
+    }
+  });
+
+  if (createUser.token !== null) {
+    return c.json({ok: true, msg: "user created"});
+  }
+  return c.json({ok: false, msg: "unknown error occurred"});
+});
+/*
 app.get("/cron", authMiddleware, (c) => {
   schedulePostTask(c.env, c.executionCtx);
   return c.text("ran");
-});
+});*/
 
 app.get("/start", async (c) => {
   if (await doesAdminExist(c))
@@ -141,7 +182,10 @@ app.get("/start", async (c) => {
       bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
     }
   });
-  return c.redirect("/");
+  if (data.token !== null)
+    return c.redirect("/");
+  else
+    return c.html("failure", 401);
 })
 
 export default {

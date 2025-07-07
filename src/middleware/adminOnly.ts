@@ -2,7 +2,7 @@ import { Context } from "hono";
 
 // This requires that the user is an admin, it must pipe through
 // the auth middleware first.
-async function adminOnlyMiddleware(c: Context, next: any) {
+export async function adminOnlyMiddleware(c: Context, next: any) {
   const user = c.get("user");
   console.log(user);
 
