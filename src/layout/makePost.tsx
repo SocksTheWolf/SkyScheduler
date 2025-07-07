@@ -20,7 +20,7 @@ export default function PostCreation() {
               <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into a thread with {MAX_LENGTH} characters per post</small>
             </section>
             <footer>
-              Character Count: <div id="count">0/{MAX_LENGTH}</div>
+              <small>Character Count: <div id="count">0/{MAX_LENGTH}</div></small>
             </footer>
           </article>
 
