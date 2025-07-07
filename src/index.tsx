@@ -161,9 +161,10 @@ app.post("/signup", async (c) => {
   });
 
   if (createUser.token !== null) {
-    return c.json({ok: true, msg: "user created"});
+    console.log(`user ${username} created!`);
+    return c.json({ok: true, msg: "signup success"});
   }
-  return c.json({ok: false, msg: "unknown error occurred"});
+  return c.json({ok: false, msg: "unknown error occurred"}, 501);
 });
 
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
