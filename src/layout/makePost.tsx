@@ -43,7 +43,7 @@ export default function PostCreation() {
           </div>
           <div class="vstack">
             <div class="rounded-lg dark:bg-gray-950 px-2 py-2 shadow-xl ring ring-gray-900/5 hstack mb-2 gap-3 flex">
-              <label class="label ms-auto">
+              <label class="label">
                 Schedule Date
                 <input type="datetime-local" id="scheduledDate" class="input grow" placeholder="" required />
               </label>
