@@ -65,7 +65,7 @@ export const BaseLayout = ({
       }
       </style>
     </head>
-    <body class="dark:bg-gray-700 bg-neutral-content min-h-screen">
+    <body class="dark:bg-gray-950 bg-neutral-content min-h-screen">
       ${children}
     </body>
   </html>

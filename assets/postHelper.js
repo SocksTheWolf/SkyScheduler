@@ -169,7 +169,7 @@ scheduledDate.addEventListener('change', (e) => {
 });
 
 function setSelectDisable(disable) {
-  document.querySelectorAll("select").forEach((el) => {
+  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => {
     if (disable)
       el.setAttribute("disabled", true);
     else
