@@ -1,7 +1,7 @@
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { posts, reposts } from "../db/app.schema";
 import { users } from "../db/auth.schema";
-import { and, eq, lte, inArray, desc } from "drizzle-orm";
+import { and, eq, lte, inArray, desc, count, getTableColumns } from "drizzle-orm";
 import { Bindings } from "../types";
 import { createPostObject, floorCurrentTime } from "./helpers";
 import { deleteFromR2 } from "./r2Query";
@@ -13,7 +13,9 @@ import { BatchItem } from "drizzle-orm/batch";
 
 export const doesUserExist = async (c: Context, username:string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const result = await db.select().from(users).where(eq(users.name, username)).limit(1).all();
+  const result = await db.select().from(users)
+    .where(eq(users.name, username))
+    .limit(1).all();
   return result.length > 0;
 }
 
@@ -26,7 +28,14 @@ export const getPostsForUser = async (c: Context) => {
     const userData = c.get("user");
     if (userData) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
-      return await db.select().from(posts).where(eq(posts.userId, userData.id)).orderBy(desc(posts.scheduledDate)).all();
+      return await db.select({
+            ...getTableColumns(posts),
+            repostCount: count(reposts.uuid) 
+        })
+        .from(posts).where(eq(posts.userId, userData.id))
+        .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+        .groupBy(posts.uuid)
+        .orderBy(desc(posts.scheduledDate)).all();
     }
   } catch(err) {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
@@ -94,14 +103,21 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime: Date = floorCurrentTime();
 
-  return await db.select().from(posts).where(and(lte(posts.scheduledDate, currentTime), eq(posts.posted, false))).all();
+  return await db.select().from(posts)
+  .where(and(lte(posts.scheduledDate, currentTime), 
+    eq(posts.posted, false)))
+    .all();
 }
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
-  const query = db.select({uuid: reposts.uuid}).from(reposts).where(lte(reposts.scheduledDate, givenDate));
-  return await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId }).from(posts).where(inArray(posts.uuid, query)).all();
+  const query = db.select({uuid: reposts.uuid}).from(reposts)
+    .where(lte(reposts.scheduledDate, givenDate));
+  return await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
+    .from(posts)
+    .where(inArray(posts.uuid, query))
+    .all();
 }
 
 export const getAllRepostsForCurrentTime = async (env: Bindings) => {
@@ -126,5 +142,8 @@ export const getPostById = async(env: Bindings, id: string) => {
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({user: users.username, pass: users.bskyAppPass}).from(users).where(eq(users.id, userid)).limit(1);
+  return await db.select({user: users.username, pass: users.bskyAppPass})
+    .from(users)
+    .where(eq(users.id, userid))
+    .limit(1);
 }

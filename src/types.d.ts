@@ -27,12 +27,18 @@ export enum PostLabel {
   Graphic = "Graphic"
 };
 
+// Basically a copy of the schema
 export type Post = {
   postid: string;
   user: string;
   text: string;
   embeds?: EmbedData[];
   label: PostLabel;
+  posted?: boolean;
+  scheduledDate?: string;
+  repostCount?: number;
+  cid?: string;
+  uri?: string;
 };
 
 export type Repost = {

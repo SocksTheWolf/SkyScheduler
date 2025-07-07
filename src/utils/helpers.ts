@@ -1,4 +1,5 @@
 import { Post, Repost } from "../types";
+import { startOfHour } from "date-fns";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);
@@ -7,6 +8,19 @@ export function createPostObject(data: any) {
   postData.embeds = data.embedContent;
   postData.label = data.contentLabel;
   postData.text = data.content;
+  if (data.repostCount)
+    postData.repostCount = data.repostCount;
+  if (data.posted)
+    postData.posted = data.posted;
+  if (data.scheduledDate)
+    postData.scheduledDate = data.scheduledDate;
+
+  // ATProto data
+  if (data.uri)
+    postData.uri = data.uri;
+  if (data.cid)
+    postData.cid = data.cid;
+  
   return postData;
 }
 
@@ -19,8 +33,5 @@ export function createRepostObject(data: any) {
 };
 
 export function floorCurrentTime() {
-  const currentTime = new Date();
-  // round current time to nearest hour
-  currentTime.setMinutes(0, 0, 0);
-  return currentTime;
+  return startOfHour(new Date());
 }
