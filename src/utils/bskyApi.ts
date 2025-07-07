@@ -44,13 +44,15 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
   try {
     await agent.deleteRepost(content.uri);
   } catch(err) {
-    console.error(`failed to unrepost post, may have never been reposted originally ${err}`);
+    // This probably should not be a warning, and should silently fail.
+    // the only thing that actually matters is the object below.
+    console.warn(`failed to unrepost post ${content.uri} with err ${err}`);
   }
   
   try {
     await agent.repost(content.uri, content.cid);
   } catch(err) {
-    console.error(`Failed to repost, got error ${err}`);
+    console.error(`Failed to repost ${content.uri}, got error ${err}`);
     bWasSuccess = false;
   }
 
@@ -98,7 +100,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       createdAt: new Date().toISOString(),
     };
     if (content.label != PostLabel.None) {
-      let contentStr = "";
+      let contentStr:string = "";
       switch (content.label) {
         case PostLabel.Adult:
           contentStr = "porn";
