@@ -5,7 +5,7 @@ import { and, eq, lte, inArray, desc } from "drizzle-orm";
 import { Bindings } from "../types";
 import { createPostObject, floorCurrentTime } from "./helpers";
 import { deleteFromR2 } from "./r2Query";
-import { isAfter, addHours, setMinutes } from "date-fns";
+import { isAfter, addHours, startOfHour } from "date-fns";
 import { PostSchema } from "./postSchema";
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from "hono";
@@ -57,7 +57,7 @@ export const createPost = async (c: Context, body:any) => {
   }
 
   const { content, scheduledDate, embeds, label, makePostNow, repostData } = validation.data;
-  const scheduleDate = (makePostNow) ? setMinutes(new Date(), 0) : new Date(scheduledDate);
+  const scheduleDate = startOfHour((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, new Date()) && !makePostNow) {
