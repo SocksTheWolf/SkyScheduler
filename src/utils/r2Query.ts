@@ -4,10 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
   if (embeds !== undefined) {
+    let itemsToDelete:string[] = [];
     embeds.forEach(async (data) => {
       console.log(`Deleting ${data.content}...`);
-      await env.R2.delete(data.content);
+      itemsToDelete.push(data.content);
     });
+    await env.R2.delete(itemsToDelete);
   }
 };
 
