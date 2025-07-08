@@ -1,10 +1,13 @@
+import { Context } from "hono";
 import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
-export default function Signup() {
+export default function Signup(props:any) {
+  const ctx: Context = props.c;
   return (
     <BaseLayout title="Signup - SkyScheduler">
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       <br /><br />
       <section class="container">
         <article>
@@ -36,7 +39,11 @@ export default function Signup() {
               <small>This is an invite key to try to dissuade bots. You can ask for the maintainer's signup token</small>
             </label>
 
-            <button type="submit" class="w-full">
+            <label>
+              Captcha
+              <div class="cf-turnstile" data-sitekey={ctx.env.TURNSTILE_PUBLIC_KEY} data-callback="enableSubmit"></div>
+            </label>
+            <button type="submit" id="submitSignup" class="w-full" disabled>
               Sign Up
             </button>
           </form>
@@ -51,6 +58,9 @@ export default function Signup() {
       </section>
       <script>
         {html`
+        function enableSubmit() {
+          document.getElementById("submitSignup").disabled = false;
+        }
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
           e.preventDefault();
           let postObject = {};

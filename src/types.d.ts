@@ -12,6 +12,8 @@ export interface Bindings {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   SIGNUP_TOKEN_SECRET: string;
+  TURNSTILE_PUBLIC_KEY: string;
+  TURNSTILE_SECRET_KEY: string;
 };
 
 export type EmbedData = {

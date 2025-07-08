@@ -177,11 +177,30 @@ app.get("/dashboard", authMiddleware, (c) => {
 
 // Signup route
 app.get("/signup", (c) => {
-  return c.html(<Signup />);
+  return c.html(<Signup c={c} />);
 });
 
 app.post("/signup", async (c) => {
   const body = await c.req.json();
+  const userIP: string|undefined = c.req.header("CF-Connecting-IP");
+  const token = body["cf-turnstile-response"];
+
+  let formData = new FormData();
+  formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
+  formData.append("response", token);
+  if (userIP)
+    formData.append("remoteip", userIP);
+
+  const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    body: formData,
+    method: "POST"
+  });
+
+  const turnstileOutcome = await turnstileFetch.json();
+  if (!turnstileOutcome.success) {
+    return c.json({ok: false, msg: "incorrect captcha solve"}, 401);
+  }
+
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
     return c.json({ ok: false, msg: validation.error.toString() }, 400);
