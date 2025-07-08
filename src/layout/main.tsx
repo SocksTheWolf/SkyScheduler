@@ -1,5 +1,6 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
+import MetaTags from './metaTags';
 
 type BaseLayoutProps = {
   children: Child;
@@ -26,6 +27,7 @@ export const BaseLayout = ({
         href="/stylesheet.css">
       <script type="text/javascript" src="/main.js"></script>
       <title>${title}</title>
+      ${<MetaTags />}
     </head>
     <body>
       <main>

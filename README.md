@@ -50,25 +50,32 @@ cp .dev.vars.example .dev.vars
 
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
-4. Install dependencies
+4. Update your `wrangler.toml` with changes that reflect your account.
+   - You'll need to update the values for the kv, r2, d1 to reflect the bindings on your account.
+   - Also make sure you update the `BETTER_AUTH_URL` to your working url as well.
+   - Do remember to remove the domain bindings!
+
+5. Install dependencies
 ```bash
 npm install
 ```
 
-5. Run the development server
+6. Run the development server
 ```bash
 npm run dev
 ```
 
-6. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
+7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
 ```bash
 npm run deploy
 ```
 
-7. Create your D1 tables using the following command, this will set up your tables both locally and remotely
+8. Create your D1 tables using the following command, this will set up your tables both locally and remotely
 ```bash
 npm run migrate:all
-``` 
+```
+
+9. Modify the metatags located in the `metaTags.tsx` (these are currently set up for the website attached to this project)
 
 ## Configuration
 
