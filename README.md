@@ -45,6 +45,8 @@ cp .dev.vars.example .dev.vars
    - `DEFAULT_ADMIN_PASS` - the admin password
    - `DEFAULT_ADMIN_BSKY_PASS` - the above account's bsky app password
    - `SIGNUP_TOKEN_SECRET` - the invite code/password for this app.
+   - `TURNSTILE_PUBLIC_KEY` - the turnstile public key for captcha
+   - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
 
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
