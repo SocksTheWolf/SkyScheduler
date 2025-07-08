@@ -49,7 +49,7 @@
 .btn-delete {
   float: right;
   svg {
-    margin-top: -7px;
+    margin-top: -10px;
   }
 }
 
@@ -93,8 +93,12 @@
   display: inline-block;
 }
 
-#refresh-posts > span, #settingsButton > span, .controls > button {
+#refresh-posts > span, #settingsButton > span{
   margin-right: 5px;
+}
+
+.controls > button {
+  margin-right: 10px;
 }
 
 .smallest {
