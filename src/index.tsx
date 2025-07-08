@@ -211,7 +211,8 @@ app.post("/signup", async (c) => {
     return c.json({ok: false, msg: "user already exists"}, 401);
   }
 
-  if (signupToken !== c.env.SIGNUP_TOKEN_SECRET) {
+  const signupTokenKey = c.env.SIGNUP_TOKEN_SECRET;
+  if (!isEmpty(signupTokenKey) && signupToken.toLowerCase() !== signupTokenKey.toLowerCase()) {
     return c.json({ok: false, msg: "invalid signup token value"}, 400);
   }
 
