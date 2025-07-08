@@ -31,7 +31,7 @@ binding = "R2"
 bucket_name = "skyembeds"
 
 [[kv_namespaces]]
-binding = "SKYSCHEDULER_KV"
+binding = "KV"
 id = "0ecd892014ac47eea38c72be94586e7b"
 
 [images]
