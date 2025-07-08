@@ -112,3 +112,7 @@
 #loginForm button[type="submit"] {
   width: 50%;
 }
+
+.inline-header {
+  margin-top: unset;
+}

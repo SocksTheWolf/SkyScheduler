@@ -7,22 +7,21 @@ export default function Home() {
       <NavTags />
       <section class="container">
         <article>
-          <header><h2>SkyScheduler</h2></header>
           <p>
-            SkyScheduler is a tool that lets you schedule and automatically repost your content automatically on Bluesky!<br />
+            <strong>SkyScheduler</strong> is a tool that lets you schedule and automatically repost your content automatically on Bluesky!<br />
             Boost engagement and reach more people no matter what time of day!<br />
             <center>
               <figure>
                 <img
-                  src="/dashboard.jpg"
+                  src="/dashboard.png"
                   alt="Picture of SkyScheduler Dashboard"
                 />
                 <figcaption>
-                  Picture of SkyScheduler's Dashboard
+                  An amazing picture of SkyScheduler's Dashboard
                 </figcaption>
               </figure>
             </center>
-            <h5>Features:</h5>
+            <h6 class="inline-header">Features:</h6>
             <ul>
               <li>Handles multiple users/accounts easily</li>
               <li>Schedule your posts any time in the future (to the nearest hour)</li>

@@ -8,10 +8,12 @@ export default function MetaTags() {
       <meta property="og:url" content="https://skyscheduler.work/" />
       <meta property="og:title" content="SkyScheduler" />
       <meta property="og:description" content="Schedule and automatically repost your content automatically on Bluesky! Boost engagement and reach more people no matter what time of day!" />
+      <meta property="og:image" content="https://skyscheduler.work/dashboard.png" />
       <meta property="twitter:card" content="summary_large_image" />
       <meta property="twitter:url" content="https://skyscheduler.work/" />
       <meta property="twitter:title" content="SkyScheduler" />
       <meta property="twitter:description" content="Schedule and automatically repost your content automatically on Bluesky! Boost engagement and reach more people no matter what time of day!" />
+      <meta property="twitter:image" content="https://skyscheduler.work/dashboard.png" />
     </>
   );
 };
