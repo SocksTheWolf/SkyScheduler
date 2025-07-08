@@ -87,6 +87,15 @@ app.post("/account/update", authMiddleware, async (c) => {
   return c.html(<b class="btn-error">Unknown error occurred</b>);
 });
 
+// endpoint that just returns current username
+app.get("/account/username", authMiddleware, async (c) => {
+  const userData = c.get("user");
+  if (userData) {
+    return c.text(userData.username);
+  }
+  return c.text("");
+});
+
 // proxy the logout call because of course this wouldn't work properly anyways
 app.post("/account/logout", authMiddleware, async (c) => {
   try {
