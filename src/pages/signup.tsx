@@ -47,6 +47,7 @@ export default function Signup(props:any) {
               Sign Up
             </button>
           </form>
+          <span aria-busy="true" id="loading" hidden>Signing up...</span>
           <footer>
             <center>
               <small>
@@ -58,6 +59,7 @@ export default function Signup(props:any) {
       </section>
       <script>
         {html`
+        const loadingBar = document.getElementById("loading");
         function enableSubmit() {
           document.getElementById("submitSignup").disabled = false;
         }
@@ -66,6 +68,7 @@ export default function Signup(props:any) {
         }
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
           e.preventDefault();
+          loadingBar.removeAttribute("hidden");
           let postObject = {};
           document.querySelectorAll("input").forEach((el) => {
             postObject[el.name] = el.value;
@@ -78,6 +81,7 @@ export default function Signup(props:any) {
             });
 
             const data = await response.json();
+            loadingBar.setAttribute("hidden", true);
             if (response.ok) {
               pushToast("success! redirecting to login...", true);
               setTimeout(goToLogin, 3000);

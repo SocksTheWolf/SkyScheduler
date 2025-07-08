@@ -13,19 +13,20 @@ export default function Home() {
           <form id="loginForm">
             <label>
               Bluesky Handle
-              <input type="text" id="username" placeholder="" />
+              <input type="text" name="username" id="username" placeholder="" />
               <small>In the format of a custom domain or <code>socksthewolf.bsky.social</code></small>
             </label>
 
             <label>
               Dashboard Password
-              <input type="password" id="password" placeholder="" />
+              <input type="password" name="password" id="password" placeholder="" />
               <small><b>NOTE</b>: This password is not related to your bluesky account!</small>
             </label>
 
             <button type="submit" class="w-full">
               Login
             </button>
+            <span aria-busy="true" id="loading" hidden>Logging in...</span>
           </form>
           <footer>
             <center>
@@ -36,8 +37,10 @@ export default function Home() {
       </section>
       <script>
         {html`
+        const loadingBar = document.getElementById("loading");
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
           e.preventDefault();
+          loadingBar.removeAttribute("hidden");
           let postObject = {};
           document.querySelectorAll("input").forEach((el) => {
             postObject[el.name] = el.value;
@@ -50,6 +53,7 @@ export default function Home() {
             });
 
             const data = await response.json();
+            loadingBar.setAttribute("hidden", true);
             if (response.ok)
               window.location.href = '/dashboard';
             else
