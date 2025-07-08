@@ -2,17 +2,19 @@ import { Context } from "hono";
 import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import ProcessAccountForm from "../layout/accountForm";
+import NavTags from "../layout/navTags";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
   return (
-    <BaseLayout title="Signup - SkyScheduler">
+    <BaseLayout title="SkyScheduler - Signup">
+      <NavTags />
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-      <br /><br />
       <section class="container">
         <article>
           <header>
-            <center><h2>Account Signup</h2></center>
+            <center><h3>SkyScheduler Account Signup</h3></center>
           </header>
           <form id="loginForm">
             <label>
@@ -43,58 +45,22 @@ export default function Signup(props:any) {
               Captcha
               <div class="cf-turnstile" data-sitekey={ctx.env.TURNSTILE_PUBLIC_KEY} data-callback="enableSubmit"></div>
             </label>
-            <button type="submit" id="submitSignup" class="w-full" disabled>
-              Sign Up
-            </button>
-          </form>
-          <span aria-busy="true" id="loading" hidden>Signing up...</span>
-          <footer>
             <center>
-              <small>
-                <a class="contrast outline" href="/">Go Back</a>
-              </small>
+              <button type="submit" id="submitSignup" disabled>
+                Sign Up
+              </button>
             </center>
-          </footer>
+          </form>
+          <ProcessAccountForm text="Signing up..." />
         </article>
       </section>
       <script>
-        {html`
-        const loadingBar = document.getElementById("loading");
+      {html`
         function enableSubmit() {
           document.getElementById("submitSignup").disabled = false;
         }
-        function goToLogin() {
-          window.location.href = "/";
-        }
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          loadingBar.removeAttribute("hidden");
-          let postObject = {};
-          document.querySelectorAll("input").forEach((el) => {
-            postObject[el.name] = el.value;
-          });
-          try {
-            const response = await fetch('/signup', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json' },
-              body: JSON.stringify(postObject)
-            });
-
-            const data = await response.json();
-            loadingBar.setAttribute("hidden", true);
-            if (response.ok) {
-              pushToast("success! redirecting to login...", true);
-              setTimeout(goToLogin, 3000);
-            }
-            else
-              pushToast(data.msg, false);
-
-          } catch (err) {
-            pushToast("An error occurred", false);
-            console.error(err);
-          }
-        });
-        `}
+        easySetup("/account/signup", "success! redirecting to login...", "/login");
+      `}
       </script>
     </BaseLayout>
   );

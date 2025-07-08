@@ -1,71 +1,40 @@
-import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
+import NavTags from "../layout/navTags";
 
 export default function Home() {
   return (
-    <BaseLayout title="Login - SkyScheduler">
-      <br /><br />
+    <BaseLayout title="SkyScheduler - Home">
+      <NavTags />
       <section class="container">
         <article>
-          <header>
-            <center><h2>Login to portal</h2></center>
-          </header>
-          <form id="loginForm">
-            <label>
-              Bluesky Handle
-              <input type="text" name="username" id="username" placeholder="" />
-              <small>In the format of a custom domain or <code>socksthewolf.bsky.social</code></small>
-            </label>
-
-            <label>
-              Dashboard Password
-              <input type="password" name="password" id="password" placeholder="" />
-              <small><b>NOTE</b>: This password is not related to your bluesky account!</small>
-            </label>
-
-            <button type="submit" class="w-full">
-              Login
-            </button>
-            <span aria-busy="true" id="loading" hidden>Logging in...</span>
-          </form>
-          <footer>
+          <header><h2>SkyScheduler</h2></header>
+          <p>
+            SkyScheduler is a tool that lets you schedule and automatically repost your content automatically on Bluesky!<br />
+            Boost engagement and reach more people no matter what time of day!<br />
             <center>
-              <a href="/signup" class="contrast outline">Sign-up</a>
+              <figure>
+                <img
+                  src="/dashboard.jpg"
+                  alt="Picture of SkyScheduler Dashboard"
+                />
+                <figcaption>
+                  Picture of SkyScheduler's Dashboard
+                </figcaption>
+              </figure>
             </center>
-          </footer>
+            <h5>Features:</h5>
+            <ul>
+              <li>Handles multiple users/accounts easily</li>
+              <li>Schedule your posts any time in the future (to the nearest hour)</li>
+              <li>Supports embeds, link embeds, tagging, mentions</li>
+              <li>Post images with content labels and alt text</li>
+              <li>Create and schedule threads of posts</li>
+              <li>Automatically repost your posts at an interval of your choosing</li>
+            </ul>
+          </p>
+          <footer><small><a class="secondary" target="_blank" href="https://github.com/SocksTheWolf/SkyScheduler">SkyScheduler</a> &copy; {new Date().getFullYear()} <a href="https://socksthewolf.com">SocksTheWolf</a></small></footer>
         </article>
       </section>
-      <script>
-        {html`
-        const loadingBar = document.getElementById("loading");
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          loadingBar.removeAttribute("hidden");
-          let postObject = {};
-          document.querySelectorAll("input").forEach((el) => {
-            postObject[el.name] = el.value;
-          });
-          try {
-            const response = await fetch('/api/auth/sign-in/username', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json' },
-              body: JSON.stringify(postObject)
-            });
-
-            const data = await response.json();
-            loadingBar.setAttribute("hidden", true);
-            if (response.ok)
-              window.location.href = '/dashboard';
-            else
-              pushToast(data.message, false);
-
-          } catch (err) {
-            pushToast("An error occurred", false);
-            console.error(err);
-          }
-        });
-        `}
-      </script>
     </BaseLayout>
   );
 }

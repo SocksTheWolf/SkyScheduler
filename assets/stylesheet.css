@@ -96,3 +96,15 @@
 #refresh-posts > span, #settingsButton > span, .controls > button {
   margin-right: 5px;
 }
+
+.smallest {
+  text-align: center;
+  font-size: smaller;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: var(--pico-muted-color);
+}
+
+#loginForm button[type="submit"] {
+  width: 50%;
+}

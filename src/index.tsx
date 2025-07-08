@@ -17,6 +17,7 @@ import { uploadFileR2 } from "./utils/r2Query";
 import { SignupSchema } from "./validation/signupSchema";
 import { AccountUpdateSchema } from "./validation/accountUpdateSchema";
 import isEmpty from "just-is-empty";
+import Login from "./pages/login";
 
 type Variables = {
   auth: ReturnType<typeof createAuth>;
@@ -89,8 +90,8 @@ app.post("/account/update", authMiddleware, async (c) => {
 
 // endpoint that just returns current username
 app.get("/account/username", authMiddleware, async (c) => {
-  const userData = c.get("user");
-  if (userData) {
+  const userData:any = c.get("user" as any);
+  if (userData !== null) {
     return c.text(userData.username);
   }
   return c.text("");
@@ -163,7 +164,7 @@ app.post("/post/:id/delete", authMiddleware, async (c) => {
   return c.redirect("/posts");
 });
 
-// Root route with login form
+// Root route
 app.get("/", (c) => {
   return c.html(<Home />);
 });
@@ -175,12 +176,16 @@ app.get("/dashboard", authMiddleware, (c) => {
   );
 });
 
+app.get("/login", (c) => {
+  return c.html(<Login />);
+});
+
 // Signup route
 app.get("/signup", (c) => {
   return c.html(<Signup c={c} />);
 });
 
-app.post("/signup", async (c) => {
+app.post("/account/signup", async (c) => {
   const body = await c.req.json();
   const userIP: string|undefined = c.req.header("CF-Connecting-IP");
   const token = body["cf-turnstile-response"];
@@ -192,28 +197,34 @@ app.post("/signup", async (c) => {
     formData.append("remoteip", userIP);
 
   const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    body: formData,
-    method: "POST"
+    method: "POST",
+    body: formData
   });
 
-  const turnstileOutcome = await turnstileFetch.json();
+  // Check if we could contact siteverify
+  if (!turnstileFetch.ok) {
+    return c.json({ok: false, message: "timed out verifying captcha"}, 400);
+  }
+
+  // Check if the output was okay
+  const turnstileOutcome:any = await turnstileFetch.json();
   if (!turnstileOutcome.success) {
-    return c.json({ok: false, msg: "incorrect captcha solve"}, 401);
+    return c.json({ok: false, message: "incorrect captcha solve"}, 401);
   }
 
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ ok: false, msg: validation.error.toString() }, 400);
+    return c.json({ ok: false, message: validation.error.toString() }, 400);
   }
 
   const { signupToken, username, password, bskyAppPassword } = validation.data;
   if (await doesUserExist(c, username)) {
-    return c.json({ok: false, msg: "user already exists"}, 401);
+    return c.json({ok: false, message: "user already exists"}, 401);
   }
 
   const signupTokenKey = c.env.SIGNUP_TOKEN_SECRET;
   if (!isEmpty(signupTokenKey) && signupToken.toLowerCase() !== signupTokenKey.toLowerCase()) {
-    return c.json({ok: false, msg: "invalid signup token value"}, 400);
+    return c.json({ok: false, message: "invalid signup token value"}, 400);
   }
 
   // create the user
@@ -229,9 +240,9 @@ app.post("/signup", async (c) => {
 
   if (createUser.token !== null) {
     console.log(`user ${username} created!`);
-    return c.json({ok: true, msg: "signup success"});
+    return c.json({ok: true, message: "signup success"});
   }
-  return c.json({ok: false, msg: "unknown error occurred"}, 501);
+  return c.json({ok: false, message: "unknown error occurred"}, 501);
 });
 
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {

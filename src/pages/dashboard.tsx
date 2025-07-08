@@ -8,7 +8,7 @@ export default function Dashboard(props:any) {
   const ctx: Context = props.c;
 
   return (
-    <BaseLayout title="Dashboard - SkyScheduler">
+    <BaseLayout title="SkyScheduler - Dashboard">
       <div class="grid">
         <section class="max-width-50">
           <article>
