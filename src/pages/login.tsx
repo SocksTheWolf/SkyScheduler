@@ -31,7 +31,7 @@ export default function Login() {
             </center>
           </form>
           <p class="smallest"><b>Forgot your password?</b> Contact the project admin to get your password reset.<br />
-              <em>Autoated resets are coming soon!</em></p>
+              <em>Automated resets are coming soon!</em></p>
           <ProcessAccountForm text="Logging in..." />
           <footer>
             <center>
@@ -42,7 +42,7 @@ export default function Login() {
       </section>
       <script>
       {html`
-        easySetup("/api/auth/sign-in/username", "success! redirecting to dashboard...", "/dashboard");
+        easySetup("/api/auth/sign-in/username", "Success! Redirecting to dashboard...", "/dashboard");
       `}
       </script>
     </BaseLayout>

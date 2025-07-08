@@ -59,7 +59,7 @@ export default function Signup(props:any) {
         function enableSubmit() {
           document.getElementById("submitSignup").disabled = false;
         }
-        easySetup("/account/signup", "success! redirecting to login...", "/login");
+        easySetup("/account/signup", "Success! Redirecting to login...", "/login");
       `}
       </script>
     </BaseLayout>
