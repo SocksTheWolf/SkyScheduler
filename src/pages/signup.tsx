@@ -61,6 +61,9 @@ export default function Signup(props:any) {
         function enableSubmit() {
           document.getElementById("submitSignup").disabled = false;
         }
+        function goToLogin() {
+          window.location.href = "/";
+        }
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
           e.preventDefault();
           let postObject = {};
@@ -75,8 +78,10 @@ export default function Signup(props:any) {
             });
 
             const data = await response.json();
-            if (response.ok)
-              window.location.href = '/';
+            if (response.ok) {
+              pushToast("success! redirecting to login...", true);
+              setTimeout(goToLogin, 3000);
+            }
             else
               pushToast(data.msg, false);
 
