@@ -2,19 +2,21 @@ import { Env, Hono } from "hono";
 import { every } from 'hono/combine'
 import { cors } from "hono/cors";
 import { auth, createAuth } from "./auth";
-import { Bindings } from "./types.d";
+import { Bindings, LooseObj } from "./types.d";
 import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import { schedulePostTask } from "./utils/scheduler";
-import { createPost, deletePost, doesAdminExist, doesUserExist, getPostById } from "./utils/dbQuery";
+import { createPost, deletePost, doesAdminExist, doesUserExist, getPostById, updateUserData } from "./utils/dbQuery";
 import { createPostObject } from "./utils/helpers";
 import { makePost } from "./utils/bskyApi";
 import { ScheduledPostList } from "./layout/postList";
 import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { uploadFileR2 } from "./utils/r2Query";
-import { SignupSchema } from "./utils/signupSchema";
+import { SignupSchema } from "./validation/signupSchema";
+import { AccountUpdateSchema } from "./validation/accountUpdateSchema";
+import isEmpty from "just-is-empty";
 
 type Variables = {
   auth: ReturnType<typeof createAuth>;
@@ -49,11 +51,47 @@ app.all("/api/auth/*", async (c) => {
   return auth.handler(c.req.raw);
 });
 
+app.post("/account/update", authMiddleware, async (c) => {
+  const body = await c.req.parseBody();
+  const auth = c.get("auth");
+  const validation = AccountUpdateSchema.safeParse(body);
+  if (!validation.success) {
+    console.log(validation.error);
+    return c.html(<b class="btn-error">Failed Validation</b>);
+  }
+
+  const { username, password, bskyAppPassword } = validation.data;
+  let newObject:LooseObj = {};
+  if (!isEmpty(username))
+    newObject.username = username!;
+
+  if (!isEmpty(bskyAppPassword))
+    newObject.bskyAppPass = bskyAppPassword;
+
+  if (!isEmpty(password)) {
+    // attempt to rehash the password (ugh slow.)
+    const authCtx = await auth.$context;
+    newObject.password = await authCtx.password.hash(password!);
+  }
+
+  // Check to see if we made any changes at all
+  if (isEmpty(newObject)) {
+    return c.html(<b class="btn-error">No Changes Made</b>);
+  }
+
+  const userUpdated = await updateUserData(c, newObject);
+  if (userUpdated) {
+    c.header("HX-Trigger", "accountUpdated");
+    return c.html(<></>);
+  }
+  return c.html(<b class="btn-error">Unknown error occurred</b>);
+});
+
 // proxy the logout call because of course this wouldn't work properly anyways
-app.post("/logout", authMiddleware, async (c) => {
+app.post("/account/logout", authMiddleware, async (c) => {
   try {
     const auth = c.get("auth");
-    await auth.api.signOut(c.req.raw);
+    await auth.api.signOut(c.req.raw as any);
   } catch(err) {
     console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
   }

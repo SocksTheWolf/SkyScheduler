@@ -51,3 +51,7 @@ export type PostResponseObject = {
   uri: string;
   cid: string;
 };
+
+export interface LooseObj {
+  [key: string]: any;
+};

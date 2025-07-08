@@ -3,14 +3,18 @@ import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { and, eq, lte, inArray, desc, count, getTableColumns } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts } from "../db/app.schema";
-import { users } from "../db/auth.schema";
-import { PostSchema } from "./postSchema";
+import { accounts, users } from "../db/auth.schema";
+import { PostSchema } from "../validation/postSchema";
 import { Bindings } from "../types";
 
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteFromR2 } from "./r2Query";
 import { isAfter, addHours } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
+import has from "just-has";
+import isEmpty from "just-is-empty";
+
+type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 
 export const doesUserExist = async (c: Context, username:string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -43,6 +47,39 @@ export const getPostsForUser = async (c: Context) => {
   }
   return null;
 };
+
+export const updateUserData = async (c: Context, newData: any) => {
+  const userData = c.get("user");
+  try {
+    if (userData) {
+      const db: DrizzleD1Database = drizzle(c.env.DB);
+      let queriesToExecute:BatchItem<"sqlite">[] = [];
+
+      if (has(newData, "password")) {
+        // cache out the new hash
+        const newPassword = newData.password;
+        // remove it from the original object
+        delete newData.password;
+
+        // add the query to the db batch object
+        queriesToExecute.push(db.update(accounts)
+          .set({password: newPassword})
+          .where(eq(accounts.userId, userData.id)));
+      }
+
+      if (!isEmpty(newData)) {
+        queriesToExecute.push(db.update(users).set(newData)
+          .where(eq(users.id, userData.id)));
+      }
+
+      await db.batch(queriesToExecute as BatchQuery);
+      return true;
+    }
+  } catch(err) {
+    console.error(`Failed to update new user data for user ${userData.id}: ${userData.username}`);
+  }
+  return false;
+}
 
 export const deletePost = async (env: Bindings, id:string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
@@ -95,7 +132,7 @@ export const createPost = async (c: Context, body:any) => {
   }
 
   // TODO: Check success better here
-  await db.batch(dbOperations);
+  await db.batch(dbOperations as BatchQuery);
   return { ok: true, postNow: makePostNow, postId: postUUID };
 };
 

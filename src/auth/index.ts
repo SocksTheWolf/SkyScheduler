@@ -6,6 +6,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
+import { usernameRegex } from "../validation/regexCases";
+import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
@@ -15,29 +17,34 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
     return betterAuth({
         ...withCloudflare(
             {
-                autoDetectIpAddress: false,
-                geolocationTracking: false,
-                cf: cf || {},
-                d1: env
-                  ? {
-                        db,
-                        options: {
-                            usePlural: true,
-                            debugLogs: false,
-                        },
-                    }
-                  : undefined,
-                kv: env?.KV,
+              autoDetectIpAddress: false,
+              geolocationTracking: false,
+              cf: cf || {},
+              d1: env
+                ? {
+                      db,
+                      options: {
+                          usePlural: true,
+                          debugLogs: false,
+                      },
+                  }
+                : undefined,
+              kv: env?.KV,
             },
             {
-                emailAndPassword: {
-                    enabled: true,
-                    requireEmailVerification: false,
-                },
-                plugins: [username()],
-                rateLimit: {
-                    enabled: true,
-                },
+              emailAndPassword: {
+                  enabled: true,
+                  requireEmailVerification: false,
+              },
+              plugins: [username({
+                  minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
+                  usernameValidator: (username) => {
+                    return usernameRegex.test(username);
+                  },
+              })],
+              rateLimit: {
+                  enabled: true,
+              },
             }
         ),
         secret: env?.BETTER_AUTH_SECRET,
@@ -60,12 +67,12 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         ...(env
             ? {}
             : {
-                  database: drizzleAdapter({} as D1Database, {
-                      provider: "sqlite",
-                      usePlural: true,
-                      debugLogs: false,
-                  }),
+              database: drizzleAdapter({} as D1Database, {
+                  provider: "sqlite",
+                  usePlural: true,
+                  debugLogs: false,
               }),
+            }),
     });
 }
 

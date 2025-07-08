@@ -46,7 +46,7 @@ cp .dev.vars.example .dev.vars
    - `DEFAULT_ADMIN_BSKY_PASS` - the above account's bsky app password
    - `SIGNUP_TOKEN_SECRET` - the invite code/password for this app.
 
-Note: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
+**Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
 4. Install dependencies
 ```bash
@@ -85,7 +85,8 @@ skyscheduler/
 │   ├── middleware/
 │   ├── layout/
 │   ├── pages/
-│   └── utils/
+│   ├── utils/
+│   └── validation/
 ├── migrations/
 ├── .dev.vars
 ├── drizzle.config.ts

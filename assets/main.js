@@ -33,3 +33,9 @@ document.addEventListener("showDeleteMsg", function(evt) {
 document.addEventListener("timeSidebar", function(ev) {
   updateAllTimes();
 });
+
+document.addEventListener("accountUpdated", function(ev) {
+  closeModal(document.getElementById("changeInfo"));
+  document.getElementById("settingsData").reset();
+  pushToast("Settings Updated!", true);
+});

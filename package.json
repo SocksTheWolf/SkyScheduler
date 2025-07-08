@@ -18,6 +18,8 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
     "hono": "^4.8.3",
+    "just-has": "^2.3.0",
+    "just-is-empty": "^3.4.1",
     "just-truncate": "^2.2.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.67"
