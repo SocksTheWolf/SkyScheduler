@@ -8,7 +8,7 @@ export default function Home() {
       <section class="container">
         <article>
           <p>
-            <strong>SkyScheduler</strong> is a tool that lets you schedule and automatically repost your content automatically on Bluesky!<br />
+            <strong>SkyScheduler</strong> is a tool that lets you schedule and automatically repost your content on Bluesky!<br />
             Boost engagement and reach more people no matter what time of day!<br />
             <center>
               <figure>
@@ -31,7 +31,10 @@ export default function Home() {
               <li>Automatically repost your posts at an interval of your choosing</li>
             </ul>
           </p>
-          <footer><small><a class="secondary" target="_blank" href="https://github.com/SocksTheWolf/SkyScheduler">SkyScheduler</a> &copy; {new Date().getFullYear()} <a href="https://socksthewolf.com">SocksTheWolf</a></small></footer>
+          <footer><small>
+            <a class="secondary" target="_blank" href="https://github.com/SocksTheWolf/SkyScheduler">SkyScheduler</a> &copy; {new Date().getFullYear()} <a href="https://socksthewolf.com">SocksTheWolf</a> - 
+            <a class="secondary" target="_blank" href="https://ko-fi.com/socksthewolf">Tip/Donate</a>
+          </small></footer>
         </article>
       </section>
     </BaseLayout>

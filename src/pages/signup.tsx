@@ -36,9 +36,9 @@ export default function Signup(props:any) {
             </label>
 
             <label>
-              Invite Key
+              Invite Key/Signup Token
               <input type="text" name="signupToken" placeholder="" required />
-              <small>This is an invite key to try to dissuade bots. You can ask for the maintainer's signup token</small>
+              <small>This is an invite key to try to dissuade bots/automated applications. You can ask for the maintainer for it.</small>
             </label>
 
             <label>
