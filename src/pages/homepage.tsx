@@ -20,7 +20,7 @@ export default function Home() {
             <label>
               Dashboard Password
               <input type="password" id="password" placeholder="" />
-              <small><b>NOTE</b>: This is not a bsky app password!</small>
+              <small><b>NOTE</b>: This password is not related to your bluesky account!</small>
             </label>
 
             <button type="submit" class="w-full">

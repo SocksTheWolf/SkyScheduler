@@ -15,7 +15,7 @@ export default function Signup() {
             <label>
               Dashboard Password
               <input type="password" name="password" placeholder="" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
-              <small>This is not your bsky app password, but a new password you'll use to login to the tool. <b>DO NOT LOSE THIS PASSWORD, IT CANNOT BE CHANGED.</b></small>
+              <small>Create a new password unrelated with bluesky to use to login to this website</small>
             </label>
 
             <label>

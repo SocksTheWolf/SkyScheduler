@@ -16,7 +16,7 @@ export default function Dashboard(props:any) {
               <h3>SkyScheduler Dash</h3>
               <div>
                 <small>Schedule Bluesky posts effortlessly.</small><br />
-                <small>User: <b id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body" hx-target="this">{ctx.get("user").username}</b></small>
+                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body" hx-target="this">{ctx.get("user").username}</b></small>
               </div>
               <br />
               <center class="controls">
