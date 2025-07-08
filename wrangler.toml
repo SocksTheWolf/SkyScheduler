@@ -6,6 +6,11 @@ send_metrics = false
 # turn off preview urls to lower confusion
 preview_urls = false
 
+# Domain for the website
+routes = [
+  { pattern = "skyscheduler.work", custom_domain = true }
+]
+
 [observability]
 enabled = true
 head_sampling_rate = 1
@@ -39,7 +44,7 @@ crons = [ "0 * * * *" ] # at the start of every hour
 [vars]
 # the domain and protocol that this application is hosted on
 # this value is also used for CORS
-BETTER_AUTH_URL="https://skyscheduler.socks-c56.workers.dev"
+BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms
 USE_IMAGE_TRANSFORMS=true
