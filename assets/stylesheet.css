@@ -93,6 +93,6 @@
   display: inline-block;
 }
 
-#refresh-posts > span, .controls > button {
+#refresh-posts > span, #settingsButton > span, .controls > button {
   margin-right: 5px;
 }

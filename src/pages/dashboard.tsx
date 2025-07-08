@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import PostCreation from "../layout/makePost";
-import { BaseLayout } from "../layout";
+import { BaseLayout } from "../layout/main";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 

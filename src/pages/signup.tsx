@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { BaseLayout } from "../layout";
+import { BaseLayout } from "../layout/main";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
 export default function Signup() {

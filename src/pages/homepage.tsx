@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { BaseLayout } from "../layout";
+import { BaseLayout } from "../layout/main";
 
 export default function Home() {
   return (
