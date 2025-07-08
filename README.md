@@ -9,13 +9,13 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 ## Features
 
-- **Multiple user/account handling**: Have your friends also be able to post and repost stuff automatically! Wow!
+- **Multiple user/account handling**: Manage multiple users/bsky accounts easily
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
-- **Simple and Lightweight**: Minimal setup and easy to use
-- **Supports media posts**: Automatically handles content tagging and formating your media so that it looks the best on BSky. Image transforms via Cloudflare Images.
+- **Simple and Lightweight**: Fairly minimal setup and easy to use
+- **Supports media posts**: Automatically handles content tagging and formating your media so that it looks the best on BSky. Image transforms via Cloudflare Images
 - **Handles threading**: Post is over the 300 character limit? The system will autothread your posts for you
-- **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work.
+- **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work
 
 ## Getting Started
 
@@ -23,7 +23,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - Node.js (v20.x or later)
 - Package Manager
-- Cloudflare Pro Workers account
+- Cloudflare Pro Workers account (otherwise you will hit the cpu limit)
 
 ### Installation
 
@@ -39,14 +39,12 @@ cp .dev.vars.example .dev.vars
 ```
 
 3. Configure your `.dev.vars` file with the following environment variables:
-   - `BETTER_AUTH_SECRET` - a cryptographic value to use for any authentication you might be using
-   - `BETTER_AUTH_URL` - the working url of your application.
-   - `DEFAULT_ADMIN_USER` - the admin username (this should be a bsky handle)
+   - `BETTER_AUTH_SECRET` - the cryptographic hash to use better auth ([you can generate one from this page](https://www.better-auth.com/docs/installation))
+   - `BETTER_AUTH_URL` - the working url of your site (this should be "*" in dev).
+   - `DEFAULT_ADMIN_USER` - the admin bsky handle
    - `DEFAULT_ADMIN_PASS` - the admin password
-   - `DEFAULT_ADMIN_BSKY_PASS` - the admin default app password
+   - `DEFAULT_ADMIN_BSKY_PASS` - the above account's bsky app password
    - `SIGNUP_TOKEN_SECRET` - the invite code/password for this app.
-
-These settings should reflect the same sort of values that you would set for your BetterAuth install.
 
 Note: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
@@ -68,7 +66,7 @@ npm run deploy
 7. Create your D1 tables using the following command, this will set up your tables both locally and remotely
 ```bash
 npm run migrate:all
-```
+``` 
 
 ## Configuration
 
@@ -80,8 +78,11 @@ Ensure you have configured the `.dev.vars` file with the necessary credentials a
 
 ```
 skyscheduler/
+├── assets/
 ├── src/
+│   ├── auth/
 │   ├── db/
+│   ├── middleware/
 │   ├── layout/
 │   ├── pages/
 │   └── utils/
