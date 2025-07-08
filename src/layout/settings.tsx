@@ -8,25 +8,31 @@ export function Settings() {
         <header>
           <h5>Change Account Info</h5>
         </header>
-        <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" hx-swap="innerHTML">
-          <label>
-            BSky Username: <input type="input" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
-            <small>Only change this if you have recently changed your bsky handle</small>
-          </label>
-          <label>
-            Dashboard Pass: <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
-            <small>The password to access this website</small>
-          </label>
-          <label>
-            BSky App Password: <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
-            <small>If you need to change your application password for whatever reason</small>
-          </label>
-        </form>
+        <p>Only fill in the textboxes that you want to change. 
+          Fields that contain no data in them will continue to use the old value.
+        </p>
         <br />
-        <center>
-          <div id="accountResponse">
-          </div>
-        </center>
+        <section>
+          <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" hx-swap="innerHTML">
+            <label>
+              BSky Username: <input type="input" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
+              <small>Only change this if you have recently changed your bsky handle</small>
+            </label>
+            <label>
+              Dashboard Pass: <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
+              <small>The password to access this website</small>
+            </label>
+            <label>
+              BSky App Password: <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
+              <small>If you need to change your application password for whatever reason</small>
+            </label>
+          </form>
+          <br />
+          <center>
+            <div id="accountResponse">
+            </div>
+          </center>
+        </section>
         <footer>
           <button form="settingsData">Save</button>
           <button class="secondary" onclick='closeModal(document.getElementById("changeInfo"));'>Cancel</button>
