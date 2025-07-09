@@ -13,7 +13,8 @@ export function Settings() {
         </p>
         <br />
         <section>
-          <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" hx-swap="innerHTML">
+          <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" 
+            hx-swap="innerHTML" hx-indicator="#spinner">
             <label>
               BSky Username: <input type="input" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
               <small>Only change this if you have recently changed your bsky handle</small>
@@ -28,6 +29,7 @@ export function Settings() {
             </label>
           </form>
           <br />
+          <progress id="spinner" class="htmx-indicator" />
           <center>
             <div id="accountResponse">
             </div>
