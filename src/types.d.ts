@@ -12,7 +12,6 @@ export interface Bindings {
   IMAGE_DEGRADE_PER_STEP: number;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
-  SIGNUP_TOKEN_SECRET: string;
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
   USE_TURNSTILE_CAPTCHA: boolean;
