@@ -11,6 +11,14 @@ routes = [
   { pattern = "skyscheduler.work", custom_domain = true }
 ]
 
+# KV Dataspaces
+kv_namespaces = [
+  # Redis for sessions
+  { binding = "KV", id = "0ecd892014ac47eea38c72be94586e7b" },
+  # Invite key pool
+  { binding = "INVITE_POOL", id = "45e1cff45cad45c28b22c4fbcd30db00" }
+]
+
 [observability]
 enabled = true
 head_sampling_rate = 1
@@ -29,10 +37,6 @@ migrations_dir = "migrations"
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "skyembeds"
-
-[[kv_namespaces]]
-binding = "KV"
-id = "0ecd892014ac47eea38c72be94586e7b"
 
 [images]
 binding = "IMAGES"
@@ -54,3 +58,6 @@ MAX_IMAGE_QUALITY_STEPS=6
 
 # how much should the image quality go down per steps
 IMAGE_DEGRADE_PER_STEP=5
+
+# Should we use turnstile captchas?
+USE_TURNSTILE_CAPTCHA=true

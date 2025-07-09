@@ -18,6 +18,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - **Supports media posts**: Automatically handles content tagging and formating your media so that it looks the best on BSky. Image transforms via Cloudflare Images
 - **Handles threading**: Post is over the 300 character limit? The system will autothread your posts for you
 - **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work
+- **Invite Keys**: Want to throttle the signups to your portal or keep the pool to friends/org only? Use invite keys to manage signups
 
 ## Getting Started
 
@@ -46,7 +47,6 @@ cp .dev.vars.example .dev.vars
    - `DEFAULT_ADMIN_USER` - the admin bsky handle
    - `DEFAULT_ADMIN_PASS` - the admin password
    - `DEFAULT_ADMIN_BSKY_PASS` - the above account's bsky app password
-   - `SIGNUP_TOKEN_SECRET` - the invite code/password for this app.
    - `TURNSTILE_PUBLIC_KEY` - the turnstile public key for captcha
    - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
 

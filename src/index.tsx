@@ -6,6 +6,7 @@ import { Bindings, LooseObj } from "./types.d";
 import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
+import Login from "./pages/login";
 import { schedulePostTask } from "./utils/scheduler";
 import { createPost, deletePost, doesAdminExist, doesUserExist, getPostById, updateUserData } from "./utils/dbQuery";
 import { createPostObject } from "./utils/helpers";
@@ -16,8 +17,8 @@ import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { uploadFileR2 } from "./utils/r2Query";
 import { SignupSchema } from "./validation/signupSchema";
 import { AccountUpdateSchema } from "./validation/accountUpdateSchema";
+import { doesInviteKeyHaveValues, useInviteKey } from "./utils/inviteKeys";
 import isEmpty from "just-is-empty";
-import Login from "./pages/login";
 
 type Variables = {
   auth: ReturnType<typeof createAuth>;
@@ -187,31 +188,35 @@ app.get("/signup", (c) => {
 
 app.post("/account/signup", async (c) => {
   const body = await c.req.json();
-  const userIP: string|undefined = c.req.header("CF-Connecting-IP");
-  const token = body["cf-turnstile-response"];
 
-  let formData = new FormData();
-  formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
-  formData.append("response", token);
-  if (userIP)
-    formData.append("remoteip", userIP);
+  // Turnstile handling.
+  if (c.env.USE_TURNSTILE_CAPTCHA) {
+    const userIP: string|undefined = c.req.header("CF-Connecting-IP");
+    const token = body["cf-turnstile-response"];
 
-  const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    body: formData
-  });
+    let formData = new FormData();
+    formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
+    formData.append("response", token);
+    if (userIP)
+      formData.append("remoteip", userIP);
 
-  // Check if we could contact siteverify
-  if (!turnstileFetch.ok) {
-    return c.json({ok: false, message: "timed out verifying captcha"}, 400);
+    const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body: formData
+    });
+
+    // Check if we could contact siteverify
+    if (!turnstileFetch.ok) {
+      return c.json({ok: false, message: "timed out verifying captcha"}, 400);
+    }
+
+    // Check if the output was okay
+    const turnstileOutcome:any = await turnstileFetch.json();
+    if (!turnstileOutcome.success) {
+      return c.json({ok: false, message: "incorrect captcha solve"}, 401);
+    }
   }
-
-  // Check if the output was okay
-  const turnstileOutcome:any = await turnstileFetch.json();
-  if (!turnstileOutcome.success) {
-    return c.json({ok: false, message: "incorrect captcha solve"}, 401);
-  }
-
+  
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
     return c.json({ ok: false, message: validation.error.toString() }, 400);
@@ -222,8 +227,8 @@ app.post("/account/signup", async (c) => {
     return c.json({ok: false, message: "user already exists"}, 401);
   }
 
-  const signupTokenKey = c.env.SIGNUP_TOKEN_SECRET;
-  if (!isEmpty(signupTokenKey) && signupToken.toLowerCase() !== signupTokenKey.toLowerCase()) {
+  // Check to see if we're using invite keys, and if so, check em.
+  if (await doesInviteKeyHaveValues(c, signupToken) === false) {
     return c.json({ok: false, message: "invalid signup token value"}, 400);
   }
 
@@ -239,6 +244,9 @@ app.post("/account/signup", async (c) => {
   });
 
   if (createUser.token !== null) {
+    // Burn the invite key
+    await useInviteKey(c, signupToken);
+
     console.log(`user ${username} created!`);
     return c.json({ok: true, message: "signup success"});
   }

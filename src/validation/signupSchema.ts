@@ -3,7 +3,7 @@ import { usernameRegex, appPasswordRegex } from "./regexCases";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
 export const SignupSchema = z.object({
-  signupToken: z.string().nonempty("signup token is missing"),
+  signupToken: z.string().optional(),
   username: z.string()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")

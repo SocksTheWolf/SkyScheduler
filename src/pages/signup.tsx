@@ -1,6 +1,7 @@
 import { Context } from "hono";
 import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
+import { isUsingInviteKeys } from "../utils/inviteKeys";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import ProcessAccountForm from "../layout/accountForm";
 import NavTags from "../layout/navTags";
@@ -10,7 +11,6 @@ export default function Signup(props:any) {
   return (
     <BaseLayout title="SkyScheduler - Signup">
       <NavTags />
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       <section class="container">
         <article>
           <header>
@@ -35,18 +35,24 @@ export default function Signup(props:any) {
               <small>If you need an app password, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a></small>
             </label>
 
-            <label>
-              Invite Key/Signup Token
-              <input type="text" name="signupToken" placeholder="" required />
-              <small>This is an invite key to try to dissuade bots/automated applications. You can ask for the maintainer for it.</small>
-            </label>
+            {isUsingInviteKeys(ctx) ? (
+              <label>
+                Invite Key/Signup Token
+                <input type="text" name="signupToken" placeholder="" required />
+                <small>This is an invite key to try to dissuade bots/automated applications. You can ask for the maintainer for it.</small>
+              </label>
+            ) : ''}
 
-            <label>
-              Captcha
-              <div class="cf-turnstile" data-sitekey={ctx.env.TURNSTILE_PUBLIC_KEY} data-callback="enableSubmit"></div>
-            </label>
+            {ctx.env.USE_TURNSTILE_CAPTCHA ? (
+              <label>
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                Captcha
+                <div class="cf-turnstile" data-sitekey={ctx.env.TURNSTILE_PUBLIC_KEY}></div>
+              </label>
+            ) : ''}
+
             <center>
-              <button type="submit" id="submitSignup" disabled>
+              <button type="submit" id="submitSignup">
                 Sign Up
               </button>
             </center>
@@ -56,9 +62,6 @@ export default function Signup(props:any) {
       </section>
       <script type="text/javascript">
       {html`
-        function enableSubmit() {
-          document.getElementById("submitSignup").disabled = false;
-        }
         easySetup("/account/signup", "Success! Redirecting to login...", "/login");
       `}
       </script>

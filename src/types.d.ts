@@ -2,6 +2,7 @@ export interface Bindings {
   DB: D1Database;
   R2: R2Bucket;
   KV: KVNamespace;
+  INVITE_POOL: KVNamespace;
   IMAGES: Images;  
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
@@ -14,6 +15,7 @@ export interface Bindings {
   SIGNUP_TOKEN_SECRET: string;
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
+  USE_TURNSTILE_CAPTCHA: boolean;
 };
 
 export type EmbedData = {
