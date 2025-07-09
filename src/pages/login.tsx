@@ -10,7 +10,7 @@ export default function Login() {
       <section class="container">
         <article>
           <header>
-            <center><h3>SkyScheduler Login</h3></center>
+            <center><h3>Login</h3></center>
           </header>
           <form id="loginForm">
             <label>

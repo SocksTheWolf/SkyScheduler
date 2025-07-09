@@ -14,7 +14,7 @@ export default function Signup(props:any) {
       <section class="container">
         <article>
           <header>
-            <center><h3>SkyScheduler Account Signup</h3></center>
+            <center><h3>Account Signup</h3></center>
           </header>
           <form id="loginForm">
             <label>
