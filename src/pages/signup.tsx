@@ -54,7 +54,7 @@ export default function Signup(props:any) {
           <ProcessAccountForm text="Signing up..." />
         </article>
       </section>
-      <script>
+      <script type="text/javascript">
       {html`
         function enableSubmit() {
           document.getElementById("submitSignup").disabled = false;

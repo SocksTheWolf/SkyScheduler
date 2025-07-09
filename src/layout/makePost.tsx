@@ -4,9 +4,9 @@ import { MAX_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d"
 export default function PostCreation() {
   return (
   <section>
-    <script src="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone-min.js"></script>
-    <script src="https://unpkg.com/countable@3.0.1/Countable.min.js"></script>
-    <link href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" rel="stylesheet" type="text/css" />
+    <script src="/dep/dropzone-min.js"></script>
+    <script src="/dep/countable.min.js"></script>
+    <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
     <article>
       <form id="postForm">
         <header>
@@ -91,13 +91,13 @@ export default function PostCreation() {
           </button>
         </footer>
       </form>
-      <script>
+      <script type="text/javascript">
       {html`
         const MAX_LENGTH=${MAX_LENGTH};
         updateAllTimes();
       `}
       </script>
-      <script src="/postHelper.js"></script>
+      <script type="text/javascript" src="/postHelper.js"></script>
     </article>
   </section>
   );
