@@ -3,12 +3,11 @@ export default function NavTags() {
     <div class="container">
       <nav>
         <ul>
-          <li><h3>SkyScheduler</h3></li>
+          <li><h2><a class="contrast" href="/">SkyScheduler</a></h2></li>
         </ul>
         <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/signup">Create an Account</a></li>
-          <li><a role="button" class="secondary" href="/login">Login</a></li>
+          <li><a href="/signup">Sign Up</a></li>
+          <li><a href="/login"><button class="secondary">Login</button></a></li>
         </ul>
       </nav>
     </div>
