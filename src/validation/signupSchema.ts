@@ -1,5 +1,5 @@
 import * as z from "zod/v4";
-import { usernameRegex, appPasswordRegex } from "./regexCases";
+import { appPasswordRegex } from "./regexCases";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
 export const SignupSchema = z.object({
@@ -7,7 +7,7 @@ export const SignupSchema = z.object({
   username: z.string()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(usernameRegex),
+    .regex(z.regexes.domain),
   password: z.string()
     .nonempty("password is missing")
     .min(MIN_DASHBOARD_PASS, "password too short")
