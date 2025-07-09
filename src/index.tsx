@@ -54,6 +54,7 @@ app.all("/api/auth/*", async (c) => {
   return auth.handler(c.req.raw);
 });
 
+// wrapper to login
 app.post("/account/login", async (c) => {
   const body = await c.req.json();
   const auth = c.get("auth");
@@ -77,7 +78,7 @@ app.post("/account/login", async (c) => {
     return c.json({ok: false, message: "could not login user"}, 401);
   } catch(err) {
     console.error(`failed to login user ${err}`);
-    return c.json({ok: false, message: "incorrect data"}, 404);
+    return c.json({ok: false, message: err.message}, 404);
   }
   return c.json({ok: false, message: "invalid error occurred"}, 501);
 });

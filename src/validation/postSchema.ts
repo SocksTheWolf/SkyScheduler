@@ -1,6 +1,6 @@
 import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d";
 import { PostLabel } from "../types.d";
-import { z } from "zod";
+import * as z from "zod/v4";
 
 // Schema for post creation
 export const PostSchema = z.object({
