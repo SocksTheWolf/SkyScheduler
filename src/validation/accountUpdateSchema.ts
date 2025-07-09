@@ -1,11 +1,11 @@
 import * as z from "zod/v4";
-import { appPasswordRegex, usernameRegex } from "./regexCases";
+import { appPasswordRegex } from "./regexCases";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
 export const AccountUpdateSchema = z.object({
   username: z.string()
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(usernameRegex)
+    .regex(z.regexes.domain)
     .optional()
     .or(z.literal("")),
   password: z.string()
