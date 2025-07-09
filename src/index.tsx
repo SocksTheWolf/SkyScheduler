@@ -79,7 +79,6 @@ app.post("/account/login", async (c) => {
   } catch(err) {
     return c.json({ok: false, message: err.message}, 404);
   }
-  return c.json({ok: false, message: "invalid error occurred"}, 501);
 });
 
 app.post("/account/update", authMiddleware, async (c) => {

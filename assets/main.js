@@ -39,3 +39,14 @@ document.addEventListener("accountUpdated", function(ev) {
   document.getElementById("settingsData").reset();
   pushToast("Settings Updated!", true);
 });
+
+// Remove this bullshit unicode thing that gets injected on usernames if you copy them
+// from the bsky website, why the fuck did they do this?
+function addUnicodeRemoval() {
+  const userEl = document.getElementById("username");
+  userEl.value = "";
+  userEl.addEventListener("change", ev => {
+    ev.preventDefault();
+    userEl.value = userEl.value.replace(/[^\x00-\x7F]/g, "");
+  });
+}

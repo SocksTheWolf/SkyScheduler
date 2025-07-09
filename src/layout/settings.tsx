@@ -16,7 +16,7 @@ export function Settings() {
           <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" 
             hx-swap="innerHTML" hx-indicator="#spinner">
             <label>
-              BSky Username: <input type="input" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
+              BSky Username: <input type="input" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
               <small>Only change this if you have recently changed your bsky handle</small>
             </label>
             <label>
@@ -40,6 +40,7 @@ export function Settings() {
           <button class="secondary" onclick='closeModal(document.getElementById("changeInfo"));'>Cancel</button>
         </footer>
       </article>
+      <script type="text/javascript">{html`addUnicodeRemoval();`}</script>
     </dialog>
   );
 }

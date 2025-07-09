@@ -22,14 +22,12 @@ export default function ProcessAccountForm(props: any) {
               postObject[el.name] = el.value;
             });
             try {
-              const payload = JSON.stringify(postObject);
               const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Content-Length': payload.length
                  },
-                body: payload
+                body: JSON.stringify(postObject)
               });
 
               // Hide loading bar after delay
@@ -50,6 +48,7 @@ export default function ProcessAccountForm(props: any) {
           });
         }
         function easySetup(url, successMessage, successLocation) {
+          addUnicodeRemoval();
           rawSubmitHandler(url, function() {
             pushToast(successMessage, true);
             redirectAfterDelay(successLocation);

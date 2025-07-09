@@ -25,7 +25,7 @@ export default function Signup(props:any) {
 
             <label>
               Bluesky Handle
-              <input type="text" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} placeholder="" required />
+              <input type="text" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} placeholder="" required />
               <small>This is your bsky username, like <code>socksthewolf.bsky.social</code></small>
             </label>
 
