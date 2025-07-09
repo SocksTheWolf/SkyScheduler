@@ -16,6 +16,7 @@ import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { uploadFileR2 } from "./utils/r2Query";
 import { SignupSchema } from "./validation/signupSchema";
+import { LoginSchema } from "./validation/loginSchema";
 import { AccountUpdateSchema } from "./validation/accountUpdateSchema";
 import { doesInviteKeyHaveValues, useInviteKey } from "./utils/inviteKeys";
 import isEmpty from "just-is-empty";
@@ -51,6 +52,34 @@ app.use("*", async (c, next) => {
 app.all("/api/auth/*", async (c) => {
   const auth = c.get("auth");
   return auth.handler(c.req.raw);
+});
+
+app.post("/account/login", async (c) => {
+  const body = await c.req.json();
+  const auth = c.get("auth");
+  const validation = LoginSchema.safeParse(body);
+  if (!validation.success) {
+    return c.json({ ok: false, message: validation.error.toString() }, 400);
+  }
+  const { username, password } = validation.data;
+  try {
+    const { headers, response } = await auth.api.signInUsername({
+      body: {
+        username: username,
+        password: password,
+      },
+      returnHeaders: true
+    });
+    if (response) {
+      c.res.headers.set("set-cookie", headers.get("set-cookie")!);
+      return c.json({ok: true, message:"logged in"});
+    }
+    return c.json({ok: false, message: "could not login user"}, 401);
+  } catch(err) {
+    console.error(`failed to login user ${err}`);
+    return c.json({ok: false, message: "incorrect data"}, 404);
+  }
+  return c.json({ok: false, message: "invalid error occurred"}, 501);
 });
 
 app.post("/account/update", authMiddleware, async (c) => {

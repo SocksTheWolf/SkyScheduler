@@ -67,7 +67,7 @@
 }
 
 #posts {
-  max-height: 60dvh;
+  max-height: 55dvh;
   overflow-y: auto;
   overflow-x: hidden;
 }

@@ -42,7 +42,7 @@ export default function Login() {
       </section>
       <script type="text/javascript">
       {html`
-        easySetup("/api/auth/sign-in/username", "Success! Redirecting to dashboard...", "/dashboard");
+        easySetup("/account/login", "Success! Redirecting to dashboard...", "/dashboard");
       `}
       </script>
     </BaseLayout>

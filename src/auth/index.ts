@@ -6,7 +6,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
-import { usernameRegex } from "../validation/regexCases";
 import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
 
 // Single auth configuration that handles both CLI and runtime scenarios
@@ -37,10 +36,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
                   requireEmailVerification: false,
               },
               plugins: [username({
-                  minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
-                  usernameValidator: (username) => {
-                    return usernameRegex.test(username);
-                  },
+                  minUsernameLength: BSKY_MIN_USERNAME_LENGTH
               })],
               rateLimit: {
                   enabled: true,
