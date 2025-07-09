@@ -22,10 +22,14 @@ export default function ProcessAccountForm(props: any) {
               postObject[el.name] = el.value;
             });
             try {
+              const payload = JSON.stringify(postObject);
               const response = await fetch(url, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json' },
-                body: JSON.stringify(postObject)
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': payload.length
+                 },
+                body: payload
               });
 
               // Hide loading bar after delay

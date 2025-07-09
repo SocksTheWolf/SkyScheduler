@@ -77,7 +77,6 @@ app.post("/account/login", async (c) => {
     }
     return c.json({ok: false, message: "could not login user"}, 401);
   } catch(err) {
-    console.error(`failed to login user ${err}`);
     return c.json({ok: false, message: err.message}, 404);
   }
   return c.json({ok: false, message: "invalid error occurred"}, 501);
