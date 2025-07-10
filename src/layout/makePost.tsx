@@ -32,6 +32,9 @@ export default function PostCreation() {
                   <center class="dz-message">Drag or click here to upload images</center>
                 </div>
               </div>
+            <footer>
+              <small>Your files should be less than 70MB and smaller than 100 megapixels.</small>
+            </footer>
             </section>
             <section id="content-label-selector" class="hidden">
               <header>Content Label</header>
