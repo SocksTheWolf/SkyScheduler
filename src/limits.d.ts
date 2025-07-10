@@ -13,6 +13,8 @@ export const BSKY_MAX_HEIGHT: number = 2000;
 export const BSKY_FILE_SIZE_LIMIT_IN_MB: number = 1;
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
 export const BSKY_MAX_APP_PASSWORD_LENGTH: number = 20;
+export const CF_FILE_SIZE_LIMIT_IN_MB: number = 70;
+export const CF_MAX_DIMENSION: number = 10000;
 
 export const TO_MB: number = 1024 * 1024;
 export const TO_MiB: number = 1000 * 1000;
