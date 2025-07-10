@@ -8,8 +8,8 @@ export function Settings() {
         <header>
           <h5>Change Account Info</h5>
         </header>
-        <p>Only fill in the textboxes that you want to change. 
-          Fields that contain no data in them will continue to use the old value.
+        <p>Only fill in the textboxes that you want to change.<br />
+          <b>NOTE</b>: Fields that contain no data in them will continue to use the old value.
         </p>
         <br />
         <section>
