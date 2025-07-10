@@ -6,6 +6,7 @@ let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
   url: "/upload", 
   autoProcessQueue: true,
+  maxFilesize: 70000000,
   acceptedFiles: "image/*"
 });
 
