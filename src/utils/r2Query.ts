@@ -1,5 +1,5 @@
 import { Bindings, EmbedData } from '../types';
-import { R2_FILE_SIZE_LIMIT, CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
+import { R2_FILE_SIZE_LIMIT, CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
@@ -26,8 +26,8 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
   let finalFileSize = file.size;
 
   // The file size limit for ImageTransforms
-  if (file.size > CF_FILE_SIZE_LIMIT_IN_MB) {
-    return {"success": false, "error": `max file size is ${CF_FILE_SIZE_LIMIT_IN_MB * TO_MB}MB`};
+  if (file.size > CF_FILE_SIZE_LIMIT) {
+    return {"success": false, "error": `max file size is ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
   }
 
   let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
