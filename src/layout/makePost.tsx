@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { MAX_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d"
+import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_INTERVAL } from "../limits.d"
 
 export default function PostCreation() {
   return (
@@ -33,7 +33,7 @@ export default function PostCreation() {
                 </div>
               </div>
             <footer>
-              <small>Your files should be less than 70MB and smaller than 100 megapixels.</small>
+              <small>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB or images with a res of {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} or higher.<br />Images will be attempted to be resized and compressed to fit BSky's requirements.</small>
             </footer>
             </section>
             <section id="content-label-selector" class="hidden">
