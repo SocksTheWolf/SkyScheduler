@@ -1,5 +1,5 @@
 import { Bindings, EmbedData } from '../types';
-import { R2_FILE_SIZE_LIMIT, BSKY_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
+import { R2_FILE_SIZE_LIMIT, CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
@@ -18,21 +18,26 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
   let finalQualityLevel = 100;
 
   if (!(file instanceof File)) {
-    console.warn("Failed to upload", 400);
+    console.warn("Failed to upload");
     return {"success": false, "error": "data invalid"};
   }
 
   const originalName = file.name;
   let finalFileSize = file.size;
 
-  // The file size limit for R2 without chunking
-  if (file.size > R2_FILE_SIZE_LIMIT) {
-    return {"success": false, "error": `max file size is ${R2_FILE_SIZE_LIMIT * TO_MB}MB`};
+  // The file size limit for ImageTransforms
+  if (file.size > CF_FILE_SIZE_LIMIT) {
+    return {"success": false, "error": `max file size is ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
   }
 
   let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
   // We need to double check this image for various size information.
   const imageMetaData = await env.IMAGES.info(await file.stream());
+
+  // if the image is over the cf image transforms, then return an error.
+  if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION)
+    return {"success": false, "error": `image dimensions are too large to autosize. make sure your files fit the appropriate format.`};
+
   // If the image is over any bsky limits, we will need to resize it
   if (file.size > BSKY_FILE_SIZE_LIMIT || imageMetaData.width > BSKY_MAX_WIDTH || imageMetaData.height > BSKY_MAX_HEIGHT) {
     let failedToResize = true;

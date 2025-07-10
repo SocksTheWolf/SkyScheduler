@@ -19,6 +19,9 @@ export const TO_MiB: number = 1000 * 1000;
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const BSKY_FILE_SIZE_LIMIT: number = BSKY_FILE_SIZE_LIMIT_IN_MB * TO_MiB;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * TO_MB;
+export const CF_FILE_SIZE_LIMIT_IN_MB: number = 70;
+export const CF_FILE_SIZE_LIMIT: number = CF_FILE_SIZE_LIMIT_IN_MB * TO_MB;
+export const CF_MAX_DIMENSION: number = 10000;
 
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
