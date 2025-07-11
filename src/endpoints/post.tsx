@@ -9,6 +9,7 @@ import { makePost } from "../utils/bskyApi";
 import { ScheduledPostList } from "../layout/postList";
 import { uploadFileR2 } from "../utils/r2Query";
 import { createPost, deletePost, getPostById } from "../utils/dbQuery";
+import { FileDeleteSchema } from "../validation/mediaSchema";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -22,15 +23,24 @@ post.post("/upload", authMiddleware, async (c: Context) => {
   if (fileUploadResponse.success === false) {
     return c.json(fileUploadResponse, 400);
   }
-  return c.json(fileUploadResponse, 200);
+  else {
+    return c.json(fileUploadResponse, 200);
+  }
 });
 
 // Delete an upload
 post.delete("/upload", authMiddleware, async (c: Context) => {
-  const data = await c.req.json();
+  const body = await c.req.parseBody();
 
-  // this can never fail
-  await c.env.R2.delete(data['key']);
+  // Validate that this is a legitimate key
+  const validation = FileDeleteSchema.safeParse(body);
+  if (!validation.success) {
+    return c.json({"success": false, msg: validation.error.message}, 402);
+  }
+
+  const { key } = validation.data;
+  // delete item from r2
+  await c.env.R2.delete(key);
   return c.json({"success": true}, 200);
 });
 

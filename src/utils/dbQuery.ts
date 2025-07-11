@@ -6,13 +6,13 @@ import { posts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
 import { Bindings } from "../types";
-
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
-import { deleteFromR2 } from "./r2Query";
+import { deleteEmbedsFromR2 } from "./r2Query";
 import { isAfter, addHours } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
 import has from "just-has";
 import isEmpty from "just-is-empty";
+import flatten from "just-flatten-it";
 
 type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 
@@ -46,6 +46,17 @@ export const getPostsForUser = async (c: Context) => {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
   }
   return null;
+};
+
+export const getAllMediaOfUser = async (env: Bindings, userId: string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const mediaList = await db.select({embeds: posts.embedContent}).from(posts).where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
+  let messyArray:string[][] = [];
+  mediaList.forEach(obj => {
+    const postMedia = obj.embeds;
+    messyArray.push(postMedia.map(media => media.content));
+  });
+  return flatten(messyArray);
 };
 
 export const updateUserData = async (c: Context, newData: any) => {
@@ -88,7 +99,7 @@ export const deletePost = async (env: Bindings, id:string) => {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postQuery[0].posted)
-      await deleteFromR2(env, createPostObject(postQuery[0]).embeds);
+      await deleteEmbedsFromR2(env, createPostObject(postQuery[0]).embeds);
 
     await db.delete(posts).where(eq(posts.uuid, id));
     return true;
@@ -122,6 +133,8 @@ export const createPost = async (c: Context, body:any) => {
         userId: c.get("user").id
     })
   ];
+
+  // Add repost data to the table
   if (repostData) {
     for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({

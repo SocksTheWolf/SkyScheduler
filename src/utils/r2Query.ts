@@ -1,17 +1,23 @@
 import { Bindings, EmbedData } from '../types';
-import { R2_FILE_SIZE_LIMIT, CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, TO_MB, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
+import { CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
-export const deleteFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
+export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
+  let itemsToDelete:string[] = [];
+
   if (embeds !== undefined && embeds.length > 0) {
-    let itemsToDelete:string[] = [];
     embeds.forEach(async (data) => {
       console.log(`Deleting ${data.content}...`);
       itemsToDelete.push(data.content);
     });
-    if (itemsToDelete.length > 0)
-      await env.R2.delete(itemsToDelete);
+    await deleteFromR2(env, itemsToDelete);
   }
+  return itemsToDelete;
+};
+
+export const deleteFromR2 = async (env: Bindings, embeds: string[]) => {
+  if (embeds.length > 0)
+    await env.R2.delete(embeds);
 };
 
 export const uploadFileR2 = async (env: Bindings, file: File|string) => {

@@ -10,6 +10,7 @@ import { authMiddleware } from "../middleware/auth";
 import { ContextVariables } from "../auth";
 import { secureHeaders } from "hono/secure-headers";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
+import { AccountDeleteSchema } from "../validation/accountDeleteSchema";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -167,4 +168,29 @@ account.post("/signup", async (c: Context) => {
     return c.json({ok: true, message: "signup success"});
   }
   return c.json({ok: false, message: "unknown error occurred"}, 501);
+});
+
+account.delete("/delete", authMiddleware, async (c) => {
+  const body = await c.req.parseBody();
+  const auth = c.get("auth");
+  const validation = AccountDeleteSchema.safeParse(body);
+  
+  if (!validation.success) {
+    return c.html(<b class="btn-error">Failed: <code>{validation.error.toString()}</code></b>);
+  }
+
+  const { password } = validation.data;
+  // Media is deleted via better auth's "beforeDelete" callback
+  const deleted = await auth.api.deleteUser({
+    body: {
+      password: password
+    },
+  });
+
+  if (deleted.success) {
+    c.header("HX-Trigger", "accountDeleted");
+    return c.redirect("/");
+  } else {
+    return c.html(<b class="btn-error">Failed: <code>{deleted.message}</code></b>);
+  }
 });

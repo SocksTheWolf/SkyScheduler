@@ -40,7 +40,7 @@ app.route("/account", account);
 app.route("/post", post);
 
 // Root route
-app.get("/", (c) => {
+app.all("/", (c) => {
   return c.html(<Home />);
 });
 

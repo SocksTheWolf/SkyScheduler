@@ -7,6 +7,8 @@ import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
 import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
+import { getAllMediaOfUser } from "../utils/dbQuery";
+import { deleteFromR2 } from "../utils/r2Query";
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
@@ -56,7 +58,16 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             enabled: false
           },
           deleteUser: {
-            enabled: false
+            enabled: true,
+            beforeDelete: async (user) => {
+              if (env === undefined) {
+                console.error(`missing environment when trying to delete ${user.id}`);
+                return;
+              }
+              const media:string[] = await getAllMediaOfUser(env, user.id);
+              // delete all items in the media list
+              await deleteFromR2(env, media);
+            }
           }
         },
         // Only add database adapter for CLI schema generation

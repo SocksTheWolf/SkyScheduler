@@ -1,5 +1,6 @@
 import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d";
 import { PostLabel } from "../types.d";
+import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
 
 // Schema for post creation
@@ -7,7 +8,7 @@ export const PostSchema = z.object({
   content: z.string().min(MIN_LENGTH).max(MAX_LENGTH),
   label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
   embeds: z.object({
-    content: z.string(),
+    content: z.string().nonempty().regex(fileKeyRegex),
     alt: z.string().max(MAX_ALT_TEXT)
   }).array().optional(),
   makePostNow: z.boolean().default(false),

@@ -40,6 +40,10 @@ document.addEventListener("accountUpdated", function(ev) {
   pushToast("Settings Updated!", true);
 });
 
+document.addEventListener("accountDeleted", function(ev) {
+  pushToast("Account deleted!", true);
+});
+
 // Remove this bullshit unicode thing that gets injected on usernames if you copy them
 // from the bsky website, why the fuck did they do this?
 function addUnicodeRemoval() {

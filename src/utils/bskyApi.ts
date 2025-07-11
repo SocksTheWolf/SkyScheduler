@@ -2,7 +2,7 @@ import { AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId } from './dbQuery';
-import { deleteFromR2 } from './r2Query';
+import { deleteEmbedsFromR2 } from './r2Query';
 import truncate from "just-truncate";
 
 const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
@@ -185,7 +185,7 @@ export const makePost = async (env: Bindings, content: Post) => {
     if (newPost !== null) {
       await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid });
       // Delete any embeds if they exist.
-      await deleteFromR2(env, content.embeds);
+      await deleteEmbedsFromR2(env, content.embeds);
       return true;
     }
   } catch(err) {
