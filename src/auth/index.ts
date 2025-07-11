@@ -1,5 +1,5 @@
 import type { D1Database, IncomingRequestCfProperties } from "@cloudflare/workers-types";
-import { betterAuth } from "better-auth";
+import { betterAuth, Session, User } from "better-auth";
 import { username } from "better-auth/plugins";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -75,5 +75,12 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
 // Export for CLI schema generation
 export const auth = createAuth();
 
+// Export for variable types
+type ContextVariables = {
+  auth: ReturnType<typeof createAuth>;
+  user: User;
+  session: Session;
+};
+
 // Export for runtime usage
-export { createAuth };
+export { createAuth, ContextVariables };

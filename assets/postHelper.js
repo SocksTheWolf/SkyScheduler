@@ -4,7 +4,7 @@ const scheduledDate = document.getElementById('scheduledDate');
 
 let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
-  url: "/upload", 
+  url: "/post/upload", 
   autoProcessQueue: true,
   maxFilesize: 70000000,
   acceptedFiles: "image/*"
@@ -43,7 +43,7 @@ fileDropzone.on("addedfile", file => {
     e.stopPropagation();
 
     // Remove the file
-    fetch('/upload', {
+    fetch('/post/upload', {
         method: 'DELETE',
         body: JSON.stringify({"key": fileData.get(file.name).content })
     }).then(response => {
@@ -131,7 +131,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     }
 
     const payload = JSON.stringify(postObject);
-    const response = await fetch('/post', {
+    const response = await fetch('/post/create', {
       method: 'POST',
       headers: {'Content-Type': 'application/json' },
       body: payload

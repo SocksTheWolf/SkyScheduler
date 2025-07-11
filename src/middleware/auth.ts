@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import { auth, createAuth } from "../auth";
 
 // Middleware to verify authentication
 export async function authMiddleware(c: Context, next: any) {

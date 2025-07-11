@@ -45,6 +45,10 @@ binding = "IMAGES"
 # Schedule cron triggers:
 crons = [ "0 * * * *" ] # at the start of every hour
 
+[dev]
+# flags required to run wrangler in linux
+ip = "127.0.0.1"
+
 [vars]
 # the domain and protocol that this application is hosted on
 # this value is also used for CORS
