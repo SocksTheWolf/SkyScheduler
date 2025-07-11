@@ -116,3 +116,7 @@
 .inline-header {
   margin-top: unset;
 }
+
+#deleteAccount {
+  z-index: 20;
+}

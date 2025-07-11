@@ -7,8 +7,6 @@ import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
 import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
-import { getAllMediaOfUser } from "../utils/dbQuery";
-import { deleteFromR2 } from "../utils/r2Query";
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
@@ -34,14 +32,14 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             },
             {
               emailAndPassword: {
-                  enabled: true,
-                  requireEmailVerification: false,
+                enabled: true,
+                requireEmailVerification: false,
               },
               plugins: [username({
-                  minUsernameLength: BSKY_MIN_USERNAME_LENGTH
+                minUsernameLength: BSKY_MIN_USERNAME_LENGTH
               })],
               rateLimit: {
-                  enabled: true,
+                enabled: true,
               },
             }
         ),
@@ -58,16 +56,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             enabled: false
           },
           deleteUser: {
-            enabled: true,
-            beforeDelete: async (user) => {
-              if (env === undefined) {
-                console.error(`missing environment when trying to delete ${user.id}`);
-                return;
-              }
-              const media:string[] = await getAllMediaOfUser(env, user.id);
-              // delete all items in the media list
-              await deleteFromR2(env, media);
-            }
+            enabled: false,
           }
         },
         // Only add database adapter for CLI schema generation
@@ -75,9 +64,9 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
             ? {}
             : {
               database: drizzleAdapter({} as D1Database, {
-                  provider: "sqlite",
-                  usePlural: true,
-                  debugLogs: false,
+                provider: "sqlite",
+                usePlural: true,
+                debugLogs: false,
               }),
             }),
     });

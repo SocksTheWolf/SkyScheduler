@@ -1,16 +1,17 @@
 import { Context, Hono } from "hono";
+import { secureHeaders } from "hono/secure-headers";
+import { authMiddleware } from "../middleware/auth";
+import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings, LooseObj } from "../types";
-import { doesUserExist, updateUserData } from "../utils/dbQuery";
+import { doesUserExist, getAllMediaOfUser, updateUserData } from "../utils/dbQuery";
 import { SignupSchema } from "../validation/signupSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
-import { doesInviteKeyHaveValues, useInviteKey } from "../utils/inviteKeys";
-import isEmpty from "just-is-empty";
-import { authMiddleware } from "../middleware/auth";
-import { ContextVariables } from "../auth";
-import { secureHeaders } from "hono/secure-headers";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { AccountDeleteSchema } from "../validation/accountDeleteSchema";
+import { doesInviteKeyHaveValues, useInviteKey } from "../utils/inviteKeys";
+import { ContextVariables } from "../auth";
+import isEmpty from "just-is-empty";
+import { deleteFromR2 } from "../utils/r2Query";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -46,13 +47,13 @@ account.post("/login", async (c) => {
 
 account.post("/update", authMiddleware, async (c) => {
   const body = await c.req.parseBody();
-  const auth = c.get("auth");
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
     console.log(validation.error);
     return c.html(<b class="btn-error">Failed Validation</b>);
   }
 
+  const auth = c.get("auth");
   const { username, password, bskyAppPassword } = validation.data;
   let newObject:LooseObj = {};
   if (!isEmpty(username))
@@ -170,9 +171,8 @@ account.post("/signup", async (c: Context) => {
   return c.json({ok: false, message: "unknown error occurred"}, 501);
 });
 
-account.delete("/delete", authMiddleware, async (c) => {
+account.post("/delete", authMiddleware, async (c) => {
   const body = await c.req.parseBody();
-  const auth = c.get("auth");
   const validation = AccountDeleteSchema.safeParse(body);
   
   if (!validation.success) {
@@ -180,17 +180,42 @@ account.delete("/delete", authMiddleware, async (c) => {
   }
 
   const { password } = validation.data;
-  // Media is deleted via better auth's "beforeDelete" callback
-  const deleted = await auth.api.deleteUser({
-    body: {
-      password: password
-    },
-  });
+  const auth = c.get("auth");
+  const user = c.get("user");
+  const authCtx = await auth.$context;
+  try {
+    // I don't know why this is so broken in better auth, but
+    // something is wrong with their session middleware for the deleteUser
+    // that it only throws exceptions with just a password.
+    const accountHandler = await authCtx.internalAdapter.findAccounts(user.id);
+    const usrAccount = accountHandler.find(
+      (account) => account.providerId === "credential" && account.password,
+    );
 
-  if (deleted.success) {
-    c.header("HX-Trigger", "accountDeleted");
-    return c.redirect("/");
-  } else {
-    return c.html(<b class="btn-error">Failed: <code>{deleted.message}</code></b>);
+    // Make sure we still have data
+    if (!usrAccount || !usrAccount.password) {
+      return c.html(<b class="btn-error">Failed: <code>User Data Missing...</code></b>);
+    }
+
+    // Do a hash verification on the user's input to see if the passwords match
+    const verify = await authCtx.password.verify({
+      hash: usrAccount.password,
+      password: password
+    });
+    if (verify) {
+      await getAllMediaOfUser(c.env, user.id)
+        .then((media) => deleteFromR2(c.env, media))
+        .then(() => authCtx.internalAdapter.deleteSessions(user.id))
+        .then(() => authCtx.internalAdapter.deleteUser(user.id));
+      
+      c.header("HX-Redirect", "/");
+      c.header("HX-Trigger", "accountDeleted");
+      return c.html(<strong>Success!</strong>);
+    } else {
+      return c.html(<b class="btn-error">Failed: <code>Invalid Password</code></b>);
+    }
+  } catch (err) {
+    console.error(`failed to delete user ${user.id} had error ${err.message || err.msg || 'no code'}`);
+    return c.html(<b class="btn-error">Failed: <code>Server Error</code></b>);
   }
 });

@@ -3,6 +3,7 @@ import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_P
 
 export function Settings() {
   return (
+    <>
     <dialog id="changeInfo">
       <article>
         <header>
@@ -36,12 +37,46 @@ export function Settings() {
           </center>
         </section>
         <footer>
+          <button id="deleteAccountButton" class="btn-error" style="float: left;">Delete</button>
           <button form="settingsData">Save</button>
-          <button class="secondary" onclick='closeModal(document.getElementById("changeInfo"));'>Cancel</button>
+          <button class="secondary" onclick='closeSettingsModal();'>Cancel</button>
         </footer>
       </article>
-      <script type="text/javascript">{html`addUnicodeRemoval();`}</script>
     </dialog>
+    <dialog id="deleteAccount">
+      <article>
+        <header>Delete Account</header>
+        <p>To delete your SkyScheduler account, please type your password below.<br />
+          <strong>NOTE</strong>: THIS ACTION IS PERMENENT.
+        </p>
+        <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDelete" 
+            hx-swap="innerHTML" hx-indicator="#delSpinner">
+          <label>
+            Dashboard Pass: <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
+            <small>The password to access this website</small>
+          </label>
+        </form>
+        <br />
+        <progress id="delSpinner" class="htmx-indicator" />
+        <center>
+          <div id="accountDelete">
+          </div>
+        </center>
+        <footer>
+          <button class="btn-error" form="delAccountForm">Delete</button>
+          <button class="secondary" onclick='closeDeleteModal();'>Cancel</button>
+        </footer>
+      </article>
+    </dialog>
+    <script type="text/javascript">{html`
+      addUnicodeRemoval();
+      document.getElementById("deleteAccountButton").addEventListener("click", (ev) => {
+        ev.preventDefault();
+        closeSettingsModal();
+        openModal(document.getElementById("deleteAccount"));
+      });
+    `}</script>
+    </>
   );
 }
 
@@ -59,6 +94,12 @@ export function SettingsButton() {
             ev.preventDefault();
             openModal(document.getElementById("changeInfo"));
           });
+          function closeSettingsModal() {
+            closeModal(document.getElementById("changeInfo"));
+          }
+          function closeDeleteModal() {
+            closeModal(document.getElementById("deleteAccount"));
+          }
         `}
       </script>
     </>
