@@ -5,9 +5,14 @@ import { isUsingInviteKeys } from "../utils/inviteKeys";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import ProcessAccountForm from "../layout/accountForm";
 import NavTags from "../layout/navTags";
+import isEmpty from "just-is-empty";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
+  const linkToInvites = isUsingInviteKeys(ctx) && !isEmpty(ctx.env.INVITE_THREAD) ? 
+    (<a href={ctx.env.INVITE_THREAD} target="_blank">You can check for invite codes in this thread</a>) : 
+    "You can ask for the maintainer for it";
+
   return (
     <BaseLayout title="SkyScheduler - Signup">
       <NavTags />
@@ -39,7 +44,7 @@ export default function Signup(props:any) {
               <label>
                 Invite Key/Signup Token
                 <input type="text" name="signupToken" placeholder="" required />
-                <small>This is an invite key to try to dissuade bots/automated applications. You can ask for the maintainer for it.</small>
+                <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
               </label>
             ) : ''}
 

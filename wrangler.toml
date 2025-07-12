@@ -50,8 +50,7 @@ crons = [ "0 * * * *" ] # at the start of every hour
 ip = "127.0.0.1"
 
 [vars]
-# the domain and protocol that this application is hosted on
-# this value is also used for CORS
+# the domain and protocol that this application is hosted on, this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms
@@ -65,3 +64,6 @@ IMAGE_DEGRADE_PER_STEP=5
 
 # Should we use turnstile captchas?
 USE_TURNSTILE_CAPTCHA=true
+
+# link to invite threads
+INVITE_THREAD="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"
