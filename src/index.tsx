@@ -8,7 +8,7 @@ import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import { schedulePostTask } from "./utils/scheduler";
 import { doesAdminExist } from "./utils/dbQuery";
-import { authMiddleware } from "./middleware/auth";
+import { authMiddleware, pullAuthData } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { account } from "./endpoints/account";
@@ -51,13 +51,20 @@ app.get("/dashboard", authMiddleware, (c) => {
   );
 });
 
-app.get("/login", (c) => {
-  return c.html(<Login />);
+// Login route
+app.get("/login", pullAuthData, (c) => {
+  if (c.get("user") !== null)
+    return c.redirect("/dashboard");
+  else
+    return c.html(<Login />);
 });
 
 // Signup route
-app.get("/signup", (c) => {
-  return c.html(<Signup c={c} />);
+app.get("/signup", pullAuthData, (c) => {
+  if (c.get("user") !== null)
+    return c.redirect("/dashboard");
+  else
+    return c.html(<Signup c={c} />);
 });
 
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
