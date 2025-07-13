@@ -5,6 +5,7 @@ import { isUsingInviteKeys } from "../utils/inviteKeys";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import ProcessAccountForm from "../layout/accountForm";
 import NavTags from "../layout/navTags";
+import UsernameHelper from "../layout/usernameHelper";
 import isEmpty from "just-is-empty";
 
 export default function Signup(props:any) {
@@ -24,20 +25,22 @@ export default function Signup(props:any) {
           <form id="loginForm">
             <label>
               Dashboard Password
-              <input type="password" name="password" placeholder="" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
-              <small>Create a new password unrelated with bluesky to use to login to this website</small>
+              <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
+              <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
             </label>
 
             <label>
               Bluesky Handle
-              <input type="text" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} placeholder="" required />
-              <small>This is your bsky username, like <code>socksthewolf.bsky.social</code></small>
+              <input type="text" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} required />
+              <small>This is your bsky username, in the format of a domain like <code>USERNAME.bsky.social</code>.</small>
             </label>
 
             <label>
-              App Password
+              Bluesky App Password
               <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required />
-              <small>If you need an app password, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a></small>
+              <small>
+                If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
+              </small>
             </label>
 
             {isUsingInviteKeys(ctx) ? (
@@ -70,6 +73,7 @@ export default function Signup(props:any) {
         easySetup("/account/signup", "Success! Redirecting to login...", "/login");
       `}
       </script>
+      <UsernameHelper />
     </BaseLayout>
   );
 }

@@ -131,7 +131,7 @@ account.post("/signup", async (c: Context) => {
     // Check if the output was okay
     const turnstileOutcome:any = await turnstileFetch.json();
     if (!turnstileOutcome.success) {
-      return c.json({ok: false, message: "incorrect captcha solve"}, 401);
+      return c.json({ok: false, message: "captcha timed out"}, 401);
     }
   }
   
