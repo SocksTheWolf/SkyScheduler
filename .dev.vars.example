@@ -5,3 +5,5 @@ DEFAULT_ADMIN_PASS=dashboard-password
 DEFAULT_ADMIN_BSKY_PASS=bsky-app-password-for-user
 TURNSTILE_PUBLIC_KEY=cf-public-keycode
 TURNSTILE_SECRET_KEY=cf-secret-keycode
+RESET_BOT_USERNAME=skyscheduler.work
+RESET_BOT_PASSWORD=bsky-app-password-for-user

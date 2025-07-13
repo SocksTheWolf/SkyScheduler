@@ -5,7 +5,7 @@ import { updatePostData, getBskyUserPassForId } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import truncate from "just-truncate";
 
-const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
+export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
   try {
     const loginResponse = await agent.login({
       identifier: user,
