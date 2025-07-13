@@ -27,7 +27,7 @@ function updateAllTimes() {
 }
 
 function refreshPosts() {
-  document.getElementById("refresh-posts").click();
+  document.getElementById("refresh-posts-force").click();
 }
 
 document.addEventListener("showDeleteMsg", function(evt) {

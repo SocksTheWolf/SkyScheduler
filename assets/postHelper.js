@@ -144,7 +144,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       setSelectDisable(true);
       scheduledDate.setAttribute("required", true);
       document.getElementById('postForm').reset();
-      document.getElementById("refresh-posts").click();
+      refreshPosts();
     } else {
       pushToast(data.error?.message || data.error || data.message || 'An error occurred', false);
     }
