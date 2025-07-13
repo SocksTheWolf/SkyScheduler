@@ -40,7 +40,7 @@ account.post("/login", async (c) => {
       return c.json({ok: true, message:"logged in"});
     }
     return c.json({ok: false, message: "could not login user"}, 401);
-  } catch (err) {
+  } catch (err: any) {
     return c.json({ok: false, message: err.message || err.msg || "Unknown Error"}, 404);
   }
 });
@@ -214,7 +214,7 @@ account.post("/delete", authMiddleware, async (c) => {
     } else {
       return c.html(<b class="btn-error">Failed: <code>Invalid Password</code></b>);
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error(`failed to delete user ${user.id} had error ${err.message || err.msg || 'no code'}`);
     return c.html(<b class="btn-error">Failed: <code>Server Error</code></b>);
   }
