@@ -9,6 +9,7 @@ export default function Dashboard(props:any) {
 
   return (
     <BaseLayout title="SkyScheduler - Dashboard">
+      <script src="/dep/countable.min.js"></script>
       <div class="grid">
         <section class="max-width-50">
           <article>

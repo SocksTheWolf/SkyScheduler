@@ -10,7 +10,9 @@ export const sendResetLink = async (env: Bindings, passwordResetURL: string) => 
 
   const botUsername = env.RESET_BOT_USERNAME;
   const botPassword = env.RESET_BOT_APP_PASS;
-  if (isEmpty(env.))
+  if (isEmpty(botUsername) || isEmpty(botPassword)) {
+    return;
+  }
 
   const loginResponse = await loginToBsky(agent, botUsername, botPassword);
   if (!loginResponse) {

@@ -111,7 +111,6 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
         repostData: undefined
     };
 
-    console.log(postObject);
     // Add repost data if we should be making reposts
     if (repostCheckbox.checked) {
       postObject.repostData = {

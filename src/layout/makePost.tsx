@@ -5,7 +5,6 @@ export default function PostCreation() {
   return (
   <section>
     <script src="/dep/dropzone-min.js"></script>
-    <script src="/dep/countable.min.js"></script>
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
     <article>
       <form id="postForm">
@@ -17,7 +16,8 @@ export default function PostCreation() {
             <header>Post Content</header>
             <section>
               <textarea id="content" rows={8} style="resize: none" placeholder="Post text here" required></textarea>
-              <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into a thread with {MAX_LENGTH} characters per post</small>
+              <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into 
+                a thread with {MAX_LENGTH} characters per post</small>
             </section>
             <footer>
               <small>Character Count: <div id="count">0/{MAX_LENGTH}</div></small>
@@ -33,7 +33,9 @@ export default function PostCreation() {
                 </div>
               </div>
             <footer>
-              <small>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB or images with a res of {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} or higher.<br />Images will be attempted to be resized and compressed to fit BSky's requirements.</small>
+              <small>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB or images with a res of 
+                {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} or higher.<br />
+                Images will be attempted to be resized and compressed to fit BSky's requirements.</small>
             </footer>
             </section>
             <section id="content-label-selector" class="hidden">
