@@ -47,7 +47,7 @@ export function Settings() {
       <article>
         <header>Delete Account</header>
         <p>To delete your SkyScheduler account, please type your password below.<br />
-          <strong>NOTE</strong>: THIS ACTION IS PERMENENT.
+          <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMENENT</u>.</center>
         </p>
         <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDelete" 
             hx-swap="innerHTML" hx-indicator="#delSpinner">
@@ -72,7 +72,6 @@ export function Settings() {
       addUnicodeRemoval();
       document.getElementById("deleteAccountButton").addEventListener("click", (ev) => {
         ev.preventDefault();
-        closeSettingsModal();
         openModal(document.getElementById("deleteAccount"));
       });
     `}</script>

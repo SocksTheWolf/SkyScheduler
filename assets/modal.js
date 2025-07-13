@@ -33,11 +33,15 @@
 	// Open modal
 	const openModal = (modal) => {
 		const { documentElement: html } = document;
-		const scrollbarWidth = getScrollbarWidth();
-		if (scrollbarWidth) {
-			html.style.setProperty(scrollbarWidthCssVar, `${scrollbarWidth}px`);
+		if (!document.querySelector("dialog[open]")) {
+			const scrollbarWidth = getScrollbarWidth();
+			if (scrollbarWidth) {
+				html.style.setProperty(scrollbarWidthCssVar, `${scrollbarWidth}px`);
+			}
+			html.classList.add(isOpenClass, openingClass);
+		} else {
+			html.classList.add(isOpenClass);
 		}
-		html.classList.add(isOpenClass, openingClass);
 		setTimeout(() => {
 			visibleModal = modal;
 			html.classList.remove(openingClass);
@@ -47,13 +51,16 @@
 
 	// Close modal
 	const closeModal = (modal) => {
-		visibleModal = null;
 		const { documentElement: html } = document;
-		html.classList.add(closingClass);
+		if (!document.querySelector(`dialog[open]:not(#${visibleModal.id})`))
+			html.classList.add(closingClass);
+		visibleModal = null;
 		setTimeout(() => {
 			html.classList.remove(closingClass, isOpenClass);
 			html.style.removeProperty(scrollbarWidthCssVar);
 			modal.close();
+			if (getNextModal = document.querySelector("dialog[open]"))
+				visibleModal = getNextModal;
 		}, animationDuration);
 	};
 
