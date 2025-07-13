@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import { MAX_LENGTH } from "../limits.d"
-import { Post } from "../types.d";
+import { Post } from "../types";
 import { PostContentObject } from "./postList";
 
 type EditedPostProps = {
@@ -29,10 +29,11 @@ export default function PostEdit({post}:EditedPostProps) {
         <small>Character Count: <div id={`editCount${post.postid}`}>0/{MAX_LENGTH}</div></small>
       </footer>
       <progress id={editSpinner} class="htmx-indicator" />
-      <center>
+      <center class="controls">
         <div id={editResponse}>
         </div>
-        <button>Update Post</button>
+        <button>Update Post</button> 
+        <a role="button" onclick="refreshPosts()" class="secondary">Cancel</a>
       </center>
       <script type="text/javascript">{html`
         addCounter("content${post.postid}", "editCount${post.postid}");

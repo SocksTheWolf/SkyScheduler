@@ -10,7 +10,7 @@ import { ScheduledPostList } from "../layout/postList";
 import { uploadFileR2 } from "../utils/r2Query";
 import { createPost, deletePost, getPostById, updatePostForUser } from "../utils/dbQuery";
 import { FileDeleteSchema } from "../validation/mediaSchema";
-import PostEdit from "../layout/editArea";
+import PostEdit from "../layout/editPost";
 import { validate as isValid  } from 'uuid';
 import { EditSchema } from "../validation/postSchema";
 
