@@ -8,8 +8,11 @@ import { createPostObject } from "../utils/helpers";
 import { makePost } from "../utils/bskyApi";
 import { ScheduledPostList } from "../layout/postList";
 import { uploadFileR2 } from "../utils/r2Query";
-import { createPost, deletePost, getPostById } from "../utils/dbQuery";
+import { createPost, deletePost, getPostById, updatePostForUser } from "../utils/dbQuery";
 import { FileDeleteSchema } from "../validation/mediaSchema";
+import PostEdit from "../layout/editArea";
+import { validate as isValid  } from 'uuid';
+import { EditSchema } from "../validation/postSchema";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -20,12 +23,10 @@ post.use(corsHelperMiddleware);
 post.post("/upload", authMiddleware, async (c: Context) => {
   const formData = await c.req.parseBody();
   const fileUploadResponse = await uploadFileR2(c.env, formData['file']);
-  if (fileUploadResponse.success === false) {
+  if (fileUploadResponse.success === false)
     return c.json(fileUploadResponse, 400);
-  }
-  else {
+  else
     return c.json(fileUploadResponse, 200);
-  }
 });
 
 // Delete an upload
@@ -51,11 +52,17 @@ post.post("/create", authMiddleware, async (c: Context) => {
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
   } else if (response.postNow) {
-    const postInfo = await getPostById(c.env, response.postId);
-    const postResponse = await makePost(c.env, createPostObject(postInfo[0]));
-    if (postResponse === false) {
-      return c.json({message: "Failed to post content immediately..."}, 400);
+    const postInfo = await getPostById(c, response.postId);
+    if (postInfo.length > 0) {
+      
+      const postResponse = await makePost(c.env, createPostObject(postInfo[0]));
+      if (postResponse === false)
+        return c.json({message: "Failed to post content immediately, will post next schedule parse"}, 400);
+
+    } else {
+      return c.json({message: "Unable to get content to post"}, 401);
     }
+
   }
   return c.json({ message: "Post scheduled successfully" });
 });
@@ -68,11 +75,52 @@ post.all("/all", authMiddleware, async (c: Context) => {
   );
 });
 
+// Edit posts
+post.get("/edit/:id", authMiddleware, async (c: Context) => {
+  const { id } = c.req.param();
+  if (!isValid(id))
+    return c.html(<></>, 400);
+
+  const postInfo = await getPostById(c, id);
+  if (postInfo.length > 0) {
+    const postData = createPostObject(postInfo[0]);
+    return c.html(
+      <PostEdit post={postData} />
+    );
+  }
+  return c.html(<></>, 400);
+});
+
+post.post("/edit/:id", authMiddleware, async (c: Context) => {
+  const { id } = c.req.param();
+  if (!isValid(id)) {
+    c.header("HX-Trigger-After-Swap", "refreshPosts");
+    return c.html(<></>, 400);
+  }
+
+  const body = await c.req.parseBody();
+  const validation = EditSchema.safeParse(body);
+  if (!validation.success) {
+    return c.html(<b>Data was invalid</b>);
+  }
+
+  const { content } = validation.data;
+  const payload = {content: content};
+  if (await updatePostForUser(c, id, payload)) {
+    c.header("HX-Trigger-After-Swap", "refreshPosts");
+    return c.html(<b>Success</b>);
+  } else {
+    return c.html(<b>Failed to process</b>);
+  }
+});
+
 // delete a post
 post.delete("/delete/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
-  await deletePost(c.env, id);
+  if (isValid(id)) {
+    if (await deletePost(c, id) === true)
+      c.header("HX-Trigger-After-Swap", "showDeleteMsg");
+  }
 
-  c.header("HX-Trigger-After-Swap", "showDeleteMsg");
   return c.redirect("/post/all");
 });

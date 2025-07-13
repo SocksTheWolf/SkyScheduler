@@ -92,9 +92,16 @@ export const updateUserData = async (c: Context, newData: any) => {
   return false;
 }
 
-export const deletePost = async (env: Bindings, id:string) => {
+export const deletePost = async (c: Context, id:string) => {
+  const userData = c.get("user");
+  if (!userData) {
+    console.log("no user data");
+    return false;
+  }
+
+  const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  const postQuery = await db.select().from(posts).where(eq(posts.uuid, id)).all();
+  const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id))).all();
   if (postQuery.length !== 0) {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
@@ -109,6 +116,11 @@ export const deletePost = async (env: Bindings, id:string) => {
 
 export const createPost = async (c: Context, body:any) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
+
+  const user = c.get("user");
+  if (!user)
+    return { ok: false, msg: "Your user session has expired, please login again"};
+
   const validation = PostSchema.safeParse(body);
   if (!validation.success) {
     return { ok: false, msg: validation.error.toString() };
@@ -130,7 +142,7 @@ export const createPost = async (c: Context, body:any) => {
         scheduledDate: scheduleDate,
         embedContent: embeds,
         contentLabel: label,
-        userId: c.get("user").id
+        userId: user.id
     })
   ];
 
@@ -186,9 +198,24 @@ export const updatePostData = async (env: Bindings, id: string, newData:Object) 
   await db.update(posts).set(newData).where(eq(posts.uuid, id));
 }
 
-export const getPostById = async(env: Bindings, id: string) => {
+export const updatePostForUser = async (c: Context, id: string, newData:Object) => {
+  const userData = c.get("user");
+  if (!userData)
+    return false;
+
+  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const result = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id)));
+  return result.success;
+}
+
+export const getPostById = async(c: Context, id: string) => {
+  const userData = c.get("user");
+  if (!userData)
+    return [];
+
+  const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select().from(posts).where(eq(posts.uuid, id)).limit(1).all();
+  return await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id))).limit(1).all();
 }
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {

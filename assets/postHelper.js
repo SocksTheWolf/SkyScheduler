@@ -85,17 +85,7 @@ fileDropzone.on("error", function(file, msg) {
 });
 
 // Handle character counting
-const charCounter = document.getElementById("count");
-Countable.on(document.getElementById('content'), counter => {
-  charCounter.innerHTML = counter.all + "/" + MAX_LENGTH; 
-  // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
-  // The other thing to note is that this app will attempt to split up long text into a tweet thread for you.
-  if (counter.all > MAX_LENGTH) {
-    charCounter.classList.add('tooLong');
-  } else {
-    charCounter.classList.remove('tooLong');
-  }
-});
+addCounter("content", "count");
 
 // Handle form submission
 document.getElementById('postForm').addEventListener('submit', async (e) => {

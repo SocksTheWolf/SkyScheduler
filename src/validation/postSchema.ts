@@ -1,11 +1,11 @@
-import { MAX_LENGTH, MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d";
+import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d";
 import { PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
 
 // Schema for post creation
 export const PostSchema = z.object({
-  content: z.string().min(MIN_LENGTH).max(MAX_LENGTH),
+  content: z.string().min(MIN_LENGTH).nonempty(),
   label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
   embeds: z.object({
     content: z.string().nonempty().regex(fileKeyRegex),
@@ -24,4 +24,8 @@ export const PostSchema = z.object({
       return false;
     }
   }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
+});
+
+export const EditSchema = z.object({
+  content: z.string().min(MIN_LENGTH).nonempty()
 });
