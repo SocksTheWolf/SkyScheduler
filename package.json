@@ -17,20 +17,20 @@
     "better-auth-cloudflare": "^0.2.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
-    "hono": "^4.8.3",
+    "hono": "^4.8.5",
     "just-flatten-it": "^5.2.0",
     "just-has": "^2.3.0",
     "just-is-empty": "^3.4.1",
     "just-truncate": "^2.2.0",
     "randomstring": "^1.3.1",
     "uuid": "^11.1.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250620.0",
-    "@types/node": "^24.0.13",
+    "@cloudflare/workers-types": "^4.20250718.0",
+    "@types/node": "^24.0.14",
     "drizzle-kit": "^0.31.4",
     "prettier": "^3.6.2",
-    "wrangler": "^4.24.3"
+    "wrangler": "^4.25.0"
   }
 }
