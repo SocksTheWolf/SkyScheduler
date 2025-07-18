@@ -1,8 +1,9 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
+import {imageDimensionsFromStream} from 'image-dimensions';
 import truncate from "just-truncate";
 
 export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
@@ -128,11 +129,25 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
         const file = await env.R2.get(currentEmbed.content);
         if (file) {
-          const uploadImg = await agent.uploadBlob(await file.blob(), {encoding: file.httpMetadata?.contentType });
-          imagesArray.push({
+          const imageBlob = await file.blob();
+          // Attempt to get the width and height of the image file.
+          const sizeResult = await imageDimensionsFromStream(await imageBlob.stream());
+          // Upload the data itself.
+          const uploadImg = await agent.uploadBlob(imageBlob, {encoding: file.httpMetadata?.contentType });
+          const bskyMetadata:LooseObj = {
             "image": uploadImg.data.blob, 
-            "alt": truncate(currentEmbed.alt, MAX_ALT_TEXT)
-          });
+            "alt": truncate(currentEmbed.alt, MAX_ALT_TEXT),
+          };
+
+          // If we were able to parse the width and height of the image, then append the aspect ratio into the image record.
+          if (sizeResult) {
+            bskyMetadata.aspectRatio = {
+              "width": sizeResult.width,
+              "height": sizeResult.height
+            }
+          }
+
+          imagesArray.push(bskyMetadata);
         } else {
           console.warn(`Could not get the image ${currentEmbed.content} for post!`);
         }

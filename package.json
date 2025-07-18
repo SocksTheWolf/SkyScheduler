@@ -18,6 +18,7 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
     "hono": "^4.8.5",
+    "image-dimensions": "^2.3.0",
     "just-flatten-it": "^5.2.0",
     "just-has": "^2.3.0",
     "just-is-empty": "^3.4.1",

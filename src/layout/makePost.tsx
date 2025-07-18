@@ -6,6 +6,7 @@ export default function PostCreation() {
   <section>
     <script src="/dep/dropzone-min.js"></script>
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
+    <link href="/dropzoneMods.css" rel="stylesheet" type="text/css" />
     <article>
       <form id="postForm">
         <header>
@@ -35,16 +36,18 @@ export default function PostCreation() {
             <footer>
               <small>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB or images with 
                 a res of {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} or higher.<br />
-                Images will be attempted to be resized and compressed to fit BSky's requirements.</small>
+                Images will be modified to fit Bluesky's requirements.</small>
             </footer>
             </section>
             <section id="content-label-selector" class="hidden">
               <header>Content Label</header>
               <select name="label" id="contentLabels">
-                <option value="None">None/Safe</option>
+                <option disabled selected value=""> -- select an option -- </option>
+                <option value="None">Safe</option>
                 <option value="Suggestive">Suggestive</option>
                 <option value="Nudity">Nudity (non-sexual nudity)</option>
                 <option value="Adult">Adult (porn)</option>
+                <option disabled value="">---</option>
                 <option value="Graphic">Graphic Media (gore/violence)</option>
               </select>
               <small>Remember to set the appropriate content label for your content</small>

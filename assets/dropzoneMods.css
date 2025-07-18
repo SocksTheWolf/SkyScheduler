@@ -1,0 +1,13 @@
+.dropzone .dz-preview.dz-image-preview {
+  background-color: var(--pico-background-color);
+}
+
+.dropzone .dz-preview .dz-details {
+  opacity: 0.7;
+  color: unset;
+}
+
+.dropzone .dz-preview .dz-details .dz-filename:hover span {
+  border: unset;
+  background-color: rgba(255,255,255,.4);
+}

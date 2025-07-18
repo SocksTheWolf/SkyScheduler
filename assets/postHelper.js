@@ -11,13 +11,13 @@ let fileDropzone = new Dropzone("#imageUploads", {
 });
 
 fileDropzone.on("reset", () => {
-  document.getElementById("content-label-selector").classList.add("hidden");
+  showContentLabeler(false);
 });
 
 fileDropzone.on("addedfile", file => {
-  var buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
-  var removeButton = Dropzone.createElement("<button class='outline btn-error' disabled><small>Remove file</small></button>");
-  var addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
+  const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
+  const removeButton = Dropzone.createElement("<button class='outline btn-error' disabled><small>Remove file</small></button>");
+  const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
   
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
@@ -56,9 +56,9 @@ fileDropzone.on("addedfile", file => {
 });
 fileDropzone.on("success", function(file, response) {
   // show the labels
-  document.getElementById("content-label-selector").setAttribute("class", "");
+  showContentLabeler(true);
 
-  console.log("Adding "+file.name+" to the fileData map with size: "+response.fileSize+" at quality "+response.qualityLevel);
+  console.log(`Adding ${file.name} to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel}`);
   fileData.set(file.name, {content: response.data, alt: ""});
 
   // Make the buttons pressable
@@ -67,11 +67,14 @@ fileDropzone.on("success", function(file, response) {
   });
 
   try {
-    // attempt to rewrite the file size value as well
-    // TODO: Attempt to print out quality level as well???
-    file.previewElement.querySelectorAll("[data-dz-size]")[0].innerHTML = fileDropzone.filesize(response.fileSize);
-  }
-  catch (err) {
+    // attempt to write the file size value
+    const fileSizeElement = file.previewElement.querySelector(".dz-size");
+    const detailsArea = file.previewElement.querySelector(".dz-details");
+    fileSizeElement.firstChild.innerHTML = fileDropzone.filesize(response.fileSize);
+    // and the quality compression as well
+    const fileQualityLevel = Dropzone.createElement(`<div class="dz-size"><span>Quality: ${response.qualityLevel}%</span></div>`);
+    detailsArea.insertBefore(fileQualityLevel, fileSizeElement);
+  } catch (err) {
     console.error(err);
   }
   
@@ -79,7 +82,7 @@ fileDropzone.on("success", function(file, response) {
 });
 
 fileDropzone.on("error", function(file, msg) {
-  pushToast("Error: "+file.name+" had error: '"+msg+"'", false);
+  pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
   fileDropzone.removeFile(file);
 });
 
@@ -128,7 +131,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     
     if (response.ok) {
       // Hide the selector
-      document.getElementById("content-label-selector").classList.add("hidden");
+      showContentLabeler(false);
       // Remove all data in the dropzone as well
       fileDropzone.removeAllFiles();
       // Clear the file data map
@@ -142,7 +145,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       }
       
       setSelectDisable(true);
-      scheduledDate.setAttribute("required", true);
+      scheduledDate.setAttribute("required", "");
       document.getElementById('postForm').reset();
       refreshPosts();
     } else {
@@ -177,5 +180,18 @@ postNowCheckbox.addEventListener('click', (e) => {
   if (postNowCheckbox.checked)
     scheduledDate.removeAttribute("required");
   else
-    scheduledDate.setAttribute("required", true);
+    scheduledDate.setAttribute("required", "");
 });
+
+function showContentLabeler(shouldShow) {
+  const contentLabelSelector = document.getElementById("content-label-selector");
+  const contentLabelSelect = document.getElementById("contentLabels");
+  if (shouldShow) {
+    contentLabelSelector.setAttribute("class", "");
+    contentLabelSelect.setAttribute("required", "");
+  } else {
+    contentLabelSelector.classList.add("hidden");
+    contentLabelSelect.removeAttribute("required");
+    contentLabelSelect.value = "";
+  }
+}

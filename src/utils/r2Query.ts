@@ -1,4 +1,4 @@
-import { Bindings, EmbedData } from '../types';
+import { Bindings, EmbedData, LooseObj } from '../types';
 import { CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -36,26 +36,46 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
     return {"success": false, "error": `max file size is ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
   }
 
+  // if we should force to bsky image dimensions
+  const fitToBSkyDim: boolean = env.USE_BSKY_IMAGE_DIMENSIONS;
+
+  // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
   let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
   // We need to double check this image for various size information.
   const imageMetaData = await env.IMAGES.info(await file.stream());
 
   // if the image is over the cf image transforms, then return an error.
   if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION)
-    return {"success": false, "error": `image dimensions are too large to autosize. make sure your files fit the appropriate format.`};
+    return {"success": false, "error": `Image dimensions are too large to autosize. Make sure your files fit the requirements listed.`};
+
+  // Check if the image is over the bluesky image dimension limits
+  const imageDimensionsTooLarge:boolean = imageMetaData.width > BSKY_MAX_WIDTH || imageMetaData.height > BSKY_MAX_HEIGHT;
 
   // If the image is over any bsky limits, we will need to resize it
-  if (file.size > BSKY_FILE_SIZE_LIMIT || imageMetaData.width > BSKY_MAX_WIDTH || imageMetaData.height > BSKY_MAX_HEIGHT) {
+  if (file.size > BSKY_FILE_SIZE_LIMIT || (fitToBSkyDim && imageDimensionsTooLarge)) {
     let failedToResize = true;
 
     if (env.USE_IMAGE_TRANSFORMS) {
-      const degradePerStep:number = env.IMAGE_DEGRADE_PER_STEP;
+      // number of attempts to fit the image to BSky's requirements
       var attempts:number = 1;
+      // quality of the degrade per steps
+      const degradePerStep:number = env.IMAGE_DEGRADE_PER_STEP;
+
+      const transformRules:LooseObj = { metadata: "copyright" };
+      // Fit to aspect ratio, but only if we're too large.
+      if (fitToBSkyDim) {
+        transformRules.width = BSKY_MAX_WIDTH;
+        transformRules.height = BSKY_MAX_HEIGHT;
+        transformRules.fit = "scale-down";
+      }
       do {
+        // Set the quality level for this step
         const qualityLevel:number = 100 - degradePerStep*attempts;
+        transformRules.quality = qualityLevel;
+
         const response = (
           await env.IMAGES.input(await file.stream())
-            .transform({ width: BSKY_MAX_WIDTH, height: BSKY_MAX_HEIGHT, fit: "scale-down", quality: qualityLevel, metadata: "copyright" })
+            .transform(transformRules)
             .output({ format: "image/jpeg" })
         ).response();
 
@@ -84,8 +104,7 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
     }
 
     if (failedToResize)
-      return {"success": false, "originalName": originalName, "error": `image is too large for bsky, size is over by ${file.size - BSKY_FILE_SIZE_LIMIT}MB, 
-          with width ${imageMetaData.width} and height ${imageMetaData.height}`};
+      return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, size is over by ${file.size - BSKY_FILE_SIZE_LIMIT}MB`};
   }
   
   const fileExt = originalName.split(".").pop();

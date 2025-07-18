@@ -15,6 +15,7 @@ export interface Bindings {
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
   USE_TURNSTILE_CAPTCHA: boolean;
+  USE_BSKY_IMAGE_DIMENSIONS: boolean;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
 };
