@@ -1,6 +1,7 @@
 export const MIN_LENGTH: number = 1;
 export const MAX_LENGTH: number = 300;
 export const MAX_REPOST_INTERVAL: number = 11;
+export const MAX_HOURS_REPOSTING: number = 24;
 
 export const MAX_EMBEDS: number = 4;
 // Alt text limit via 

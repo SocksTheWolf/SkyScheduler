@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_INTERVAL } from "../limits.d"
+import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } from "../limits.d"
 
 export default function PostCreation() {
   return (
@@ -79,7 +79,7 @@ export default function PostCreation() {
             <center id="repostScheduleSimple">
                 Automatically repost this content every 
                 <select id="hoursInterval" disabled>
-                  {[...Array(24)].map((x, i) => {
+                  {[...Array(MAX_HOURS_REPOSTING)].map((x, i) => {
                     if (i == 0) return;
                     return (<option value={i}>{i}</option>);
                   })}

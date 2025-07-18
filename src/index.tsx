@@ -13,6 +13,7 @@ import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
+import { redirectToDashIfLogin } from "./middleware/redirectDash";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -52,19 +53,18 @@ app.get("/dashboard", authMiddleware, (c) => {
 });
 
 // Login route
-app.get("/login", pullAuthData, (c) => {
-  if (c.get("user") !== null)
-    return c.redirect("/dashboard");
-  else
-    return c.html(<Login />);
+app.get("/login", redirectToDashIfLogin, (c) => {
+  return c.html(<Login />);
 });
 
 // Signup route
-app.get("/signup", pullAuthData, (c) => {
-  if (c.get("user") !== null)
-    return c.redirect("/dashboard");
-  else
-    return c.html(<Signup c={c} />);
+app.get("/signup", redirectToDashIfLogin, (c) => {
+  return c.html(<Signup c={c} />);
+});
+
+// Forgot Password route
+app.get("/reset", redirectToDashIfLogin, (c) => {
+  return c.text("Coming Soon");
 });
 
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
