@@ -134,6 +134,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       fileDropzone.removeAllFiles();
       // Clear the file data map
       fileData.clear();
+      resetCounter("count");
       
       if (postNow) {
         pushToast("Post created!", true);

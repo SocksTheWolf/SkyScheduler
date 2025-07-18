@@ -78,3 +78,9 @@ function addCounter(textField, counter) {
     }
   });
 }
+
+function resetCounter(counter) {
+  const counterEl = document.getElementById(counter);
+  counterEl.innerHTML = 0 + "/" + MAX_LENGTH;
+  counterEl.classList.remove('tooLong');
+}
