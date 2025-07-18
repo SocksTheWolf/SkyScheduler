@@ -22,11 +22,10 @@ fileDropzone.on("addedfile", file => {
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    var askUserData = prompt("What is the alt text?");
+    const existingData = fileData.get(file.name);
+    var askUserData = prompt("What is the alt text?", existingData.alt);
     if (askUserData !== "") {
-      console.log("Setting alt data on "+file.name);
       try {
-        let existingData = fileData.get(file.name);
         existingData.alt = askUserData;
         fileData.set(file.name, existingData);
         addAltText.classList.add("btn-success");
@@ -94,7 +93,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
   try {
-    let postObject = {
+    const postObject = {
         content,
         scheduledDate: postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString(),
         makePostNow: postNow,
