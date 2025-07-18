@@ -31,7 +31,7 @@ post.post("/upload", authMiddleware, async (c: Context) => {
 
 // Delete an upload
 post.delete("/upload", authMiddleware, async (c: Context) => {
-  const body = await c.req.parseBody();
+  const body = await c.req.json();
 
   // Validate that this is a legitimate key
   const validation = FileDeleteSchema.safeParse(body);
