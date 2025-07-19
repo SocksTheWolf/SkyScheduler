@@ -2,6 +2,7 @@ import { html } from "hono/html";
 
 export default function ProcessAccountForm(props: any) {
   const loadingText:string = props.text;
+  const delayRedirect:number = 2000;
   return (
     <center>
       <span aria-busy="true" id="loading" hidden>{loadingText}</span>
@@ -10,7 +11,7 @@ export default function ProcessAccountForm(props: any) {
         function redirectAfterDelay(url) {
           setTimeout(function() {
             window.location.href = url;
-          }, 3000);
+          }, ${delayRedirect});
         }
         function rawSubmitHandler(url, successCallback) {
           const loadingBar = document.getElementById("loading");
@@ -33,7 +34,7 @@ export default function ProcessAccountForm(props: any) {
               // Hide loading bar after delay
               setTimeout(function() {
                 loadingBar.setAttribute("hidden", true);
-              }, 1000);
+              }, ${delayRedirect/2});
 
               if (response.ok)
                 successCallback();
