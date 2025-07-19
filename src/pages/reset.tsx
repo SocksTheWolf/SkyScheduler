@@ -18,13 +18,13 @@ export default function ResetPassword() {
 
             <label>
               New Password
-              <input type="password" name="password" id="password" required />
+              <input type="password" name="password" id="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
               <small>Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
             </label>
 
             <label>
               Confirm Password
-              <input type="password" name="confirmPassword" id="confirmPassword" required />
+              <input type="password" name="confirmPassword" id="confirmPassword" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
             </label>
 
             <center>
@@ -34,13 +34,18 @@ export default function ResetPassword() {
             </center>
           </form>
           <ProcessAccountForm text="Resetting Password..." />
+          <footer>
+            <center>
+              <small><a href="/forgot" class="secondary outline">Request a password reset</a></small>
+            </center>
+          </footer>
         </article>
       </section>
       <script type="text/javascript">
       {html`
         easySetup("/account/reset", "Success! Redirecting to login...", "/login");
         if (resetToken = new URLSearchParams(window.location.search).get("token")) {
-          document.getElementById("resetToken").value = resetToken;
+          document.getElementById("resetToken").value = encodeURI(resetToken);
           const submitButton = document.getElementById("submitButton");
           submitButton.removeAttribute("disabled");
         } else {
