@@ -41,7 +41,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
                   if (bskyUserId !== null) {
                     const response = await createDMWithUser(env!, bskyUserId, `
 Your SkyScheduler password reset url is: 
-${env?.BETTER_AUTH_URL}/api/auth${url} 
+${url} 
 
 This URL will expire in about an hour.
 
