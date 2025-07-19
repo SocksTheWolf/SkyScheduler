@@ -1,17 +1,20 @@
 import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings, LooseObj } from "../types";
-import { doesUserExist, getAllMediaOfUser, updateUserData } from "../utils/dbQuery";
+import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, updateUserData } from "../utils/dbQuery";
 import { SignupSchema } from "../validation/signupSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { AccountDeleteSchema } from "../validation/accountDeleteSchema";
 import { doesInviteKeyHaveValues, useInviteKey } from "../utils/inviteKeys";
 import { ContextVariables } from "../auth";
-import isEmpty from "just-is-empty";
 import { deleteFromR2 } from "../utils/r2Query";
+import { AccountResetSchema } from "../validation/accountResetSchema";
+import { verifyTurnstile } from "../middleware/turnstile";
+import { AccountForgotSchema } from "../validation/accountForgotSchema";
+import isEmpty from "just-is-empty";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -104,37 +107,8 @@ account.post("/logout", authMiddleware, async (c) => {
   return c.html("Success");
 });
 
-account.post("/signup", async (c: Context) => {
+account.post("/signup", verifyTurnstile, async (c: Context) => {
   const body = await c.req.json();
-
-  // Turnstile handling.
-  if (c.env.USE_TURNSTILE_CAPTCHA) {
-    const userIP: string|undefined = c.req.header("CF-Connecting-IP");
-    const token = body["cf-turnstile-response"];
-
-    let formData = new FormData();
-    formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
-    formData.append("response", token);
-    if (userIP)
-      formData.append("remoteip", userIP);
-
-    const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-      method: "POST",
-      body: formData
-    });
-
-    // Check if we could contact siteverify
-    if (!turnstileFetch.ok) {
-      return c.json({ok: false, message: "timed out verifying captcha"}, 400);
-    }
-
-    // Check if the output was okay
-    const turnstileOutcome:any = await turnstileFetch.json();
-    if (!turnstileOutcome.success) {
-      return c.json({ok: false, message: "captcha timed out"}, 401);
-    }
-  }
-  
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
     return c.json({ ok: false, message: validation.error.toString() }, 400);
@@ -150,8 +124,13 @@ account.post("/signup", async (c: Context) => {
     return c.json({ok: false, message: "invalid signup token value"}, 400);
   }
 
+  const auth = c.get("auth");
+  if (!auth) {
+    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+  }
+
   // create the user
-  const createUser = await c.get("auth").api.signUpEmail({
+  const createUser = await auth.api.signUpEmail({
     body: {
       name: username,
       email: `${username}@skyscheduler.tld`,
@@ -169,6 +148,67 @@ account.post("/signup", async (c: Context) => {
     return c.json({ok: true, message: "signup success"});
   }
   return c.json({ok: false, message: "unknown error occurred"}, 501);
+});
+
+account.post("/forgot", verifyTurnstile, async (c: Context) => {
+  const body = await c.req.json();
+
+  const validation = AccountForgotSchema.safeParse(body);
+  if (!validation.success) {
+    return c.json({ ok: false, message: validation.error.toString() }, 400);
+  }
+
+  const { username } = validation.data;
+  if (await doesUserExist(c, username) === false) {
+    return c.json({ok: false, message: "user doesn't exist"}, 401);
+  }
+
+  // TODO: do a d1 lookup on the user for their email
+  const dbResult = await getUserEmailForHandle(c.env, username);
+  if (dbResult.length === 0) {
+    return c.json({ok: false, message: "user data is missing"}, 401);
+  }
+
+  const userEmail = dbResult[0].email;
+  const auth = c.get("auth");
+  if (!auth) {
+    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+  }
+
+  const { data, error } = await auth.api.requestPasswordReset({
+    body: {
+      email: userEmail,
+      redirectTo: "/reset",
+    }
+  });
+  if (error) {
+    console.error(error);
+    return c.json({ok: false, message: "could not request a password reset token at this time, please try again later"}, 401);
+  }
+  return c.json({ok: true, message: "request processed"});
+});
+
+account.post("/reset", pullAuthData, async (c: Context) => {
+  const body = await c.req.json();
+
+  const validation = AccountResetSchema.safeParse(body);
+  if (!validation.success) {
+    return c.json({ ok: false, message: validation.error.toString() }, 400);
+  }
+  const { resetToken, password } = validation.data;
+  const auth = c.get("auth");
+  if (!auth) {
+    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+  }
+  
+  const { data, error } = await auth.api.resetPassword({body: {
+    newPassword: password,
+    token: resetToken,
+  }});
+  if (error) {
+    return c.json({ok: false, message: "invalid token/password"}, 401);
+  }
+  return c.json({ ok: true, message: "successfully updated password" });
 });
 
 account.post("/delete", authMiddleware, async (c) => {

@@ -1,23 +1,40 @@
-import { AtpAgent } from '@atproto/api';
+import { AtpAgent, RichText } from '@atproto/api';
 import { loginToBsky } from './bskyApi';
 import { Bindings } from '../types';
-import isEmpty from 'just-is-empty';
 
-export const sendResetLink = async (env: Bindings, passwordResetURL: string) => {
+export const createDMWithUser = async (env: Bindings, user: string, msg: string) => {
   const agent = new AtpAgent({
-    service: new URL('https://api.bsky.chat'),
+    service: new URL('https://bsky.social')
   });
 
-  const botUsername = env.RESET_BOT_USERNAME;
-  const botPassword = env.RESET_BOT_APP_PASS;
-  if (isEmpty(botUsername) || isEmpty(botPassword)) {
-    return;
-  }
-
-  const loginResponse = await loginToBsky(agent, botUsername, botPassword);
+  const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
   if (!loginResponse) {
-    console.error("Unable to login to reset bot");
+    console.error("Unable to login to the bot to send reset password messages");
     return false;
   }
 
+  const chatHeaders = {headers: {
+    "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
+  }};
+
+  const getConvo = await agent.chat.bsky.convo.getConvoForMembers({members: [user]}, chatHeaders);
+
+  if (getConvo.success) {
+    const convoId = getConvo.data.convo.id;
+
+    // Generate facets so we get things like links.
+    const rt = new RichText({text: msg});
+    await rt.detectFacets(agent);
+
+    const sendMessage = await agent.chat.bsky.convo.sendMessage({convoId: convoId, message: {text: msg, facets: rt.facets}}, chatHeaders);
+    if (sendMessage.success) {
+      // Message has been sent.      
+      return true;
+    } else {
+      console.error(`Unable to send the message to ${user}, could not sendMessage call`);
+    }
+  } else {
+    console.error(`Unable to send message to user ${user}, could not get convo.`);
+  }
+  return false;
 };

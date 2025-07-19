@@ -6,14 +6,16 @@ import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
+import ResetPassword from "./pages/reset";
 import { schedulePostTask } from "./utils/scheduler";
 import { doesAdminExist } from "./utils/dbQuery";
-import { authMiddleware, pullAuthData } from "./middleware/auth";
+import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
+import ForgotPassword from "./pages/forgot";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -63,8 +65,13 @@ app.get("/signup", redirectToDashIfLogin, (c) => {
 });
 
 // Forgot Password route
+app.get("/forgot", redirectToDashIfLogin, (c) => {
+  return c.html(<ForgotPassword c={c} />);
+});
+
+// Reset Password route
 app.get("/reset", redirectToDashIfLogin, (c) => {
-  return c.text("Coming Soon");
+  return c.html(<ResetPassword />);
 });
 
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {

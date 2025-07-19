@@ -56,11 +56,13 @@ document.addEventListener("refreshPosts", function(ev) {
 // from the bsky website, why the fuck did they do this?
 function addUnicodeRemoval() {
   const userEl = document.getElementById("username");
-  userEl.value = "";
-  userEl.addEventListener("change", ev => {
-    ev.preventDefault();
-    userEl.value = userEl.value.replace(/[^\x00-\x7F]/g, "");
-  });
+  if (userEl !== null) {
+    userEl.value = "";
+    userEl.addEventListener("change", ev => {
+      ev.preventDefault();
+      userEl.value = userEl.value.replace(/[^\x00-\x7F]/g, "");
+    });
+  }
 }
 
 function addCounter(textField, counter) {

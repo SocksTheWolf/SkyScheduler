@@ -31,12 +31,10 @@ export default function Login() {
               </button>
             </center>
           </form>
-          <p class="smallest"><b>Forgot your password?</b> Contact the project admin to get your password reset.<br />
-              <em>Automated resets are coming soon!</em></p>
           <ProcessAccountForm text="Logging in..." />
           <footer>
             <center>
-              <small>Don't have an account? <a href="/signup" class="contrast outline">Click here to Sign Up</a></small>
+              <small><a class="contrast outline" href="/signup">Sign Up</a> | <a class="contrast outline" href="/forgot">Forgot Password</a></small>
             </center>
           </footer>
         </article>

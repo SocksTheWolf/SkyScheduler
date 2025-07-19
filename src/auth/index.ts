@@ -7,6 +7,8 @@ import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
 import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
+import { lookupBskyHandle } from "../utils/bskyApi";
+import { createDMWithUser } from "../utils/bskyMsg";
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
@@ -34,6 +36,23 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
               emailAndPassword: {
                 enabled: true,
                 requireEmailVerification: false,
+                sendResetPassword: async ({user, url, token}, request) => {
+                  const bskyUserId = await lookupBskyHandle(user.username);
+                  if (bskyUserId !== null) {
+                    const response = await createDMWithUser(env!, bskyUserId, `
+Your SkyScheduler password reset url is: 
+${env?.BETTER_AUTH_URL}/api/auth${url} 
+
+This URL will expire in about an hour.
+
+If you did not request a password reset, please ignore this message.`);
+                    if (!response)
+                      throw new Error("FAILED_MESSAGE");
+                  } else {
+                    console.error(`Unable to look up bsky username for user ${user.username}, got null`);
+                    throw new Error("NO_LOOKUP");
+                  }
+                },
               },
               plugins: [username({
                 minUsernameLength: BSKY_MIN_USERNAME_LENGTH

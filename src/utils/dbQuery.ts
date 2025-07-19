@@ -225,3 +225,8 @@ export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
     .where(eq(users.id, userid))
     .limit(1);
 }
+
+export const getUserEmailForHandle = async (env: Bindings, userhandle: string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  return await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
+};

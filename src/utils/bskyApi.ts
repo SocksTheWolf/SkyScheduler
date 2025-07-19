@@ -6,6 +6,15 @@ import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
 import truncate from "just-truncate";
 
+export const lookupBskyHandle = async (user: string) => {
+  const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`);
+  if (lookupRequest.ok) {
+    const response:any = await lookupRequest.json();
+    return response.did;
+  }
+  return null;
+};
+
 export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
   try {
     const loginResponse = await agent.login({
