@@ -1,12 +1,12 @@
 import { Context } from "hono";
-import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
 import { isUsingInviteKeys } from "../utils/inviteKeys";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
-import ProcessAccountForm from "../layout/accountForm";
+import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import NavTags from "../layout/navTags";
-import UsernameHelper from "../layout/usernameHelper";
 import isEmpty from "just-is-empty";
+import AccountHandler from "../layout/account";
+import UsernameField from "../layout/usernameField";
+import TurnstileCaptcha from "../layout/turnstile";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
@@ -17,63 +17,39 @@ export default function Signup(props:any) {
   return (
     <BaseLayout title="SkyScheduler - Signup">
       <NavTags />
-      <section class="container">
-        <article>
-          <header>
-            <center><h3>Account Signup</h3></center>
-          </header>
-          <form id="loginForm">
-            <label>
-              Dashboard Password
-              <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
-              <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
-            </label>
+      <AccountHandler title="Create an Account" 
+        submitText="Sign Up!"
+        loadingText="Signing up..." 
+        endpoint="/account/signup" 
+        successText="Success! Redirecting to login..." 
+        redirect="/login">
 
-            <label>
-              Bluesky Handle
-              <input type="text" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} required />
-              <small>This is your bsky username, in the format of a domain like <code>USERNAME.bsky.social</code>.</small>
-            </label>
+        <label>
+          Dashboard Password
+          <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
+          <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
+        </label>
 
-            <label>
-              Bluesky App Password
-              <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required />
-              <small>
-                If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
-              </small>
-            </label>
+        <UsernameField />
+        
+        <label>
+          Bluesky App Password
+          <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required />
+          <small>
+            If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
+          </small>
+        </label>
 
-            {isUsingInviteKeys(ctx) ? (
-              <label>
-                Invite Key/Signup Token
-                <input type="text" name="signupToken" placeholder="" required />
-                <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
-              </label>
-            ) : ''}
+        {isUsingInviteKeys(ctx) ? (
+          <label>
+            Invite Key/Signup Token
+            <input type="text" name="signupToken" placeholder="" required />
+            <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
+          </label>
+        ) : ''}
 
-            {ctx.env.USE_TURNSTILE_CAPTCHA ? (
-              <label>
-                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-                Captcha
-                <div class="cf-turnstile" data-sitekey={ctx.env.TURNSTILE_PUBLIC_KEY}></div>
-              </label>
-            ) : ''}
-
-            <center>
-              <button type="submit" id="submitSignup">
-                Sign Up
-              </button>
-            </center>
-          </form>
-          <ProcessAccountForm text="Signing up..." />
-        </article>
-      </section>
-      <script type="text/javascript">
-      {html`
-        easySetup("/account/signup", "Success! Redirecting to login...", "/login");
-      `}
-      </script>
-      <UsernameHelper />
+        <TurnstileCaptcha c={ctx} />
+      </AccountHandler>
     </BaseLayout>
   );
 }

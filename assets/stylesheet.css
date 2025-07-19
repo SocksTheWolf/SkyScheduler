@@ -95,6 +95,7 @@
 
 .controls > button {
   margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 .smallest {
@@ -119,4 +120,14 @@
 
 #refresh-posts-force {
   display: none;
+}
+
+#footerLinks span:not(:last-child):after {
+  content: " | "
+}
+
+@media (min-width:320px) {
+  .max-width-50 {
+    margin-left: 20px;
+  }
 }
