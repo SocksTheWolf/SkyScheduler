@@ -28,6 +28,13 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
 
     const sendMessage = await agent.chat.bsky.convo.sendMessage({convoId: convoId, message: {text: msg, facets: rt.facets}}, chatHeaders);
     if (sendMessage.success) {
+      // delete the message for me
+      const messageId = sendMessage.data.id;
+      try {
+        await agent.chat.bsky.convo.deleteMessageForSelf({convoId: convoId, messageId: messageId}, chatHeaders);
+      } catch(err) {
+        console.error(err);
+      }
       // Message has been sent.      
       return true;
     } else {
