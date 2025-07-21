@@ -1,13 +1,13 @@
 import { Env, Hono } from "hono";
 import { every } from 'hono/combine'
-import { auth, createAuth, ContextVariables } from "./auth";
+import { createAuth, ContextVariables } from "./auth";
 import { Bindings } from "./types.d";
 import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import ResetPassword from "./pages/reset";
-import { schedulePostTask } from "./utils/scheduler";
+import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { doesAdminExist } from "./utils/dbQuery";
 import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
@@ -79,6 +79,11 @@ app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
   return c.text("ran");
 });
 
+app.get("/cron-clean", every(authMiddleware, adminOnlyMiddleware), (c) => {
+  c.executionCtx.waitUntil(cleanUpPostsTask(c.env, c.executionCtx));
+  return c.text("ran");
+});
+
 app.get("/start", async (c) => {
   if (await doesAdminExist(c))
     return c.html("already created", 501);
@@ -100,9 +105,16 @@ app.get("/start", async (c) => {
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
-    ctx.waitUntil(schedulePostTask(env, ctx));
+    switch (event.cron) {
+      case "30 17 * * sun":
+        ctx.waitUntil(cleanUpPostsTask(env, ctx));
+      break;
+      default:
+      case "0 * * * *":
+        ctx.waitUntil(schedulePostTask(env, ctx));
+      break;
+    }
   },
-
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     return app.fetch(request, env, ctx);
   },

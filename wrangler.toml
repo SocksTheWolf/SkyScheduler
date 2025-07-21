@@ -39,15 +39,15 @@ bucket_name = "skyembeds"
 binding = "IMAGES"
 
 [triggers]
-# Schedule cron triggers:
-crons = [ "0 * * * *" ] # at the start of every hour
+# Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:
+crons = [ "0 * * * *", "30 17 * * sun" ]
 
 [dev]
 # flags required to run wrangler in linux
 ip = "127.0.0.1"
 
 [vars]
-# the domain and protocol that this application is hosted on, this value is also used for CORS
+# the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms

@@ -22,6 +22,7 @@
     "just-flatten-it": "^5.2.0",
     "just-has": "^2.3.0",
     "just-is-empty": "^3.4.1",
+    "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",
     "randomstring": "^1.3.1",
     "uuid": "^11.1.0",

@@ -22,11 +22,11 @@ export const doesUserExist = async (c: Context, username:string) => {
     .where(eq(users.name, username))
     .limit(1).all();
   return result.length > 0;
-}
+};
 
 export const doesAdminExist = async (c: Context) => {
   return await doesUserExist(c, "admin");
-}
+};
 
 export const getPostsForUser = async (c: Context) => {
   try {
@@ -90,9 +90,9 @@ export const updateUserData = async (c: Context, newData: any) => {
     console.error(`Failed to update new user data for user ${userData.id}: ${userData.username}`);
   }
   return false;
-}
+};
 
-export const deletePost = async (c: Context, id:string) => {
+export const deletePost = async (c: Context, id: string) => {
   const userData = c.get("user");
   if (!userData) {
     console.log("no user data");
@@ -170,7 +170,7 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
   .where(and(lte(posts.scheduledDate, currentTime), 
     eq(posts.posted, false)))
     .all();
-}
+};
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
   // Get all scheduled posts for the given time
@@ -181,22 +181,22 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) 
     .from(posts)
     .where(inArray(posts.uuid, query))
     .all();
-}
+};
 
 export const getAllRepostsForCurrentTime = async (env: Bindings) => {
   return await getAllRepostsForGivenTime(env, floorCurrentTime());
-}
+};
 
 export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime = floorCurrentTime();
   await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime));
-}
+};
 
 export const updatePostData = async (env: Bindings, id: string, newData:Object) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   await db.update(posts).set(newData).where(eq(posts.uuid, id));
-}
+};
 
 export const updatePostForUser = async (c: Context, id: string, newData:Object) => {
   const userData = c.get("user");
@@ -206,7 +206,7 @@ export const updatePostForUser = async (c: Context, id: string, newData:Object) 
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const result = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id)));
   return result.success;
-}
+};
 
 export const getPostById = async(c: Context, id: string) => {
   const userData = c.get("user");
@@ -216,7 +216,7 @@ export const getPostById = async(c: Context, id: string) => {
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id))).limit(1).all();
-}
+};
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
@@ -224,9 +224,35 @@ export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
     .from(users)
     .where(eq(users.id, userid))
     .limit(1);
-}
+};
 
 export const getUserEmailForHandle = async (env: Bindings, userhandle: string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
+};
+
+export const getAllPostedPostsOfUser = async(env: Bindings, userid:string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  return await db.select({id: posts.uuid, uri: posts.uri})
+    .from(posts)
+    .where(and(eq(posts.userId, userid), eq(posts.posted, true)))
+    .all();
+};
+
+export const getAllPostedPosts = async (env: Bindings) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  return await db.select({id: posts.uuid, uri: posts.uri})
+    .from(posts)
+    .where(eq(posts.posted, true))
+    .all();
+};
+
+// deletes multiple posts from a database.
+export const deletePosts = async (env: Bindings, postsToDelete:string[]) => {
+  // Don't do anything on empty arrays.
+  if (isEmpty(postsToDelete))
+    return;
+
+  const db: DrizzleD1Database = drizzle(env.DB);
+  await db.delete(posts).where(and(inArray(posts.uuid, postsToDelete), eq(posts.posted, true)));
 };
