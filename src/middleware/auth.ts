@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { auth } from "../auth";
 import { every } from "hono/combine";
 
 // Middleware to verify authentication

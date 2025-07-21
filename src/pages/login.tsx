@@ -1,4 +1,3 @@
-import { html } from "hono/html";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
