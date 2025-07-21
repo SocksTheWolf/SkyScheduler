@@ -1,6 +1,4 @@
 User-Agent: *
-Disallow: /login
-Disallow: /signup
 Disallow: /dashboard
 Disallow: *.js$
 Disallow: *.css$
