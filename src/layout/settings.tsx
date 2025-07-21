@@ -1,5 +1,6 @@
 import { html } from "hono/html";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import UsernameField from "./usernameField";
 
 export function Settings() {
   return (
@@ -16,16 +17,17 @@ export function Settings() {
         <section>
           <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" 
             hx-swap="innerHTML" hx-indicator="#spinner">
+
+            <UsernameField required={false} title="BlueSky Handle:" hintText="Only change this if you have recently changed your Bluesky handle" />
+            
             <label>
-              BSky Username: <input type="input" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} />
-              <small>Only change this if you have recently changed your bsky handle</small>
-            </label>
-            <label>
-              Dashboard Pass: <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
+              Dashboard Pass: 
+              <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
               <small>The password to access this website</small>
             </label>
             <label>
-              BSky App Password: <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
+              BSky App Password: 
+              <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
               <small>If you need to change your application password for whatever reason</small>
             </label>
           </form>
