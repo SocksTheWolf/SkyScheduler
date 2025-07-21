@@ -1,4 +1,4 @@
-import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL } from "../limits.d";
+import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } from "../limits.d";
 import { PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
@@ -13,7 +13,7 @@ export const PostSchema = z.object({
   }).array().optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
-    hours: z.coerce.number().min(1).max(23),
+    hours: z.coerce.number().min(1).max(MAX_HOURS_REPOSTING),
     times: z.coerce.number().min(1).max(MAX_REPOST_INTERVAL)
   }).optional(),
   scheduledDate: z.string().refine((date) => {
