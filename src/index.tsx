@@ -37,9 +37,11 @@ app.all("/api/auth/*", async (c) => {
 });
 
 // Account endpoints
+app.use("/account/**", corsHelperMiddleware);
 app.route("/account", account);
 
 // Posts endpoints
+app.use("/post/**", corsHelperMiddleware);
 app.route("/post", post);
 
 // Root route

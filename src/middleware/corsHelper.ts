@@ -6,7 +6,7 @@ export const corsHelperMiddleware = async (c: Context, next:any) => {
       origin: c.env.BETTER_AUTH_URL,
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS", "DELETE"],
-      exposeHeaders: ["Content-Length"],
+      exposeHeaders: ["Content-Length", "HX-Trigger", "HX-Redirect", "HX-Trigger-After-Swap"],
       maxAge: 600,
       credentials: true,
   });
