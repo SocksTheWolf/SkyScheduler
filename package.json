@@ -17,7 +17,7 @@
     "better-auth-cloudflare": "^0.2.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.38.4",
-    "hono": "^4.8.5",
+    "hono": "^4.9.6",
     "image-dimensions": "^2.3.0",
     "just-flatten-it": "^5.2.0",
     "just-has": "^2.3.0",
