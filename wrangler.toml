@@ -18,7 +18,7 @@ kv_namespaces = [
 ]
 
 [limits]
-cpu_ms = 5000 # this is overkill. In one instance have we ever hit like 60ms, we're usually floating at less than 15ms (for cryptography)
+cpu_ms = 35000 # this is overkill. In one instance have we ever hit like 60ms, we're usually floating at less than 15ms (for cryptography)
 
 [observability]
 enabled = true
