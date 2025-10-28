@@ -58,6 +58,12 @@ If you did not request a password reset, please ignore this message.`);
         })],
         rateLimit: {
           enabled: true,
+          window: 60,
+          max: 100,
+          "*": {
+            window: 60,
+            max: 100,
+          },
         },
       }
     ),
