@@ -1,6 +1,6 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj } from '../types.d';
-import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH } from '../limits.d';
+import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
@@ -207,7 +207,9 @@ export const makePost = async (env: Bindings, content: Post) => {
   try {
     const newPost: PostResponseObject|null = await makePostRaw(env, content);
     if (newPost !== null) {
-      await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, content: truncate(content.text, 50), embedContent: [] });
+      await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
+        content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] });
+
       // Delete any embeds if they exist.
       await deleteEmbedsFromR2(env, content.embeds);
       return true;

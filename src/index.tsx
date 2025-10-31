@@ -8,7 +8,7 @@ import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import ResetPassword from "./pages/reset";
 import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
-import { doesAdminExist } from "./utils/dbQuery";
+import { doesAdminExist, compactPostedPosts } from "./utils/dbQuery";
 import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
@@ -83,6 +83,11 @@ app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
 
 app.get("/cron-clean", every(authMiddleware, adminOnlyMiddleware), (c) => {
   c.executionCtx.waitUntil(cleanUpPostsTask(c.env, c.executionCtx));
+  return c.text("ran");
+});
+
+app.get("/db-truncate", every(authMiddleware, adminOnlyMiddleware), (c) => {
+  c.executionCtx.waitUntil(compactPostedPosts(c.env));
   return c.text("ran");
 });
 

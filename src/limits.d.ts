@@ -26,3 +26,6 @@ export const CF_MAX_DIMENSION: number = 10000;
 
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
+
+// This is the length of how much we keep in the DB after a post has been made
+export const MAX_POSTED_LENGTH: number = 50;
