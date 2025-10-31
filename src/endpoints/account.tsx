@@ -182,8 +182,8 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
     }
   });
   if (error) {
-    console.error(error);
-    return c.json({ok: false, message: "could not request a password reset token at this time, please try again later"}, 401);
+    console.error(`Password reset encountered an error: ${error}`);
+    return c.json({ok: false, message: `Could not send a direct message to your account. Please check to see if you are following ${c.env.RESET_BOT_USERNAME} on bluesky, or if you are, try again later`}, 401);
   }
   return c.json({ok: true, message: "request processed"});
 });
