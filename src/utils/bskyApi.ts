@@ -207,7 +207,7 @@ export const makePost = async (env: Bindings, content: Post) => {
   try {
     const newPost: PostResponseObject|null = await makePostRaw(env, content);
     if (newPost !== null) {
-      await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid });
+      await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, content: truncate(content.text, 50), embedContent: [] });
       // Delete any embeds if they exist.
       await deleteEmbedsFromR2(env, content.embeds);
       return true;
