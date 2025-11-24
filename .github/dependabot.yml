@@ -4,7 +4,5 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "cron"
-      # Run biweekly instead of monthly
-      cronjob: "0 1 * * 1/2"
+      interval: "weekly"
     open-pull-requests-limit: 5

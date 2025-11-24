@@ -83,6 +83,9 @@ If you did not request a password reset, please ignore this message.`);
         enabled: false,
       }
     },
+    telemetry: { 
+      enabled: false
+    },
     // Only add database adapter for CLI schema generation
     ...(env ? {} : {
       database: drizzleAdapter({} as D1Database, {
