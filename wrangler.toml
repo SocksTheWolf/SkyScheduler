@@ -9,16 +9,15 @@ preview_urls = false
 assets = { run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
 
 # Website Domain
-routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
+routes = [{ 
+  pattern = "skyscheduler.work", custom_domain = true 
+}]
 
 # KV Data
 kv_namespaces = [
   { binding = "KV", id = "0ecd892014ac47eea38c72be94586e7b" }, # Redis for sessions
   { binding = "INVITE_POOL", id = "45e1cff45cad45c28b22c4fbcd30db00" } # Invite key pool
 ]
-
-[limits]
-cpu_ms = 75000 # this is overkill. In one instance have we ever hit like 60ms, we're usually floating at less than 15ms (for cryptography)
 
 [observability]
 enabled = true
@@ -31,6 +30,7 @@ database_id = "5553e724-4dfb-4771-9c08-3584da5855d1"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
+# media storage
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "skyembeds"
