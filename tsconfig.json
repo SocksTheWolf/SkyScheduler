@@ -9,8 +9,8 @@
       "ESNext"
     ],
     "types": [
-      "@cloudflare/workers-types",
-      "node"
+      "node",
+      "./src/wrangler.d.ts"
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
