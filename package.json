@@ -5,7 +5,7 @@
     "deploy": "wrangler deploy --minify",
     "auth": "npm run auth:generate && npm run auth:format",
     "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
-    "auth:format": "npx prettier --write src/db/auth.schema.ts",
+    "auth:format": "prettier --write src/db/auth.schema.ts",
     "generate": "drizzle-kit generate",
     "migrate:local": "wrangler d1 migrations apply skyposts --local",
     "migrate:prod": "wrangler d1 migrations apply skyposts --remote",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "drizzle-kit": "^0.31.7",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "wrangler": "^4.55.0"
   }
 }
