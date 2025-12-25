@@ -5,11 +5,11 @@ import * as z from "zod/v4";
 
 // Schema for post creation
 export const PostSchema = z.object({
-  content: z.string().min(MIN_LENGTH).nonempty(),
+  content: z.string().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty"),
   label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
   embeds: z.object({
     content: z.string().nonempty().regex(fileKeyRegex),
-    alt: z.string().max(MAX_ALT_TEXT)
+    alt: z.string().max(MAX_ALT_TEXT, "alt text is too long")
   }).array().optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
@@ -27,5 +27,5 @@ export const PostSchema = z.object({
 });
 
 export const EditSchema = z.object({
-  content: z.string().min(MIN_LENGTH).nonempty()
+  content: z.string().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty")
 });

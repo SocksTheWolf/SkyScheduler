@@ -1,2 +1,2 @@
-export const appPasswordRegex = /([0-9a-z]{4}-){3}[0-9a-z]{4}/i;
+export const appPasswordRegex = /(?:[0-9a-z]{4}-){3}[0-9a-z]{4}/i;
 export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|gif|webp|heic|svg)$/;

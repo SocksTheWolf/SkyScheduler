@@ -7,7 +7,7 @@ export const SignupSchema = z.object({
   username: z.string().trim().toLowerCase()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(z.regexes.domain),
+    .regex(z.regexes.domain, "username should be in a format like username.bsky.social or a domain"),
   password: z.string().trim()
     .nonempty("password is missing")
     .min(MIN_DASHBOARD_PASS, "password too short")
@@ -15,5 +15,5 @@ export const SignupSchema = z.object({
   bskyAppPassword: z.string().trim()
     .nonempty("missing bsky app password")
     .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
-    .regex(appPasswordRegex)
+    .regex(appPasswordRegex, "please go back and recreate your app password from your bsky settings")
 });

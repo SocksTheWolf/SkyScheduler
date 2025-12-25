@@ -6,7 +6,7 @@ export const LoginSchema = z.object({
   username: z.string().trim().toLowerCase()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(z.regexes.domain),
+    .regex(z.regexes.domain, "username must be in the format of username.bsky.social or a custom domain"),
   password: z.string().trim()
     .nonempty("password is missing")
     .min(MIN_DASHBOARD_PASS, "password too short")

@@ -4,5 +4,5 @@ import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
 export const AccountForgotSchema = z.object({
   username: z.string().trim().toLowerCase()
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(z.regexes.domain),
+    .regex(z.regexes.domain, "username must be in the format of username.bsky.social or a custom domain"),
 });
