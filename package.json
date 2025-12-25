@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.18.8",
-    "better-auth": "^1.4.4",
+    "better-auth": "^1.4.9",
     "better-auth-cloudflare": "^0.2.9",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.1",
