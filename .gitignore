@@ -33,3 +33,4 @@ lerna-debug.log*
 .DS_Store
 misc/generated.css
 src/css.ts
+*.db

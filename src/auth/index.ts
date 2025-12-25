@@ -14,6 +14,28 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
   // Use actual DB for runtime, empty object for CLI
   const db = env ? drizzle(env.DB, { schema, logger: false }) : ({} as any);
   return betterAuth({
+    "disabledPaths": [
+      "/sign-in/email",
+      "/sign-in/social",
+      "/change-email",
+      "/set-password",
+      "/link-social-account",
+      "/unlink-account",
+      "/account-info",
+      "/refresh-token",
+      "/get-access-token",
+      "/verify-email",
+      "/send-verification-email",
+      "/revoke-other-sessions",
+      "/revoke-session",
+      "/link-social",
+      "/list-accounts",
+      "/list-sessions",
+      "/cloudflare/geolocation",
+      "/is-username-available",
+      "/delete-user/callback",
+      "/change-password"
+    ],
     ...withCloudflare(
       {
         autoDetectIpAddress: false,
@@ -52,9 +74,11 @@ If you did not request a password reset, please ignore this message.`);
             }
           },
         },
-        plugins: [username({
-          minUsernameLength: BSKY_MIN_USERNAME_LENGTH
-        })],
+        plugins: [
+          username({
+            minUsernameLength: BSKY_MIN_USERNAME_LENGTH
+          })
+        ],
         rateLimit: {
           enabled: true,
           window: 60,
@@ -66,6 +90,7 @@ If you did not request a password reset, please ignore this message.`);
         },
       }
     ),
+    appName: "SkyScheduler",
     secret: env?.BETTER_AUTH_SECRET,
     baseURL: (env?.BETTER_AUTH_URL === "*") ? undefined : env?.BETTER_AUTH_URL,
     user: {
@@ -73,6 +98,12 @@ If you did not request a password reset, please ignore this message.`);
         bskyAppPass: {
           type: "string",
           required: true
+        },
+        pds: {
+          type: "string",
+          defaultValue: "https://bsky.social",
+          required: true,
+          input: false
         }
       },
       changeEmail: {
