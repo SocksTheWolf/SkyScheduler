@@ -1,6 +1,7 @@
 import { Context } from 'hono';
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
+import { HtmlEscapedString } from 'hono/utils/html';
 
 type FooterLink = {
   title: string;
@@ -17,6 +18,7 @@ type AccountFormProps = {
   successText: string;
   redirect: string;
   footerLinks?: FooterLink[]
+  footerHTML?: string | Promise<HtmlEscapedString>
 };
 
 export default function AccountHandler(props: AccountFormProps) {
@@ -43,7 +45,7 @@ export default function AccountHandler(props: AccountFormProps) {
         <footer>
           <center>
             <small id="footerLinks">
-              {footerLinkHTML}
+              {props.footerLinks ? footerLinkHTML : (props.footerHTML || "")}
             </small>
           </center>
         </footer>

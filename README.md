@@ -85,6 +85,8 @@ npm run migrate:all
 
 9. Modify the metatags located in the `metaTags.tsx` (these are currently set up for the website attached to this project)
 
+10. Run your application and go to `/setup`. This will create the admin account.
+
 ## Configuration
 
 ### Environment Variables

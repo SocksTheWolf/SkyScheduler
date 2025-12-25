@@ -1,9 +1,9 @@
+import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 import { MAX_HOURS_REPOSTING, MAX_REPOST_INTERVAL } from "../limits.d";
 
 export default function Home() {
-  const currentYear = new Date().getFullYear();
   return (
     <BaseLayout title="SkyScheduler - Home">
       <NavTags />
@@ -35,9 +35,7 @@ export default function Home() {
             </ul>
           </p>
           <footer><small>
-            <a class="secondary" target="_blank" href="https://github.com/SocksTheWolf/SkyScheduler">SkyScheduler</a> &copy; {currentYear} 
-            <span class="credits"><a href="https://socksthewolf.com">SocksTheWolf</a> -
-            <a class="secondary" target="_blank" href="https://ko-fi.com/socksthewolf">Tip/Donate</a></span>
+            <FooterCopyright />
           </small></footer>
         </article>
       </section>

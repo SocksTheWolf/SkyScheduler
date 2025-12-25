@@ -16,6 +16,8 @@ import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import ForgotPassword from "./pages/forgot";
+import {humanId} from 'human-id'
+import setupAccounts from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -76,6 +78,17 @@ app.get("/reset", redirectToDashIfLogin, (c) => {
   return c.html(<ResetPassword />);
 });
 
+// Generate invites route
+app.get("/invite", every(authMiddleware, adminOnlyMiddleware), async (c) => {
+  const newKey:string = humanId({
+    separator: '-',
+    capitalize: false,
+  });
+  await c.env.INVITE_POOL.put(newKey, "10");
+  return c.text(`${newKey} is good for 10 uses`);
+});
+
+// Admin Maintenance Cleanup
 app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
   schedulePostTask(c.env, c.executionCtx);
   return c.text("ran");
@@ -91,25 +104,10 @@ app.get("/db-truncate", every(authMiddleware, adminOnlyMiddleware), (c) => {
   return c.text("ran");
 });
 
-app.get("/start", async (c) => {
-  if (await doesAdminExist(c))
-    return c.html("already created", 501);
-
-  const data = await c.get("auth").api.signUpEmail({
-    body: {
-      name: "admin",
-      email: `${c.env.DEFAULT_ADMIN_USER}@skyscheduler.tld`,
-      // @ts-ignore: Property does not exist (it does via an extension)
-      username: c.env.DEFAULT_ADMIN_USER,
-      password: c.env.DEFAULT_ADMIN_PASS,
-      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
-    }
-  });
-  if (data.token !== null)
-    return c.redirect("/");
-  else
-    return c.html("failure", 401);
-})
+// Startup Application
+app.get("/start", async (c) => await setupAccounts(c));
+app.get("/setup", async (c) => await setupAccounts(c));
+app.get("/startup", async (c) => await setupAccounts(c));
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {

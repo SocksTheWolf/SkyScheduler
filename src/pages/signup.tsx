@@ -7,11 +7,12 @@ import isEmpty from "just-is-empty";
 import AccountHandler from "../layout/account";
 import UsernameField from "../layout/usernameField";
 import TurnstileCaptcha from "../layout/turnstile";
+import FooterCopyright from "../layout/footer";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
   const linkToInvites = isUsingInviteKeys(ctx) && !isEmpty(ctx.env.INVITE_THREAD) ? 
-    (<a href={ctx.env.INVITE_THREAD} target="_blank">You can check for invite codes in this thread</a>) : 
+    (<a href={ctx.env.INVITE_THREAD} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) : 
     "You can ask for the maintainer for it";
 
   return (
@@ -22,7 +23,8 @@ export default function Signup(props:any) {
         loadingText="Signing up..." 
         endpoint="/account/signup" 
         successText="Success! Redirecting to login..." 
-        redirect="/login">
+        redirect="/login"
+        footerHTML={<FooterCopyright />}>
 
         <label>
           Dashboard Password
