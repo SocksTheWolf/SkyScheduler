@@ -15,7 +15,7 @@ export default function UsernameField(props?: UsernameFieldProps) {
   return (
     <label>
       {props?.title || "Bluesky Handle"}
-      <input type="text" id="username" name="username" minlength={BSKY_MIN_USERNAME_LENGTH} required={inputRequired} />
+      <input type="text" id="username" name="username" autocomplete="username" minlength={BSKY_MIN_USERNAME_LENGTH} required={inputRequired} />
       <small>{hintText}</small>
       <script type="text/javascript">
       {html`

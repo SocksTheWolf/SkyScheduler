@@ -26,17 +26,19 @@ export default function Signup(props:any) {
         redirect="/login"
         footerHTML={<FooterCopyright />}>
 
+        <UsernameField />
+
         <label>
           Dashboard Password
-          <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
+          <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required 
+            autocomplete="new-password" />
           <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
         </label>
 
-        <UsernameField />
-        
         <label>
           Bluesky App Password
-          <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required />
+          <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required 
+            data-1p-ignore data-bwignore data-lpignore="true" data-protonpass-ignore="true" autocomplete="off" />
           <small>
             If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
           </small>
