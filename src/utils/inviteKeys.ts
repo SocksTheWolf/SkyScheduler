@@ -2,7 +2,7 @@ import { Context } from "hono";
 import has from "just-has";
 
 export const isUsingInviteKeys = (c: Context) => {
-  return has(c.env, "INVITE_POOL");
+  return has(c.env, "INVITE_POOL") && c.env.USE_INVITE_KEYS;
 }
 
 export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|undefined) => {

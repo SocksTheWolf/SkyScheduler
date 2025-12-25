@@ -52,6 +52,8 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms
 USE_IMAGE_TRANSFORMS=true
+# this could possibly fail, and should probably be kept as false
+USE_BSKY_IMAGE_DIMENSIONS=false
 
 # how many image quality steps should we attempt
 MAX_IMAGE_QUALITY_STEPS=6
@@ -59,11 +61,9 @@ MAX_IMAGE_QUALITY_STEPS=6
 # how much should the image quality go down per steps
 IMAGE_DEGRADE_PER_STEP=5
 
-# Should we use turnstile captchas?
+# Signup options
 USE_TURNSTILE_CAPTCHA=true
-
-# Enforce bsky image dimensions (possible failure for resizes)
-USE_BSKY_IMAGE_DIMENSIONS=false
+USE_INVITE_KEYS=true
 
 # link to invite threads
 INVITE_THREAD="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"
