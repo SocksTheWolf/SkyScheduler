@@ -33,7 +33,7 @@ export function Settings() {
             <label>
               BSky PDS: 
               <input type="text" name="bskyUserPDS" placeholder="https://bsky.social" />
-              <small>If you have not changed your PDS (or do not know what that means), you should leave this blank</small>
+              <small>If you have not changed your PDS (or do not know what that means), you should leave this blank!</small>
             </label>
           </form>
           <br />

@@ -41,7 +41,7 @@ account.post("/login", async (c) => {
     });
     if (response) {
       c.res.headers.set("set-cookie", headers.get("set-cookie")!);
-      return c.json({ok: true, message:"logged in"});
+      return c.json({ok: true, message: "logged in!"});
     }
     return c.json({ok: false, message: "could not login user"}, 401);
   } catch (err: any) {
@@ -167,7 +167,6 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "user doesn't exist"}, 401);
   }
 
-  // TODO: do a d1 lookup on the user for their email
   const dbResult = await getUserEmailForHandle(c.env, username);
   if (dbResult.length === 0) {
     return c.json({ok: false, message: "user data is missing"}, 401);

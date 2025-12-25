@@ -31,12 +31,14 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/socksthewolf/skyscheduler.git
 cd skyscheduler
 ```
 
 2. Copy environment variables template
+
 ```bash
 cp .dev.vars.example .dev.vars
 ```
@@ -58,21 +60,25 @@ cp .dev.vars.example .dev.vars
    - Do remember to remove the domain bindings!
 
 5. Install dependencies
+
 ```bash
 npm install
 ```
 
 6. Run the development server
+
 ```bash
 npm run dev
 ```
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
+
 ```bash
 npm run deploy
 ```
 
 8. Create your D1 tables using the following command, this will set up your tables both locally and remotely
+
 ```bash
 npm run migrate:all
 ```
@@ -87,7 +93,7 @@ Ensure you have configured the `.dev.vars` file with the necessary credentials a
 
 ## Project Structure
 
-```
+```text
 skyscheduler/
 ├── assets/
 ├── src/

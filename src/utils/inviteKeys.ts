@@ -56,8 +56,11 @@ export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
       return;
 
     let newValue: number = amount - 1;
-    if (newValue <= 0)
-      newValue = 0;
+    // Delete any keys that fall to 0, they should be removed from the db
+    if (newValue <= 0) {
+      await c.env.INVITE_POOL.delete(loweredKey);
+      return;
+    }
 
     // put the new value on the stack
     await c.env.INVITE_POOL.put(loweredKey, newValue.toString());

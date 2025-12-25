@@ -7,7 +7,7 @@ import TurnstileCaptcha from "../layout/turnstile";
 
 export default function ForgotPassword(props:any) {
   const ctx: Context = props.c;
-  const botaccounturl:string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
+  const botAccountURL:string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (
     <BaseLayout title="SkyScheduler - Forgot Password">
       <NavTags />
@@ -20,7 +20,7 @@ export default function ForgotPassword(props:any) {
         <center>
           <p>You will receive a Direct Message from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on Bluesky with a link to reset your password.<br /><br />
             If you encounter errors, your Bluesky Communication settings might be set to forbid contact via Direct Messages from accounts you don't follow.<br />As a first step in troubleshooting, 
-            make sure <a href={botaccounturl} target="_blank">you follow the service account</a>.</p>
+            make sure <a href={botAccountURL} target="_blank">you follow the service account</a>.</p>
         </center>
 
         <UsernameField />
