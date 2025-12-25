@@ -18,7 +18,7 @@ export default function ForgotPassword(props:any) {
         redirect="/">
 
         <center>
-          <p>You will recieve a Direct Message from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on Bluesky with a link to reset your password.<br /><br />
+          <p>You will receive a Direct Message from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on Bluesky with a link to reset your password.<br /><br />
             If you encounter errors, your Bluesky Communication settings might be set to forbid contact via Direct Messages from accounts you don't follow.<br />As a first step in troubleshooting, 
             make sure <a href={botaccounturl} target="_blank">you follow the service account</a>.</p>
         </center>

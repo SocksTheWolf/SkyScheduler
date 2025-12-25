@@ -57,13 +57,16 @@ account.post("/update", authMiddleware, async (c) => {
   }
 
   const auth = c.get("auth");
-  const { username, password, bskyAppPassword } = validation.data;
+  const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
   let newObject:LooseObj = {};
   if (!isEmpty(username))
     newObject.username = username!;
 
   if (!isEmpty(bskyAppPassword))
     newObject.bskyAppPass = bskyAppPassword;
+
+  if (!isEmpty(bskyUserPDS))
+    newObject.pds = bskyUserPDS;
 
   if (!isEmpty(password)) {
     // attempt to rehash the password (ugh slow.)

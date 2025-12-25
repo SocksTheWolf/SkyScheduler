@@ -30,6 +30,11 @@ export function Settings() {
               <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
               <small>If you need to change your application password for whatever reason</small>
             </label>
+            <label>
+              BSky PDS: 
+              <input type="text" name="bskyUserPDS" placeholder="https://bsky.social" />
+              <small>If you have not changed your PDS (or do not know what that means), you should leave this blank</small>
+            </label>
           </form>
           <br />
           <progress id="spinner" class="htmx-indicator" />
@@ -49,7 +54,7 @@ export function Settings() {
       <article>
         <header>Delete Account</header>
         <p>To delete your SkyScheduler account, please type your password below.<br />
-          <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMENENT</u>.</center>
+          <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMANENT</u>.</center>
         </p>
         <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDelete" 
             hx-swap="innerHTML" hx-indicator="#delSpinner">

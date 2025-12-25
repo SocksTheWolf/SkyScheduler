@@ -34,12 +34,12 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
 
 export const makeRepost = async (env: Bindings, content: Repost) => {
   let bWasSuccess = true;
+  const loginCreds = await getBskyUserPassForId(env, content.userId);
+  const {user, pass, pds} = loginCreds[0];
   const agent = new AtpAgent({
-    service: new URL('https://bsky.social'),
+    service: new URL(pds),
   });
 
-  const loginCreds = await getBskyUserPassForId(env, content.userId);
-  const {user, pass} = loginCreds[0];
   if (user === null || pass === null) {
     console.error(`The username/pass for userid ${content.userId} is invalid!`);
     return false;
@@ -70,13 +70,13 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
 };
 
 export const makePostRaw = async (env: Bindings, content: Post) => {
+  const loginCreds = await getBskyUserPassForId(env, content.user);
+  const {user, pass, pds} = loginCreds[0];
   // Post to Bluesky
   const agent = new AtpAgent({
-    service: new URL('https://bsky.social'),
+    service: new URL(pds),
   });
 
-  const loginCreds = await getBskyUserPassForId(env, content.user);
-  const {user, pass} = loginCreds[0];
   if (user === null || pass === null) {
     console.error(`The username/pass for userid ${content.user} is invalid!`);
     return null;

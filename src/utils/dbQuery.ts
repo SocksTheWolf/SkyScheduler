@@ -222,7 +222,7 @@ export const getPostById = async(c: Context, id: string) => {
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({user: users.username, pass: users.bskyAppPass})
+  return await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
     .from(users)
     .where(eq(users.id, userid))
     .limit(1);

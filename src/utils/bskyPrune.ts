@@ -32,7 +32,7 @@ export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
     // Records from the public bsky api service
     const bskyLookupResults = await getPostRecords(urisOnly);
     if (bskyLookupResults !== null) {
-      // There is a discrepency, we need to find which record it is.
+      // There is a discrepancy, we need to find which record it is.
       if (bskyLookupResults.length !== urisOnly.length) {
         // Go through the entire lookup results
         while (!isEmpty(bskyLookupResults)) {

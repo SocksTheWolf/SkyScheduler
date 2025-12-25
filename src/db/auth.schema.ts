@@ -17,6 +17,7 @@ export const users = sqliteTable("users", {
   username: text("username").unique(),
   displayUsername: text("display_username"),
   bskyAppPass: text("bsky_app_pass").notNull(),
+  pds: text("bsky_pds").notNull().default("https://bsky.social")
 });
 
 export const sessions = sqliteTable("sessions", {
