@@ -30,7 +30,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.4",
     "drizzle-kit": "^0.31.7",
     "prettier": "^3.7.4",
     "wrangler": "^4.56.0"
