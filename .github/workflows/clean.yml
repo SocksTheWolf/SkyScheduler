@@ -1,0 +1,34 @@
+# This workflow cleans up the cf cache for your application
+# as well as cleans up previous GH actions queues
+
+name: Clean Environment
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  id-token: write
+  actions: write
+
+jobs:
+  # Clean job
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    continue-on-error: true
+    environment:
+      name: cloudflare
+    steps:
+      - name: Cleanup Actions
+        uses: igorjs/gh-actions-clean-workflow@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          runs_to_keep: 1
+          runs_older_than: 0
+      - name: Cloudflare Cache Cleaner
+        uses: Cyb3r-Jak3/action-cloudflare-cache@v3.0.0
+        with:
+          zone: ${{ secrets.CLOUDFLARE_ZONE }}
+          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+          account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
