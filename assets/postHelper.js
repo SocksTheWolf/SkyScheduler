@@ -95,10 +95,20 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
   const content = document.getElementById('content').value;
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
+  // Handle conversion of date time to make sure that it is correct.
+  let dateTime;
+  try {
+    dateTime = postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
+  } catch(dateErr) {
+    pushToast("Invalid date", false);
+    return;
+  }
+
+  // if it is, then go about getting all the data for the form
   try {
     const postObject = {
         content,
-        scheduledDate: postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString(),
+        scheduledDate: dateTime,
         makePostNow: postNow,
         repostData: undefined
     };
@@ -149,10 +159,11 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       document.getElementById('postForm').reset();
       refreshPosts();
     } else {
-      pushToast(data.error?.message || data.error || data.message || 'An error occurred', false);
+      pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);
     }
   } catch (err) {
-    pushToast("An error occurred", false);
+    console.log(err);
+    pushToast("An unknown error occurred", false);
   }
 });
 

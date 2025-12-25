@@ -93,6 +93,27 @@ function redirectAfterDelay(url) {
   }, 2000);
 }
 
+function translateErrorObject(obj, defaultString) {
+  let errData = defaultString;
+  // If we have a json object in the error message field
+  var hasJsonErr = false;
+  try {
+    errData = JSON.parse(obj.message);
+    hasJsonErr = true;
+  } catch {
+    if (obj.message !== null)
+      errData = obj.message;
+  }
+  // Check to see if we even have anything.
+  if (hasJsonErr) {
+    var combinedErrors = "";
+    for (error of errData)
+      combinedErrors += `${error.message}\n`;
+    errData = combinedErrors;
+  }
+  return `Error Occurred!\n----\n${errData}`;
+}
+
 function rawSubmitHandler(url, successCallback) {
   const loadingBar = document.getElementById("loading");
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -120,7 +141,7 @@ function rawSubmitHandler(url, successCallback) {
         successCallback();
       else {
         const data = await response.json();
-        pushToast(data.msg || data.message, false);
+        pushToast(translateErrorObject(data, data.msg), false);
       }
     } catch (err) {
       pushToast("An error occurred", false);
