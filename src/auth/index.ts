@@ -1,4 +1,3 @@
-import type { D1Database, IncomingRequestCfProperties } from "@cloudflare/workers-types";
 import { betterAuth, Session, User } from "better-auth";
 import { username } from "better-auth/plugins";
 import { withCloudflare } from "better-auth-cloudflare";

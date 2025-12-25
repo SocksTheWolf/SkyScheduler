@@ -1,4 +1,4 @@
-import { AtpAgent, RichText } from '@atproto/api';
+import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId } from './dbQuery';
@@ -103,7 +103,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
   const posts:PostResponseObject[] = [];
 
   const postSegment = async (data: string) => {
-    let postRecord = {
+  let postRecord:AppBskyFeedPost.Record = {
       $type: 'app.bsky.feed.post',
       text: data,
       facets: rt.facets,

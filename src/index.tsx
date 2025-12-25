@@ -99,6 +99,7 @@ app.get("/start", async (c) => {
     body: {
       name: "admin",
       email: `${c.env.DEFAULT_ADMIN_USER}@skyscheduler.tld`,
+      // @ts-ignore: Property does not exist (it does via an extension)
       username: c.env.DEFAULT_ADMIN_USER,
       password: c.env.DEFAULT_ADMIN_PASS,
       bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS

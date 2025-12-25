@@ -31,6 +31,7 @@ account.post("/login", async (c) => {
   }
   const { username, password } = validation.data;
   try {
+    // @ts-ignore: Property does not exist (the username field, which does via an extension)
     const { headers, response } = await auth.api.signInUsername({
       body: {
         username: username,
