@@ -37,8 +37,8 @@ export const violations = sqliteTable('violations', {
   userId: text("user")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }).primaryKey(),
-  tosViolation: integer('tos', { mode: 'boolean' }).default(false),
-  userPassInvalid: integer('invalidPW', { mode: 'boolean' }).default(false),
+  tosViolation: integer('tosViolation', { mode: 'boolean' }).default(false),
+  userPassInvalid: integer('userPassInvalid', { mode: 'boolean' }).default(false),
   accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),
   accountGone: integer('accountGone', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })

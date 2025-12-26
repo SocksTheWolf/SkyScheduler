@@ -29,6 +29,13 @@
       "when": 1766702339895,
       "tag": "0003_redundant_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1766712936564,
+      "tag": "0004_daffy_tattoo",
+      "breakpoints": true
     }
   ]
 }

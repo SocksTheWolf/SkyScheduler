@@ -54,11 +54,9 @@ post.post("/create", authMiddleware, async (c: Context) => {
   } else if (response.postNow) {
     const postInfo = await getPostById(c, response.postId);
     if (postInfo.length > 0) {
-      
       const postResponse = await makePost(c.env, createPostObject(postInfo[0]));
       if (postResponse === false)
-        return c.json({message: "Failed to post content immediately, will post next schedule parse"}, 400);
-
+        return c.json({message: "Failed to post content"}, 400);
     } else {
       return c.json({message: "Unable to get content to post"}, 401);
     }

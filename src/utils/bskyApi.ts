@@ -37,6 +37,17 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
     }
     return PlatformLoginResponse.Ok;
   } catch (err) {
+    // Apparently login can rethrow as an XRPCError and completely eat the original throw.
+    // so errors don't get handled gracefully.
+    const errWrap:LooseObj = err as LooseObj;
+    if (errWrap.constructor.name === "XRPCError") {
+      const errCode = errWrap.status;
+      if (errCode == 401) {
+        return PlatformLoginResponse.InvalidAccount;
+      } else if (errCode >= 500) {
+        return PlatformLoginResponse.PlatformOutage;
+      }
+    }
     console.error(`encountered exception on login for user ${user}, err ${err}`);
   }
   return PlatformLoginResponse.UnhandledError;

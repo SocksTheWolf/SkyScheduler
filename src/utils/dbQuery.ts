@@ -67,9 +67,8 @@ export const updateUserData = async (c: Context, newData: any) => {
     if (userData) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
       let queriesToExecute:BatchItem<"sqlite">[] = [];
-      const updatedPassword = has(newData, "password");
 
-      if (updatedPassword) {
+      if (has(newData, "password")) {
         // cache out the new hash
         const newPassword = newData.password;
         // remove it from the original object
@@ -82,7 +81,7 @@ export const updateUserData = async (c: Context, newData: any) => {
       }
 
       // If we have new data about the username, pds, or password, then clear account invalid violations
-      if (updatedPassword || has(newData, "username") || has(newData, "pds")) {
+      if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
         queriesToExecute.push(getViolationDeleteQueryForUser(db, userData.id));
       }
 
@@ -149,6 +148,8 @@ export const createPost = async (c: Context, body: any) => {
       const violationData:Violation = (hasViolations.results[0] as Violation);
       if (violationData.tosViolation) {
         return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+      } else if (violationData.userPassInvalid) {
+        return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
       }
     }
   }
@@ -325,7 +326,6 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
   switch (violationType)
   {
     case PlatformLoginResponse.InvalidAccount:
-    case PlatformLoginResponse.InvalidCreds:
       valuesUpdate.userPassInvalid = true;
     break;
     case PlatformLoginResponse.Suspended:

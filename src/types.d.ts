@@ -76,7 +76,6 @@ export interface LooseObj {
 export enum PlatformLoginResponse {
   None = 0,
   Ok,
-  InvalidCreds,
   Suspended,
   Deactivated,
   TakenDown,
