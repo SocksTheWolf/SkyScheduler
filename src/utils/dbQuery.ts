@@ -5,7 +5,7 @@ import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
-import { Bindings, LooseObj, PlatformLoginResponse } from "../types.d";
+import { Bindings, LooseObj, PlatformLoginResponse, Violation } from "../types.d";
 import { MAX_POSTED_LENGTH } from "../limits.d";
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -18,7 +18,7 @@ import truncate from "just-truncate";
 
 type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 
-export const doesUserExist = async (c: Context, username:string) => {
+export const doesUserExist = async (c: Context, username: string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const result = await db.select().from(users)
     .where(eq(users.name, username))
@@ -122,7 +122,7 @@ export const deletePost = async (c: Context, id: string) => {
   return false;
 };
 
-export const createPost = async (c: Context, body:any) => {
+export const createPost = async (c: Context, body: any) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
 
   const user = c.get("user");
@@ -142,8 +142,18 @@ export const createPost = async (c: Context, body:any) => {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 
-  // TODO: prevent anything from happening if you are currently in violations table
+  // Check if account is in violation
+  const hasViolations = await getViolationsForUser(db, user.id);
+  if (hasViolations.success) {
+    if (hasViolations.results.length > 0) {
+      const violationData:Violation = (hasViolations.results[0] as Violation);
+      if (violationData.tosViolation) {
+        return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+      }
+    }
+  }
 
+  // Create the posts
   const postUUID = uuidv4();
   let dbOperations:BatchItem<"sqlite">[] = [
     db.insert(posts).values({
@@ -166,9 +176,10 @@ export const createPost = async (c: Context, body:any) => {
     }
   }
 
-  // TODO: Check success better here
-  await db.batch(dbOperations as BatchQuery);
-  return { ok: true, postNow: makePostNow, postId: postUUID };
+  // Batch the query
+  const batchResponse = await db.batch(dbOperations as BatchQuery);
+  const success = batchResponse.every((el) => el.success);
+  return { ok: success, postNow: makePostNow, postId: postUUID };
 };
 
 export const getAllPostsForCurrentTime = async (env: Bindings) => {
@@ -244,7 +255,7 @@ export const getUserEmailForHandle = async (env: Bindings, userhandle: string) =
   return await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
 };
 
-export const getAllPostedPostsOfUser = async(env: Bindings, userid:string) => {
+export const getAllPostedPostsOfUser = async(env: Bindings, userid: string) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
@@ -261,7 +272,7 @@ export const getAllPostedPosts = async (env: Bindings) => {
 };
 
 // deletes multiple posts from a database.
-export const deletePosts = async (env: Bindings, postsToDelete:string[]) => {
+export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
   // Don't do anything on empty arrays.
   if (isEmpty(postsToDelete))
     return;
@@ -333,7 +344,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
   return success;
 };
 
-const getViolationDeleteQueryForUser = (db:DrizzleD1Database, userId: string) => {
+const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: string) => {
   return db.delete(violations).where(and(eq(violations.userId, userId), 
     and(ne(violations.tosViolation, true), ne(violations.accountGone, true))));
 };
@@ -344,11 +355,15 @@ export const clearViolationForUser = async(env: Bindings, userId: string) => {
   return success;
 };
 
+const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
+  return await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
+};
+
 export const getViolationsForCurrentUser = async(c: Context) => {
   const userData = c.get("user");
   if (userData) {
     const db: DrizzleD1Database = drizzle(c.env.DB);
-    return await db.select().from(violations).where(eq(violations.userId, userData.id)).limit(1).run();
+    return await getViolationsForUser(db, userData.id);
   } else {
     return {success: false, results: []};
   }
