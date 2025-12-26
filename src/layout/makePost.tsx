@@ -66,7 +66,7 @@ export default function PostCreation() {
             </section>
             <footer>
               <small>
-                <i>You can schedule posts in the future, hourly. Time is floored to the lowest hour.</i>
+                <i>You can schedule posts in the future, hourly. Time is rounded down to the nearest hour.</i>
               </small>
             </footer>
           </details>

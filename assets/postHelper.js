@@ -2,6 +2,14 @@ const repostCheckbox = document.getElementById("makeReposts");
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
 
+function resetForm() {
+  repostCheckbox.checked = false;
+  postNowCheckbox.checked = false;
+  setSelectDisable(true);
+}
+
+resetForm();
+
 let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
   url: "/post/upload", 

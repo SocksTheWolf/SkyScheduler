@@ -18,7 +18,7 @@ export async function ViolationNoticeBar(props: any) {
       errorStr = "Unable to find your account, update your Bluesky handle in the settings";
     }
     return (
-      <div class="warning-box">
+      <div id="violationBar" class="warning-box">
         <span class="warning"><b>WARNING</b>: Account error found! {errorStr}</span>
       </div>
     );
