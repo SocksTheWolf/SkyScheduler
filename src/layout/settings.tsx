@@ -1,6 +1,8 @@
 import { html } from "hono/html";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
-import UsernameField from "./usernameField";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { UsernameField } from "./usernameField";
+import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
+import { PWAutoCompleteSettings } from "../types.d";
 
 export function Settings() {
   return (
@@ -22,13 +24,13 @@ export function Settings() {
 
             <label>
               Dashboard Pass: 
-              <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
+              <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} />
               <small>The password to access this website</small>
             </label>
             <label>
               BSky App Password: 
-              <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} />
-              <small>If you need to change your application password for whatever reason</small>
+              <BSkyAppPasswordField />
+              <small>If you need to change your application password, you can <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a></small>
             </label>
             <label>
               BSky PDS: 
@@ -36,12 +38,9 @@ export function Settings() {
               <small>If you have not changed your PDS (or do not know what that means), you should leave this blank!</small>
             </label>
           </form>
-          <br />
           <progress id="spinner" class="htmx-indicator" />
-          <center>
-            <div id="accountResponse">
-            </div>
-          </center>
+          <div id="accountResponse">
+          </div>
         </section>
         <footer>
           <button id="deleteAccountButton" class="btn-error" style="float: left;">Delete</button>
@@ -63,12 +62,9 @@ export function Settings() {
             <small>The password to access this website</small>
           </label>
         </form>
-        <br />
         <progress id="delSpinner" class="htmx-indicator" />
-        <center>
           <div id="accountDelete">
           </div>
-        </center>
         <footer>
           <button class="btn-error" form="delAccountForm">Delete</button>
           <button class="secondary" onclick='closeDeleteModal();'>Cancel</button>

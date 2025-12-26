@@ -3,6 +3,7 @@ import PostCreation from "../layout/makePost";
 import { BaseLayout } from "../layout/main";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
+import { ViolationNoticeBar } from "../layout/violationsBar";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -44,6 +45,7 @@ export default function Dashboard(props:any) {
           </article>
         </section>
         <div class="container-fluid mainContent">
+          <ViolationNoticeBar ctx={ctx} />
           <PostCreation />
         </div>
       </div>

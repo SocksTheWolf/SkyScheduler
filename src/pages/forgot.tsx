@@ -2,7 +2,7 @@ import { Context } from "hono";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
-import UsernameField from "../layout/usernameField";
+import { UsernameField } from "../layout/usernameField";
 import TurnstileCaptcha from "../layout/turnstile";
 
 export default function ForgotPassword(props:any) {

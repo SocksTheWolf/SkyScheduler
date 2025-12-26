@@ -1,13 +1,15 @@
 import { Context } from "hono";
 import { BaseLayout } from "../layout/main";
 import { isUsingInviteKeys } from "../utils/inviteKeys";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import NavTags from "../layout/navTags";
 import isEmpty from "just-is-empty";
 import AccountHandler from "../layout/account";
-import UsernameField from "../layout/usernameField";
+import { UsernameField } from "../layout/usernameField";
 import TurnstileCaptcha from "../layout/turnstile";
 import FooterCopyright from "../layout/footer";
+import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
+import { PWAutoCompleteSettings } from "../types.d";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
@@ -30,15 +32,13 @@ export default function Signup(props:any) {
 
         <label>
           Dashboard Password
-          <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required 
-            autocomplete="new-password" />
+          <DashboardPasswordField autocomplete={PWAutoCompleteSettings.NewPass} required={true} />
           <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
         </label>
 
         <label>
           Bluesky App Password
-          <input type="password" name="bskyAppPassword" maxlength={BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" required 
-            data-1p-ignore data-bwignore data-lpignore="true" data-protonpass-ignore="true" autocomplete="off" />
+          <BSkyAppPasswordField required={true} />
           <small>
             If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
           </small>

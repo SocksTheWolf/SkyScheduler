@@ -1,7 +1,7 @@
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH, MAX_POSTED_LENGTH } from '../limits.d';
-import { updatePostData, getBskyUserPassForId } from './dbQuery';
+import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
 import truncate from "just-truncate";
@@ -22,14 +22,24 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
       password: pass,
     });
     if (!loginResponse.success) {
-      console.warn(`could not login as user ${user}`);
-      return false;
+      if (loginResponse.data.active == false) {
+        switch (loginResponse.data.status) {
+          case "deactivated":
+            return PlatformLoginResponse.Deactivated;
+          case "suspended":
+            return PlatformLoginResponse.Suspended;
+          case "takendown":
+            return PlatformLoginResponse.TakenDown;
+        }
+        return PlatformLoginResponse.InvalidAccount;
+      }
+      return PlatformLoginResponse.PlatformOutage;
     }
-    return true;
+    return PlatformLoginResponse.Ok;
   } catch (err) {
     console.error(`encountered exception on login for user ${user}, err ${err}`);
   }
-  return false;
+  return PlatformLoginResponse.UnhandledError;
 }
 
 export const makeRepost = async (env: Bindings, content: Repost) => {
@@ -45,9 +55,11 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
     return false;
   }
 
-  const loginResponse = await loginToBsky(agent, user, pass);
-  if (!loginResponse) {
-    // TODO: Probably should handle failure better here.
+  const loginResponse:PlatformLoginResponse = await loginToBsky(agent, user, pass);
+  if (loginResponse != PlatformLoginResponse.Ok) {
+    const addViolation:boolean = await createViolationForUser(env, content.userId, loginResponse);
+    if (addViolation)
+      console.error(`Unable to login to make repost from user ${content.userId} with violation ${loginResponse}`);
     return false;
   }
 
@@ -82,9 +94,11 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
     return null;
   }
 
-  const loginResponse = await loginToBsky(agent, user, pass);
-  if (!loginResponse) {
-    // TODO: Probably should handle failure better here.
+  const loginResponse:PlatformLoginResponse = await loginToBsky(agent, user, pass);
+  if (loginResponse != PlatformLoginResponse.Ok) {
+    const addViolation:boolean = await createViolationForUser(env, content.user, loginResponse);
+    if (addViolation)
+      console.error(`Unable to login to make post ${content.postid} with violation ${loginResponse}`);
     return null;
   }
 
@@ -103,7 +117,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
   const posts:PostResponseObject[] = [];
 
   const postSegment = async (data: string) => {
-  let postRecord:AppBskyFeedPost.Record = {
+    let postRecord:AppBskyFeedPost.Record = {
       $type: 'app.bsky.feed.post',
       text: data,
       facets: rt.facets,

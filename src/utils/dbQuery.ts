@@ -1,11 +1,11 @@
 import { Context } from "hono";
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { sql, and, or, gt, eq, lte, inArray, desc, count, getTableColumns } from "drizzle-orm";
+import { sql, and, gt, eq, lte, inArray, desc, count, getTableColumns, notInArray, ne } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
-import { posts, reposts } from "../db/app.schema";
+import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
-import { Bindings } from "../types";
+import { Bindings, LooseObj, PlatformLoginResponse } from "../types.d";
 import { MAX_POSTED_LENGTH } from "../limits.d";
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -67,8 +67,9 @@ export const updateUserData = async (c: Context, newData: any) => {
     if (userData) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
       let queriesToExecute:BatchItem<"sqlite">[] = [];
+      const updatedPassword = has(newData, "password");
 
-      if (has(newData, "password")) {
+      if (updatedPassword) {
         // cache out the new hash
         const newPassword = newData.password;
         // remove it from the original object
@@ -78,6 +79,11 @@ export const updateUserData = async (c: Context, newData: any) => {
         queriesToExecute.push(db.update(accounts)
           .set({password: newPassword})
           .where(eq(accounts.userId, userData.id)));
+      }
+
+      // If we have new data about the username, pds, or password, then clear account invalid violations
+      if (updatedPassword || has(newData, "username") || has(newData, "pds")) {
+        queriesToExecute.push(getViolationDeleteQueryForUser(db, userData.id));
       }
 
       if (!isEmpty(newData)) {
@@ -136,6 +142,8 @@ export const createPost = async (c: Context, body:any) => {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 
+  // TODO: prevent anything from happening if you are currently in violations table
+
   const postUUID = uuidv4();
   let dbOperations:BatchItem<"sqlite">[] = [
     db.insert(posts).values({
@@ -168,10 +176,12 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime: Date = floorCurrentTime();
 
+  const violationUsers = db.select({data: violations.userId}).from(violations);
   return await db.select().from(posts)
-  .where(and(lte(posts.scheduledDate, currentTime), 
-    eq(posts.posted, false)))
-    .all();
+  .where(and(and(
+    lte(posts.scheduledDate, currentTime), eq(posts.posted, false)),
+    notInArray(posts.userId, violationUsers))
+    ).all();
 };
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
@@ -179,9 +189,10 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) 
   const db: DrizzleD1Database = drizzle(env.DB);
   const query = db.select({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
+  const violationsQuery = db.select({data: violations.userId}).from(violations);
   return await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
     .from(posts)
-    .where(inArray(posts.uuid, query))
+    .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
     .all();
 };
 
@@ -206,8 +217,8 @@ export const updatePostForUser = async (c: Context, id: string, newData:Object) 
     return false;
 
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const result = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id)));
-  return result.success;
+  const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id)));
+  return success;
 };
 
 export const getPostById = async(c: Context, id: string) => {
@@ -287,5 +298,58 @@ export const compactPostedPosts = async (env: Bindings) => {
     postTruncation.forEach(async item => {
       await db.update(posts).set({ content: truncate(item.content, MAX_POSTED_LENGTH) }).where(eq(posts.uuid, item.id));
     });
+  }
+};
+
+export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
+  const NoHandleState:PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
+  // Don't do anything in these cases
+  if (violationType in NoHandleState) {
+    console.warn(`createViolationForUser got a not valid add request for user ${userId} with violation ${violationType}`);
+    return false;
+  }
+
+  const db: DrizzleD1Database = drizzle(env.DB);
+  let valuesUpdate:LooseObj = {};
+  switch (violationType)
+  {
+    case PlatformLoginResponse.InvalidAccount:
+    case PlatformLoginResponse.InvalidCreds:
+      valuesUpdate.userPassInvalid = true;
+    break;
+    case PlatformLoginResponse.Suspended:
+      valuesUpdate.accountSuspended = true;
+    break;
+    case PlatformLoginResponse.TakenDown:
+    case PlatformLoginResponse.Deactivated:
+      valuesUpdate.accountGone = true;
+    break;
+    default:
+      console.warn(`createViolationForUser was not properly handled for ${violationType}`);
+      return false;
+  }
+
+  const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate}).onConflictDoUpdate({target: violations.userId, set: valuesUpdate});
+  return success;
+};
+
+const getViolationDeleteQueryForUser = (db:DrizzleD1Database, userId: string) => {
+  return db.delete(violations).where(and(eq(violations.userId, userId), 
+    and(ne(violations.tosViolation, true), ne(violations.accountGone, true))));
+};
+
+export const clearViolationForUser = async(env: Bindings, userId: string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const {success} = await getViolationDeleteQueryForUser(db, userId);
+  return success;
+};
+
+export const getViolationsForCurrentUser = async(c: Context) => {
+  const userData = c.get("user");
+  if (userData) {
+    const db: DrizzleD1Database = drizzle(c.env.DB);
+    return await db.select().from(violations).where(eq(violations.userId, userData.id)).limit(1).run();
+  } else {
+    return {success: false, results: []};
   }
 };

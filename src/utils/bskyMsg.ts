@@ -1,6 +1,6 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { loginToBsky } from './bskyApi';
-import { Bindings } from '../types';
+import { Bindings, PlatformLoginResponse } from '../types.d';
 
 export const createDMWithUser = async (env: Bindings, user: string, msg: string) => {
   const agent = new AtpAgent({
@@ -8,7 +8,7 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
   });
 
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
-  if (!loginResponse) {
+  if (loginResponse != PlatformLoginResponse.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
     return false;
   }

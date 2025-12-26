@@ -1,7 +1,9 @@
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
-import UsernameField from "../layout/usernameField";
+import { UsernameField } from "../layout/usernameField";
+import { DashboardPasswordField } from "../layout/passwordFields";
+import { PWAutoCompleteSettings } from "../types.d";
 
 export default function Login() {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];
@@ -18,7 +20,7 @@ export default function Login() {
 
         <label>
           Dashboard Password
-          <input type="password" name="password" id="password" required />
+          <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} required={true} />
           <small><b>NOTE</b>: This password is not related to your bluesky account!</small>
         </label>
       </AccountHandler>

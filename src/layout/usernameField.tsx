@@ -8,8 +8,9 @@ type UsernameFieldProps = {
   required?: boolean;
 };
 
-export default function UsernameField(props?: UsernameFieldProps) {
-  const hintText = props?.hintText ? raw(props.hintText) : raw("This is your Bluesky username, in the format of a custom domain or like <code>USERNAME.bsky.social</code>.");
+export function UsernameField(props?: UsernameFieldProps) {
+  const hintText = props?.hintText ? raw(props.hintText) :
+     raw("This is your Bluesky username, in the format of a custom domain or like <code>USERNAME.bsky.social</code>.");
   // default required true.
   const inputRequired = (props) ? (props?.required || false) : true;
   return (
