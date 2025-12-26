@@ -15,7 +15,7 @@ export const AccountUpdateSchema = z.object({
     .or(z.literal("")),
   bskyAppPassword: z.string().trim()
     .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
-    .regex(appPasswordRegex)
+    .regex(appPasswordRegex, "not a valid bsky app password")
     .optional()
     .or(z.literal("")),
   bskyUserPDS: z.url("PDS should be in the format of an URL").trim()

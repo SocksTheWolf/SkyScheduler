@@ -37,6 +37,7 @@ export enum PostLabel {
 // Basically a copy of the schema
 export type Post = {
   postid: string;
+  // SkyScheduler User Id
   user: string;
   text: string;
   embeds?: EmbedData[];
@@ -52,7 +53,16 @@ export type Repost = {
   uri: string;
   cid: string;
   userId: string;
-}
+};
+
+export type Violation = {
+  userId: string;
+  tosViolation: boolean;
+  userPassInvalid: boolean;
+  accountSuspended: boolean;
+  accountGone: boolean;
+  createdAt: string;
+};
 
 export type PostResponseObject = {
   uri: string;
@@ -61,4 +71,22 @@ export type PostResponseObject = {
 
 export interface LooseObj {
   [key: string]: any;
+};
+
+export enum PlatformLoginResponse {
+  None = 0,
+  Ok,
+  InvalidCreds,
+  Suspended,
+  Deactivated,
+  TakenDown,
+  InvalidAccount,
+  PlatformOutage,
+  UnhandledError
+};
+
+export enum PWAutoCompleteSettings {
+  Off,
+  NewPass,
+  CurrentPass
 };

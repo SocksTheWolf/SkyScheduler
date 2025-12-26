@@ -53,8 +53,15 @@ account.post("/update", authMiddleware, async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
-    console.log(validation.error);
-    return c.html(<b class="btn-error">Failed Validation</b>);
+    const errorMsgs = JSON.parse(validation.error.message);
+    return c.html(<div class="btn-error">
+      <b>Failed Validation</b>: 
+        <ul>
+          {errorMsgs.map((el: { message: string; }) => {
+            return <li>{el.message}</li>;
+          })}
+        </ul>
+      </div>);
   }
 
   const auth = c.get("auth");

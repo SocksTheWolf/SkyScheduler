@@ -17,6 +17,7 @@ export function PostContentObject({text}: PostContentObjectProps) {
 }
 
 export function ScheduledPost(content: Post) {
+  // Throwaway gibberish generator to make htmx link up properly across a lot of posts
   const postID = randomstring.generate(7);
 
   return html`

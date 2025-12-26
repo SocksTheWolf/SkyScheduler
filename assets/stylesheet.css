@@ -135,3 +135,19 @@
 .credits a {
   margin-left: 5px;
 }
+
+.warning-box {
+  position: relative;
+  padding: 3px;
+  background: linear-gradient(to right, orange, orangered);
+  margin-bottom: 5px;
+}
+
+.warning {
+  color: white;
+}
+
+#accountResponse .btn-error *, #accountDelete .btn-error * {
+  margin-left: 5px;
+  color: white;
+}

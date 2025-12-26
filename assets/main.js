@@ -1,6 +1,7 @@
 function pushToast(msg, isSuccess) {
   Toastify({
     text: msg,
+    duration: !isSuccess ? 10000 : Toastify.defaults.duration,
     style: {
       background: isSuccess ? 'green' : 'red'
     }
