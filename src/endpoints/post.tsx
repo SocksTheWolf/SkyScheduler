@@ -36,7 +36,7 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
   // Validate that this is a legitimate key
   const validation = FileDeleteSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({"success": false, msg: validation.error.message}, 402);
+    return c.json({"success": false, "error": validation.error}, 402);
   }
 
   const { key } = validation.data;

@@ -45,9 +45,16 @@ fileDropzone.on("addedfile", file => {
     fetch('/post/upload', {
         method: 'DELETE',
         body: JSON.stringify({"key": fileData.get(file.name).content })
-    }).then(response => {
-      fileData.delete(file.name);
-      fileDropzone.removeFile(file);
+    }).then(async response => {
+      const data = await response.json();
+      if (!data.success) {
+        const errText = translateErrorObject(data.error, `Unknown Error`);
+        pushToast(`Unable to delete file ${file.name}! ${errText}`, false);
+      } else {
+        fileData.delete(file.name);
+        fileDropzone.removeFile(file);
+        pushToast(`Deleted file ${file.name}`, true);
+      }
     });
   });
   buttonHolder.appendChild(addAltText);

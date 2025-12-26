@@ -8,7 +8,7 @@ export const PostSchema = z.object({
   content: z.string().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty"),
   label: z.nativeEnum(PostLabel).optional().default(PostLabel.None),
   embeds: z.object({
-    content: z.string().nonempty().regex(fileKeyRegex),
+    content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid"),
     alt: z.string().max(MAX_ALT_TEXT, "alt text is too long")
   }).array().optional(),
   makePostNow: z.boolean().default(false),
