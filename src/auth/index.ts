@@ -14,7 +14,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
   // Use actual DB for runtime, empty object for CLI
   const db = env ? drizzle(env.DB, { schema, logger: false }) : ({} as any);
   return betterAuth({
-    "disabledPaths": [
+    disabledPaths: [
       "/sign-in/email",
       "/sign-in/social",
       "/change-email",
@@ -115,6 +115,9 @@ If you did not request a password reset, please ignore this message.`);
     },
     telemetry: { 
       enabled: false
+    },
+    logger: {
+      disabled: true
     },
     // Only add database adapter for CLI schema generation
     ...(env ? {} : {
