@@ -26,7 +26,7 @@ export default function PostCreation() {
           </article>
 
           <details>
-            <summary role="button" class="secondary outline">Post Media</summary>
+            <summary role="button" id="imageAttachmentSection" title="click to toggle" class="secondary outline">Attach Images</summary>
             <section>
               <div id="imgArea">
                 <div id="imageUploads" class="dropzone">
@@ -55,7 +55,7 @@ export default function PostCreation() {
           </details>
 
           <details open>
-            <summary role="button" class="outline secondary">Post Scheduling</summary>
+            <summary title="click to toggle" role="button" class="outline secondary">Post Scheduling</summary>
             <section>
               Schedule Date
               <input type="datetime-local" id="scheduledDate" placeholder="" required />
@@ -72,7 +72,7 @@ export default function PostCreation() {
           </details>
 
           <details>
-            <summary role="button" class="secondary outline">Reposting</summary>
+            <summary role="button" title="click to toggle" class="secondary outline">Reposting</summary>
             <section>
               <input type="checkbox" id="makeReposts" /> Should Repost? 
             </section>
