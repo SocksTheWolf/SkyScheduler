@@ -19,6 +19,7 @@ export interface Bindings {
   USE_BSKY_IMAGE_DIMENSIONS: boolean;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
+  CONTACT_LINK: string;
 };
 
 export enum EmbedDataType {

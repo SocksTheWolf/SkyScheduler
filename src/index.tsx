@@ -7,15 +7,15 @@ import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import ResetPassword from "./pages/reset";
+import ForgotPassword from "./pages/forgot";
 import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
-import { doesAdminExist, compactPostedPosts } from "./utils/dbQuery";
+import { compactPostedPosts } from "./utils/dbQuery";
 import { authMiddleware } from "./middleware/auth";
 import { adminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
-import ForgotPassword from "./pages/forgot";
 import {humanId} from 'human-id'
 import setupAccounts from "./utils/setup";
 
@@ -50,6 +50,11 @@ app.route("/post", post);
 app.all("/", (c) => {
   return c.html(<Home />);
 });
+
+// Add contact link
+app.all("/contact", (c) => {
+  return c.redirect(c.env.CONTACT_LINK);
+})
 
 // Dashboard route
 app.get("/dashboard", authMiddleware, (c) => {
@@ -105,9 +110,9 @@ app.get("/db-truncate", every(authMiddleware, adminOnlyMiddleware), (c) => {
 });
 
 // Startup Application
-app.get("/start", async (c) => await setupAccounts(c));
+app.get("/start", (c) => c.redirect('/setup'));
+app.get("/startup", (c) => c.redirect('/setup'));
 app.get("/setup", async (c) => await setupAccounts(c));
-app.get("/startup", async (c) => await setupAccounts(c));
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {

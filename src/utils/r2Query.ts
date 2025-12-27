@@ -1,5 +1,5 @@
 import { Bindings, EmbedData, EmbedDataType, LooseObj } from '../types.d';
-import { CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
+import { CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT, TO_MB } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
@@ -106,7 +106,7 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
     }
 
     if (failedToResize)
-      return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, size is over by ${file.size - BSKY_FILE_SIZE_LIMIT}MB`};
+      return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, over by ${((file.size - BSKY_FILE_SIZE_LIMIT)/TO_MB).toFixed(2)}MB`};
   }
   
   const fileExt = originalName.split(".").pop();

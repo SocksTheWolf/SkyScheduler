@@ -52,13 +52,10 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms
 USE_IMAGE_TRANSFORMS=true
-# this could possibly fail, and should probably be kept as false
 USE_BSKY_IMAGE_DIMENSIONS=false
 
-# how many image quality steps should we attempt
+# how many image quality steps should we attempt and how much of a percentage per step should we take off of quality
 MAX_IMAGE_QUALITY_STEPS=6
-
-# how much should the image quality go down per steps
 IMAGE_DEGRADE_PER_STEP=5
 
 # Signup options
@@ -67,3 +64,6 @@ USE_INVITE_KEYS=true
 
 # link to invite threads
 INVITE_THREAD="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"
+
+# contact link
+CONTACT_LINK="https://bsky.app/profile/skyscheduler.work"
