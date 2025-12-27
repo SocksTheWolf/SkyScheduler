@@ -4,6 +4,7 @@ import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
 import { UsernameField } from "../layout/usernameField";
 import TurnstileCaptcha from "../layout/turnstile";
+import FooterCopyright from "../layout/footer";
 
 export default function ForgotPassword(props:any) {
   const ctx: Context = props.c;
@@ -15,12 +16,13 @@ export default function ForgotPassword(props:any) {
         submitText="Request Password Reset"
         loadingText="Requesting Password Reset..." endpoint="/account/forgot" 
         successText="Success! Check your bsky dms for info. Redirecting to home.." 
-        redirect="/">
+        redirect="/"
+        footerHTML={<FooterCopyright />}>
 
         <center>
           <p>You will receive a Direct Message from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on Bluesky with a link to reset your password.<br /><br />
-            If you encounter errors, your Bluesky Communication settings might be set to forbid contact via Direct Messages from accounts you don't follow.<br />As a first step in troubleshooting, 
-            make sure <a href={botAccountURL} target="_blank">you follow the service account</a>.</p>
+            If you encounter errors, your Bluesky Communication settings might be set to forbid contact via Direct Messages from accounts you don't follow.<br />
+            It is <u>heavily recommended</u> that <a href={botAccountURL} target="_blank">you follow the service account</a>.</p>
         </center>
 
         <UsernameField />

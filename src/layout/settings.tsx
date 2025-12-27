@@ -72,7 +72,7 @@ export function Settings() {
       </article>
     </dialog>
     <script type="text/javascript">{html`
-      addUnicodeRemoval();
+      addUsernameFieldWatchers();
       document.getElementById("deleteAccountButton").addEventListener("click", (ev) => {
         ev.preventDefault();
         openModal(document.getElementById("deleteAccount"));

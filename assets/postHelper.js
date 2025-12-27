@@ -32,14 +32,17 @@ fileDropzone.on("addedfile", file => {
     e.stopPropagation();
     const existingData = fileData.get(file.name);
     var askUserData = prompt("What is the alt text?", existingData.alt);
-    if (askUserData !== "") {
-      try {
-        existingData.alt = askUserData;
-        fileData.set(file.name, existingData);
+    try {
+      existingData.alt = askUserData;
+      fileData.set(file.name, existingData);
+      if (askUserData === "" || askUserData === null) {
+        addAltText.classList.remove("btn-success");
+      } else {
         addAltText.classList.add("btn-success");
-      } catch(err) {
-        pushToast("failed to set alt text for image, try again", false);
       }
+    } catch (err) {
+      console.error(err);
+      pushToast("failed to set alt text for image, try again", false);
     }
   });
 

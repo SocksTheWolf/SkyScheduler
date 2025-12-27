@@ -57,15 +57,44 @@ document.addEventListener("refreshPosts", function(ev) {
   refreshPosts();
 });
 
-// Remove this bullshit unicode thing that gets injected on usernames if you copy them
-// from the bsky website, why the fuck did they do this?
-function addUnicodeRemoval() {
+const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
+function updateUsername(val) {
+  // Remove this bullshit unicode thing that gets injected on usernames if you copy them
+  // from the bsky website, why the fuck did they do this?
+  let inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
+  // prevent the did:plc: logic from appearing in the field
+  if (inputData.includes("did:plc:")) {
+    pushToast("Invalid link posted, does not have handle in it", false);
+    return "";
+  }
+  // Convert urls into handles
+  var matches = linkRegex.exec(inputData);
+  if (matches != null && matches.length >= 2) {
+    // was a URL, convert to handle
+    return matches[1];
+  }
+  // was something else, check if we need to add .bsky.social
+  if (!inputData.match(domainRegex)) {
+    const newName = inputData + ".bsky.social";
+    if (newName.match(domainRegex)) {
+      return newName;
+    }
+  }
+  return inputData;
+}
+function addUsernameFieldWatchers() {
   const userEl = document.getElementById("username");
   if (userEl !== null) {
     userEl.value = "";
     userEl.addEventListener("change", ev => {
       ev.preventDefault();
-      userEl.value = userEl.value.replace(/[^\x00-\x7F]/g, "");
+      userEl.value = updateUsername(userEl.value);
+    });
+
+    userEl.addEventListener("paste", ev => {
+      ev.preventDefault();
+      userEl.value = updateUsername(ev.clipboardData.getData("text"));
     });
   }
 }
@@ -156,7 +185,7 @@ function rawSubmitHandler(url, successCallback) {
 }
 
 function easySetup(url, successMessage, successLocation) {
-  addUnicodeRemoval();
+  addUsernameFieldWatchers();
   rawSubmitHandler(url, function() {
     pushToast(successMessage, true);
     redirectAfterDelay(successLocation);
