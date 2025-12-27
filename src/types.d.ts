@@ -21,9 +21,19 @@ export interface Bindings {
   RESET_BOT_APP_PASS: string;
 };
 
+export enum EmbedDataType {
+  None = 0,
+  Image,
+  WebLink
+};
+
 export type EmbedData = {
   content: string;
-  alt: string;
+  alt?: string;
+  title?: string;
+  uri?: string;
+  type?: EmbedDataType;
+  description?: string;
 };
 
 export enum PostLabel {

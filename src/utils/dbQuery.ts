@@ -5,7 +5,7 @@ import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
-import { Bindings, LooseObj, PlatformLoginResponse, Violation } from "../types.d";
+import { Bindings, LooseObj, PlatformLoginResponse, PostLabel, Violation } from "../types.d";
 import { MAX_POSTED_LENGTH } from "../limits.d";
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -162,7 +162,7 @@ export const createPost = async (c: Context, body: any) => {
         uuid: postUUID,
         scheduledDate: scheduleDate,
         embedContent: embeds,
-        contentLabel: label,
+        contentLabel: label || PostLabel.None,
         userId: user.id
     })
   ];

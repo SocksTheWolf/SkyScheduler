@@ -77,7 +77,7 @@ fileDropzone.on("success", function(file, response) {
   showContentLabeler(true);
 
   console.log(`Adding ${file.name} to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel}`);
-  fileData.set(file.name, {content: response.data, alt: ""});
+  fileData.set(file.name, {content: response.data, alt: "", type: 1});
 
   // Make the buttons pressable
   file.previewElement.querySelectorAll("button").forEach(el => {

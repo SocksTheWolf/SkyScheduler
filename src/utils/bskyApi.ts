@@ -1,5 +1,5 @@
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS, MAX_LENGTH, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
@@ -134,7 +134,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       facets: rt.facets,
       createdAt: new Date().toISOString(),
     };
-    if (content.label != PostLabel.None) {
+    if (content.label !== undefined && content.label !== PostLabel.None) {
       let contentStr:string = "";
       switch (content.label) {
         case PostLabel.Adult:
@@ -156,32 +156,44 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       };
     }
 
-    // Upload any images to this post
+    // Upload any embeds to this post
     if (content.embeds?.length) {
       let imagesArray = [];
+      let externalData:LooseObj = {};
       for (; currentEmbedIndex < MAX_EMBEDS && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex) {
         const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
         const file = await env.R2.get(currentEmbed.content);
         if (file) {
           const imageBlob = await file.blob();
-          // Attempt to get the width and height of the image file.
-          const sizeResult = await imageDimensionsFromStream(await imageBlob.stream());
           // Upload the data itself.
           const uploadImg = await agent.uploadBlob(imageBlob, {encoding: file.httpMetadata?.contentType });
-          const bskyMetadata:LooseObj = {
-            "image": uploadImg.data.blob, 
-            "alt": truncate(currentEmbed.alt, MAX_ALT_TEXT),
-          };
+          // Pull the embed type so that we can determine how to parse the embed
+          const currentEmbedType:EmbedDataType = currentEmbed.type || EmbedDataType.Image;
 
-          // If we were able to parse the width and height of the image, then append the aspect ratio into the image record.
-          if (sizeResult) {
-            bskyMetadata.aspectRatio = {
-              "width": sizeResult.width,
-              "height": sizeResult.height
+          // Handle images. Images will always take precedence over links
+          if (currentEmbedType == EmbedDataType.Image) {
+            const bskyMetadata:LooseObj = {
+              image: uploadImg.data.blob,
+              alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT)
+            };
+            // Attempt to get the width and height of the image file.
+            const sizeResult = await imageDimensionsFromStream(await imageBlob.stream());
+            // If we were able to parse the width and height of the image, then append the aspect ratio into the image record.
+            if (sizeResult) {
+              bskyMetadata.aspectRatio = {
+                "width": sizeResult.width,
+                "height": sizeResult.height
+              }
             }
+            imagesArray.push(bskyMetadata);
+          } else if (currentEmbedType == EmbedDataType.WebLink && imagesArray.length == 0) {
+            // only process links if we have no images.
+            externalData.uri = currentEmbed.uri;
+            externalData.title = currentEmbed.title;
+            externalData.description = currentEmbed.description;
+            externalData.thumb = uploadImg.data.blob;
+            break;
           }
-
-          imagesArray.push(bskyMetadata);
         } else {
           console.warn(`Could not get the image ${currentEmbed.content} for post!`);
         }
@@ -191,6 +203,12 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         (postRecord as any).embed = {
           "images": imagesArray,
           "$type": "app.bsky.embed.images"
+        }
+      } else {
+        // push the web link as a post
+        (postRecord as any).embed = {
+          "$type": "app.bsky.embed.external",
+          "external": externalData
         }
       }
     }
