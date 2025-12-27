@@ -10,7 +10,7 @@ import isEmpty from "just-is-empty";
 export const lookupBskyHandle = async (user: string) => {
   const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
     cf: {
-      cacheTtlByStatus: {"200-299": 86400, 404: 1, "500-599": 0},
+      cacheTtlByStatus: {"200-299": 600, 404: 1, "500-599": 0},
       cacheEverything: true,
     }
   });
