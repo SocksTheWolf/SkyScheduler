@@ -55,6 +55,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
       {
       emailAndPassword: {
         enabled: true,
+        autoSignIn: false,
         requireEmailVerification: false,
         sendResetPassword: async ({user, url, token}, request) => {
           const userName = (user as any).username;
