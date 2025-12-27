@@ -4,6 +4,7 @@ import { BaseLayout } from "../layout/main";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
+import FooterCopyright from "../layout/footer";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -41,6 +42,8 @@ export default function Dashboard(props:any) {
                   Logout
                 </button>
               </div>
+              <hr />
+              <FooterCopyright />
             </footer>
           </article>
         </section>

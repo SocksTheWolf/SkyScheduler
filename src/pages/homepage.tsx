@@ -36,9 +36,9 @@ export default function Home() {
               <li>Edit the content of pending posts before posting</li>
             </ul>
           </p>
-          <footer><small>
+          <footer>
             <FooterCopyright />
-          </small></footer>
+          </footer>
         </article>
       </section>
     </BaseLayout>

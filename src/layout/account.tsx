@@ -44,9 +44,9 @@ export default function AccountHandler(props: AccountFormProps) {
         </center>
         <footer>
           <center>
-            <small id="footerLinks">
-              {props.footerLinks ? footerLinkHTML : (props.footerHTML || "")}
-            </small>
+            <span id="footerLinks">
+              {props.footerLinks ? <small>{footerLinkHTML}</small> : (props.footerHTML || "")}
+            </span>
           </center>
         </footer>
       </article>
