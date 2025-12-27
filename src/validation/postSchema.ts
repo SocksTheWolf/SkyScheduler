@@ -2,21 +2,38 @@ import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } fr
 import { EmbedDataType, PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
-
-const BaseEmbedSchema = z.object({
-  content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid")
-});
+import isEmpty from "just-is-empty";
 
 const ImageEmbedSchema = z.object({
+  content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid"),
   type: z.literal(EmbedDataType.Image).optional(),
   alt: z.string().max(MAX_ALT_TEXT, "alt text is too long"),
 });
 
 const LinkEmbedSchema = z.object({
+  content: z.string().trim().prefault("").refine((value) => { 
+    if (isEmpty(value))
+      return true;
+    // So the idea here is to try to encode the string into an URL object, and if that fails
+    // then you just fail out the string.
+    try {
+      const urlWrap = new URL(value);
+      return urlWrap.protocol === "https:" || urlWrap.protocol === "http:";
+    } catch (err) {
+      return false;
+    }
+  }, {
+    message: "The link embed contained invalid data, please check your URL and try again",
+    path: ["content"]
+  }),
   type: z.literal(EmbedDataType.WebLink),
-  title: z.string(),
-  uri: z.url(),
-  description: z.string()
+  title: z.string().trim().default(""),
+  uri: z.url({
+    normalize: true, 
+    protocol: /^https?$/,
+    hostname: z.regexes.domain,
+    error: "provided weblink is not in the correct form of an url"}).trim().default(""),
+  description: z.string().trim().default("")
 });
 
 // Schema for post creation
@@ -25,7 +42,7 @@ export const PostSchema = z.object({
   embeds: z.discriminatedUnion("type", [
     ImageEmbedSchema,
     LinkEmbedSchema
-  ]).and(BaseEmbedSchema).array().optional(),
+  ]).array().optional(),
   label: z.nativeEnum(PostLabel).optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({

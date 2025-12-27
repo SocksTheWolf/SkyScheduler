@@ -1,14 +1,31 @@
-const repostCheckbox = document.getElementById("makeReposts");
+const repostCheckbox = document.getElementById('makeReposts');
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
+const urlCardBox = document.getElementById('urlCard');
+
+const imageAttachmentSection = document.getElementById("imageAttachmentSection");
+const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
 
 function resetForm() {
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
+  urlCardBox.value = "";
+  toggleElementVisibleState(imageAttachmentSection, true);
+  toggleElementVisibleState(linkAttachmentSection, true);
+  showContentLabeler(false);
   setSelectDisable(true);
 }
 
-resetForm();
+urlCardBox.addEventListener("paste", () => {
+  showContentLabeler(true);
+  toggleElementVisibleState(imageAttachmentSection, false);
+});
+
+urlCardBox.addEventListener("change", () => {
+  const isNotEmpty = urlCardBox.value.length > 0;
+  showContentLabeler(isNotEmpty);
+  toggleElementVisibleState(imageAttachmentSection, !isNotEmpty);
+});
 
 let fileData = new Map();
 let fileDropzone = new Dropzone("#imageUploads", { 
@@ -20,9 +37,11 @@ let fileDropzone = new Dropzone("#imageUploads", {
 
 fileDropzone.on("reset", () => {
   showContentLabeler(false);
+  toggleElementVisibleState(linkAttachmentSection, true);
 });
 
 fileDropzone.on("addedfile", file => {
+  toggleElementVisibleState(linkAttachmentSection, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
@@ -66,6 +85,9 @@ fileDropzone.on("addedfile", file => {
         fileDropzone.removeFile(file);
         pushToast(`Deleted file ${file.name}`, true);
       }
+      if (fileData.length == 0) {
+        toggleElementVisibleState(linkAttachmentSection, true);
+      }
     });
   });
   buttonHolder.appendChild(addAltText);
@@ -102,10 +124,10 @@ fileDropzone.on("success", function(file, response) {
 fileDropzone.on("error", function(file, msg) {
   pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
   fileDropzone.removeFile(file);
+  if (fileData.length == 0) {
+    toggleElementVisibleState(linkAttachmentSection, true);
+  }
 });
-
-// Handle character counting
-addCounter("content", "count");
 
 // Handle form submission
 document.getElementById('postForm').addEventListener('submit', async (e) => {
@@ -139,13 +161,40 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       };
     }
 
-    // Only handle data here if we have images
-    if (fileData.size > 0) {
-      console.log("parsing images for upload");
+    const hasFiles = fileData.size > 0;
+    const linkCardURL = urlCardBox.value;
+    const hasWebEmbed = linkCardURL.length > 0;
+    if (hasFiles || hasWebEmbed) {
       postObject.embeds = [];
-      fileData.forEach((value, key) => {
-        postObject.embeds.push(value)
-      });
+      if (hasFiles) {
+        fileData.forEach((value, key) => {
+          postObject.embeds.push(value)
+        });
+      } else {
+        // Attempt to fetch the web information
+        const webDataObj = {
+          uri: linkCardURL,
+          type: 2
+        };
+        // Going to rondezoop this from bsky as I don't want to write my own atm
+        const extractResponse = await fetch(`https://cardyb.bsky.app/v1/extract?url=${encodeURI(linkCardURL)}`);
+        if (extractResponse.ok) {
+          const extractData = await extractResponse.json();
+          if (extractData.error === "") {
+            webDataObj.description = extractData.description;
+            webDataObj.title = extractData.title;
+            webDataObj.content = extractData.image;
+          } else {
+            console.error(extractData.error);
+            pushToast("An error occurred with the URL card, please correct.", false);
+            return;
+          }
+        } else {
+          pushToast("Unable to fetch URL card embed information...", false);
+          return;
+        }
+        postObject.embeds.push(webDataObj);
+      }
       postObject.label = document.getElementById("contentLabels").value;
     }
 
@@ -175,6 +224,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       setSelectDisable(true);
       scheduledDate.setAttribute("required", "");
       document.getElementById('postForm').reset();
+      resetForm();
       refreshPosts();
     } else {
       pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);
@@ -192,15 +242,6 @@ scheduledDate.addEventListener('change', (e) => {
   scheduledDate.value = date.toISOString().slice(0,16);
 });
 
-function setSelectDisable(disable) {
-  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => {
-    if (disable)
-      el.setAttribute("disabled", true);
-    else
-      el.removeAttribute("disabled");
-  });
-}
-
 repostCheckbox.addEventListener('click', (e) => {
   setSelectDisable(!repostCheckbox.checked);
 });
@@ -212,9 +253,22 @@ postNowCheckbox.addEventListener('click', (e) => {
     scheduledDate.setAttribute("required", "");
 });
 
+function setSelectDisable(disable) {
+  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => {
+    if (disable)
+      el.setAttribute("disabled", true);
+    else
+      el.removeAttribute("disabled");
+  });
+}
+
 function showContentLabeler(shouldShow) {
   const contentLabelSelector = document.getElementById("content-label-selector");
   const contentLabelSelect = document.getElementById("contentLabels");
+
+  if (!shouldShow && (fileData.length > 0 || urlCardBox.value.length > 0))
+    return;
+
   if (shouldShow) {
     contentLabelSelector.setAttribute("class", "");
     contentLabelSelect.setAttribute("required", "");
@@ -224,3 +278,14 @@ function showContentLabeler(shouldShow) {
     contentLabelSelect.value = "";
   }
 }
+
+function toggleElementVisibleState(el, shouldShow) {
+  if (shouldShow)
+    el.classList.remove("hidden");
+  else
+    el.classList.add("hidden");
+}
+
+// Handle character counting
+addCounter("content", "count");
+resetForm();

@@ -5,9 +5,15 @@ import { updatePostData, getBskyUserPassForId, createViolationForUser } from './
 import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
 import truncate from "just-truncate";
+import isEmpty from "just-is-empty";
 
 export const lookupBskyHandle = async (user: string) => {
-  const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`);
+  const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
+    cf: {
+      cacheTtlByStatus: {"200-299": 86400, 404: 1, "500-599": 0},
+      cacheEverything: true,
+    }
+  });
   if (lookupRequest.ok) {
     const response:any = await lookupRequest.json();
     return response.did;
@@ -161,17 +167,15 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       let imagesArray = [];
       let externalData:LooseObj = {};
       for (; currentEmbedIndex < MAX_EMBEDS && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex) {
-        const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
-        const file = await env.R2.get(currentEmbed.content);
-        if (file) {
-          const imageBlob = await file.blob();
-          // Upload the data itself.
-          const uploadImg = await agent.uploadBlob(imageBlob, {encoding: file.httpMetadata?.contentType });
-          // Pull the embed type so that we can determine how to parse the embed
-          const currentEmbedType:EmbedDataType = currentEmbed.type || EmbedDataType.Image;
-
-          // Handle images. Images will always take precedence over links
-          if (currentEmbedType == EmbedDataType.Image) {
+        const currentEmbed:EmbedData = content.embeds[currentEmbedIndex];
+        const currentEmbedType:EmbedDataType = currentEmbed.type || EmbedDataType.Image;
+        if (currentEmbedType == EmbedDataType.Image) {
+          const file = await env.R2.get(currentEmbed.content);
+          if (file) {
+            const imageBlob = await file.blob();
+            // Upload the data itself.
+            const uploadImg = await agent.uploadBlob(imageBlob, {encoding: file.httpMetadata?.contentType });
+            // Handle images. Images will always take precedence over links
             const bskyMetadata:LooseObj = {
               image: uploadImg.data.blob,
               alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT)
@@ -186,16 +190,24 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
               }
             }
             imagesArray.push(bskyMetadata);
-          } else if (currentEmbedType == EmbedDataType.WebLink && imagesArray.length == 0) {
-            // only process links if we have no images.
-            externalData.uri = currentEmbed.uri;
-            externalData.title = currentEmbed.title;
-            externalData.description = currentEmbed.description;
-            externalData.thumb = uploadImg.data.blob;
-            break;
+          } else {
+            console.warn(`Could not get the image ${currentEmbed.content} for post!`);
           }
-        } else {
-          console.warn(`Could not get the image ${currentEmbed.content} for post!`);
+        } else if (currentEmbedType == EmbedDataType.WebLink && imagesArray.length == 0) {
+          // only process links if we have no images.
+          externalData.uri = currentEmbed.uri;
+          externalData.title = currentEmbed.title;
+          externalData.description = currentEmbed.description;
+          // Attempt to fetch the thumbnail
+          if (!isEmpty(currentEmbed.content)) {
+            const thumbnail = await fetch(currentEmbed.content);
+            if (thumbnail.ok) {
+              const imageBlob = await thumbnail.blob();
+              const uploadImg = await agent.uploadBlob(imageBlob, {encoding: thumbnail.headers.get("content-type") || "image/png" });
+              externalData.thumb = uploadImg.data.blob;
+            }
+          }
+          break;
         }
       }
       // Push the embed images into the post record.

@@ -1,4 +1,4 @@
-import { Bindings, EmbedData, LooseObj } from '../types';
+import { Bindings, EmbedData, EmbedDataType, LooseObj } from '../types.d';
 import { CF_MAX_DIMENSION, BSKY_FILE_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, BSKY_MAX_WIDTH, BSKY_MAX_HEIGHT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,8 +7,10 @@ export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|unde
 
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach(async (data) => {
-      console.log(`Deleting ${data.content}...`);
-      itemsToDelete.push(data.content);
+      if (data.type !== EmbedDataType.WebLink || data.type === undefined) {
+        console.log(`Deleting ${data.content}...`);
+        itemsToDelete.push(data.content);
+      }
     });
     await deleteFromR2(env, itemsToDelete);
   }
