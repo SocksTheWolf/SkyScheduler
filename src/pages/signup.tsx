@@ -30,7 +30,7 @@ export default function Signup(props:any) {
 
         <UsernameField />
 
-        <label>
+        <label hx-history="false">
           Dashboard Password
           <DashboardPasswordField autocomplete={PWAutoCompleteSettings.NewPass} required={true} />
           <small>Create a new password to use to login to this website. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>

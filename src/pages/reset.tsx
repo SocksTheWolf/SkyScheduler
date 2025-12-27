@@ -16,7 +16,7 @@ export default function ResetPassword() {
         redirect="/login" 
         footerLinks={links}>
 
-        <input type="hidden" name="resetToken" id="resetToken" />
+        <input type="hidden" name="resetToken" id="resetToken" hx-history="false" />
 
         <label>
           New Password
