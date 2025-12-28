@@ -38,7 +38,7 @@ const LinkEmbedSchema = z.object({
 
 // Schema for post creation
 export const PostSchema = z.object({
-  content: z.string().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty"),
+  content: z.string().trim().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty"),
   embeds: z.discriminatedUnion("type", [
     ImageEmbedSchema,
     LinkEmbedSchema
@@ -68,5 +68,5 @@ export const PostSchema = z.object({
 });
 
 export const EditSchema = z.object({
-  content: z.string().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty")
+  content: z.string().trim().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty")
 });
