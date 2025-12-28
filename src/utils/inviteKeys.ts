@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import humanId from "human-id";
 import has from "just-has";
 
 export const isUsingInviteKeys = (c: Context) => {
@@ -65,4 +66,17 @@ export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
     // put the new value on the stack
     await c.env.INVITE_POOL.put(loweredKey, newValue.toString());
   }
+}
+
+export const makeInviteKey = (c: Context) => {
+  if (!isUsingInviteKeys(c)) {
+    return null;
+  }
+
+  const newKey: string = humanId({
+    separator: '-',
+    capitalize: false,
+  });
+  c.executionCtx.waitUntil(c.env.INVITE_POOL.put(newKey, "10"));
+  return newKey;
 }

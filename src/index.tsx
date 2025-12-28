@@ -16,8 +16,8 @@ import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
-import {humanId} from 'human-id'
-import setupAccounts from "./utils/setup";
+import { setupAccounts } from "./utils/setup";
+import { makeInviteKey } from "./utils/inviteKeys";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -85,12 +85,11 @@ app.get("/reset", redirectToDashIfLogin, (c) => {
 
 // Generate invites route
 app.get("/invite", every(authMiddleware, adminOnlyMiddleware), (c) => {
-  const newKey:string = humanId({
-    separator: '-',
-    capitalize: false,
-  });
-  c.executionCtx.waitUntil(c.env.INVITE_POOL.put(newKey, "10"));
-  return c.text(`${newKey} is good for 10 uses`);
+  const newKey = makeInviteKey(c);
+  if (newKey !== null)
+    return c.text(`${newKey} is good for 10 uses`);
+  else
+    return c.text("Invite keys are disabled.");
 });
 
 // Admin Maintenance Cleanup

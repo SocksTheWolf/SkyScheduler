@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { doesAdminExist } from "./dbQuery";
 
-export default async function setupAccounts(c: Context) {
+export const setupAccounts = async(c: Context) => {
   if (await doesAdminExist(c))
     return c.html("already created", 501);
 
