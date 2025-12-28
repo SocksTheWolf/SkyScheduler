@@ -104,7 +104,7 @@ export default function PostCreation() {
           </details>
         </div>
         <footer>
-          <button type="submit" class="w-full primary">
+          <button id="makingPostRequest" type="submit" class="w-full primary">
             Schedule Post
           </button>
         </footer>

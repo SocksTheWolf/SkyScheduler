@@ -14,6 +14,7 @@ function resetForm() {
   toggleElementVisibleState(linkAttachmentSection, true);
   showContentLabeler(false);
   setSelectDisable(true);
+  showPostProgress(false);
 }
 
 urlCardBox.addEventListener("paste", () => {
@@ -132,6 +133,7 @@ fileDropzone.on("error", function(file, msg) {
 // Handle form submission
 document.getElementById('postForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  showPostProgress(true);
   const content = document.getElementById('content').value;
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
@@ -141,6 +143,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     dateTime = postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
   } catch(dateErr) {
     pushToast("Invalid date", false);
+    showPostProgress(false);
     return;
   }
 
@@ -187,10 +190,12 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
           } else {
             console.error(extractData.error);
             pushToast("An error occurred with the URL card, please correct.", false);
+            showPostProgress(false);
             return;
           }
         } else {
           pushToast("Unable to fetch URL card embed information...", false);
+          showPostProgress(false);
           return;
         }
         postObject.embeds.push(webDataObj);
@@ -233,6 +238,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     console.log(err);
     pushToast("An unknown error occurred", false);
   }
+  showPostProgress(false);
 });
 
 // rounddown minutes
@@ -284,6 +290,18 @@ function toggleElementVisibleState(el, shouldShow) {
     el.classList.remove("hidden");
   else
     el.classList.add("hidden");
+}
+
+function showPostProgress(shouldShow) {
+  const el = document.getElementById("makingPostRequest");
+  el.setAttribute("aria-busy", shouldShow);
+  if (shouldShow) {
+    el.setAttribute("disabled", true);
+    el.innerHTML = "Making Post...";
+  } else {
+    el.removeAttribute("disabled");
+    el.innerHTML = "Schedule Post";
+  }
 }
 
 // Handle character counting
