@@ -51,7 +51,7 @@ fileDropzone.on("addedfile", file => {
     e.preventDefault();
     e.stopPropagation();
     const existingData = fileData.get(file.name);
-    var askUserData = prompt("What is the alt text?", existingData.alt);
+    var askUserData = prompt("What is the alt text?", existingData.alt || "");
     try {
       existingData.alt = askUserData;
       fileData.set(file.name, existingData);
