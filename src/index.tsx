@@ -84,12 +84,12 @@ app.get("/reset", redirectToDashIfLogin, (c) => {
 });
 
 // Generate invites route
-app.get("/invite", every(authMiddleware, adminOnlyMiddleware), async (c) => {
+app.get("/invite", every(authMiddleware, adminOnlyMiddleware), (c) => {
   const newKey:string = humanId({
     separator: '-',
     capitalize: false,
   });
-  await c.env.INVITE_POOL.put(newKey, "10");
+  c.executionCtx.waitUntil(c.env.INVITE_POOL.put(newKey, "10"));
   return c.text(`${newKey} is good for 10 uses`);
 });
 
