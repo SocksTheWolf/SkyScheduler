@@ -42,7 +42,7 @@ export const getPostsForUser = async (c: Context) => {
         .from(posts).where(eq(posts.userId, userData.id))
         .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
         .groupBy(posts.uuid)
-        .orderBy(desc(posts.scheduledDate)).all();
+        .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
     }
   } catch(err) {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
