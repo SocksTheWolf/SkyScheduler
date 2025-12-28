@@ -18,19 +18,19 @@ export function Settings() {
         <br />
         <section>
           <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" 
-            hx-swap="innerHTML" hx-indicator="#spinner">
+            hx-swap="innerHTML" hx-indicator="#spinner" hx-disabled-elt="#settingsButtons button, find input">
 
             <UsernameField required={false} title="BlueSky Handle:" hintText="Only change this if you have recently changed your Bluesky handle" />
 
             <label>
               Dashboard Pass: 
               <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} />
-              <small>The password to access this website</small>
+              <small>The password to access the SkyScheduler Dashboard</small>
             </label>
             <label>
               BSky App Password: 
               <BSkyAppPasswordField />
-              <small>If you need to change your application password, you can <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a></small>
+              <small>If you need to change your bsky application password, you can <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
             </label>
             <label>
               BSky PDS: 
@@ -42,8 +42,8 @@ export function Settings() {
           <div id="accountResponse">
           </div>
         </section>
-        <footer>
-          <button id="deleteAccountButton" class="btn-error" style="float: left;">Delete</button>
+        <footer id="settingsButtons">
+          <button id="deleteAccountButton" class="btn-error">Delete Account</button>
           <button form="settingsData">Save</button>
           <button class="secondary" onclick='closeSettingsModal();'>Cancel</button>
         </footer>
@@ -53,19 +53,21 @@ export function Settings() {
       <article>
         <header>Delete Account</header>
         <p>To delete your SkyScheduler account, please type your password below.<br />
+            All pending, scheduled tweets + all unposted media will be deleted from this service.
+          
           <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMANENT</u>.</center>
         </p>
-        <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDelete" 
+        <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDeleteResponse" hx-disabled-elt="#accountDeleteButtons button, find input"
             hx-swap="innerHTML" hx-indicator="#delSpinner">
           <label>
-            Dashboard Pass: <input type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
-            <small>The password to access this website</small>
+            Dashboard Pass: <input id="deleteAccountPass" type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
+            <small>The password to access the SkyScheduler Dashboard</small>
           </label>
         </form>
         <progress id="delSpinner" class="htmx-indicator" />
-          <div id="accountDelete">
+          <div id="accountDeleteResponse">
           </div>
-        <footer>
+        <footer id="accountDeleteButtons">
           <button class="btn-error" form="delAccountForm">Delete</button>
           <button class="secondary" onclick='closeDeleteModal();'>Cancel</button>
         </footer>
@@ -75,6 +77,7 @@ export function Settings() {
       addUsernameFieldWatchers();
       document.getElementById("deleteAccountButton").addEventListener("click", (ev) => {
         ev.preventDefault();
+        clearSettingsData();
         openModal(document.getElementById("deleteAccount"));
       });
     `}</script>
@@ -92,15 +95,24 @@ export function SettingsButton() {
       <script src="/dep/modal.js" type="application/javascript"></script>
       <script type="text/javascript">
         {html`
+          function clearSettingsData() {
+            document.querySelectorAll("#changeInfo input").forEach((el) => el.value = "");
+            document.querySelectorAll("#deleteAccount input").forEach((el) => el.value = "");
+            document.getElementById("accountResponse").innerHTML = "";
+            document.getElementById("accountDeleteResponse").innerHTML = "";
+          }
           document.getElementById("settingsButton").addEventListener("click", (ev) => {
             ev.preventDefault();
             openModal(document.getElementById("changeInfo"));
+            clearSettingsData();
           });
           function closeSettingsModal() {
             closeModal(document.getElementById("changeInfo"));
+            clearSettingsData();
           }
           function closeDeleteModal() {
             closeModal(document.getElementById("deleteAccount"));
+            clearSettingsData();
           }
         `}
       </script>

@@ -147,9 +147,13 @@
   color: white;
 }
 
-#accountResponse .btn-error *, #accountDelete .btn-error * {
+#accountResponse .btn-error *, #accountDeleteResponse .btn-error * {
   margin-left: 5px;
   color: white;
+}
+
+dialog button.btn-error {
+  float: left;
 }
 
 .uploadGuidelines {

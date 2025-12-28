@@ -21,6 +21,22 @@ export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariable
 account.use(secureHeaders());
 account.use(corsHelperMiddleware);
 
+const serverParseValidationErr = (c: Context, errorJson: string) => {
+  try {
+    const errorMsgs = JSON.parse(errorJson);
+    return c.html(<div class="validation-error btn-error">
+      <b>Failed Validation</b>: 
+        <ul>
+          {errorMsgs.map((el: { message: string; }) => {
+            return <li>{el.message}</li>;
+          })}
+        </ul>
+      </div>);
+  } catch {
+    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>);
+  }
+}
+
 // wrapper to login
 account.post("/login", async (c) => {
   const body = await c.req.json();
@@ -53,15 +69,7 @@ account.post("/update", authMiddleware, async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
-    const errorMsgs = JSON.parse(validation.error.message);
-    return c.html(<div class="btn-error">
-      <b>Failed Validation</b>: 
-        <ul>
-          {errorMsgs.map((el: { message: string; }) => {
-            return <li>{el.message}</li>;
-          })}
-        </ul>
-      </div>);
+    return serverParseValidationErr(c, validation.error.message);
   }
 
   const auth = c.get("auth");
@@ -226,7 +234,7 @@ account.post("/delete", authMiddleware, async (c) => {
   const validation = AccountDeleteSchema.safeParse(body);
   
   if (!validation.success) {
-    return c.html(<b class="btn-error">Failed: <code>{validation.error.toString()}</code></b>);
+    return serverParseValidationErr(c, validation.error.message);
   }
 
   const { password } = validation.data;
@@ -244,7 +252,7 @@ account.post("/delete", authMiddleware, async (c) => {
 
     // Make sure we still have data
     if (!usrAccount || !usrAccount.password) {
-      return c.html(<b class="btn-error">Failed: <code>User Data Missing...</code></b>);
+      return c.html(<b class="btn-error">Failed: User Data Missing...</b>);
     }
 
     // Do a hash verification on the user's input to see if the passwords match
@@ -262,10 +270,10 @@ account.post("/delete", authMiddleware, async (c) => {
       c.header("HX-Trigger", "accountDeleted");
       return c.html(<strong>Success!</strong>);
     } else {
-      return c.html(<b class="btn-error">Failed: <code>Invalid Password</code></b>);
+      return c.html(<b class="btn-error">Failed: Invalid Password</b>);
     }
   } catch (err: any) {
     console.error(`failed to delete user ${user.id} had error ${err.message || err.msg || 'no code'}`);
-    return c.html(<b class="btn-error">Failed: <code>Server Error</code></b>);
+    return c.html(<b class="btn-error">Failed: Server Error</b>);
   }
 });
