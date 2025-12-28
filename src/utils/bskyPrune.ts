@@ -12,7 +12,7 @@ export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
     const currentGroup = postedGroups.pop();
     // This technically shouldn't be possible because we do a check in the while loop beforehand.
     if (currentGroup === undefined) {
-      console.log("current group was somehow undefined...");
+      console.error("current group was somehow undefined...");
       break;
     }
 
@@ -29,26 +29,33 @@ export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
       urisOnly.push(itm.uri);
     });
 
-    // Records from the public bsky api service
-    const bskyLookupResults = await getPostRecords(urisOnly);
-    if (bskyLookupResults !== null) {
-      // There is a discrepancy, we need to find which record it is.
-      if (bskyLookupResults.length !== urisOnly.length) {
-        // Go through the entire lookup results
-        while (!isEmpty(bskyLookupResults)) {
-          // remove the object at the end so we can try to figure out what's left
-          const currentRecord = bskyLookupResults.pop();
-          if (currentRecord === undefined)
-            break;
+    try {
+      // Records from the public bsky api service
+      const bskyLookupResults = await getPostRecords(urisOnly);
+      if (bskyLookupResults !== null) {
+        // There is a discrepancy, we need to find which record it is.
+        if (bskyLookupResults.length !== urisOnly.length) {
+          // Go through the entire lookup results
+          while (!isEmpty(bskyLookupResults)) {
+            // remove the object at the end so we can try to figure out what's left
+            const currentRecord = bskyLookupResults.pop();
+            if (currentRecord === undefined)
+              break;
 
-          // remove it from our post map.
-          postMap.delete(currentRecord.uri);
+            // if this record exists, remove it from our post map
+            // we will reconcile outside of this loop to delete the posts.
+            postMap.delete(currentRecord.uri);
+          }
+          // Add all the deleted keys to the main array.
+          postMap.forEach((value, key) => {
+            removePostIds.push(value);
+          });
         }
-        // All all the deleted keys to the main array.
-        postMap.forEach((value, key) => {
-          removePostIds.push(value);
-        });
       }
+    } catch(err) {
+      console.error(`encountered error trying to prune: ${err}`);
+      // Remove all the posts in the current post group.
+      continue;
     }
   }
   return removePostIds;

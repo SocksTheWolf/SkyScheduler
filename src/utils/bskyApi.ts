@@ -276,13 +276,17 @@ export const makePost = async (env: Bindings, content: Post) => {
 }
 
 export const getPostRecords = async (records:string[]) => {
-  const agent = new AtpAgent({
-    service: new URL('https://public.api.bsky.app'),
-  });
+  try
+  {
+    const agent = new AtpAgent({
+      service: new URL('https://public.api.bsky.app'),
+    });
 
-  const response = await agent.app.bsky.feed.getPosts({uris: records});
-  if (response.success)
-    return response.data.posts;
-  else
-    return null;
+    const response = await agent.app.bsky.feed.getPosts({uris: records});
+    if (response.success)
+      return response.data.posts;
+  } catch(err) {
+    console.error(`Unable to get post records for ${records} had error ${err}`);
+  }
+  return null;
 }
