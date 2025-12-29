@@ -27,15 +27,6 @@ function updateAllTimes() {
   });
 }
 
-function updateAllPostedLinks() {
-  const postIDRegex = /\/((?=[^.]*$).+)/;
-  const username = document.getElementById("currentUser").innerHTML;
-  document.querySelectorAll(".has-posted").forEach((el) => {
-    const dataURI = el.getAttribute("data-uri").match(postIDRegex)[0];
-    el.setAttribute("href", `https://bsky.app/profile/${username}/post${dataURI}`);
-  })
-}
-
 function refreshPosts() {
   document.getElementById("refresh-posts-force").click();
 }
@@ -46,7 +37,6 @@ document.addEventListener("showDeleteMsg", function(evt) {
 
 document.addEventListener("timeSidebar", function() {
   updateAllTimes();
-  updateAllPostedLinks();
 });
 
 document.addEventListener("accountUpdated", function(ev) {
@@ -57,7 +47,6 @@ document.addEventListener("accountUpdated", function(ev) {
     violations.setAttribute("hidden", "true");
   }
   pushToast("Settings Updated!", true);
-  updateAllPostedLinks();
 });
 
 document.addEventListener("accountDeleted", function(ev) {
