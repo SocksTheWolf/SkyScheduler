@@ -35,7 +35,7 @@ document.addEventListener("showDeleteMsg", function(evt) {
   pushToast("Post deleted", true);
 });
 
-document.addEventListener("timeSidebar", function(ev) {
+document.addEventListener("timeSidebar", function() {
   updateAllTimes();
 });
 
@@ -104,7 +104,7 @@ function addCounter(textField, counter) {
   const counterEl = document.getElementById(counter);
 
   Countable.on(textEl, counter => {
-    counterEl.innerHTML = counter.all + "/" + MAX_LENGTH; 
+    counterEl.innerHTML = `${counter.all}/${MAX_LENGTH}`;
     // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
     if (counter.all > MAX_LENGTH) {
       counterEl.classList.add('tooLong');
@@ -116,14 +116,14 @@ function addCounter(textField, counter) {
 
 function resetCounter(counter) {
   const counterEl = document.getElementById(counter);
-  counterEl.innerHTML = 0 + "/" + MAX_LENGTH;
+  counterEl.innerHTML = `0/${MAX_LENGTH}`;
   counterEl.classList.remove('tooLong');
 }
 
 function redirectAfterDelay(url) {
   setTimeout(function() {
     window.location.href = url;
-  }, 2000);
+  }, 1200);
 }
 
 function translateErrorObject(obj, defaultString) {

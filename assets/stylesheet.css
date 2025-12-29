@@ -62,6 +62,10 @@
   grid-column: auto / span 1;
 }
 
+.max-width-50 article, .dashboard {
+  padding-bottom: 0px;
+}
+
 .mainContent {
   grid-column: auto / span 3;
 }
@@ -91,6 +95,10 @@
 
 #refresh-posts > span, #settingsButton > span {
   margin-right: 5px;
+}
+
+.controls {
+  margin-top: 0.6rem;
 }
 
 .controls > button {
@@ -158,4 +166,14 @@ dialog button.btn-error {
 
 .uploadGuidelines {
   margin-left: 10px;
+}
+/* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
+@keyframes refreshPostSpinner {
+  100% {
+    transform:rotate(-360deg)
+  }
+}
+.svgAnim svg {
+  transform-origin:center;
+  animation:refreshPostSpinner .75s infinite linear;
 }
