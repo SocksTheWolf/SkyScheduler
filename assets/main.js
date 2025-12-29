@@ -106,7 +106,6 @@ function addCounter(textField, counter) {
   Countable.on(textEl, counter => {
     counterEl.innerHTML = counter.all + "/" + MAX_LENGTH; 
     // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
-    // The other thing to note is that this app will attempt to split up long text into a tweet thread for you.
     if (counter.all > MAX_LENGTH) {
       counterEl.classList.add('tooLong');
     } else {

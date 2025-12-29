@@ -22,12 +22,9 @@ export default function PostEdit({post}:EditedPostProps) {
         <textarea name="content" id={`content${post.postid}`} rows={8} style="resize: none" required>
           {post.text}
         </textarea>
-        <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into 
-          a thread with {MAX_LENGTH} characters per post</small>
-      </section>
-      <footer>
         <small>Character Count: <div id={`editCount${post.postid}`}>0/{MAX_LENGTH}</div></small>
-      </footer>
+      </section>
+
       <progress id={editSpinner} class="htmx-indicator" />
       <center class="controls">
         <div id={editResponse}>

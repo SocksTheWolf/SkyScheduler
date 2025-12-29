@@ -6,7 +6,7 @@ import isEmpty from 'just-is-empty';
 
 export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
   const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(env, userId) : await getAllPostedPosts(env);
-  let removePostIds:string[] = [];
+  let removePostIds: string[] = [];
   let postedGroups = split(allPostedPosts, 25);
   while (!isEmpty(postedGroups)) {
     const currentGroup = postedGroups.pop();
@@ -18,7 +18,7 @@ export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
 
     // Create a map and an array so we can do lookups for reconciliation later
     // to figure out what posts can be removed.
-    let urisOnly:string[] = [];
+    let urisOnly: string[] = [];
     const postMap = new Map<string, string>();
     currentGroup.forEach((itm) => {
       if (itm.uri === null) {

@@ -16,7 +16,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
 - **Simple and Lightweight**: Fairly minimal setup and easy to use
 - **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images
-- **Handles threading**: Post is over the 300 character limit? The system will autothread your posts for you
+- **Handles Link Embeds**: Post your content with a link embed easily!
 - **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work
 - **Invite Keys**: Want to throttle the signups to your portal or keep the pool to friends/org only? Use invite keys to manage signups
 

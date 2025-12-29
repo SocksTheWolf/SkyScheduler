@@ -17,12 +17,8 @@ export default function PostCreation() {
             <header>Post Content</header>
             <section>
               <textarea id="content" rows={8} style="resize: none" placeholder="Post text here" required></textarea>
-              <small>Any text content with text over {MAX_LENGTH} characters will be automatically made into 
-                a thread with {MAX_LENGTH} characters per post</small>
-            </section>
-            <footer>
               <small>Character Count: <div id="count">0/{MAX_LENGTH}</div></small>
-            </footer>
+            </section>
           </article>
 
           <details>
