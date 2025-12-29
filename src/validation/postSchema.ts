@@ -1,4 +1,4 @@
-import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } from "../limits.d";
+import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, MAX_LENGTH } from "../limits.d";
 import { EmbedDataType, PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
@@ -36,14 +36,21 @@ const LinkEmbedSchema = z.object({
   description: z.string().trim().default("")
 });
 
+const TextContent = z.object({
+  content: z.string().trim()
+    .min(MIN_LENGTH,`post is too short, min ${MIN_LENGTH} characters`)
+    .max(MAX_LENGTH, `post is over ${MAX_LENGTH} characters`)
+    .nonempty("post cannot be empty"),
+});
+
 // Schema for post creation
 export const PostSchema = z.object({
-  content: z.string().trim().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty"),
+  ...TextContent.shape,
   embeds: z.discriminatedUnion("type", [
     ImageEmbedSchema,
     LinkEmbedSchema
   ]).array().optional(),
-  label: z.nativeEnum(PostLabel).optional(),
+  label: z.nativeEnum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
     hours: z.coerce.number().min(1).max(MAX_HOURS_REPOSTING),
@@ -67,6 +74,4 @@ export const PostSchema = z.object({
   }
 });
 
-export const EditSchema = z.object({
-  content: z.string().trim().min(MIN_LENGTH, "post is too short").nonempty("post cannot be empty")
-});
+export const EditSchema = TextContent;
