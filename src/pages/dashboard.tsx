@@ -1,16 +1,22 @@
 import { Context } from "hono";
-import PostCreation from "../layout/makePost";
+import {PostCreation, PreloadPostCreation} from "../layout/makePost";
 import { BaseLayout } from "../layout/main";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import FooterCopyright from "../layout/footer";
+import { PreloadRules } from "../types.d";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
-
+  const defaultDashboardPreloads:PreloadRules[] = [
+    {href: "/dep/countable.min.js", type: "script"},
+    {href: "/dep/modal.js", type: "script"}
+  ];
+  
   return (
-    <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard">
+    <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
+      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads]}>
       <script src="/dep/countable.min.js"></script>
       <div class="grid">
         <section class="max-width-50">

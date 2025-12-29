@@ -1,6 +1,13 @@
 import { Context } from "hono";
 
-export default function TurnstileCaptcha(props: any) {
+export function TurnstileCaptchaPreloads(ctx: Context) {
+  if (ctx.env.USE_TURNSTILE_CAPTCHA) {
+    return [{type: "script", href: "https://challenges.cloudflare.com/turnstile/v0/api.js"}];
+  }
+  return [];
+}
+
+export function TurnstileCaptcha(props: any) {
   const ctx: Context = props.c;
   return (
     <>

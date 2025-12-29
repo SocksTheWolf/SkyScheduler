@@ -1,12 +1,19 @@
 import { html } from "hono/html";
 import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } from "../limits.d"
+import { PreloadRules } from "../types.d";
 
-export default function PostCreation() {
+export const PreloadPostCreation:PreloadRules[] = [
+    {type: "script", href: "/dep/dropzone-min.js"}, 
+    {type: "style", href: "/dep/dropzone.css"}, 
+    {type: "style", href: "/css/dropzoneMods.css"}
+];
+
+export function PostCreation() {
   return (
   <section>
     <script src="/dep/dropzone-min.js"></script>
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
-    <link href="/dropzoneMods.css" rel="stylesheet" type="text/css" />
+    <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
     <article>
       <form id="postForm">
         <header>
@@ -111,7 +118,7 @@ export default function PostCreation() {
         updateAllTimes();
       `}
       </script>
-      <script type="text/javascript" src="/postHelper.js"></script>
+      <script type="text/javascript" src="/js/postHelper.js"></script>
     </article>
   </section>
   );

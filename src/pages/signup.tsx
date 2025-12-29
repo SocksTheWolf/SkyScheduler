@@ -6,7 +6,7 @@ import NavTags from "../layout/navTags";
 import isEmpty from "just-is-empty";
 import AccountHandler from "../layout/account";
 import { UsernameField } from "../layout/usernameField";
-import TurnstileCaptcha from "../layout/turnstile";
+import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
 import FooterCopyright from "../layout/footer";
 import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
 import { PWAutoCompleteSettings } from "../types.d";
@@ -18,7 +18,8 @@ export default function Signup(props:any) {
     "You can ask for the maintainer for it";
 
   return (
-    <BaseLayout title="SkyScheduler - Signup">
+    <BaseLayout title="SkyScheduler - Signup" 
+      preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Create an Account" 
         submitText="Sign Up!"

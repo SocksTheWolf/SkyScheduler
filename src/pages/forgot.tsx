@@ -3,14 +3,15 @@ import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
 import { UsernameField } from "../layout/usernameField";
-import TurnstileCaptcha from "../layout/turnstile";
+import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
 import FooterCopyright from "../layout/footer";
 
 export default function ForgotPassword(props:any) {
   const ctx: Context = props.c;
   const botAccountURL:string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (
-    <BaseLayout title="SkyScheduler - Forgot Password">
+    <BaseLayout title="SkyScheduler - Forgot Password" 
+      preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Forgot Password Reset" 
         submitText="Request Password Reset"

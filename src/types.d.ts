@@ -100,3 +100,8 @@ export enum PWAutoCompleteSettings {
   NewPass,
   CurrentPass
 };
+
+export type PreloadRules = {
+  type: string;
+  href: string;
+};
