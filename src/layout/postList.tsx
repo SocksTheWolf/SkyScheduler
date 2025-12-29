@@ -16,9 +16,11 @@ export function PostContentObject({text}: PostContentObjectProps) {
   `;
 }
 
-export function ScheduledPost(content: Post) {
+export function ScheduledPost(props: any) {
   // Throwaway gibberish generator to make htmx link up properly across a lot of posts
   const postID = randomstring.generate(7);
+  const content: Post = props.post;
+  const username: string = props.user;
 
   return html`
   <article>
@@ -34,7 +36,10 @@ export function ScheduledPost(content: Post) {
     </div>
     <footer>
       <small>
-        ${content.posted ? 'Posted on:' : 'Scheduled for:'} <span class="timestamp">${content.scheduledDate}</span>${content.repostCount! ? ' | Reposts Left: ' + content.repostCount : ''}
+        ${ (content.posted && content.uri) ? 
+          html`<a class="secondary" href="https://bsky.app/profile/${username}/post/${content.uri.slice(content.uri.lastIndexOf('/') + 1)}" target="_blank" title="link to post">Posted on</a>:` : 
+          'Scheduled for:' } 
+          <span class="timestamp">${content.scheduledDate}</span>${content.repostCount! ? ' | Reposts Left: ' + content.repostCount : ''}
       </small>
     </footer>
   </article>`;
@@ -46,14 +51,15 @@ type ScheduledPostListProps = {
 
 export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
-    const response:Object[]|null = await getPostsForUser(ctx);
+    const response: Object[]|null = await getPostsForUser(ctx);
+    const username: string = ctx.get("user").username;
     if (response !== null) {
       if (response.length > 0) {
         return (
           <>
           {response.map((message:any) => {
-            const data:Post = createPostObject(message);
-            return <ScheduledPost {...data} />;
+            const data: Post = createPostObject(message);
+            return <ScheduledPost post={data} user={username} />;
           })}
           </>
         );
