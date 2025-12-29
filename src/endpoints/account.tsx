@@ -7,13 +7,12 @@ import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, updateUserData
 import { SignupSchema } from "../validation/signupSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
-import { AccountDeleteSchema } from "../validation/accountDeleteSchema";
+import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { doesInviteKeyHaveValues, useInviteKey } from "../utils/inviteKeys";
 import { ContextVariables } from "../auth";
 import { deleteFromR2 } from "../utils/r2Query";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { verifyTurnstile } from "../middleware/turnstile";
-import { AccountForgotSchema } from "../validation/accountForgotSchema";
 import isEmpty from "just-is-empty";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
