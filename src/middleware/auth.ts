@@ -9,22 +9,28 @@ export async function pullAuthData(c: Context, next: any) {
       headers: c.req.raw.headers
     });
     if (session?.session && session?.user) {
-      c.set("user", session.user);
+      c.set("userId", session.user.id);
+      // This can't be changed by anyone specifically because it's not a domain
+      // and zod will require your username to be a domain.
+      c.set("isAdmin", session.user.name === "admin");
+      // We can probably drop this too
       c.set("session", session.session);
     } else {
-      c.set("user", null);
+      c.set("userId", null);
+      c.set("isAdmin", false);
       c.set("session", null);
     }
   }
   catch (err) {
     console.error(`Failed to process authentication, got err: ${err}`);
-    c.set("user", null);
+    c.set("userId", null);
+    c.set("isAdmin", false);
     c.set("session", null);
   }
   await next();
 }
 export async function requireAuth(c: Context, next: any) { 
-  if (c.get("session") === null || c.get("user") === null) {
+  if (c.get("session") === null || c.get("userId") === null) {
     return c.json({ error: "Unauthorized" }, 401);
   }
   await next();

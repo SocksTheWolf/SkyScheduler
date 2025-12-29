@@ -3,7 +3,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings, LooseObj } from "../types";
-import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, updateUserData } from "../utils/dbQuery";
+import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, getUsernameForUser, updateUserData } from "../utils/dbQuery";
 import { SignupSchema } from "../validation/signupSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
@@ -104,11 +104,8 @@ account.post("/update", authMiddleware, async (c) => {
 
 // endpoint that just returns current username
 account.get("/username", authMiddleware, async (c) => {
-  const userData:any = c.get("user" as any);
-  if (userData !== null) {
-    return c.text(userData.username);
-  }
-  return c.text("");
+  const username = await getUsernameForUser(c);
+  return c.text(username || "");
 });
 
 // proxy the logout call because of course this wouldn't work properly anyways
@@ -238,13 +235,13 @@ account.post("/delete", authMiddleware, async (c) => {
 
   const { password } = validation.data;
   const auth = c.get("auth");
-  const user = c.get("user");
+  const userId = c.get("userId");
   const authCtx = await auth.$context;
   try {
     // I don't know why this is so broken in better auth, but
     // something is wrong with their session middleware for the deleteUser
     // that it only throws exceptions with just a password.
-    const accountHandler = await authCtx.internalAdapter.findAccounts(user.id);
+    const accountHandler = await authCtx.internalAdapter.findAccounts(userId);
     const usrAccount = accountHandler.find(
       (account) => account.providerId === "credential" && account.password,
     );
@@ -260,10 +257,10 @@ account.post("/delete", authMiddleware, async (c) => {
       password: password
     });
     if (verify) {
-      await getAllMediaOfUser(c.env, user.id)
+      await getAllMediaOfUser(c.env, userId)
         .then((media) => deleteFromR2(c.env, media))
-        .then(() => authCtx.internalAdapter.deleteSessions(user.id))
-        .then(() => authCtx.internalAdapter.deleteUser(user.id));
+        .then(() => authCtx.internalAdapter.deleteSessions(userId))
+        .then(() => authCtx.internalAdapter.deleteUser(userId));
       
       c.header("HX-Redirect", "/");
       c.header("HX-Trigger", "accountDeleted");
@@ -272,7 +269,7 @@ account.post("/delete", authMiddleware, async (c) => {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>);
     }
   } catch (err: any) {
-    console.error(`failed to delete user ${user.id} had error ${err.message || err.msg || 'no code'}`);
+    console.error(`failed to delete user ${userId} had error ${err.message || err.msg || 'no code'}`);
     return c.html(<b class="btn-error">Failed: Server Error</b>);
   }
 });

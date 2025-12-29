@@ -21,25 +21,29 @@ type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 export const doesUserExist = async (c: Context, username: string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const result = await db.select().from(users)
-    .where(eq(users.name, username))
+    .where(eq(users.username, username))
     .limit(1).all();
   return result.length > 0;
 };
 
 export const doesAdminExist = async (c: Context) => {
-  return await doesUserExist(c, "admin");
+  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const result = await db.select().from(users)
+    .where(eq(users.name, "admin"))
+    .limit(1).all();
+  return result.length > 0;
 };
 
 export const getPostsForUser = async (c: Context) => {
   try {
-    const userData = c.get("user");
-    if (userData) {
+    const userId = c.get("userId");
+    if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
       return await db.select({
             ...getTableColumns(posts),
             repostCount: count(reposts.uuid) 
         })
-        .from(posts).where(eq(posts.userId, userData.id))
+        .from(posts).where(eq(posts.userId, userId))
         .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
         .groupBy(posts.uuid)
         .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
@@ -62,9 +66,9 @@ export const getAllMediaOfUser = async (env: Bindings, userId: string) => {
 };
 
 export const updateUserData = async (c: Context, newData: any) => {
-  const userData = c.get("user");
+  const userId = c.get("userId");
   try {
-    if (userData) {
+    if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
       let queriesToExecute:BatchItem<"sqlite">[] = [];
 
@@ -77,38 +81,38 @@ export const updateUserData = async (c: Context, newData: any) => {
         // add the query to the db batch object
         queriesToExecute.push(db.update(accounts)
           .set({password: newPassword})
-          .where(eq(accounts.userId, userData.id)));
+          .where(eq(accounts.userId, userId)));
       }
 
       // If we have new data about the username, pds, or password, then clear account invalid violations
       if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
-        queriesToExecute.push(getViolationDeleteQueryForUser(db, userData.id));
+        queriesToExecute.push(getViolationDeleteQueryForUser(db, userId));
       }
 
       if (!isEmpty(newData)) {
         queriesToExecute.push(db.update(users).set(newData)
-          .where(eq(users.id, userData.id)));
+          .where(eq(users.id, userId)));
       }
 
       await db.batch(queriesToExecute as BatchQuery);
       return true;
     }
   } catch(err) {
-    console.error(`Failed to update new user data for user ${userData.id}: ${userData.username}`);
+    console.error(`Failed to update new user data for user ${userId}`);
   }
   return false;
 };
 
 export const deletePost = async (c: Context, id: string) => {
-  const userData = c.get("user");
-  if (!userData) {
+  const userId = c.get("userId");
+  if (!userId) {
     console.log("no user data");
     return false;
   }
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id))).all();
+  const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).all();
   if (postQuery.length !== 0) {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
@@ -124,8 +128,8 @@ export const deletePost = async (c: Context, id: string) => {
 export const createPost = async (c: Context, body: any) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
 
-  const user = c.get("user");
-  if (!user)
+  const userId = c.get("userId");
+  if (!userId)
     return { ok: false, msg: "Your user session has expired, please login again"};
 
   const validation = PostSchema.safeParse(body);
@@ -142,7 +146,7 @@ export const createPost = async (c: Context, body: any) => {
   }
 
   // Check if account is in violation
-  const hasViolations = await getViolationsForUser(db, user.id);
+  const hasViolations = await getViolationsForUser(db, userId);
   if (hasViolations.success) {
     if (hasViolations.results.length > 0) {
       const violationData:Violation = (hasViolations.results[0] as Violation);
@@ -163,7 +167,7 @@ export const createPost = async (c: Context, body: any) => {
         scheduledDate: scheduleDate,
         embedContent: embeds,
         contentLabel: label || PostLabel.None,
-        userId: user.id
+        userId: userId
     })
   ];
 
@@ -224,23 +228,23 @@ export const updatePostData = async (env: Bindings, id: string, newData:Object) 
 };
 
 export const updatePostForUser = async (c: Context, id: string, newData:Object) => {
-  const userData = c.get("user");
-  if (!userData)
+  const userId = c.get("userId");
+  if (!userId)
     return false;
 
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id)));
+  const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userId)));
   return success;
 };
 
 export const getPostById = async(c: Context, id: string) => {
-  const userData = c.get("user");
-  if (!userData)
+  const userId = c.get("userId");
+  if (!userId)
     return [];
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userData.id))).limit(1).all();
+  return await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).limit(1).all();
 };
 
 export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
@@ -249,6 +253,19 @@ export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
     .from(users)
     .where(eq(users.id, userid))
     .limit(1);
+};
+
+export const getUsernameForUser = async (c: Context) => {
+  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const userId = c.get("userId");
+  if (!userId)
+    return null;
+
+  const result = await db.select({username: users.username}).from(users)
+    .where(eq(users.id, userId)).limit(1);
+  if (result !== null && result.length > 0)
+    return result[0].username;
+  return null;
 };
 
 export const getUserEmailForHandle = async (env: Bindings, userhandle: string) => {
@@ -360,10 +377,10 @@ const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
 };
 
 export const getViolationsForCurrentUser = async(c: Context) => {
-  const userData = c.get("user");
-  if (userData) {
+  const userId = c.get("userId");
+  if (userId) {
     const db: DrizzleD1Database = drizzle(c.env.DB);
-    return await getViolationsForUser(db, userData.id);
+    return await getViolationsForUser(db, userId);
   } else {
     return {success: false, results: []};
   }

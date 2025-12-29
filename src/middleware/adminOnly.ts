@@ -3,8 +3,7 @@ import { Context } from "hono";
 // This requires that the user is an admin, it must pipe through
 // the auth middleware first.
 export async function adminOnlyMiddleware(c: Context, next: any) {
-  const user = c.get("user");
-  if (user.username === c.env.DEFAULT_ADMIN_USER) {
+  if (c.get("isAdmin")) {
     await next();
     return;
   }

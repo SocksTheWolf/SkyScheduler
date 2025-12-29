@@ -19,7 +19,7 @@ export default function Dashboard(props:any) {
               <h4>SkyScheduler Dash</h4>
               <div>
                 <small>Schedule Bluesky posts effortlessly.</small><br />
-                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body" hx-target="this">{ctx.get("user").username}</b></small>
+                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
               <center class="controls">
                 <button id="refresh-posts" hx-get="/post/all" hx-target="#posts" hx-trigger="click throttle:3s" 
@@ -53,7 +53,7 @@ export default function Dashboard(props:any) {
         </div>
       </div>
       <Settings />
-      <span id="refresh-posts-force" hx-get="/post/all" hx-target="#posts" />
+      <span id="refresh-posts-force" hidden hx-get="/post/all" hx-target="#posts" hx-trigger="accountUpdated from:body, click" />
     </BaseLayout>
   );
 }

@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { html, raw } from "hono/html";
-import { getPostsForUser } from "../utils/dbQuery";
+import { getPostsForUser, getUsernameForUser } from "../utils/dbQuery";
 import { createPostObject } from "../utils/helpers";
 import { Post } from "../types.d";
 
@@ -21,7 +21,7 @@ export function ScheduledPost(props: any) {
   const postID = randomstring.generate(7);
   const content: Post = props.post;
   const username: string = props.user;
-  const hasBeenPosted: boolean = (content.posted === true && content.uri !== undefined);
+  const hasBeenPosted: boolean = (username !== null && content.posted === true && content.uri !== undefined);
   const postURIID: string|null = content.uri ? content.uri.match(/\/((?=[^.]*$).+)/)![0] : null;
 
   return html`
@@ -54,7 +54,7 @@ type ScheduledPostListProps = {
 export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
     const response: Object[]|null = await getPostsForUser(ctx);
-    const username: string = ctx.get("user").username;
+    const username = await getUsernameForUser(ctx);
     if (response !== null) {
       if (response.length > 0) {
         return (

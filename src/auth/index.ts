@@ -137,7 +137,8 @@ export const auth = createAuth();
 // Export for variable types
 type ContextVariables = {
   auth: ReturnType<typeof createAuth>;
-  user: User;
+  userId: string;
+  isAdmin: boolean;
   session: Session;
 };
 
