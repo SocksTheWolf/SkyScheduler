@@ -34,7 +34,7 @@ export type EmbedData = {
   alt?: string;
   title?: string;
   uri?: string;
-  type?: EmbedDataType;
+  type: EmbedDataType;
   description?: string;
   width?: number;
   height?: number;

@@ -172,7 +172,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       // go until we run out of embeds or have hit the amount of embeds per post
       for (; embedsProcessed < MAX_EMBEDS_PER_POST && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
         const currentEmbed:EmbedData = content.embeds[currentEmbedIndex];
-        const currentEmbedType: EmbedDataType = currentEmbed.type || EmbedDataType.Image;
+        const currentEmbedType: EmbedDataType = currentEmbed.type;
 
         // Handle weblinks
         if (currentEmbedType == EmbedDataType.WebLink) {

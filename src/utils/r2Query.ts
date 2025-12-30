@@ -9,7 +9,7 @@ export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|unde
 
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach(async (data) => {
-      if (data.type !== EmbedDataType.WebLink || data.type === undefined) {
+      if (data.type !== EmbedDataType.WebLink) {
         console.log(`Deleting ${data.content}...`);
         itemsToDelete.push(data.content.toLowerCase());
       }
