@@ -62,7 +62,7 @@
   grid-column: auto / span 1;
 }
 
-.max-width-50 article, .dashboard {
+.max-width-50 article, .dashboard, .homepage {
   padding-bottom: 0px;
 }
 
