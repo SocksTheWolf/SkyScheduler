@@ -57,7 +57,6 @@ export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/mp4",
   "video/mpeg",
   "video/webm",
-  "image/gif",
   "video/quicktime"
 ];
 
@@ -67,7 +66,6 @@ export const BSKY_VIDEO_FILE_EXTS: string[] = [
   "mp4v",
   "mpeg",
   "mpg",
-  "gif",
   "m1v",
   "mp2",
   "m2v",
