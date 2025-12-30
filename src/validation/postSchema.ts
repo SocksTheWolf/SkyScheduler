@@ -7,7 +7,7 @@ import isEmpty from "just-is-empty";
 
 const ImageEmbedSchema = z.object({
   content: z.string().nonempty().toLowerCase().regex(fileKeyRegex, "file key for embed is invalid"),
-  type: z.literal(EmbedDataType.Image).optional(),
+  type: z.literal(EmbedDataType.Image),
   alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault(""),
 });
 
