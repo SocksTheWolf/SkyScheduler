@@ -90,7 +90,7 @@ const uploadImageToR2 = async(env: Bindings, file: File) => {
         const response = (
           await env.IMAGES.input(await file.stream())
             .transform(transformRules)
-            .output({ format: "jpeg" })
+            .output({ format: "image/jpeg" })
         ).response();
 
         // Break the responses into two streams so that we can read the data as both an info as well as the actual R2 upload
