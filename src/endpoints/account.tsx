@@ -162,9 +162,9 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
 
   if (createUser.token !== null) {
     // Burn the invite key
-    await useInviteKey(c, signupToken);
+    c.executionCtx.waitUntil(useInviteKey(c, signupToken));
 
-    console.log(`user ${username} created!`);
+    console.log(`user ${username} created! with code ${signupToken}`);
     return c.json({ok: true, message: "signup success"});
   }
   return c.json({ok: false, message: "unknown error occurred"}, 501);
@@ -262,10 +262,10 @@ account.post("/delete", authMiddleware, async (c) => {
       password: password
     });
     if (verify) {
-      await getAllMediaOfUser(c.env, userId)
+      c.executionCtx.waitUntil(getAllMediaOfUser(c.env, userId)
         .then((media) => deleteFromR2(c.env, media))
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
-        .then(() => authCtx.internalAdapter.deleteUser(userId));
+        .then(() => authCtx.internalAdapter.deleteUser(userId)));
       
       c.header("HX-Redirect", "/");
       c.header("HX-Trigger", "accountDeleted");

@@ -44,8 +44,9 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
     customMetadata: {"user": metaData.user}
   });
   if (R2UploadRes) {
-    return {"success": true, "data": R2UploadRes.key, "originalName": metaData.name, "fileSize": metaData.size, 
-      "qualityLevel": metaData.qualityLevel || 100};
+    return {"success": true, "data": R2UploadRes.key, 
+      "originalName": metaData.name, "fileSize": metaData.size, 
+      "qualityLevel": metaData.qualityLevel};
   } else {
     return {"success": false, "error": "unable to push to file storage"};
   }

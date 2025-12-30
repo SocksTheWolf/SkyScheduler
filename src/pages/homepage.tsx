@@ -9,6 +9,7 @@ export default function Home() {
       <NavTags />
       <section class="container">
         <article>
+          <noscript><header>Javascript is required to use this website</header></noscript>
           <p>
             <strong>SkyScheduler</strong> is a free, <a href="https://github.com/socksthewolf/skyscheduler" rel="nofollow" target="_blank">open source</a> service that 
             lets you schedule and automatically repost your content on Bluesky!<br />
