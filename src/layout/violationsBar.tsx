@@ -16,6 +16,8 @@ export async function ViolationNoticeBar(props: any) {
       errorStr = "Your account has been suspended by Bluesky. Some features may not work at this time";
     } else if (violationData.accountGone) {
       errorStr = "Unable to find your account, update your Bluesky handle in the settings";
+    } else if (violationData.mediaTooBig) {
+      errorStr = "You currently have media that's too large for Bluesky (like a video), please delete those posts";
     }
     return (
       <div id="violationBar" class="warning-box">

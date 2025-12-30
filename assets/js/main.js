@@ -102,7 +102,7 @@ function addUsernameFieldWatchers() {
 function addCounter(textField, counter) {
   const textEl = document.getElementById(textField);
   const counterEl = document.getElementById(counter);
-
+  
   Countable.on(textEl, counter => {
     counterEl.innerHTML = `${counter.all}/${MAX_LENGTH}`;
     // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e

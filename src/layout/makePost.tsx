@@ -1,5 +1,8 @@
-import { html } from "hono/html";
-import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING } from "../limits.d"
+import { html, raw } from "hono/html";
+import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, 
+  MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, 
+  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_MIME_TYPES, BSKY_VIDEO_MAX_DURATION, 
+  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_VIDEO_LENGTH_LIMIT} from "../limits.d"
 import { PreloadRules } from "../types.d";
 
 export const PreloadPostCreation:PreloadRules[] = [
@@ -9,9 +12,12 @@ export const PreloadPostCreation:PreloadRules[] = [
 ];
 
 export function PostCreation() {
+  const makeFileTypeStr = (typeMap:string[]) => {
+    return typeMap.map((type) => `"${type}"`).join()
+  };
   return (
   <section>
-    <script src="/dep/dropzone-min.js"></script>
+    <script type="text/javascript" src="/dep/dropzone-min.js"></script>
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
     <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
     <article>
@@ -32,15 +38,18 @@ export function PostCreation() {
             <summary role="button" title="click to toggle" class="secondary outline">Attach Media</summary>
             <section id="imageAttachmentSection">
               <article>
-                <header>Images</header>
-                <div id="imgArea">
-                  <div id="imageUploads" class="dropzone">
-                    <center class="dz-message">Drag or click here to upload images</center>
+                <header>Files</header>
+                <div>
+                  <div id="fileUploads" class="dropzone">
+                    <center class="dz-message">Drag or click here to upload files</center>
                   </div>
                 </div>
                 <footer>
-                <div class="uploadGuidelines"><small>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB or images with 
-                  a res of {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} or higher. Images will be modified to fit Bluesky's requirements.</small></div>
+                <div class="uploadGuidelines"><small><b>Note</b>: <ul>
+                  <li>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB</li>
+                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must have a resolution less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
+                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
+                  </ul></small></div>
                 </footer>
               </article>
             </section>
@@ -113,8 +122,14 @@ export function PostCreation() {
         </footer>
       </form>
       <script type="text/javascript">
+      {raw(`
+      const fileTypesSupported = [${makeFileTypeStr([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES])}];
+      const imageTypes = [${makeFileTypeStr(BSKY_IMG_MIME_TYPES)}];
+      const videoTypes = [${makeFileTypeStr(BSKY_VIDEO_MIME_TYPES)}];
+      `)}
       {html`
         const MAX_LENGTH=${MAX_LENGTH};
+        const MAX_VIDEO_LENGTH=${BSKY_VIDEO_LENGTH_LIMIT};
         updateAllTimes();
       `}
       </script>

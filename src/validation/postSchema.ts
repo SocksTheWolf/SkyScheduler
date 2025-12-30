@@ -1,13 +1,29 @@
-import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, MAX_LENGTH } from "../limits.d";
+import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, 
+  MAX_HOURS_REPOSTING, MAX_LENGTH, BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType, PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
 import isEmpty from "just-is-empty";
 
 const ImageEmbedSchema = z.object({
-  content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid"),
+  content: z.string().nonempty().toLowerCase().regex(fileKeyRegex, "file key for embed is invalid"),
   type: z.literal(EmbedDataType.Image).optional(),
-  alt: z.string().max(MAX_ALT_TEXT, "alt text is too long"),
+  alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault(""),
+});
+
+const VideoEmbedSchema = z.object({
+  content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid"),
+  type: z.literal(EmbedDataType.Video),
+  width: z.number("video width is not a number")
+    .min(0, "width value is below 0")
+    .nonoptional("video width is required"),
+  height: z.number("video height is not a number")
+    .min(0, "height value is below 0")
+    .nonoptional("video height is required"),
+  duration: z.number("video duration is invalid")
+    .min(1, "video must be at least 1 second long")
+    .max(BSKY_VIDEO_LENGTH_LIMIT, `videos must be less than ${BSKY_VIDEO_LENGTH_LIMIT} seconds long`)
+    .nonoptional("video duration is required")
 });
 
 const LinkEmbedSchema = z.object({
@@ -48,7 +64,8 @@ export const PostSchema = z.object({
   ...TextContent.shape,
   embeds: z.discriminatedUnion("type", [
     ImageEmbedSchema,
-    LinkEmbedSchema
+    LinkEmbedSchema,
+    VideoEmbedSchema
   ]).array().optional(),
   label: z.nativeEnum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),

@@ -1,0 +1,1 @@
+ALTER TABLE `violations` ADD `mediaTooBig` integer DEFAULT false;

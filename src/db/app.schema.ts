@@ -41,6 +41,7 @@ export const violations = sqliteTable('violations', {
   userPassInvalid: integer('userPassInvalid', { mode: 'boolean' }).default(false),
   accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),
   accountGone: integer('accountGone', { mode: 'boolean' }).default(false),
+  mediaTooBig: integer('mediaTooBig', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

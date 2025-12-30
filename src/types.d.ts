@@ -24,8 +24,9 @@ export interface Bindings {
 
 export enum EmbedDataType {
   None = 0,
-  Image,
-  WebLink
+  Image = 1,
+  WebLink,
+  Video = 3
 };
 
 export type EmbedData = {
@@ -35,6 +36,9 @@ export type EmbedData = {
   uri?: string;
   type?: EmbedDataType;
   description?: string;
+  width?: number;
+  height?: number;
+  duration?: number;
 };
 
 export enum PostLabel {
@@ -72,6 +76,7 @@ export type Violation = {
   userPassInvalid: boolean;
   accountSuspended: boolean;
   accountGone: boolean;
+  mediaTooBig: boolean;
   createdAt: string;
 };
 

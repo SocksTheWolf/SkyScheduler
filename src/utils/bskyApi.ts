@@ -1,6 +1,6 @@
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType } from '../types.d';
-import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_LENGTH, MAX_POSTED_LENGTH } from '../limits.d';
+import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
@@ -99,6 +99,11 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
   return bWasSuccess;
 };
 
+type InternalEmbedProcess = {
+  type: EmbedDataType;
+  data: any;
+}
+
 export const makePostRaw = async (env: Bindings, content: Post) => {
   const loginCreds = await getBskyUserPassForId(env, content.user);
   const {user, pass, pds} = loginCreds[0];
@@ -161,42 +166,74 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
 
     // Upload any embeds to this post
     if (content.embeds?.length) {
+      let finalEmbed: InternalEmbedProcess|null = null;
       let imagesArray = [];
-      let externalData: LooseObj = {};
       let embedsProcessed: number = 0;
       // go until we run out of embeds or have hit the amount of embeds per post
       for (; embedsProcessed < MAX_EMBEDS_PER_POST && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
         const currentEmbed:EmbedData = content.embeds[currentEmbedIndex];
-        const currentEmbedType:EmbedDataType = currentEmbed.type || EmbedDataType.Image;
+        const currentEmbedType: EmbedDataType = currentEmbed.type || EmbedDataType.Image;
+
+        // Handle weblinks
+        if (currentEmbedType == EmbedDataType.WebLink) {
+          let externalData: LooseObj = {
+            url: currentEmbed.uri,
+            title: currentEmbed.title,
+            description: currentEmbed.description
+          };
+
+          // Attempt to fetch the thumbnail
+          if (!isEmpty(currentEmbed.content)) {
+            try {
+              const thumbnail = await fetch(currentEmbed.content);
+              if (thumbnail.ok) {
+                const imageBlob = await thumbnail.blob();
+                const thumbEncode = thumbnail.headers.get("content-type") || "image/png";
+                const uploadImg = await agent.uploadBlob(imageBlob, {encoding: thumbEncode });
+                externalData.thumb = uploadImg.data.blob;
+              } else {
+                console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
+              }
+            } catch(err) {
+              console.warn(`Failed to fetch thumbnail ${err} for embed ${currentEmbed.content}, removing thumb`);
+            }
+          }
+          finalEmbed = {type: EmbedDataType.WebLink, data: externalData};
+          break;
+        }
+
+        // Otherwise pull files from storage
+        const file = await env.R2.get(currentEmbed.content);
+        if (!file) {
+          console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
+          return false;
+        }
+        // Process the file and upload it to the blob service
+        const fileBlob = await file.blob();
+        let uploadFile = null;
+        try {
+          uploadFile = await agent.uploadBlob(fileBlob, {encoding: file.httpMetadata?.contentType });
+        } catch (err) {
+          // TODO: Give violation mediaTooBig if the file is too large.
+          console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
+          return false;
+        }
+
+        // if we fail to upload anything, early out entirely.
+        if (!uploadFile.success) {
+          console.warn(`failed to upload ${currentEmbed.content} to blob service`);
+          return false;
+        } 
+
+        // Handle images
         if (currentEmbedType == EmbedDataType.Image) {
-          const file = await env.R2.get(currentEmbed.content);
-          if (!file) {
-            console.warn(`Could not get the image ${currentEmbed.content} from R2 for post!`);
-            return false;
-          }
-
-          // Process the file and upload it to the blob service
-          const imageBlob = await file.blob();
-          let uploadImg = null;
-          try {
-            uploadImg = await agent.uploadBlob(imageBlob, {encoding: file.httpMetadata?.contentType });
-          } catch (err) {
-            console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
-            return false;
-          }
-
-          if (!uploadImg.success) {
-            console.warn(`image failed to upload ${currentEmbed.content} to blob service`);
-            // if we fail to upload anything, early out entirely.
-            return false;
-          } 
           // we were able to upload to the blob, go ahead and add the image record to the post
           const bskyMetadata: LooseObj = {
-            image: uploadImg.data.blob,
+            image: uploadFile.data.blob,
             alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT)
           };
           // Attempt to get the width and height of the image file.
-          const sizeResult = await imageDimensionsFromStream(await imageBlob.stream());
+          const sizeResult = await imageDimensionsFromStream(await fileBlob.stream());
           // If we were able to parse the width and height of the image, 
           // then append the "aspect ratio" into the image record.
           if (sizeResult) {
@@ -208,38 +245,42 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
           // Push the image data to the array.
           imagesArray.push(bskyMetadata);
 
-        } else if (currentEmbedType == EmbedDataType.WebLink && imagesArray.length == 0) {
-          // only process links if we have no images.
-          externalData.uri = currentEmbed.uri;
-          externalData.title = currentEmbed.title;
-          externalData.description = currentEmbed.description;
-          // Attempt to fetch the thumbnail
-          if (!isEmpty(currentEmbed.content)) {
-            const thumbnail = await fetch(currentEmbed.content);
-            if (thumbnail.ok) {
-              const imageBlob = await thumbnail.blob();
-              const thumbEncode = thumbnail.headers.get("content-type") || "image/png";
-              const uploadImg = await agent.uploadBlob(imageBlob, {encoding: thumbEncode });
-              externalData.thumb = uploadImg.data.blob;
-            } else {
-              console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
+          // Handle videos
+        } else if (currentEmbedType == EmbedDataType.Video) {
+          const bskyMetadata: LooseObj = {
+            blob: uploadFile.data.blob,
+            ar: {
+              width: currentEmbed.width,
+              height: currentEmbed.height
             }
           }
+          finalEmbed = {type: EmbedDataType.Video, data: bskyMetadata};
           break;
         }
       }
-      // Push the embed images into the post record.
-      if (imagesArray.length > 0) {
+      if (imagesArray.length > 0 && finalEmbed == null)
+        finalEmbed = {type: EmbedDataType.Image, data: imagesArray};
+
+      switch (finalEmbed?.type) {
+        case EmbedDataType.Image:
         (postRecord as any).embed = {
-          "images": imagesArray,
-          "$type": "app.bsky.embed.images"
+          "$type": "app.bsky.embed.images",
+          "images": finalEmbed.data
         }
-      } else {
-        // push the web link as a post
-        (postRecord as any).embed = {
-          "$type": "app.bsky.embed.external",
-          "external": externalData
-        }
+        break;
+        case EmbedDataType.WebLink:
+          (postRecord as any).embed = {
+            "$type": "app.bsky.embed.external",
+            "external": finalEmbed.data
+          }
+        break;
+        case EmbedDataType.Video:
+          (postRecord as any).embed = {
+            "$type": "app.bsky.embed.video",
+            "video": finalEmbed.data.blob,
+            "aspectRatio": finalEmbed.data.ar
+          }
+        break;
       }
     }
 

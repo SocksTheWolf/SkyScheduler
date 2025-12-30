@@ -6,6 +6,16 @@ const urlCardBox = document.getElementById('urlCard');
 const imageAttachmentSection = document.getElementById("imageAttachmentSection");
 const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
 
+function addOnUnloadBlocker() {
+  window.onbeforeunload = function() {
+    document.querySelectorAll(".fileDel").forEach((el) => {el.click();});
+    return false;
+  }
+}
+function clearOnUnloadBlocker() {
+  window.onbeforeunload = null;
+}
+
 function resetForm() {
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
@@ -15,6 +25,7 @@ function resetForm() {
   showContentLabeler(false);
   setSelectDisable(true);
   showPostProgress(false);
+  clearOnUnloadBlocker();
 }
 
 urlCardBox.addEventListener("paste", () => {
@@ -29,14 +40,15 @@ urlCardBox.addEventListener("change", () => {
 });
 
 let fileData = new Map();
-let fileDropzone = new Dropzone("#imageUploads", { 
+let fileDropzone = new Dropzone("#fileUploads", { 
   url: "/post/upload", 
   autoProcessQueue: true,
   maxFilesize: 70000000,
-  acceptedFiles: "image/*"
+  acceptedFiles: fileTypesSupported.toString()
 });
 
 fileDropzone.on("reset", () => {
+  clearOnUnloadBlocker();
   showContentLabeler(false);
   toggleElementVisibleState(linkAttachmentSection, true);
 });
@@ -44,7 +56,7 @@ fileDropzone.on("reset", () => {
 fileDropzone.on("addedfile", file => {
   toggleElementVisibleState(linkAttachmentSection, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
-  const removeButton = Dropzone.createElement("<button class='outline btn-error' disabled><small>Remove file</small></button>");
+  const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
   
   addAltText.addEventListener("click", function(e) {
@@ -84,24 +96,48 @@ fileDropzone.on("addedfile", file => {
       } else {
         fileData.delete(file.name);
         fileDropzone.removeFile(file);
-        pushToast(`Deleted file ${file.name}`, true);
+        if (!removeButton.hasAttribute("bad"))
+          pushToast(`Deleted file ${file.name}`, true);
       }
       if (fileData.length == 0) {
         toggleElementVisibleState(linkAttachmentSection, true);
       }
     });
   });
-  buttonHolder.appendChild(addAltText);
+  if (imageTypes.includes(file.type))
+    buttonHolder.appendChild(addAltText);
+
   buttonHolder.appendChild(removeButton);
   file.previewElement.appendChild(buttonHolder);
 });
 fileDropzone.on("success", function(file, response) {
   // show the labels
   showContentLabeler(true);
-
-  console.log(`Adding ${file.name} to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel}`);
-  fileData.set(file.name, {content: response.data, alt: "", type: 1});
-
+  const fileIsImage = imageTypes.includes(file.type);
+  const fileIsVideo = videoTypes.includes(file.type);
+  console.log(`Adding ${file.name} (${file.type}) to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel || 100}`);
+  if (fileIsVideo) {
+    // Attempt to process the video type
+    const videoTag = document.createElement("video");
+    videoTag.setAttribute("hidden", true);
+    videoTag.setAttribute("src", URL.createObjectURL(file));
+    videoTag.addEventListener("loadeddata", () => {
+      const videoDuration = videoTag.duration;
+      fileData.set(file.name, {content: response.data, type: 3, 
+        height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
+      if (videoDuration > MAX_VIDEO_LENGTH) {
+        const delButton = file.previewElement.querySelectorAll(".fileDel")[0];
+        delButton.setAttribute("bad", true);
+        delButton.click();
+        pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
+      }
+      videoTag.remove();
+    });
+    document.body.appendChild(videoTag);
+  } else {
+    fileData.set(file.name, {content: response.data, type: 1});
+  }
+  
   // Make the buttons pressable
   file.previewElement.querySelectorAll("button").forEach(el => {
     el.removeAttribute("disabled");
@@ -113,13 +149,16 @@ fileDropzone.on("success", function(file, response) {
     const detailsArea = file.previewElement.querySelector(".dz-details");
     fileSizeElement.firstChild.innerHTML = fileDropzone.filesize(response.fileSize);
     // and the quality compression as well
-    const fileQualityLevel = Dropzone.createElement(`<div class="dz-size"><span>Quality: ${response.qualityLevel}%</span></div>`);
+    const fileQualityLevel = Dropzone.createElement(`<div class="dz-size"><span>Quality: ${response.qualityLevel || 100}%</span></div>`);
     detailsArea.insertBefore(fileQualityLevel, fileSizeElement);
   } catch (err) {
     console.error(err);
   }
   
-  this.createThumbnailFromUrl(file, response.data);
+  addOnUnloadBlocker();
+
+  if (fileIsImage)
+    this.createThumbnailFromUrl(file, response.data);
 });
 
 fileDropzone.on("error", function(file, msg) {
@@ -307,3 +346,4 @@ function showPostProgress(shouldShow) {
 // Handle character counting
 addCounter("content", "count");
 resetForm();
+
