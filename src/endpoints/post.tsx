@@ -22,7 +22,7 @@ post.use(corsHelperMiddleware);
 // Create media upload
 post.post("/upload", authMiddleware, async (c: Context) => {
   const formData = await c.req.parseBody();
-  const fileUploadResponse = await uploadFileR2(c.env, formData['file']);
+  const fileUploadResponse = await uploadFileR2(c.env, formData['file'], c.get("userId"));
   if (fileUploadResponse.success === false)
     return c.json(fileUploadResponse, 400);
   else

@@ -4,6 +4,13 @@ import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FIL
   BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
+type FileMetaData = {
+  name: string,
+  size: number,
+  user: string
+  qualityLevel?: number;
+};
+
 export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
   let itemsToDelete:string[] = [];
 
@@ -20,29 +27,31 @@ export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|unde
 };
 
 export const deleteFromR2 = async (env: Bindings, embeds: string[]) => {
+  // TODO: It would be nice to waitUntil this, but a couple of places need to pass over the context and not just the Bindings
+  // Also consider pushing this data into another D1 table
   if (embeds.length > 0)
     await env.R2.delete(embeds);
 };
 
-const rawUploadToR2 = async (env: Bindings, inFileName: string, buffer: ArrayBuffer|ReadableStream, 
-    fileSize: number, additionalArgs: any={}) => {
-  const fileExt:string|undefined = inFileName.split(".").pop();
+const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
+  const fileExt:string|undefined = metaData.name.split(".").pop();
   if (fileExt === undefined) {
     return {"success": false, "error": "unable to upload, file name is invalid"};
   }
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
-  const R2UploadRes = await env.R2.put(fileName, buffer);
+  const R2UploadRes = await env.R2.put(fileName, buffer, {
+    customMetadata: {"user": metaData.user}
+  });
   if (R2UploadRes) {
-    return {"success": true, "data": R2UploadRes.key, "originalName": inFileName, 
-      "fileSize": fileSize, ...additionalArgs};
-
+    return {"success": true, "data": R2UploadRes.key, "originalName": metaData.name, "fileSize": metaData.size, 
+      "qualityLevel": metaData.qualityLevel || 100};
   } else {
-    return {"success": false, "error": "unable to push to R2"};
+    return {"success": false, "error": "unable to push to file storage"};
   }
 };
 
-const uploadImageToR2 = async(env: Bindings, file: File) => {
+const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
   const originalName = file.name;
   let finalFileSize = file.size;
   let finalQualityLevel = 100;
@@ -124,18 +133,30 @@ const uploadImageToR2 = async(env: Bindings, file: File) => {
     }
   }
 
-  return await rawUploadToR2(env, originalName, fileToProcess, finalFileSize, {"qualityLevel": finalQualityLevel});
+  const fileMetaData: FileMetaData = {
+    name: originalName,
+    size: finalFileSize,
+    user: userId,
+    qualityLevel: finalQualityLevel
+  };
+  return await rawUploadToR2(env, fileToProcess, fileMetaData);
 };
 
-const uploadVideoToR2 = async (env: Bindings, file: File) => {
+const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
   // Technically this will never hit because it is greater than our own internal limits
   if (file.size > BSKY_VIDEO_SIZE_LIMIT) {
     return {"success": false, "error": `max video size is ${BSKY_VIDEO_SIZE_LIMIT}MB`};
   }  
-  return await rawUploadToR2(env, file.name, await file.stream(), file.size);
+
+  const fileMetaData: FileMetaData = {
+    name: file.name,
+    size: file.size,
+    user: userId
+  };
+  return await rawUploadToR2(env, await file.stream(), fileMetaData);
 };
 
-export const uploadFileR2 = async (env: Bindings, file: File|string) => {
+export const uploadFileR2 = async (env: Bindings, file: File|string, userId: string) => {
   if (!(file instanceof File)) {
     console.warn("Failed to upload");
     return {"success": false, "error": "data invalid"};
@@ -148,9 +169,9 @@ export const uploadFileR2 = async (env: Bindings, file: File|string) => {
 
   const fileType: string = file.type.toLowerCase();
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
-    return await uploadImageToR2(env, file);
+    return await uploadImageToR2(env, file, userId);
   } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
-    return await uploadVideoToR2(env, file);
+    return await uploadVideoToR2(env, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};
 };
