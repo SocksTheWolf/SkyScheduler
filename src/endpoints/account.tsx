@@ -134,6 +134,11 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "user already exists"}, 401);
   }
 
+  // Prevent sign ups with these accounts, they are setup using a different method.
+  if (username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) {
+    return c.json({ok: false, message: "forbidden account"});
+  }
+
   // Check to see if we're using invite keys, and if so, check em.
   if (await doesInviteKeyHaveValues(c, signupToken) === false) {
     return c.json({ok: false, message: "invalid signup token value"}, 400);
