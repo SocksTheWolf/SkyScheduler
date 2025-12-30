@@ -11,7 +11,7 @@ export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|unde
     if (inviteKey === undefined)
       return false;
 
-    const value = await c.env.INVITE_POOL.get(inviteKey.toLowerCase());
+    const value = await c.env.INVITE_POOL.get(inviteKey);
     // Key does not exist
     if (value === null)
       return false;
@@ -37,8 +37,7 @@ export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
     if (inviteKey === undefined)
       return;
 
-    const loweredKey = inviteKey.toLowerCase();
-    const value = await c.env.INVITE_POOL.get(loweredKey);
+    const value = await c.env.INVITE_POOL.get(inviteKey);
     if (value === null) {
       console.error(`attempted to use invite key ${inviteKey} but is invalid`);
       return;
@@ -48,7 +47,7 @@ export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
     
     // handle NaN
     if (isNaN(amount)) {
-      console.warn(`${loweredKey} has the value of ${value} which triggers NaN.`);
+      console.warn(`${inviteKey} has the value of ${value} which triggers NaN.`);
       return;
     }
 
@@ -59,12 +58,12 @@ export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
     let newValue: number = amount - 1;
     // Delete any keys that fall to 0, they should be removed from the db
     if (newValue <= 0) {
-      await c.env.INVITE_POOL.delete(loweredKey);
+      await c.env.INVITE_POOL.delete(inviteKey);
       return;
     }
 
     // put the new value on the stack
-    await c.env.INVITE_POOL.put(loweredKey, newValue.toString());
+    await c.env.INVITE_POOL.put(inviteKey, newValue.toString());
   }
 }
 

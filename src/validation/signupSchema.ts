@@ -5,5 +5,5 @@ export const SignupSchema = z.object({
   ...UsernameSchema.shape,
   ...PasswordSchema.shape,
   ...BSkyAppPasswordSchema.shape,
-  signupToken: z.string().trim().optional(),
+  signupToken: z.string().trim().toLowerCase().optional(),
 });
