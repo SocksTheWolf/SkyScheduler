@@ -60,7 +60,7 @@ IMAGE_DEGRADE_PER_STEP=5
 
 # Signup options
 USE_TURNSTILE_CAPTCHA=true
-USE_INVITE_KEYS=true
+USE_INVITE_KEYS=false
 
 # link to invite threads
 INVITE_THREAD="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"

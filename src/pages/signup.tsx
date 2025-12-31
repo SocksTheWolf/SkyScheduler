@@ -53,6 +53,13 @@ export default function Signup(props:any) {
           </label>
         ) : ''}
 
+        <label>
+          <input type="checkbox" name="agreeTerms" />
+          Agree to Terms
+          <br /><small>Check the box if you agree to our <a href="/privacy" class="secondary" target="_blank" title="link to privacy policy">privacy policy
+          </a> and <a href="/tos" class="secondary" target="_blank" title="link to terms of service">terms of service</a></small>
+        </label>
+
         <TurnstileCaptcha c={ctx} />
       </AccountHandler>
     </BaseLayout>

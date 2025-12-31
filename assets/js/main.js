@@ -154,7 +154,10 @@ function rawSubmitHandler(url, successCallback) {
     loadingBar.removeAttribute("hidden");
     let postObject = {};
     document.querySelectorAll("input").forEach((el) => {
-      postObject[el.name] = el.value;
+      if (el.getAttribute("type") === "checkbox")
+        postObject[el.name] = el.checked;
+      else
+        postObject[el.name] = el.value;
     });
     try {
       const response = await fetch(url, {

@@ -19,6 +19,8 @@ import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
 import { makeConstScript } from "./utils/scriptGen";
+import TermsOfService from "./pages/tos";
+import PrivacyPolicy from "./pages/privacy";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -63,7 +65,15 @@ app.get("/js/consts.js", (c) => {
 // Add contact link
 app.all("/contact", (c) => {
   return c.redirect(c.env.CONTACT_LINK);
-})
+});
+
+// Legal linkies
+app.get("/tos", (c) => {
+  return c.html(<TermsOfService />);
+});
+app.get("/privacy", (c) => {
+  return c.html(<PrivacyPolicy />);
+});
 
 // Dashboard route
 app.get("/dashboard", authMiddleware, (c) => {
