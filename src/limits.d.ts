@@ -38,7 +38,7 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_IMG_FILE_EXTS: string[] = [
+export const BSKY_IMG_FILE_EXTS: string = [
   "png",
   "jpg",
   "jpeg",
@@ -46,7 +46,7 @@ export const BSKY_IMG_FILE_EXTS: string[] = [
   "webp",
   "heic",
   "svg"
-];
+].join(", ");
 
 // BSky limits that are inferred
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
@@ -70,7 +70,7 @@ export const BSKY_GIF_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_VIDEO_FILE_EXTS: string[] = [
+export const BSKY_VIDEO_FILE_EXTS: string = [
   "mp4",
   "m4v",
   "mp4v",
@@ -82,8 +82,8 @@ export const BSKY_VIDEO_FILE_EXTS: string[] = [
   "mov",
   "qt",
   "webm",
-  "gif" /* This is handled in a special case because bluesky */
-];
+  "animated gif" /* This is handled in a special case because bluesky */
+].join(", ");
 
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * TO_MiB;

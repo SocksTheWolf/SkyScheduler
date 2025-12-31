@@ -37,7 +37,7 @@ export function PostCreation() {
           </article>
 
           <details>
-            <summary role="button" title="click to toggle" class="secondary outline">Attach Media</summary>
+            <summary role="button" title="click to toggle section" class="secondary outline">Attach Media/Link</summary>
             <section id="imageAttachmentSection">
               <article>
                 <header>Files</header>
@@ -57,10 +57,10 @@ export function PostCreation() {
             </section>
             <section id="webLinkAttachmentSection">
               <article>
-                <header>URL Embed</header>
+                <header>Link Embed</header>
                 <input type="text" id="urlCard" placeholder="https://" value="" />
-                <small>Add a social embed card for a link to your post. This link will not count against your {MAX_LENGTH} characters per post.</small>
-                <footer><div class="uploadGuidelines"><small><b>NOTE</b>: Image media will supersede any links being posted.</small></div></footer>
+                <small>Add a social embed card for a link to your post. This link will not count against the {MAX_LENGTH} character limit.</small>
+                <footer><div class="uploadGuidelines"><small><b>NOTE</b>: File uploads will <b>always supersede</b> any link embeds.</small></div></footer>
               </article>
             </section>
             <section id="content-label-selector" class="hidden">
@@ -80,7 +80,7 @@ export function PostCreation() {
             </section>
           </details>
           <details open>
-            <summary title="click to toggle" role="button" class="outline secondary">Post Scheduling</summary>
+            <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
             <section>
               <article>
                 <header>Schedule Date</header>
@@ -96,11 +96,11 @@ export function PostCreation() {
           </details>
 
           <details>
-            <summary role="button" title="click to toggle" class="secondary outline">Reposting</summary>
+            <summary role="button" title="click to toggle section" class="secondary outline">Auto-Retweet</summary>
             <section>
-            <input type="checkbox" id="makeReposts" /> Should Repost? 
+            <input type="checkbox" id="makeReposts" /> Should Auto-Retweet? 
             <center id="repostScheduleSimple">
-                Automatically repost this content every 
+                Automatically retweet this content every 
                 <select id="hoursInterval" disabled>
                   {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
                     if (i == 0) return;
@@ -113,7 +113,7 @@ export function PostCreation() {
                     if (i == 0) return;
                     return (<option value={i}>{i}</option>);
                   })}
-                </select> times from its posting.
+                </select> times from the post time.
             </center>
           </section>
           </details>
