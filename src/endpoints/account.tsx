@@ -73,8 +73,8 @@ account.post("/update", authMiddleware, async (c) => {
 
   const auth = c.get("auth");
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
-  let newObject:LooseObj = {};
-  if (!isEmpty(username))
+  let newObject: LooseObj = {};
+  if (!isEmpty(username) && username !== c.env.RESET_BOT_USERNAME)
     newObject.username = username!;
 
   if (!isEmpty(bskyAppPassword))
