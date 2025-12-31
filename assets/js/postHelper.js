@@ -3,6 +3,7 @@ const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
 const urlCardBox = document.getElementById('urlCard');
 const content = document.getElementById('content');
+let hasFileLimit = false;
 
 const imageAttachmentSection = document.getElementById("imageAttachmentSection");
 const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
@@ -20,6 +21,7 @@ function clearOnUnloadBlocker() {
 function resetForm() {
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
+  hasFileLimit = false;
   urlCardBox.value = "";
   toggleElementVisibleState(imageAttachmentSection, true);
   toggleElementVisibleState(linkAttachmentSection, true);
@@ -49,12 +51,18 @@ let fileDropzone = new Dropzone("#fileUploads", {
 });
 
 fileDropzone.on("reset", () => {
+  hasFileLimit = false;
   clearOnUnloadBlocker();
   showContentLabeler(false);
   toggleElementVisibleState(linkAttachmentSection, true);
 });
 
 fileDropzone.on("addedfile", file => {
+  if (hasFileLimit === true) {
+    fileDropzone.removeFile(file);
+    pushToast("Maximum number of files reached", false);
+    return;
+  }
   toggleElementVisibleState(linkAttachmentSection, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
@@ -135,6 +143,7 @@ fileDropzone.on("success", function(file, response) {
         deleteFileOnError();
       } else {
         fileData.set(file.name, {content: response.data, type: 3, height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
+        hasFileLimit = true;
       }
       videoTag.remove();
     });
@@ -175,6 +184,7 @@ fileDropzone.on("success", function(file, response) {
         deleteFileOnError();
       } else {
         fileData.set(file.name, { content: response.data, type: 3, height: imgObj.height, width: imgObj.width, duration: videoDuration });
+        hasFileLimit = true;
       }
     };
     imgObj.src = URL.createObjectURL(file);
