@@ -34,7 +34,7 @@ export default function Home() {
               <li>Supports embeds, links, tagging, mentions</li>
               <li>Post <span data-tooltip={`images and video (up to ${CF_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with content labels and full support for alt text</li>
               <li>Automatically repost your posts at an interval of your choosing, up to {MAX_REPOST_INTERVAL-1} times every {MAX_HOURS_REPOSTING-1} hours</li>
-              <li>Edit the content of pending posts before posting</li>
+              <li>Edit the content of pending posts before they are posted</li>
             </ul>
           </p>
           <footer>
