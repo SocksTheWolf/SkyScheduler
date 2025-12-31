@@ -190,7 +190,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
   // if it is, then go about getting all the data for the form
   try {
     const postObject = {
-        contentVal,
+        content: contentVal,
         scheduledDate: dateTime,
         makePostNow: postNow,
         repostData: undefined
