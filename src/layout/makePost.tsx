@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, 
-  MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, BSKY_VIDEO_MAX_DURATION, 
+  MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS } from "../limits.d"
 import { PreloadRules } from "../types.d";
 
@@ -102,13 +102,14 @@ export function PostCreation() {
             <center id="repostScheduleSimple">
                 Automatically repost this content every 
                 <select id="hoursInterval" disabled>
-                  {[...Array(MAX_HOURS_REPOSTING)].map((x, i) => {
+                  {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
                     if (i == 0) return;
-                    return (<option value={i}>{i}</option>);
+                    const dayStr = i % 24 === 0 ? ` (${i/24} day)` : '';
+                    return (<option value={i}>{i}{dayStr}</option>);
                   })}
                 </select> hours 
                 <select id="timesInterval" disabled>
-                  {[...Array(MAX_REPOST_INTERVAL)].map((x, i) => {
+                  {[...Array(MAX_REPOST_INTERVAL_LIMIT)].map((x, i) => {
                     if (i == 0) return;
                     return (<option value={i}>{i}</option>);
                   })}

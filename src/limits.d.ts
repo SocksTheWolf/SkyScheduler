@@ -1,7 +1,9 @@
 export const MIN_LENGTH: number = 1;
-// Remember to add +1 to whatever limit you are setting
-export const MAX_REPOST_INTERVAL: number = 11;
-export const MAX_HOURS_REPOSTING: number = 164;
+export const MAX_REPOST_INTERVAL: number = 10;
+export const MAX_REPOST_DAYS: number = 7;
+// Maximums used internally
+export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
+export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;

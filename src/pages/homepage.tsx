@@ -1,7 +1,7 @@
 import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
-import { MAX_HOURS_REPOSTING, MAX_REPOST_INTERVAL, CF_FILE_SIZE_LIMIT_IN_MB } from "../limits.d";
+import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL, CF_FILE_SIZE_LIMIT_IN_MB, MAX_REPOST_DAYS } from "../limits.d";
 
 export default function Home() {
   return (
@@ -33,7 +33,7 @@ export default function Home() {
               <li>Schedule your posts any time in the future (to the nearest hour)</li>
               <li>Supports embeds, links, tagging, mentions</li>
               <li>Post <span data-tooltip={`images and video (up to ${CF_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with content labels and full support for alt text</li>
-              <li>Automatically repost your posts at an interval of your choosing, up to {MAX_REPOST_INTERVAL-1} times every {MAX_HOURS_REPOSTING-1} hours</li>
+              <li>Automatically repost your posts at an interval of your choosing, up to {MAX_REPOST_INTERVAL} times every {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
               <li>Edit the content of pending posts before they are posted</li>
             </ul>
           </p>

@@ -1,5 +1,5 @@
-import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL, 
-  MAX_HOURS_REPOSTING, MAX_LENGTH, BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
+import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL_LIMIT, 
+  MAX_REPOST_IN_HOURS, MAX_LENGTH, BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType, PostLabel } from "../types.d";
 import { fileKeyRegex } from "./regexCases";
 import * as z from "zod/v4";
@@ -70,8 +70,8 @@ export const PostSchema = z.object({
   label: z.nativeEnum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
-    hours: z.coerce.number().min(1).max(MAX_HOURS_REPOSTING),
-    times: z.coerce.number().min(1).max(MAX_REPOST_INTERVAL)
+    hours: z.coerce.number().min(1).max(MAX_REPOST_IN_HOURS),
+    times: z.coerce.number().min(1).max(MAX_REPOST_INTERVAL_LIMIT)
   }).optional(),
   scheduledDate: z.string().refine((date) => {
     try {
