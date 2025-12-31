@@ -21,7 +21,7 @@ const VideoEmbedSchema = z.object({
     .min(0, "height value is below 0")
     .nonoptional("video height is required"),
   duration: z.number("video duration is invalid")
-    .min(1, "video must be at least 1 second long")
+    .min(0.02, "video must be at least 0.02 seconds long")
     .max(BSKY_VIDEO_LENGTH_LIMIT, `videos must be less than ${BSKY_VIDEO_LENGTH_LIMIT} seconds long`)
     .nonoptional("video duration is required")
 });
