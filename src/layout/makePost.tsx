@@ -1,24 +1,26 @@
-import { html, raw } from "hono/html";
+import { html } from "hono/html";
 import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, 
-  MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, 
-  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_MIME_TYPES, BSKY_VIDEO_MAX_DURATION, 
-  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_VIDEO_LENGTH_LIMIT} from "../limits.d"
+  MAX_REPOST_INTERVAL, MAX_HOURS_REPOSTING, BSKY_VIDEO_MAX_DURATION, 
+  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS } from "../limits.d"
 import { PreloadRules } from "../types.d";
 
-export const PreloadPostCreation:PreloadRules[] = [
-    {type: "script", href: "/dep/dropzone-min.js"}, 
-    {type: "style", href: "/dep/dropzone.css"}, 
-    {type: "style", href: "/css/dropzoneMods.css"}
+export const PreloadPostCreation: PreloadRules[] = [
+  {type: "script", href: "/js/consts.js"}, 
+  {type: "script", href: "/dep/dropzone-min.js"}, 
+  {type: "style", href: "/dep/dropzone.css"}, 
+  {type: "style", href: "/css/dropzoneMods.css"},
+  {type: "style", href: "/dep/tribute.css"},
+  {type: "script", href: "/dep/tribute.min.js"}
 ];
 
 export function PostCreation() {
-  const makeFileTypeStr = (typeMap:string[]) => {
-    return typeMap.map((type) => `"${type}"`).join()
-  };
   return (
   <section>
     <script type="text/javascript" src="/dep/dropzone-min.js"></script>
+    <script type="text/javascript" src="/dep/tribute.min.js"></script>
+    <script type="text/javascript" src="/js/consts.js"></script>
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
+    <link href="/dep/tribute.css" rel="stylesheet" type="text/css" />
     <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
     <article>
       <form id="postForm">
@@ -122,14 +124,7 @@ export function PostCreation() {
         </footer>
       </form>
       <script type="text/javascript">
-      {raw(`
-      const fileTypesSupported = [${makeFileTypeStr([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES])}];
-      const imageTypes = [${makeFileTypeStr(BSKY_IMG_MIME_TYPES)}];
-      const videoTypes = [${makeFileTypeStr(BSKY_VIDEO_MIME_TYPES)}];
-      `)}
       {html`
-        const MAX_LENGTH=${MAX_LENGTH};
-        const MAX_VIDEO_LENGTH=${BSKY_VIDEO_LENGTH_LIMIT};
         updateAllTimes();
       `}
       </script>

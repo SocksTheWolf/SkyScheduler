@@ -2,6 +2,7 @@ const repostCheckbox = document.getElementById('makeReposts');
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
 const urlCardBox = document.getElementById('urlCard');
+const content = document.getElementById('content');
 
 const imageAttachmentSection = document.getElementById("imageAttachmentSection");
 const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
@@ -173,7 +174,7 @@ fileDropzone.on("error", function(file, msg) {
 document.getElementById('postForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   showPostProgress(true);
-  const content = document.getElementById('content').value;
+  const contentVal = content.value;
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
   // Handle conversion of date time to make sure that it is correct.
@@ -189,7 +190,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
   // if it is, then go about getting all the data for the form
   try {
     const postObject = {
-        content,
+        contentVal,
         scheduledDate: dateTime,
         makePostNow: postNow,
         repostData: undefined
@@ -343,7 +344,54 @@ function showPostProgress(shouldShow) {
   }
 }
 
+function searchBSkyMentions(query, callback) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${query}&limit=${MAX_AUTO_COMPLETE_NAMES}`);
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      // Request good
+      if (xhr.status === 200) {
+        try {
+          const returnData = JSON.parse(xhr.responseText);
+          callback(returnData.actors);
+          return;
+        } catch(err) {
+          console.error(`failed to parse bsky mention list ${err}`)
+        }
+      }
+      console.error(`fetching bluesky mentionlist returned ${xhr.status}`);
+      callback([]);
+    }
+  }
+  xhr.send();
+}
+
+const mentionTribute = new Tribute({
+  menuItemTemplate: function(item) {
+    const avatarStr = item.original.avatar !== undefined ? `<img src="${item.original.avatar}">` : "";
+    return `${avatarStr}<span><code>${item.original.displayName}</code><br /> <small>@${item.original.handle}</small></span>`;
+  },
+  values: function(text, cb) {
+    searchBSkyMentions(text, item => cb(item));
+  },
+  noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
+  lookup: 'handle',
+  fillAttr: 'handle',
+  spaceSelectsMatch: true,
+  menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
+  menuShowMinLength: 3
+});
+
+function tributeToElement(el, add=true) {
+  if (add)
+    mentionTribute.attach(el);
+  else
+    mentionTribute.detach(el);
+}
+
 // Handle character counting
 addCounter("content", "count");
+// Add mentions
+tributeToElement(content);
 resetForm();
 

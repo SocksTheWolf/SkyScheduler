@@ -167,6 +167,7 @@ dialog button.btn-error {
 .uploadGuidelines {
   margin-left: 10px;
 }
+
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
   100% {

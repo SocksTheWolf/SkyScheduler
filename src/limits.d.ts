@@ -85,3 +85,5 @@ export const CF_MAX_DIMENSION: number = 10000;
 
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
+
+export const BSKY_NAME_LOOKUP_LIMIT: number = 6;

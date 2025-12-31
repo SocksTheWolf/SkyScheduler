@@ -1,0 +1,52 @@
+.tribute-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  overflow: auto;
+  display: block;
+  z-index: 999999;
+  margin-top: 20px;
+  /*background-color: var(--pico-code-background-color);*/
+  background-color: var(--pico-card-sectioning-background-color);
+  box-shadow: 3px 2px lightgray;
+}
+.tribute-container ul {
+  margin: 0;
+  margin-top: 2px;
+  padding: 0;
+  list-style: none;
+}
+.tribute-container li {
+  border-top: 1px solid var(--pico-muted-border-color);
+  padding: 5px 5px;
+  color: var(--pico-code-color);
+  cursor: pointer;
+}
+.tribute-container li.highlight {
+  background-color: var(--pico-text-selection-color);
+}
+
+.tribute-container li {
+  img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  small {
+    color: gray;
+    margin-left: 10px;
+  }
+  code {
+    display: inline;
+  }
+} 
+
+.tribute-container li.no-match {
+  cursor: default;
+}
+.tribute-container .menu-highlighted {
+  font-weight: bold;
+}

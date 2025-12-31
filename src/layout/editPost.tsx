@@ -30,10 +30,11 @@ export default function PostEdit({post}:EditedPostProps) {
         <div id={editResponse}>
         </div>
         <button>Update Post</button> 
-        <a role="button" onclick="refreshPosts()" class="secondary">Cancel</a>
+        <a role="button" onclick={html`tributeToElement(document.getElementById('content${post.postid}'),false);refreshPosts();`} class="secondary">Cancel</a>
       </center>
       <script type="text/javascript">{html`
         addCounter("content${post.postid}", "editCount${post.postid}");
+        tributeToElement(document.getElementById("content${post.postid}"));
       `}</script>
     </form>
   );

@@ -18,6 +18,7 @@ import { post } from "./endpoints/post";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
+import { makeConstScript } from "./utils/scriptGen";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -49,6 +50,14 @@ app.route("/post", post);
 // Root route
 app.all("/", (c) => {
   return c.html(<Home />);
+});
+
+// JS injection of const variables
+app.get("/js/consts.js", (c) => {
+  const constScript = makeConstScript();
+  return c.body(constScript, 200, {
+    'Content-Type': 'text/javascript',
+  });
 });
 
 // Add contact link
