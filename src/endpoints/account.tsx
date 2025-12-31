@@ -164,7 +164,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     // Burn the invite key
     c.executionCtx.waitUntil(useInviteKey(c, signupToken));
 
-    console.log(`user ${username} created! with code ${signupToken}`);
+    console.log(`user ${username} created! with code ${signupToken||'none'}`);
     return c.json({ok: true, message: "signup success"});
   }
   return c.json({ok: false, message: "unknown error occurred"}, 501);
