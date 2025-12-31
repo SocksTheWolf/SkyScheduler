@@ -379,7 +379,7 @@ const mentionTribute = new Tribute({
   fillAttr: 'handle',
   spaceSelectsMatch: true,
   menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
-  menuShowMinLength: 3
+  menuShowMinLength: 2
 });
 
 function tributeToElement(el, add=true) {
