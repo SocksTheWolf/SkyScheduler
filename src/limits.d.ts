@@ -37,6 +37,7 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
   "image/svg+xml"
 ];
 
+// Used for human readable display
 export const BSKY_IMG_FILE_EXTS: string[] = [
   "png",
   "jpg",
@@ -54,7 +55,7 @@ export const MAX_EMBEDS_PER_POST: number = 4;
 
 // Video limits values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L184
-export const BSKY_VIDEO_MAX_DURATION: number = 3;
+export const BSKY_VIDEO_MAX_DURATION: number = 3; // in minutes
 export const BSKY_VIDEO_MAX_SIZE_IN_MB: number = 100;
 export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/mp4",
@@ -63,6 +64,12 @@ export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/quicktime"
 ];
 
+// Used for human readable display
+export const BSKY_GIF_MIME_TYPES: string[] = [
+  "image/gif"
+];
+
+// Used for human readable display
 export const BSKY_VIDEO_FILE_EXTS: string[] = [
   "mp4",
   "m4v",
@@ -74,7 +81,8 @@ export const BSKY_VIDEO_FILE_EXTS: string[] = [
   "m2v",
   "mov",
   "qt",
-  "webm"
+  "webm",
+  "gif" /* This is handled in a special case because bluesky */
 ];
 
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
@@ -89,4 +97,6 @@ export const CF_MAX_DIMENSION: number = 10000;
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
 
+/* handle auto complete */
 export const BSKY_NAME_LOOKUP_LIMIT: number = 6;
+export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;

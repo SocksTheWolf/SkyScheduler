@@ -1,7 +1,7 @@
 import { Bindings, EmbedData, EmbedDataType, LooseObj } from '../types.d';
 import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, 
   BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, TO_MB, BSKY_VIDEO_MIME_TYPES, 
-  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT } from "../limits.d";
+  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 
 type FileMetaData = {
@@ -171,7 +171,7 @@ export const uploadFileR2 = async (env: Bindings, file: File|string, userId: str
   const fileType: string = file.type.toLowerCase();
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
     return await uploadImageToR2(env, file, userId);
-  } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
+  } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType) || BSKY_GIF_MIME_TYPES.includes(fileType)) {
     return await uploadVideoToR2(env, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};

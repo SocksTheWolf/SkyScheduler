@@ -112,10 +112,16 @@ fileDropzone.on("addedfile", file => {
   file.previewElement.appendChild(buttonHolder);
 });
 fileDropzone.on("success", function(file, response) {
+  const deleteFileOnError = () => {
+    const delButton = file.previewElement.querySelectorAll(".fileDel")[0];
+    delButton.setAttribute("bad", true);
+    delButton.click();
+  };
   // show the labels
   showContentLabeler(true);
   const fileIsImage = imageTypes.includes(file.type);
   const fileIsVideo = videoTypes.includes(file.type);
+  const fileIsGif = gifTypes.includes(file.type);
   console.log(`Adding ${file.name} (${file.type}) to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel || 100}`);
   if (fileIsVideo) {
     // Attempt to process the video type
@@ -124,17 +130,54 @@ fileDropzone.on("success", function(file, response) {
     videoTag.setAttribute("src", URL.createObjectURL(file));
     videoTag.addEventListener("loadeddata", () => {
       const videoDuration = videoTag.duration;
-      fileData.set(file.name, {content: response.data, type: 3, 
-        height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
       if (videoDuration > MAX_VIDEO_LENGTH) {
-        const delButton = file.previewElement.querySelectorAll(".fileDel")[0];
-        delButton.setAttribute("bad", true);
-        delButton.click();
         pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
+        deleteFileOnError();
+      } else {
+        fileData.set(file.name, {content: response.data, type: 3, height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
       }
       videoTag.remove();
     });
+    videoTag.addEventListener("error", () => {
+      pushToast(`Unable to process ${file.name}, decoder error occurred`);
+      deleteFileOnError();
+      videoTag.remove();
+    });
     document.body.appendChild(videoTag);
+  } else if (fileIsGif) {
+    const imgObj = new Image();
+    // This is in seconds, I can't really explain it without trying to go into the gif format myself.
+    // from https://stackoverflow.com/a/74236879
+    const getGifDuration = (ab) => {
+      const uint8 = new Uint8Array(ab);
+      let duration = 0;
+      try {
+        for (let i = 0, len = uint8.length; i < len; i++) {
+          if (uint8[i] == 0x21
+            && uint8[i + 1] == 0xF9
+            && uint8[i + 2] == 0x04
+            && uint8[i + 7] == 0x00) 
+          {
+            const delay = (uint8[i + 5] << 8) | (uint8[i + 4] & 0xFF)
+            duration += delay < 2 ? 10 : delay
+          }
+        }
+        return duration / 100;
+      } catch(err) {
+        console.error(`Unable to read gif file, got error ${err}`);
+        return null;
+      }
+    }
+    imgObj.onload = async () => {
+      const videoDuration = getGifDuration(await file.arrayBuffer());
+      if (videoDuration === null || videoDuration > MAX_VIDEO_LENGTH) {
+        pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
+        deleteFileOnError();
+      } else {
+        fileData.set(file.name, { content: response.data, type: 3, height: imgObj.height, width: imgObj.width, duration: videoDuration });
+      }
+    };
+    imgObj.src = URL.createObjectURL(file);
   } else {
     fileData.set(file.name, {content: response.data, type: 1});
   }
@@ -379,7 +422,7 @@ const mentionTribute = new Tribute({
   fillAttr: 'handle',
   spaceSelectsMatch: true,
   menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
-  menuShowMinLength: 2
+  menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES
 });
 
 function tributeToElement(el, add=true) {
