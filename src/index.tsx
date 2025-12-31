@@ -59,6 +59,7 @@ app.get("/js/consts.js", (c) => {
   const constScript = makeConstScript();
   return c.body(constScript, 200, {
     'Content-Type': 'text/javascript',
+    'Cache-Control': 'max-age=604800'
   });
 });
 
