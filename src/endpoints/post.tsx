@@ -39,9 +39,9 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
     return c.json({"success": false, "error": validation.error}, 402);
   }
 
-  const { key } = validation.data;
+  const { content } = validation.data;
   // delete item from r2
-  await c.env.R2.delete(key);
+  await c.env.R2.delete(content);
   return c.json({"success": true}, 200);
 });
 

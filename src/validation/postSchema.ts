@@ -1,32 +1,33 @@
 import { MAX_ALT_TEXT, MIN_LENGTH, MAX_REPOST_INTERVAL_LIMIT, 
   MAX_REPOST_IN_HOURS, MAX_LENGTH, BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType, PostLabel } from "../types.d";
-import { fileKeyRegex } from "./regexCases";
+import { FileContentSchema } from "./mediaSchema";
 import * as z from "zod/v4";
 import isEmpty from "just-is-empty";
 
 const ImageEmbedSchema = z.object({
-  content: z.string().nonempty().toLowerCase().regex(fileKeyRegex, "file key for embed is invalid"),
+  ...FileContentSchema.shape,
   type: z.literal(EmbedDataType.Image),
   alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault(""),
 });
 
 const VideoEmbedSchema = z.object({
-  content: z.string().nonempty().regex(fileKeyRegex, "file key for embed is invalid"),
+  ...FileContentSchema.shape,
   type: z.literal(EmbedDataType.Video),
-  width: z.number("video width is not a number")
-    .min(0, "width value is below 0")
-    .nonoptional("video width is required"),
-  height: z.number("video height is not a number")
-    .min(0, "height value is below 0")
-    .nonoptional("video height is required"),
-  duration: z.number("video duration is invalid")
-    .min(0.02, "video must be at least 0.02 seconds long")
-    .max(BSKY_VIDEO_LENGTH_LIMIT, `videos must be less than ${BSKY_VIDEO_LENGTH_LIMIT} seconds long`)
-    .nonoptional("video duration is required")
+  width: z.number("media width is not a number")
+    .min(0, "media width value is below 0")
+    .nonoptional("media width is required"),
+  height: z.number("media height is not a number")
+    .min(0, "media height value is below 0")
+    .nonoptional("media height is required"),
+  duration: z.number("media duration is invalid")
+    .min(0, "media must be over 0 seconds long")
+    .max(BSKY_VIDEO_LENGTH_LIMIT, `media must be less than ${BSKY_VIDEO_LENGTH_LIMIT} seconds long`)
+    .nonoptional("media duration is required")
 });
 
 const LinkEmbedSchema = z.object({
+  /* content is the thumbnail */
   content: z.string().trim().prefault("").refine((value) => { 
     if (isEmpty(value))
       return true;
@@ -44,11 +45,12 @@ const LinkEmbedSchema = z.object({
   }),
   type: z.literal(EmbedDataType.WebLink),
   title: z.string().trim().default(""),
+  /* uri is the link to the website */
   uri: z.url({
     normalize: true, 
     protocol: /^https?$/,
     hostname: z.regexes.domain,
-    error: "provided weblink is not in the correct form of an url"}).trim().default(""),
+    error: "provided weblink is not in the correct form of an url"}).trim().nonoptional("link embeds require a url"),
   description: z.string().trim().default("")
 });
 

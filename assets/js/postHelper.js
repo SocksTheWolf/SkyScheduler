@@ -96,7 +96,7 @@ fileDropzone.on("addedfile", file => {
     // Remove the file
     fetch('/post/upload', {
         method: 'DELETE',
-        body: JSON.stringify({"key": fileData.get(file.name).content })
+        body: JSON.stringify({"content": fileData.get(file.name).content })
     }).then(async response => {
       const data = await response.json();
       if (!data.success) {
