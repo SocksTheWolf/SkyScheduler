@@ -12,7 +12,7 @@ export default function TermsOfService() {
           <header><h3>Terms of Service</h3></header>
           <h4>Terms</h4>
           <p>
-            By signing up and using the services provided by SkyScheduler ("software") you agree to the terms set forth below.
+            By signing up and using the services provided by SkyScheduler ("software") you agree to the terms set forth below.<br />
             If you do not agree to said terms please delete your account at your earliest convenience. Said deletion will be treated
             as a separation of you to this agreement.
           </p>
@@ -23,12 +23,13 @@ export default function TermsOfService() {
               <li>Not upload material that is illegal, illicit or stolen</li>
               <li>Not attempt to reverse engineer the software to cause damage or otherwise harm others</li>
               <li>Not hold SkyScheduler at fault for any damages, neither perceived nor tangible</li>
-              <li>Grant SkyScheduler a temporary, non-exclusive, royalty-free license to the content that you schedule for the sole purpose of transmitting it on your behalf to the Bluesky ATProtocol.</li>
+              <li>Grant SkyScheduler a temporary, non-exclusive, royalty-free license to the content that you schedule for the sole purpose of transmitting it on your behalf to the ATProtocol of the PDS of your choosing (default: Bluesky).</li>
               <ul>
-                <li>On transmission, content will be deleted from our temporary holding storage.</li>
+                <li>Upon successful transmission, content will be deleted from our temporary holding storage.</li>
               </ul>
             </ol>
-            Violations of these agreements will allow SkyScheduler to terminate your access to the website. Upon termination, all temporarily stored content will be deleted.
+            <hr />
+            Violations of these agreements will allow SkyScheduler to terminate your access to the website. Upon account deletion/termination, all temporarily stored content will be deleted.
           </p>
           <h4>Disclaimer/Limitations</h4>
           <p>SkyScheduler IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 

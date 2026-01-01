@@ -20,16 +20,36 @@ export default function PrivacyPolicy() {
               <li>Anything you upload for processing in order to fulfill your posts to the BlueSky network</li>
             </ul>
           </p>
+          <h4>Who We Share Data With</h4>
+          <p>
+            <ol>
+              <li>Cloudflare
+                <ul>
+                  <li>Images are sent to Cloudflare Images compressor to optimize the file size in order to upload onto BlueSky</li>
+                  <li>Data is stored in Cloudflare's D1/R2/KV storage containers</li>
+                  <li>Media may be scanned by Cloudflare's <a rel="noopener nofollow noindex" href="https://developers.cloudflare.com/cache/reference/csam-scanning/" class="secondary">illicit material detection service</a>.
+                  &nbsp;Said media is not allowed on this service, and your account will be banned.</li>
+                </ul>
+              </li>
+              <li>Bluesky/Custom PDS
+                <ul>
+                  <li>To transfer your content to their service at the time you choose</li>
+                </ul>
+              </li>
+            </ol>
+
+          </p>
           <h4>How Data is Used</h4>
-          <p>We use the data that you provide to make transmit BlueSky posts on your behalf to the BlueSky PDS (or a PDS of your own choosing).<br /><br />
-            <strong>Note that</strong>:
-            <ul>
-              <li>Images are sent to Cloudflare Images compressor to compress the file size in order to upload onto BlueSky</li>
-              <li>Outside of the above we do not share the data with any other third party outside of BlueSky themselves (to transmit your content for posting)</li>
-              <li>Data is not accessible to the maintainers of the website</li>
-              <li>We do not sell your data to any third party</li>
-              <li>No data is used for genAI purposes nor for training generative AI models</li>
-            </ul>
+          <p>We use the data that you provide to make transmit BlueSky posts on your behalf to the BlueSky PDS (or a PDS of your own choosing).<br />
+            <div style="margin-left: 15px">
+              <strong>Note that</strong>:
+              <ul>
+                <li>Data is not accessible to the maintainers of the website</li>
+                <li>We do not sell your data to any third party</li>
+                <li>No data is used for genAI purposes nor for training generative AI models</li>
+                <li>You can verify all of this by just looking at <a href="https://github.com/socksthewolf/skyscheduler" class="secondary" ref="noopener nofollow">the source code</a></li>
+              </ul>
+            </div>
           </p>
           <footer>
             <FooterCopyright />
