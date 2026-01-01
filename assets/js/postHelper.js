@@ -4,6 +4,7 @@ const scheduledDate = document.getElementById('scheduledDate');
 const urlCardBox = document.getElementById('urlCard');
 const content = document.getElementById('content');
 let hasFileLimit = false;
+let fileData = new Map();
 
 const imageAttachmentSection = document.getElementById("imageAttachmentSection");
 const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
@@ -18,19 +19,6 @@ function clearOnUnloadBlocker() {
   window.onbeforeunload = null;
 }
 
-function resetForm() {
-  repostCheckbox.checked = false;
-  postNowCheckbox.checked = false;
-  hasFileLimit = false;
-  urlCardBox.value = "";
-  toggleElementVisibleState(imageAttachmentSection, true);
-  toggleElementVisibleState(linkAttachmentSection, true);
-  showContentLabeler(false);
-  setSelectDisable(true);
-  showPostProgress(false);
-  clearOnUnloadBlocker();
-}
-
 urlCardBox.addEventListener("paste", () => {
   showContentLabeler(true);
   toggleElementVisibleState(imageAttachmentSection, false);
@@ -42,12 +30,33 @@ urlCardBox.addEventListener("change", () => {
   toggleElementVisibleState(imageAttachmentSection, !isNotEmpty);
 });
 
-let fileData = new Map();
 let fileDropzone = new Dropzone("#fileUploads", { 
   url: "/post/upload", 
   autoProcessQueue: true,
   maxFilesize: 70000000,
   acceptedFiles: fileTypesSupported.toString()
+});
+
+// Fires whenever a post is made or the form needs to reset
+document.addEventListener("resetPost", () => {
+  document.getElementById('postForm').reset();
+  toggleElementVisibleState(imageAttachmentSection, true);
+  toggleElementVisibleState(linkAttachmentSection, true);
+  showContentLabeler(false);
+  setSelectDisable(true);
+  setScheduledRequired(true);
+  showPostProgress(false);
+  clearOnUnloadBlocker();
+  repostCheckbox.checked = false;
+  postNowCheckbox.checked = false;
+  hasFileLimit = false;
+  urlCardBox.value = "";
+  resetCounter("count");
+
+  // Remove all data in the dropzone as well
+  fileDropzone.removeAllFiles();
+  // Clear the file data map
+  fileData.clear();
 });
 
 fileDropzone.on("reset", () => {
@@ -71,20 +80,7 @@ fileDropzone.on("addedfile", file => {
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    const existingData = fileData.get(file.name);
-    var askUserData = prompt("What is the alt text?", existingData.alt || "");
-    try {
-      existingData.alt = askUserData;
-      fileData.set(file.name, existingData);
-      if (askUserData === "" || askUserData === null) {
-        addAltText.classList.remove("btn-success");
-      } else {
-        addAltText.classList.add("btn-success");
-      }
-    } catch (err) {
-      console.error(err);
-      pushToast("failed to set alt text for image, try again", false);
-    }
+    openAltText(file, addAltText);
   });
 
   // Listen to the click event
@@ -305,24 +301,12 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     const data = await response.json();
     
     if (response.ok) {
-      // Hide the selector
-      showContentLabeler(false);
-      // Remove all data in the dropzone as well
-      fileDropzone.removeAllFiles();
-      // Clear the file data map
-      fileData.clear();
-      resetCounter("count");
-      
       if (postNow) {
         pushToast("Post created!", true);
       } else {
         pushToast("Scheduled post successfully!", true);
-      }
-      
-      setSelectDisable(true);
-      scheduledDate.setAttribute("required", "");
-      document.getElementById('postForm').reset();
-      resetForm();
+      }      
+      document.dispatchEvent(new Event("resetPost"));
       refreshPosts();
     } else {
       pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);
@@ -346,11 +330,15 @@ repostCheckbox.addEventListener('click', (e) => {
 });
 
 postNowCheckbox.addEventListener('click', (e) => {
-  if (postNowCheckbox.checked)
-    scheduledDate.removeAttribute("required");
-  else
-    scheduledDate.setAttribute("required", "");
+  setScheduledRequired(!postNowCheckbox.checked);
 });
+
+function setScheduledRequired(required) {
+  if (required)
+    scheduledDate.setAttribute("required", "");
+  else
+    scheduledDate.removeAttribute("required");
+}
 
 function setSelectDisable(disable) {
   document.querySelectorAll("select:not(#contentLabels)").forEach((el) => {
@@ -397,6 +385,62 @@ function showPostProgress(shouldShow) {
   }
 }
 
+function openAltText(file, altTextButton) {
+  // A bunch of DOM elements
+  const altTextModal = document.getElementById("altTextDialog");
+  const altTextField = document.getElementById("altTextField");
+  const altTextImgPreview = document.getElementById("altThumbImg");
+  const saveButton = document.getElementById("altTextSaveButton");
+  const cancelButton = document.getElementById("altTextCancelButton");
+
+  // Handle page reset
+  if (altTextModal.hasAttribute("hasReset") === false) {
+    document.addEventListener("resetPost", () => {
+      altTextField.value = "";
+      altTextImgPreview.src = "";
+      resetCounter("altTextCount");
+    });
+    altTextModal.setAttribute("hasReset", true);
+  }
+
+  const existingData = fileData.get(file.name);
+  altTextField.value = existingData.alt || "";
+  recountCounter("altTextCount");
+  tributeToElement(altTextField);
+  const handleSave = (ev) => {
+    ev.preventDefault();
+    const newAltTextData = altTextField.value;
+    existingData.alt = newAltTextData;
+    fileData.set(file.name, existingData);
+    if (newAltTextData === "") {
+      altTextButton.classList.remove("btn-success");
+    } else {
+      altTextButton.classList.add("btn-success");
+    }
+    //console.log(`Updated alt data for ${file.name} which is ${newAltTextData}`);
+    closeAltModal();
+  };
+
+  const closeAltModal = () => {
+    saveButton.removeEventListener("click", handleSave);
+    cancelButton.removeEventListener("click", closeAltModalClick);
+    altTextModal.removeEventListener("close", closeAltModal);
+    altTextImgPreview.src = "";
+    detachTribute(altTextField);
+  }
+
+  const closeAltModalClick = () => {
+    closeAltModal();
+    closeModal(altTextModal);
+  };
+
+  altTextImgPreview.src = URL.createObjectURL(file);
+  saveButton.addEventListener("click", handleSave);
+  cancelButton.addEventListener("click", closeAltModalClick);
+  altTextModal.addEventListener("close", closeAltModal);
+  openModal(altTextModal);
+}
+
 function searchBSkyMentions(query, callback) {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${query}&limit=${MAX_AUTO_COMPLETE_NAMES}`);
@@ -419,32 +463,38 @@ function searchBSkyMentions(query, callback) {
   xhr.send();
 }
 
-const mentionTribute = new Tribute({
-  menuItemTemplate: function(item) {
-    const avatarStr = item.original.avatar !== undefined ? `<img src="${item.original.avatar}">` : "";
-    return `${avatarStr}<span><code>${item.original.displayName}</code><br /> <small>@${item.original.handle}</small></span>`;
-  },
-  values: function(text, cb) {
-    searchBSkyMentions(text, item => cb(item));
-  },
-  noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
-  lookup: 'handle',
-  fillAttr: 'handle',
-  spaceSelectsMatch: true,
-  menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
-  menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES
-});
+function tributeToElement(el) {
+  const mentionTribute = new Tribute({
+    menuItemTemplate: function(item) {
+      const avatarStr = item.original.avatar !== undefined ? `<img src="${item.original.avatar}">` : "";
+      return `${avatarStr}<span><code>${item.original.displayName}</code><br /> <small>@${item.original.handle}</small></span>`;
+    },
+    values: function(text, cb) {
+      searchBSkyMentions(text, item => cb(item));
+    },
+    noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
+    lookup: 'handle',
+    fillAttr: 'handle',
+    spaceSelectsMatch: true,
+    menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
+    menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES,
+    menuContainer: el.parentNode
+  });
 
-function tributeToElement(el, add=true) {
-  if (add)
-    mentionTribute.attach(el);
-  else
+  el.addEventListener("detach", () => {
     mentionTribute.detach(el);
+  });
+  mentionTribute.attach(el);
+}
+
+function detachTribute(el) {
+  el.dispatchEvent(new Event("detach"));
 }
 
 // Handle character counting
-addCounter("content", "count");
+addCounter("content", "count", MAX_LENGTH);
+addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
 // Add mentions
 tributeToElement(content);
-resetForm();
+document.dispatchEvent(new Event("resetPost"));
 

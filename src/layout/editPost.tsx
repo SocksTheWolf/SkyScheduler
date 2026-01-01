@@ -22,7 +22,7 @@ export default function PostEdit({post}:EditedPostProps) {
         <textarea name="content" id={`content${post.postid}`} rows={8} style="resize: none" required>
           {post.text}
         </textarea>
-        <small>Character Count: <div id={`editCount${post.postid}`}>0/{MAX_LENGTH}</div></small>
+        <small>Character Count: <span id={`editCount${post.postid}`}>0/{MAX_LENGTH}</span></small>
       </section>
 
       <progress id={editSpinner} class="htmx-indicator" />
@@ -30,10 +30,10 @@ export default function PostEdit({post}:EditedPostProps) {
         <div id={editResponse}>
         </div>
         <button>Update Post</button> 
-        <a role="button" onclick={html`tributeToElement(document.getElementById('content${post.postid}'),false);refreshPosts();`} class="secondary">Cancel</a>
+        <a role="button" onclick={html`detachTribute(document.getElementById('content${post.postid}'));refreshPosts();`} class="secondary">Cancel</a>
       </center>
       <script type="text/javascript">{html`
-        addCounter("content${post.postid}", "editCount${post.postid}");
+        addCounter("content${post.postid}", "editCount${post.postid}", ${MAX_LENGTH});
         tributeToElement(document.getElementById("content${post.postid}"));
       `}</script>
     </form>

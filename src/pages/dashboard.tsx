@@ -1,11 +1,12 @@
 import { Context } from "hono";
-import {PostCreation, PreloadPostCreation} from "../layout/makePost";
+import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { BaseLayout } from "../layout/main";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import FooterCopyright from "../layout/footer";
 import { PreloadRules } from "../types.d";
+import { AltTextDialog } from "../layout/altTextModal";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -17,7 +18,8 @@ export default function Dashboard(props:any) {
   return (
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads]}>
-      <script src="/dep/countable.min.js"></script>
+      <script src="/dep/countable.min.js" type="application/javascript"></script>
+      <script src="/dep/modal.js" type="application/javascript"></script>
       <div class="grid">
         <section class="max-width-50">
           <article>
@@ -54,6 +56,7 @@ export default function Dashboard(props:any) {
           </article>
         </section>
         <div class="container-fluid mainContent">
+          <AltTextDialog />
           <ViolationNoticeBar ctx={ctx} />
           <PostCreation />
         </div>

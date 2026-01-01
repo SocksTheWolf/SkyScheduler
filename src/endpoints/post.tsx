@@ -108,7 +108,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     c.header("HX-Trigger-After-Swap", "refreshPosts");
     return c.html(<b>Success</b>);
   } else {
-    return c.html(<b>Failed to process</b>);
+    return c.html(<b class="btn-error">Failed to process</b>);
   }
 });
 

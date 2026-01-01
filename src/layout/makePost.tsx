@@ -3,9 +3,10 @@ import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB,
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS } from "../limits.d"
 import { PreloadRules } from "../types.d";
+import { ConstScript, ConstScriptPreload } from "./constScript";
 
 export const PreloadPostCreation: PreloadRules[] = [
-  {type: "script", href: "/js/consts.js"}, 
+  ...ConstScriptPreload,
   {type: "script", href: "/dep/dropzone-min.js"}, 
   {type: "style", href: "/dep/dropzone.css"}, 
   {type: "style", href: "/css/dropzoneMods.css"},
@@ -18,7 +19,7 @@ export function PostCreation() {
   <section>
     <script type="text/javascript" src="/dep/dropzone-min.js"></script>
     <script type="text/javascript" src="/dep/tribute.min.js"></script>
-    <script type="text/javascript" src="/js/consts.js"></script>
+    <ConstScript />
     <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
     <link href="/dep/tribute.css" rel="stylesheet" type="text/css" />
     <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
@@ -31,8 +32,8 @@ export function PostCreation() {
           <article>
             <header>Post Content</header>
             <section>
-              <textarea id="content" rows={8} style="resize: none" placeholder="Post text here" required></textarea>
-              <small>Character Count: <div id="count">0/{MAX_LENGTH}</div></small>
+              <textarea id="content" rows={8} placeholder="Post text here" required></textarea>
+              <small>Character Count: <span id="count">0/{MAX_LENGTH}</span></small>
             </section>
           </article>
 

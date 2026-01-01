@@ -98,26 +98,44 @@ function addUsernameFieldWatchers() {
     });
   }
 }
-
-function addCounter(textField, counter) {
+function addCounter(textField, counter, maxLength) {
   const textEl = document.getElementById(textField);
   const counterEl = document.getElementById(counter);
-  
-  Countable.on(textEl, counter => {
-    counterEl.innerHTML = `${counter.all}/${MAX_LENGTH}`;
-    // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
-    if (counter.all > MAX_LENGTH) {
-      counterEl.classList.add('tooLong');
-    } else {
+  if (counterEl) {
+    // escape out of adding a counter more than once
+    if (counterEl.hasAttribute("counting"))
+      return;
+
+    const handleCount = (counter) => {
+      counterEl.innerHTML = `${counter.all}/${maxLength}`;
+      // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
+      if (counter.all > maxLength) {
+        counterEl.classList.add('tooLong');
+      } else {
+        counterEl.classList.remove('tooLong');
+      }
+    };
+
+    Countable.on(textEl, handleCount);
+    counterEl.setAttribute("counting", true);
+    counterEl.addEventListener("reset", () => {
+      counterEl.innerHTML = `0/${maxLength}`;
       counterEl.classList.remove('tooLong');
-    }
-  });
+    });
+    counterEl.addEventListener("recount", () => {
+      Countable.count(textEl, handleCount);
+    });
+  }
+}
+
+function recountCounter(counter) {
+  const counterEl = document.getElementById(counter);
+  counterEl.dispatchEvent(new Event("recount"));
 }
 
 function resetCounter(counter) {
   const counterEl = document.getElementById(counter);
-  counterEl.innerHTML = `0/${MAX_LENGTH}`;
-  counterEl.classList.remove('tooLong');
+  counterEl.dispatchEvent(new Event("reset"));
 }
 
 function redirectAfterDelay(url) {

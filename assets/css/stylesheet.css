@@ -168,6 +168,20 @@ dialog button.btn-error {
   margin-left: 10px;
 }
 
+#altTextField {
+  margin-top: 10px;
+}
+
+#altThumbImg {
+  max-width: 25vw;
+  max-height: 25vh;
+  overflow: hidden;
+}
+
+textarea {
+  resize: none;
+}
+
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
   100% {
