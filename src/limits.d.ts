@@ -1,12 +1,27 @@
-export const MIN_LENGTH: number = 1;
+/** APPLICATION CONFIGURATIONS **/
+// minimum length of a post
+export const MIN_LENGTH: number = 1; 
+// max amount of times something can be reposted
 export const MAX_REPOST_INTERVAL: number = 10;
+// max amount of time something can be reposted over
 export const MAX_REPOST_DAYS: number = 7;
-// Maximums used internally
-export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
-export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;
+
+// Dashboard password length settings
+export const MIN_DASHBOARD_PASS: number = 8;
+export const MAX_DASHBOARD_PASS: number = 30;
+
+// max amount of returns from bsky handle search
+export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the default from bsky
+// number of characters to activate a bsky handle search
+export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
+
+/** INTERNAL LIMITS, DO NOT CHANGE **/
+// Maximums used internally, do not change these directly.
+export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
+export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
 // Helper conversion math
 export const TO_MB: number = 1024 * 1024;
@@ -85,18 +100,13 @@ export const BSKY_VIDEO_FILE_EXTS: string = [
   "animated gif" /* This is handled in a special case because bluesky */
 ].join(", ");
 
+// Max size of files that can go to R2 without doing multipart uploads
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * TO_MiB;
 export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_MAX_SIZE_IN_MB * TO_MiB;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * TO_MB;
+// Max size of Cloudflare Images files
 export const CF_FILE_SIZE_LIMIT_IN_MB: number = 70;
 export const CF_FILE_SIZE_LIMIT: number = CF_FILE_SIZE_LIMIT_IN_MB * TO_MB;
 export const CF_MAX_DIMENSION: number = 10000;
-
-export const MIN_DASHBOARD_PASS: number = 8;
-export const MAX_DASHBOARD_PASS: number = 30;
-
-/* handle auto complete */
-export const BSKY_NAME_LOOKUP_LIMIT: number = 6;
-export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;

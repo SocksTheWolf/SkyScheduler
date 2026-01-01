@@ -6,7 +6,7 @@ const makeFileTypeStr = (typeMap: string[]) => {
   return typeMap.map((type) => `"${type}"`).join()
 };
 
-export const CONST_SCRIPT_VERSION: number = 2;
+export const CONST_SCRIPT_VERSION: number = 3;
 
 export function makeConstScript() {
     return `const fileTypesSupported = [${makeFileTypeStr([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES, ...BSKY_GIF_MIME_TYPES])}];
