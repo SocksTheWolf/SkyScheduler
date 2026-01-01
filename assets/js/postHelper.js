@@ -418,26 +418,26 @@ function openAltText(file, altTextButton) {
       altTextButton.classList.add("btn-success");
     }
     //console.log(`Updated alt data for ${file.name} which is ${newAltTextData}`);
-    closeAltModalClick();
+    closeAltModal();
   };
 
-  const closeAltModal = () => {
+  const unbindAltModal = () => {
     saveButton.removeEventListener("click", handleSave);
-    cancelButton.removeEventListener("click", closeAltModalClick);
-    altTextModal.removeEventListener("close", closeAltModal);
+    cancelButton.removeEventListener("click", closeAltModal);
+    altTextModal.removeEventListener("close", unbindAltModal);
     altTextImgPreview.src = "";
     detachTribute(altTextField);
   }
 
-  const closeAltModalClick = () => {
-    closeAltModal();
+  const closeAltModal = () => {
+    unbindAltModal();
     closeModal(altTextModal);
   };
 
   altTextImgPreview.src = URL.createObjectURL(file);
   saveButton.addEventListener("click", handleSave);
-  cancelButton.addEventListener("click", closeAltModalClick);
-  altTextModal.addEventListener("close", closeAltModal);
+  cancelButton.addEventListener("click", closeAltModal);
+  altTextModal.addEventListener("close", unbindAltModal);
   openModal(altTextModal);
 }
 
