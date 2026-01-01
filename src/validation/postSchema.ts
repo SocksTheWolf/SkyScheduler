@@ -68,7 +68,7 @@ export const PostSchema = z.object({
     ImageEmbedSchema,
     LinkEmbedSchema,
     VideoEmbedSchema
-  ]).array().optional(),
+  ], "invalid media type").array().optional(),
   label: z.nativeEnum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
