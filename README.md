@@ -14,7 +14,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - **Multiple user/account handling**: Manage multiple users/bsky accounts easily
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
-- **Simple and Lightweight**: Fairly minimal setup and easy to use
+- **Simple Setup**: Fairly minimal setup and easy to use
 - **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images
 - **Handles Link Embeds**: Post your content with a link embed easily!
 - **Automatic reposting**: Schedule how many times you want your post to be retweeted on the network. Get more visibility and engagement without having to do more work
@@ -77,7 +77,7 @@ npm run dev
 npm run deploy
 ```
 
-8. Create your D1 tables using the following command, this will set up your tables both locally and remotely
+8. Create your D1 tables using the following command, this will set up your tables both locally and remotely. If you encounter issues running remotely, you can run the command again.
 
 ```bash
 npm run migrate:all
@@ -113,6 +113,30 @@ skyscheduler/
 ├── package.json
 └── wrangler.toml
 ```
+
+### Middleware Stack
+
+#### Server
+
+- Zod - data validation
+- BetterAuth - logins
+- BetterAuthCloudflare - helper adpation
+- hono - request routing/processing
+- uuid - id generation
+- image-dimensions - image data validation
+- date-fns - date processing helpers
+- drizzle - database orm/schemas
+- just - js helper library
+
+#### Client
+
+- htmx - client requests and responsiveness
+- tribute - client autocomplete library
+- toastify - client notifications
+- dropzone - file upload negotiation
+- pico - styling
+- randomstring - named random html element ids
+- countable - dynamic input counter
 
 ## Contributing
 
