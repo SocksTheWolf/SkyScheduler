@@ -13,6 +13,7 @@ import { ContextVariables } from "../auth";
 import { deleteFromR2 } from "../utils/r2Query";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { verifyTurnstile } from "../middleware/turnstile";
+import { doesHandleExist } from "../utils/bskyApi";
 import isEmpty from "just-is-empty";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -144,6 +145,12 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "invalid signup token value"}, 400);
   }
 
+  // Check bsky handle existing
+  if (await doesHandleExist(username) === false) {
+    return c.json({ok: false, message: "bsky username returned invalid, please check input"}, 400);
+  }
+
+  // grab our auth object
   const auth = c.get("auth");
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
@@ -160,6 +167,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     }
   });
 
+  // check success of user creation
   if (createUser.token !== null) {
     // Burn the invite key
     c.executionCtx.waitUntil(useInviteKey(c, signupToken));
@@ -167,6 +175,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     console.log(`user ${username} created! with code ${signupToken||'none'}`);
     return c.json({ok: true, message: "signup success"});
   }
+  console.error(`could not sign up user ${username}, no token was returned`);
   return c.json({ok: false, message: "unknown error occurred"}, 501);
 });
 

@@ -6,6 +6,16 @@ import { deleteEmbedsFromR2 } from './r2Query';
 import {imageDimensionsFromStream} from 'image-dimensions';
 import truncate from "just-truncate";
 import isEmpty from "just-is-empty";
+import has from 'just-has';
+
+export const doesHandleExist = async (user: string) => {
+  try {
+    const checkHandle = await lookupBskyHandle(user);
+    return checkHandle !== null;
+  } catch {
+    return false;
+  }
+};
 
 export const lookupBskyHandle = async (user: string) => {
   const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
@@ -15,8 +25,12 @@ export const lookupBskyHandle = async (user: string) => {
     }
   });
   if (lookupRequest.ok) {
-    const response:any = await lookupRequest.json();
-    return response.did;
+    const response: any = await lookupRequest.json();
+    if (has(response, "did")) {
+      return response.did;
+    } else {
+      return null;
+    }
   }
   return null;
 };
