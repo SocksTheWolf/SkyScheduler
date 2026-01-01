@@ -177,7 +177,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         // Handle weblinks
         if (currentEmbedType == EmbedDataType.WebLink) {
           let externalData: LooseObj = {
-            url: currentEmbed.uri,
+            uri: currentEmbed.uri,
             title: currentEmbed.title,
             description: currentEmbed.description
           };
