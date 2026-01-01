@@ -418,7 +418,7 @@ function openAltText(file, altTextButton) {
       altTextButton.classList.add("btn-success");
     }
     //console.log(`Updated alt data for ${file.name} which is ${newAltTextData}`);
-    closeAltModal();
+    closeAltModalClick();
   };
 
   const closeAltModal = () => {
