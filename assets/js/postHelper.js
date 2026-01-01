@@ -175,7 +175,11 @@ fileDropzone.on("success", function(file, response) {
     }
     imgObj.onload = async () => {
       const videoDuration = getGifDuration(await file.arrayBuffer());
-      if (videoDuration === null || videoDuration > MAX_VIDEO_LENGTH) {
+      if (videoDuration === null) {
+        pushToast(`${file.name} duration could not be processed`, false);
+        deleteFileOnError();
+      }
+      else if (videoDuration > MAX_VIDEO_LENGTH) {
         pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
         deleteFileOnError();
       } else {
@@ -183,6 +187,7 @@ fileDropzone.on("success", function(file, response) {
         hasFileLimit = true;
       }
     };
+    // Force the file to load.
     imgObj.src = URL.createObjectURL(file);
   } else {
     fileData.set(file.name, {content: response.data, type: 1});
