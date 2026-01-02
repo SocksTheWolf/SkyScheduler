@@ -119,8 +119,8 @@ skyscheduler/
 #### Server
 
 - Zod - data validation
-- BetterAuth - logins
-- BetterAuthCloudflare - helper adpation
+- BetterAuth - login/authentication
+- BetterAuthCloudflare - helper adaption
 - hono - request routing/processing
 - uuid - id generation
 - image-dimensions - image data validation
