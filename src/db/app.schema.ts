@@ -8,6 +8,8 @@ export const posts = sqliteTable('posts', {
   content: text('content').notNull(),
   scheduledDate: integer('scheduled_date', { mode: 'timestamp_ms' }).notNull(),
   posted: integer('posted', { mode: 'boolean' }).default(false),
+  // This is a flag to help beat any race conditions with our cron jobs
+  postNow: integer('postNow', { mode: 'boolean' }).default(false),
   embedContent: text('embedContent', {mode: 'json'}).notNull().$type<EmbedData[]>().default(sql`(json_array())`),
   uri: text('uri'),
   cid: text('cid'),

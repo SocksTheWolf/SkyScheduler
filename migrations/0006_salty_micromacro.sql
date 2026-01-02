@@ -1,0 +1,1 @@
+ALTER TABLE `posts` ADD `postNow` integer DEFAULT false;

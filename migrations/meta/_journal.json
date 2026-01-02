@@ -43,6 +43,13 @@
       "when": 1767065270603,
       "tag": "0005_sparkling_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1767345787785,
+      "tag": "0006_salty_micromacro",
+      "breakpoints": true
     }
   ]
 }

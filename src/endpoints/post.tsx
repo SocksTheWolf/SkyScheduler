@@ -10,7 +10,7 @@ import { EditSchema } from "../validation/postSchema";
 import { createPostObject } from "../utils/helpers";
 import { makePost } from "../utils/bskyApi";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
-import { createPost, deletePost, getPostById, updatePostForUser } from "../utils/dbQuery";
+import { createPost, deletePost, getPostById, setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
 import { ScheduledPostList } from "../layout/postList";
 import PostEdit from "../layout/editPost";
 
@@ -54,15 +54,17 @@ post.post("/create", authMiddleware, async (c: Context) => {
   } else if (response.postNow) {
     const postInfo = await getPostById(c, response.postId);
     if (postInfo.length > 0) {
-      const postResponse = await makePost(c, createPostObject(postInfo[0]));
-      if (postResponse === false)
-        return c.json({message: "Failed to post content"}, 400);
+      const postResponse: boolean = await makePost(c, createPostObject(postInfo[0]));
+      if (postResponse === false) {
+        c.executionCtx.waitUntil(setPostNowOffForPost(c.env, response.postId));
+        return c.json({message: "Failed to post content now, will try again soon"}, 302);
+      }
+      return c.json({message: "Created Post!" });
     } else {
-      return c.json({message: "Unable to get content to post"}, 401);
+      return c.json({message: "Unable to get post content, post may have been lost"}, 401);
     }
-
   }
-  return c.json({ message: "Post scheduled successfully" });
+  return c.json({ message: "Post scheduled successfully!" });
 });
 
 // Get all posts

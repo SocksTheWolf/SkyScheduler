@@ -163,6 +163,7 @@ export const createPost = async (c: Context, body: any) => {
     db.insert(posts).values({
         content,
         uuid: postUUID,
+        postNow: makePostNow,
         scheduledDate: scheduleDate,
         embedContent: embeds,
         contentLabel: label || PostLabel.None,
@@ -193,9 +194,17 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
 
   const violationUsers = db.select({data: violations.userId}).from(violations);
   return await db.select().from(posts)
-  .where(and(and(
-    lte(posts.scheduledDate, currentTime), eq(posts.posted, false)),
-    notInArray(posts.userId, violationUsers))
+  .where(
+    and(
+      and(
+        ne(posts.postNow, true), /* Ignore any posts that are marked for post now */
+        and(
+          lte(posts.scheduledDate, currentTime), 
+          eq(posts.posted, false)
+        )
+      ),
+      notInArray(posts.userId, violationUsers)
+    )
     ).all();
 };
 
@@ -224,6 +233,10 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
 export const updatePostData = async (env: Bindings, id: string, newData: Object) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   await db.update(posts).set(newData).where(eq(posts.uuid, id));
+};
+
+export const setPostNowOffForPost = async (env: Bindings, id: string) => {
+  await updatePostData(env, id, {postNow: false});
 };
 
 export const updatePostForUser = async (c: Context, id: string, newData: Object) => {

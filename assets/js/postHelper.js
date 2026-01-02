@@ -323,11 +323,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     const data = await response.json();
     
     if (response.ok) {
-      if (postNow) {
-        pushToast("Post created!", true);
-      } else {
-        pushToast("Scheduled post successfully!", true);
-      }      
+      pushToast(data.message, true);
       document.dispatchEvent(new Event("resetPost"));
       refreshPosts();
     } else {
