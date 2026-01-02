@@ -9,7 +9,7 @@ import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 import { createPostObject } from "../utils/helpers";
 import { makePost } from "../utils/bskyApi";
-import { uploadFileR2 } from "../utils/r2Query";
+import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { createPost, deletePost, getPostById, updatePostForUser } from "../utils/dbQuery";
 import { ScheduledPostList } from "../layout/postList";
 import PostEdit from "../layout/editPost";
@@ -41,7 +41,7 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
 
   const { content } = validation.data;
   // delete item from r2
-  await c.env.R2.delete(content);
+  deleteFromR2(c, content);
   return c.json({"success": true}, 200);
 });
 
@@ -54,7 +54,7 @@ post.post("/create", authMiddleware, async (c: Context) => {
   } else if (response.postNow) {
     const postInfo = await getPostById(c, response.postId);
     if (postInfo.length > 0) {
-      const postResponse = await makePost(c.env, createPostObject(postInfo[0]));
+      const postResponse = await makePost(c, createPostObject(postInfo[0]));
       if (postResponse === false)
         return c.json({message: "Failed to post content"}, 400);
     } else {

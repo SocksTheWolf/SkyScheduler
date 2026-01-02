@@ -1,8 +1,9 @@
-import { Bindings, EmbedData, EmbedDataType, LooseObj } from '../types.d';
+import { Bindings, ScheduledContext, EmbedData, EmbedDataType, LooseObj } from '../types.d';
 import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, 
   BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, TO_MB, BSKY_VIDEO_MIME_TYPES, 
   BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
+import { Context } from 'hono';
 
 type FileMetaData = {
   name: string,
@@ -11,26 +12,29 @@ type FileMetaData = {
   qualityLevel?: number;
 };
 
-export const deleteEmbedsFromR2 = async (env: Bindings, embeds: EmbedData[]|undefined) => {
+export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedData[]|undefined) => {
   let itemsToDelete:string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
-    embeds.forEach(async (data) => {
+    embeds.forEach((data) => {
+      // We don't store any data locally for weblinks
       if (data.type !== EmbedDataType.WebLink) {
-        console.log(`Deleting ${data.content}...`);
+        console.log(`Pushing ${data.content} for deletion...`);
         itemsToDelete.push(data.content.toLowerCase());
       }
     });
-    await deleteFromR2(env, itemsToDelete);
+    deleteFromR2(c, itemsToDelete);
   }
   return itemsToDelete;
 };
 
-export const deleteFromR2 = async (env: Bindings, embeds: string[]) => {
-  // TODO: It would be nice to waitUntil this, but a couple of places need to pass over the context and not just the Bindings
-  // Also consider pushing this data into another D1 table
-  if (embeds.length > 0)
-    await env.R2.delete(embeds);
+export const deleteFromR2 = (c: Context|ScheduledContext, embeds: string[]|string) => {
+  // TODO: consider pushing this data into another D1 table
+  if (embeds.length <= 0)
+    return;
+
+  console.log(`Deleting ${embeds}`);
+  c.executionCtx.waitUntil(c.env.R2.delete(embeds));
 };
 
 const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {

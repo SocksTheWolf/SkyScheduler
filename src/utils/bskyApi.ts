@@ -1,5 +1,6 @@
+import { Context, ExecutionContext } from 'hono';
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
@@ -74,6 +75,21 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
   return PlatformLoginResponse.UnhandledError;
 }
 
+export const makePost = async (c: Context|ScheduledContext, content: Post) => {
+  const env = c.env;
+  const newPost: PostResponseObject|null = await makePostRaw(env, content);
+  if (newPost !== null) {
+    // update post data in the d1
+    c.executionCtx.waitUntil(updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
+      content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] }));
+
+    // Delete any embeds if they exist.
+    deleteEmbedsFromR2(c, content.embeds);
+    return true;
+  }
+  return false;
+}
+
 export const makeRepost = async (env: Bindings, content: Repost) => {
   let bWasSuccess = true;
   const loginCreds = await getBskyUserPassForId(env, content.userId);
@@ -112,11 +128,6 @@ export const makeRepost = async (env: Bindings, content: Repost) => {
 
   return bWasSuccess;
 };
-
-type InternalEmbedProcess = {
-  type: EmbedDataType;
-  data: any;
-}
 
 export const makePostRaw = async (env: Bindings, content: Post) => {
   const loginCreds = await getBskyUserPassForId(env, content.user);
@@ -180,7 +191,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
 
     // Upload any embeds to this post
     if (content.embeds?.length) {
-      let finalEmbed: InternalEmbedProcess|null = null;
+      let finalEmbed: BskyEmbedWrapper|null = null;
       let imagesArray = [];
       let embedsProcessed: number = 0;
       // go until we run out of embeds or have hit the amount of embeds per post
@@ -319,19 +330,6 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
 
   // store the first uri/cid
   return posts[0];
-}
-
-export const makePost = async (env: Bindings, content: Post) => {
-  const newPost: PostResponseObject|null = await makePostRaw(env, content);
-  if (newPost !== null) {
-    await updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
-      content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] });
-
-    // Delete any embeds if they exist.
-    await deleteEmbedsFromR2(env, content.embeds);
-    return true;
-  }
-  return false;
 }
 
 export const getPostRecords = async (records:string[]) => {

@@ -1,4 +1,4 @@
-import { Bindings, Post, Repost } from '../types.d';
+import { Bindings, ScheduledContext, Post, Repost } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
 import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts } from './dbQuery';
@@ -8,13 +8,18 @@ import isEmpty from 'just-is-empty';
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts = await getAllPostsForCurrentTime(env);
   const scheduledReposts = await getAllRepostsForCurrentTime(env);
+  const runtimeWrapper: ScheduledContext = {
+    executionCtx: ctx,
+    env: env
+  };
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
     scheduledPosts.forEach(async (post) => {
       ctx.waitUntil((async () => {
         const postData: Post = createPostObject(post);
-        const newPost:boolean = await makePost(env, postData);
+
+        const newPost: boolean = await makePost(runtimeWrapper, postData);
         if (newPost === false) {
           console.error(`Failed to post id ${postData.postid}`);
         }
@@ -42,9 +47,9 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
 };
 
 export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
-  const removedIds:string[] = await pruneBskyPosts(env);
+  const removedIds: string[] = await pruneBskyPosts(env);
   if (!isEmpty(removedIds)) {
-    await deletePosts(env, removedIds);
-    console.log(`Deleted ${removedIds.length} missing posts from the db`);
+    if (await deletePosts(env, removedIds))
+      console.log(`Deleted ${removedIds.length} missing posts from the db`);
   }
 };

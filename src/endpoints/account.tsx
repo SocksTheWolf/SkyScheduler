@@ -272,7 +272,7 @@ account.post("/delete", authMiddleware, async (c) => {
     });
     if (verify) {
       c.executionCtx.waitUntil(getAllMediaOfUser(c.env, userId)
-        .then((media) => deleteFromR2(c.env, media))
+        .then((media) => deleteFromR2(c, media))
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
       

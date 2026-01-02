@@ -110,16 +110,15 @@ export const deletePost = async (c: Context, id: string) => {
     return false;
   }
 
-  const env = c.env;
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = drizzle(c.env.DB);
   const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).all();
   if (postQuery.length !== 0) {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postQuery[0].posted)
-      await deleteEmbedsFromR2(env, createPostObject(postQuery[0]).embeds);
+      deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
 
-    await db.delete(posts).where(eq(posts.uuid, id));
+    c.executionCtx.waitUntil(db.delete(posts).where(eq(posts.uuid, id)));
     return true;
   }
   return false;
@@ -160,7 +159,7 @@ export const createPost = async (c: Context, body: any) => {
 
   // Create the posts
   const postUUID = uuidv4();
-  let dbOperations:BatchItem<"sqlite">[] = [
+  let dbOperations: BatchItem<"sqlite">[] = [
     db.insert(posts).values({
         content,
         uuid: postUUID,
@@ -222,12 +221,12 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime));
 };
 
-export const updatePostData = async (env: Bindings, id: string, newData:Object) => {
+export const updatePostData = async (env: Bindings, id: string, newData: Object) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   await db.update(posts).set(newData).where(eq(posts.uuid, id));
 };
 
-export const updatePostForUser = async (c: Context, id: string, newData:Object) => {
+export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
   const userId = c.get("userId");
   if (!userId)
     return false;
@@ -289,14 +288,15 @@ export const getAllPostedPosts = async (env: Bindings) => {
     .all();
 };
 
-// deletes multiple posts from a database.
+// deletes multiple posted posts from a database.
 export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
   // Don't do anything on empty arrays.
   if (isEmpty(postsToDelete))
-    return;
+    return false;
 
   const db: DrizzleD1Database = drizzle(env.DB);
   await db.delete(posts).where(and(inArray(posts.uuid, postsToDelete), eq(posts.posted, true)));
+  return true;
 };
 
 export const compactPostedPosts = async (env: Bindings) => {

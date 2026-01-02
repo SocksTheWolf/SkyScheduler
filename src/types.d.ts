@@ -1,3 +1,5 @@
+import { ExecutionContext } from "hono";
+
 export interface Bindings {
   DB: D1Database;
   R2: R2Bucket;
@@ -109,4 +111,14 @@ export enum PWAutoCompleteSettings {
 export type PreloadRules = {
   type: string;
   href: string;
+};
+
+export type ScheduledContext = {
+  executionCtx: ExecutionContext;
+  env: Bindings;
+};
+
+export type BskyEmbedWrapper = {
+  type: EmbedDataType;
+  data: any;
 };
