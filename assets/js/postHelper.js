@@ -18,16 +18,36 @@ function addOnUnloadBlocker() {
 function clearOnUnloadBlocker() {
   window.onbeforeunload = null;
 }
+function setElementRequired(el, required) {
+  if (required)
+    el.setAttribute("required", true);
+  else
+    el.removeAttribute("required");
+}
+
+function setElementVisible(el, shouldShow) {
+  if (shouldShow)
+    el.classList.remove("hidden");
+  else
+    el.classList.add("hidden");
+}
+
+function setElementDisabled(el, disabled) {
+  if (disabled)
+    el.setAttribute("disabled", true);
+  else
+    el.removeAttribute("disabled");
+}
 
 urlCardBox.addEventListener("paste", () => {
   showContentLabeler(true);
-  toggleElementVisibleState(imageAttachmentSection, false);
+  setElementVisible(imageAttachmentSection, false);
 });
 
 urlCardBox.addEventListener("change", () => {
   const isNotEmpty = urlCardBox.value.length > 0;
   showContentLabeler(isNotEmpty);
-  toggleElementVisibleState(imageAttachmentSection, !isNotEmpty);
+  setElementVisible(imageAttachmentSection, !isNotEmpty);
 });
 
 let fileDropzone = new Dropzone("#fileUploads", { 
@@ -40,11 +60,11 @@ let fileDropzone = new Dropzone("#fileUploads", {
 // Fires whenever a post is made or the form needs to reset
 document.addEventListener("resetPost", () => {
   document.getElementById('postForm').reset();
-  toggleElementVisibleState(imageAttachmentSection, true);
-  toggleElementVisibleState(linkAttachmentSection, true);
+  setElementVisible(imageAttachmentSection, true);
+  setElementVisible(linkAttachmentSection, true);
   showContentLabeler(false);
   setSelectDisable(true);
-  setScheduledRequired(true);
+  setElementRequired(scheduledDate, true);
   showPostProgress(false);
   clearOnUnloadBlocker();
   repostCheckbox.checked = false;
@@ -63,7 +83,7 @@ fileDropzone.on("reset", () => {
   hasFileLimit = false;
   clearOnUnloadBlocker();
   showContentLabeler(false);
-  toggleElementVisibleState(linkAttachmentSection, true);
+  setElementVisible(linkAttachmentSection, true);
 });
 
 fileDropzone.on("addedfile", file => {
@@ -72,7 +92,7 @@ fileDropzone.on("addedfile", file => {
     pushToast("Maximum number of files reached", false);
     return;
   }
-  toggleElementVisibleState(linkAttachmentSection, false);
+  setElementVisible(linkAttachmentSection, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
@@ -105,7 +125,7 @@ fileDropzone.on("addedfile", file => {
           pushToast(`Deleted file ${file.name}`, true);
       }
       if (fileData.length == 0) {
-        toggleElementVisibleState(linkAttachmentSection, true);
+        setElementVisible(linkAttachmentSection, true);
       }
     });
   });
@@ -178,8 +198,7 @@ fileDropzone.on("success", function(file, response) {
       if (videoDuration === null) {
         pushToast(`${file.name} duration could not be processed`, false);
         deleteFileOnError();
-      }
-      else if (videoDuration > MAX_VIDEO_LENGTH) {
+      } else if (videoDuration > MAX_VIDEO_LENGTH) {
         pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
         deleteFileOnError();
       } else {
@@ -194,9 +213,7 @@ fileDropzone.on("success", function(file, response) {
   }
   
   // Make the buttons pressable
-  file.previewElement.querySelectorAll("button").forEach(el => {
-    el.removeAttribute("disabled");
-  });
+  file.previewElement.querySelectorAll("button").forEach(el => setElementDisabled(el, false));
 
   try {
     // attempt to write the file size value
@@ -220,7 +237,7 @@ fileDropzone.on("error", function(file, msg) {
   pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
   fileDropzone.removeFile(file);
   if (fileData.length == 0) {
-    toggleElementVisibleState(linkAttachmentSection, true);
+    setElementVisible(linkAttachmentSection, true);
   }
 });
 
@@ -335,23 +352,11 @@ repostCheckbox.addEventListener('click', (e) => {
 });
 
 postNowCheckbox.addEventListener('click', (e) => {
-  setScheduledRequired(!postNowCheckbox.checked);
+  setElementRequired(scheduledDate, !postNowCheckbox.checked);
 });
 
-function setScheduledRequired(required) {
-  if (required)
-    scheduledDate.setAttribute("required", "");
-  else
-    scheduledDate.removeAttribute("required");
-}
-
 function setSelectDisable(disable) {
-  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => {
-    if (disable)
-      el.setAttribute("disabled", true);
-    else
-      el.removeAttribute("disabled");
-  });
+  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => setElementDisabled(el, disable));
 }
 
 function showContentLabeler(shouldShow) {
@@ -361,31 +366,19 @@ function showContentLabeler(shouldShow) {
   if (!shouldShow && (fileData.length > 0 || urlCardBox.value.length > 0))
     return;
 
-  if (shouldShow) {
-    contentLabelSelector.setAttribute("class", "");
-    contentLabelSelect.setAttribute("required", "");
-  } else {
-    contentLabelSelector.classList.add("hidden");
-    contentLabelSelect.removeAttribute("required");
+  setElementVisible(contentLabelSelector, shouldShow);
+  setElementRequired(contentLabelSelect, shouldShow);
+  if (!shouldShow)
     contentLabelSelect.value = "";
-  }
-}
-
-function toggleElementVisibleState(el, shouldShow) {
-  if (shouldShow)
-    el.classList.remove("hidden");
-  else
-    el.classList.add("hidden");
 }
 
 function showPostProgress(shouldShow) {
   const el = document.getElementById("makingPostRequest");
   el.setAttribute("aria-busy", shouldShow);
+  setElementDisabled(el, shouldShow);
   if (shouldShow) {
-    el.setAttribute("disabled", true);
     el.innerHTML = "Making Post...";
   } else {
-    el.removeAttribute("disabled");
     el.innerHTML = "Schedule Post";
   }
 }
