@@ -1,5 +1,4 @@
 import { Env, Hono } from "hono";
-import { every } from 'hono/combine'
 import { createAuth, ContextVariables } from "./auth";
 import { Bindings } from "./types.d";
 import Home from "./pages/homepage";
@@ -8,19 +7,19 @@ import Dashboard from "./pages/dashboard";
 import Login from "./pages/login";
 import ResetPassword from "./pages/reset";
 import ForgotPassword from "./pages/forgot";
+import TermsOfService from "./pages/tos";
+import PrivacyPolicy from "./pages/privacy";
 import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { compactPostedPosts } from "./utils/dbQuery";
-import { authMiddleware } from "./middleware/auth";
-import { adminOnlyMiddleware } from "./middleware/adminOnly";
-import { corsHelperMiddleware } from "./middleware/corsHelper";
-import { account } from "./endpoints/account";
-import { post } from "./endpoints/post";
-import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
 import { makeConstScript } from "./utils/scriptGen";
-import TermsOfService from "./pages/tos";
-import PrivacyPolicy from "./pages/privacy";
+import { authMiddleware } from "./middleware/auth";
+import { authAdminOnlyMiddleware } from "./middleware/adminOnly";
+import { corsHelperMiddleware } from "./middleware/corsHelper";
+import { redirectToDashIfLogin } from "./middleware/redirectDash";
+import { account } from "./endpoints/account";
+import { post } from "./endpoints/post";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -50,9 +49,7 @@ app.use("/post/**", corsHelperMiddleware);
 app.route("/post", post);
 
 // Root route
-app.all("/", (c) => {
-  return c.html(<Home />);
-});
+app.all("/", (c) => c.html(<Home />));
 
 // JS injection of const variables
 app.get("/js/consts.js", (c) => {
@@ -64,47 +61,29 @@ app.get("/js/consts.js", (c) => {
 });
 
 // Add contact link
-app.all("/contact", (c) => {
-  return c.redirect(c.env.CONTACT_LINK);
-});
+app.all("/contact", (c) => c.redirect(c.env.CONTACT_LINK));
 
 // Legal linkies
-app.get("/tos", (c) => {
-  return c.html(<TermsOfService />);
-});
-app.get("/privacy", (c) => {
-  return c.html(<PrivacyPolicy />);
-});
+app.get("/tos", (c) => c.html(<TermsOfService />));
+app.get("/privacy", (c) => c.html(<PrivacyPolicy />));
 
 // Dashboard route
-app.get("/dashboard", authMiddleware, (c) => {
-  return c.html(
-    <Dashboard c={c} />
-  );
-});
+app.get("/dashboard", authMiddleware, (c) => c.html(<Dashboard c={c} />));
 
 // Login route
-app.get("/login", redirectToDashIfLogin, (c) => {
-  return c.html(<Login />);
-});
+app.get("/login", redirectToDashIfLogin, (c) => c.html(<Login />));
 
 // Signup route
-app.get("/signup", redirectToDashIfLogin, (c) => {
-  return c.html(<Signup c={c} />);
-});
+app.get("/signup", redirectToDashIfLogin, (c) => c.html(<Signup c={c} />));
 
 // Forgot Password route
-app.get("/forgot", redirectToDashIfLogin, (c) => {
-  return c.html(<ForgotPassword c={c} />);
-});
+app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword c={c} />));
 
 // Reset Password route
-app.get("/reset", redirectToDashIfLogin, (c) => {
-  return c.html(<ResetPassword />);
-});
+app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword />));
 
 // Generate invites route
-app.get("/invite", every(authMiddleware, adminOnlyMiddleware), (c) => {
+app.get("/invite", authAdminOnlyMiddleware, (c) => {
   const newKey = makeInviteKey(c);
   if (newKey !== null)
     return c.text(`${newKey} is good for 10 uses`);
@@ -113,17 +92,17 @@ app.get("/invite", every(authMiddleware, adminOnlyMiddleware), (c) => {
 });
 
 // Admin Maintenance Cleanup
-app.get("/cron", every(authMiddleware, adminOnlyMiddleware), (c) => {
+app.get("/cron", authAdminOnlyMiddleware, (c) => {
   schedulePostTask(c.env, c.executionCtx);
   return c.text("ran");
 });
 
-app.get("/cron-clean", every(authMiddleware, adminOnlyMiddleware), (c) => {
+app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
   c.executionCtx.waitUntil(cleanUpPostsTask(c.env, c.executionCtx));
   return c.text("ran");
 });
 
-app.get("/db-truncate", every(authMiddleware, adminOnlyMiddleware), (c) => {
+app.get("/db-truncate", authAdminOnlyMiddleware, (c) => {
   c.executionCtx.waitUntil(compactPostedPosts(c.env));
   return c.text("ran");
 });
