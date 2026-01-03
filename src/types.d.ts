@@ -1,12 +1,17 @@
 import { ExecutionContext } from "hono";
 
+type ImageConfigSettings = {
+  enabled: boolean;
+  steps: number[];
+};
+
 export interface Bindings {
   DB: D1Database;
   R2: R2Bucket;
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
   INVITE_POOL: KVNamespace;
-  IMAGE_SETTINGS: {enabled: boolean; steps: number[]};
+  IMAGE_SETTINGS: ImageConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -17,6 +22,7 @@ export interface Bindings {
   USE_INVITE_KEYS: boolean;
   USE_TURNSTILE_CAPTCHA: boolean;
   RESIZE_SECRET_HEADER: string;
+  RESIZE_BUCKET_URL: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
   CONTACT_LINK: string;

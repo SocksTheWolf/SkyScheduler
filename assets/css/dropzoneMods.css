@@ -8,6 +8,10 @@
   text-align: right;
 }
 
+.dropzone .dz-preview {
+  min-width: 15rem;
+}
+
 .dropzone .dz-preview .dz-details .dz-filename span, .dropzone .dz-preview .dz-details .dz-size span {
   background-color: unset;
 }

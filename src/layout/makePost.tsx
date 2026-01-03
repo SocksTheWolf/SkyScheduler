@@ -2,7 +2,7 @@ import { html } from "hono/html";
 import { MAX_LENGTH, CF_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
-  R2_FILE_SIZE_LIMIT_IN_MB} from "../limits.d"
+  R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE } from "../limits.d"
 import { PreloadRules } from "../types.d";
 import { ConstScript, ConstScriptPreload } from "./constScript";
 
@@ -55,14 +55,14 @@ export function PostCreation() {
                   <ul>
                     <li>be less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
                     <li>have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
-                    <li>if an image fails, it's recommended to just change the resolution</li>
+                    <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
+                    <li>if an image fails, it's recommended to use a lower resolution file instead</li>
                   </ul></li>
                   <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must 
                   <ul>
                     <li>be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
                   </ul></li>
-                  <li>If you see a white thumbnail when you upload your media, this is a temporary bug in the thumbnail renderer. Your files uploaded fine.</li>
                   </ul></small></div>
                 </footer>
               </article>

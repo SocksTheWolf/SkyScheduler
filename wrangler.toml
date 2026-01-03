@@ -31,7 +31,7 @@ migrations_dir = "migrations"
 binding = "R2"
 bucket_name = "skyembeds"
 
-# temporary storage to get CF Images working
+# temporary storage to get CF Images working, this bucket should be WAF'd so no one but the worker can access it.
 [[r2_buckets]]
 binding = "R2RESIZE" 
 bucket_name = "skyscheduler-resize"
@@ -52,8 +52,9 @@ head_sampling_rate = 1
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
-# If we should use cf image transforms & how much of a quality percentage should we try
+# If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75]}
+RESIZE_BUCKET_URL="https://resize.skyscheduler.work/"
 
 # Signup options
 USE_TURNSTILE_CAPTCHA=true

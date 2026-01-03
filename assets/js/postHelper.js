@@ -54,7 +54,7 @@ let fileDropzone = new Dropzone("#fileUploads", {
   url: "/post/upload", 
   autoProcessQueue: true,
   maxFilesize: FILE_DROP_MAX_SIZE,
-  maxThumbnailFilesize: 20,
+  maxThumbnailFilesize: FILE_DROP_MAX_THUMB_SIZE,
   acceptedFiles: fileTypesSupported.toString()
 });
 
@@ -231,18 +231,29 @@ fileDropzone.on("success", function(file, response) {
 
   try {
     // attempt to write the file size value
+    const uploadedFileSize = fileDropzone.filesize(response.fileSize);
     const fileSizeElement = file.previewElement.querySelector(".dz-size");
     const detailsArea = file.previewElement.querySelector(".dz-details");
-    fileSizeElement.firstChild.innerHTML = fileDropzone.filesize(response.fileSize);
+    fileSizeElement.firstChild.innerHTML = uploadedFileSize;
     // and the quality compression as well
     const fileQualityLevel = Dropzone.createElement(`<div class="dz-size"><span>Quality: ${response.qualityLevel || 100}%</span></div>`);
     detailsArea.insertBefore(fileQualityLevel, fileSizeElement);
     // add a tooltip to the filename field
     file.previewElement.querySelector(".dz-filename").setAttribute("title", file.name);
+    // thumbnail swap in
+    if (fileIsVideo) {
+      this.emit('thumbnail', file, '/thumbs/video.png');
+    } else if (uploadedFileSize > FILE_DROP_MAX_THUMB_SIZE) {
+      if (fileIsImage) {
+        this.emit('thumbnail', file, '/thumbs/image.png');
+      } else if (fileIsGif) {
+        this.emit('thumbnail', file, '/thumbs/gif.png');
+      }
+    }
   } catch (err) {
     console.error(err);
   }
-  
+
   addOnUnloadBlocker();
 });
 

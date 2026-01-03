@@ -104,7 +104,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
 
       for (var i = 0; i < env.IMAGE_SETTINGS.steps.length; ++i) {
         const qualityLevel = env.IMAGE_SETTINGS.steps[i];
-        const response = await fetch(`https://resize.skyscheduler.work/${resizeFilename}`, {
+        const response = await fetch(new URL(resizeFilename, env.RESIZE_BUCKET_URL), {
           headers: {
             "x-skyscheduler-helper": env.RESIZE_SECRET_HEADER
           },

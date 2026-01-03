@@ -18,6 +18,10 @@ export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the default from bsky
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 
+// the maximum size of an image file to generate a thumbnail for, in MB.
+// generation is done on client side using canvas elements.
+export const MAX_THUMBNAIL_SIZE: number = 15;
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
