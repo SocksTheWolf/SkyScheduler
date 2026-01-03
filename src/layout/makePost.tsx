@@ -53,14 +53,16 @@ export function PostCreation() {
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
                   <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must 
                   <ul>
-                    <li>have a resolution less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
-                    <li>have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>, but may fail)</li>
+                    <li>be less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
+                    <li>have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
+                    <li>if an image fails, it's recommended to just change the resolution</li>
                   </ul></li>
                   <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must 
                   <ul>
                     <li>be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
                   </ul></li>
+                  <li>If you see a white thumbnail when you upload your media, this is a temporary bug in the thumbnail renderer. Your files uploaded fine.</li>
                   </ul></small></div>
                 </footer>
               </article>
