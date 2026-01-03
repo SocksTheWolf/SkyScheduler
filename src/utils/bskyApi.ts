@@ -4,7 +4,7 @@ import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, Loose
 import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
-import {imageDimensionsFromStream} from 'image-dimensions';
+import { imageDimensionsFromStream } from 'image-dimensions';
 import truncate from "just-truncate";
 import isEmpty from "just-is-empty";
 import has from 'just-has';

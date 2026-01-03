@@ -1,9 +1,12 @@
 import { Bindings, ScheduledContext, EmbedData, EmbedDataType, LooseObj } from '../types.d';
 import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, 
   BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, TO_MB, BSKY_VIDEO_MIME_TYPES, 
-  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES } from "../limits.d";
+  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES, 
+  R2_FILE_SIZE_LIMIT,
+  R2_FILE_SIZE_LIMIT_IN_MB} from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'hono';
+import { imageDimensionsFromStream } from 'image-dimensions';
 
 type FileMetaData = {
   name: string,
@@ -58,25 +61,34 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
 
 const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
   const originalName = file.name;
-  let finalFileSize = file.size;
-  let finalQualityLevel = 100;
+  // The maximum size of CF Image transforms.
+  if (file.size > CF_FILE_SIZE_LIMIT) {
+    return {"success": false, "error": `An image has a maximum file size of ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
+  }
 
-  // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
-  let fileToProcess: ArrayBuffer|ReadableStream = await file.arrayBuffer();
   // We need to double check this image for various size information.
-  const imageMetaData = await env.IMAGES.info(await file.stream());
+  const imageMetaData = await imageDimensionsFromStream(file.stream());
+  if (imageMetaData === undefined) {
+    return {"success": false, "error": "image data could not be processed "}
+  }
 
   // if the image is over the cf image transforms, then return an error.
-  if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION){
+  if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION) {
     return {"success": false, "error": 
       `Image dimensions are too large to autosize. Make sure your files fit the requirements listed.`};
   }
 
   // Check if the image is over the bluesky image dimension limits
-  const imageDimensionsTooLarge:boolean = imageMetaData.width > BSKY_IMG_MAX_WIDTH || 
+  const imageDimensionsTooLarge: boolean = imageMetaData.width > BSKY_IMG_MAX_WIDTH || 
     imageMetaData.height > BSKY_IMG_MAX_HEIGHT;
 
   // If the image is over any bsky limits, we will need to resize it
+  let finalFileSize: number = file.size;
+  // final quality level
+  let finalQualityLevel: number = 100;
+
+  // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
+  let fileToProcess: ArrayBuffer|ReadableStream|null = null;
 
   // if we should force to bsky image dimensions
   const fitToBSkyDim: boolean = env.USE_BSKY_IMAGE_DIMENSIONS;
@@ -85,11 +97,11 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
 
     if (env.USE_IMAGE_TRANSFORMS) {
       // number of attempts to fit the image to BSky's requirements
-      var attempts:number = 1;
+      var attempts: number = 1;
       // quality of the degrade per steps
-      const degradePerStep:number = env.IMAGE_DEGRADE_PER_STEP;
+      const degradePerStep: number = env.IMAGE_DEGRADE_PER_STEP;
 
-      const transformRules:LooseObj = { metadata: "copyright" };
+      const transformRules: LooseObj = { metadata: "copyright" };
       // Fit to aspect ratio, but only if we're too large.
       if (fitToBSkyDim) {
         transformRules.width = BSKY_IMG_MAX_WIDTH;
@@ -98,11 +110,11 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
       }
       do {
         // Set the quality level for this step
-        const qualityLevel:number = 100 - degradePerStep*attempts;
+        const qualityLevel: number = 100 - degradePerStep*attempts;
         transformRules.quality = qualityLevel;
 
         const response = (
-          await env.IMAGES.input(await file.stream())
+          await env.IMAGES.input(file.stream())
             .transform(transformRules)
             .output({ format: "image/jpeg" })
         ).response();
@@ -133,7 +145,7 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
     }
 
     if (failedToResize) {
-      const fileSizeOverAmount = ((file.size - BSKY_IMG_SIZE_LIMIT)/TO_MB).toFixed(2);
+      const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/TO_MB).toFixed(2);
       return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, over by ${fileSizeOverAmount}MB`};
     }
   }
@@ -144,6 +156,9 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
     user: userId,
     qualityLevel: finalQualityLevel
   };
+
+  if (fileToProcess === null)
+    fileToProcess = await file.arrayBuffer();
   return await rawUploadToR2(env, fileToProcess, fileMetaData);
 };
 
@@ -167,9 +182,9 @@ export const uploadFileR2 = async (env: Bindings, file: File|string, userId: str
     return {"success": false, "error": "data invalid"};
   }
 
-  // The file size limit for ImageTransforms
-  if (file.size > CF_FILE_SIZE_LIMIT) {
-    return {"success": false, "error": `max file size is ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
+  // The file size limit for R2 before having to do a multipart upload.
+  if (file.size > R2_FILE_SIZE_LIMIT) {
+    return {"success": false, "error": `max file size is ${R2_FILE_SIZE_LIMIT_IN_MB}MB`};
   }
 
   const fileType: string = file.type.toLowerCase();
