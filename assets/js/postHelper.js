@@ -12,7 +12,7 @@ const linkAttachmentSection = document.getElementById("webLinkAttachmentSection"
 function addOnUnloadBlocker() {
   window.onbeforeunload = function() {
     document.querySelectorAll(".fileDel").forEach((el) => {el.click();});
-    return false;
+    return undefined;
   }
 }
 function clearOnUnloadBlocker() {
