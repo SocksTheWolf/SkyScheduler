@@ -278,7 +278,7 @@ account.post("/delete", authMiddleware, async (c) => {
       
       c.header("HX-Redirect", "/");
       c.header("HX-Trigger", "accountDeleted");
-      return c.html(<strong>Success!</strong>);
+      return c.html(<></>);
     } else {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>);
     }
