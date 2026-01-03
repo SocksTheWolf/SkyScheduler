@@ -54,6 +54,7 @@ let fileDropzone = new Dropzone("#fileUploads", {
   url: "/post/upload", 
   autoProcessQueue: true,
   maxFilesize: FILE_DROP_MAX_SIZE,
+  maxThumbnailFilesize: 20,
   acceptedFiles: fileTypesSupported.toString()
 });
 
