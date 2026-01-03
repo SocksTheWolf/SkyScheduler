@@ -44,7 +44,7 @@ urlCardBox.addEventListener("paste", () => {
   setElementVisible(imageAttachmentSection, false);
 });
 
-urlCardBox.addEventListener("change", () => {
+urlCardBox.addEventListener("input", () => {
   const isNotEmpty = urlCardBox.value.length > 0;
   showContentLabeler(isNotEmpty);
   setElementVisible(imageAttachmentSection, !isNotEmpty);
