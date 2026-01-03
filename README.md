@@ -136,7 +136,6 @@ skyscheduler/
 - toastify - client notifications
 - dropzone - file upload negotiation
 - pico - styling
-- randomstring - named random html element ids
 - countable - dynamic input counter
 
 ## Contributing

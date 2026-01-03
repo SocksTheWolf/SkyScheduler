@@ -16,7 +16,7 @@ export default function PostEdit({post}:EditedPostProps) {
   const editSpinner:string = `editSpinner${post.postid}`;
   const editResponse:string = `editResponse${post.postid}`;
   return (
-    <form hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
+    <form id={`editPost${post.postid}`} hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
         hx-swap="innerHTML" hx-indicator={`#${editSpinner}`}>
       <section>
         <textarea name="content" id={`content${post.postid}`} rows={8} style="resize: none" required>

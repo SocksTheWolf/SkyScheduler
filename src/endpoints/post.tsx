@@ -10,8 +10,8 @@ import { EditSchema } from "../validation/postSchema";
 import { createPostObject } from "../utils/helpers";
 import { makePost } from "../utils/bskyApi";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
-import { createPost, deletePost, getPostById, setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
-import { ScheduledPostList } from "../layout/postList";
+import { createPost, deletePost, getPostById, getUsernameForUser, setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
+import { ScheduledPost, ScheduledPostList } from "../layout/postList";
 import PostEdit from "../layout/editPost";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -95,20 +95,28 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   if (!isValid(id)) {
     c.header("HX-Trigger-After-Swap", "refreshPosts");
-    return c.html(<></>, 400);
+    return c.html(<b class="btn-error">Post was invalid</b>, 400);
   }
 
   const body = await c.req.parseBody();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
-    return c.html(<b>Data was invalid</b>);
+    return c.html(<b class="btn-error">New post had invalid data</b>);
   }
 
   const { content } = validation.data;
   const payload = {content: content};
   if (await updatePostForUser(c, id, payload)) {
-    c.header("HX-Trigger-After-Swap", "refreshPosts");
-    return c.html(<b>Success</b>);
+    const postInfo = await getPostById(c, id);
+    if (postInfo.length > 0) {
+      const postData = createPostObject(postInfo[0]);
+      const username = await getUsernameForUser(c);
+      c.header("HX-Trigger-After-Swap", "timeSidebar");
+      return c.html(<ScheduledPost post={postData} user={username} dynamic={true} />);
+    } else {
+      c.header("HX-Trigger-After-Swap", "refreshPosts");
+      return c.html(<></>);
+    }
   } else {
     return c.html(<b class="btn-error">Failed to process</b>);
   }
