@@ -1,6 +1,6 @@
 import { Bindings, ScheduledContext, EmbedData, EmbedDataType, LooseObj } from '../types.d';
-import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_FILE_SIZE_LIMIT_IN_MB, CF_FILE_SIZE_LIMIT, 
-  BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, TO_MB, BSKY_VIDEO_MIME_TYPES, 
+import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, CF_IMAGES_FILE_SIZE_LIMIT, 
+  BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, MB_TO_BYTES, BSKY_VIDEO_MIME_TYPES, 
   BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES, 
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB} from "../limits.d";
@@ -62,8 +62,8 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
 const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
   const originalName = file.name;
   // The maximum size of CF Image transforms.
-  if (file.size > CF_FILE_SIZE_LIMIT) {
-    return {"success": false, "error": `An image has a maximum file size of ${CF_FILE_SIZE_LIMIT_IN_MB}MB`};
+  if (file.size > CF_IMAGES_FILE_SIZE_LIMIT) {
+    return {"success": false, "error": `An image has a maximum file size of ${CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB`};
   }
 
   // We need to double check this image for various size information.
@@ -145,7 +145,7 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
     }
 
     if (failedToResize) {
-      const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/TO_MB).toFixed(2);
+      const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
       return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, over by ${fileSizeOverAmount}MB`};
     }
   }

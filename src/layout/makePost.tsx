@@ -1,7 +1,8 @@
 import { html } from "hono/html";
-import { MAX_LENGTH, CF_MAX_DIMENSION, CF_FILE_SIZE_LIMIT_IN_MB, 
+import { MAX_LENGTH, CF_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
-  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS } from "../limits.d"
+  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
+  R2_FILE_SIZE_LIMIT_IN_MB} from "../limits.d"
 import { PreloadRules } from "../types.d";
 import { ConstScript, ConstScriptPreload } from "./constScript";
 
@@ -15,6 +16,7 @@ export const PreloadPostCreation: PreloadRules[] = [
 ];
 
 export function PostCreation() {
+  const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
     <script type="text/javascript" src="/dep/dropzone-min.js"></script>
@@ -49,9 +51,16 @@ export function PostCreation() {
                 </div>
                 <footer>
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
-                  <li>This tool cannot handle files larger than {CF_FILE_SIZE_LIMIT_IN_MB}MB</li>
-                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must have a resolution less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
-                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
+                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must 
+                  <ul>
+                    <li>have a resolution less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
+                    <li>be smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to intelligently compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>, but may fail)</li>
+                  </ul></li>
+                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must 
+                  <ul>
+                    <li>be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
+                    <li>be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
+                  </ul></li>
                   </ul></small></div>
                 </footer>
               </article>

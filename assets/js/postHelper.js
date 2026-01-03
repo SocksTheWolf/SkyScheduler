@@ -53,7 +53,7 @@ urlCardBox.addEventListener("change", () => {
 let fileDropzone = new Dropzone("#fileUploads", { 
   url: "/post/upload", 
   autoProcessQueue: true,
-  maxFilesize: 70000000,
+  maxFilesize: FILE_DROP_MAX_SIZE,
   acceptedFiles: fileTypesSupported.toString()
 });
 
@@ -150,8 +150,14 @@ fileDropzone.on("success", function(file, response) {
   if (fileIsVideo) {
     // Attempt to process the video type
     const videoTag = document.createElement("video");
+    const videoObjectURL = URL.createObjectURL(file);
+    const cleanupVideoTag = () => {
+      videoTag.removeAttribute("src");
+      URL.revokeObjectURL(videoObjectURL);
+      videoTag.remove();
+    };
     videoTag.setAttribute("hidden", true);
-    videoTag.setAttribute("src", URL.createObjectURL(file));
+    videoTag.setAttribute("src", videoObjectURL);
     videoTag.addEventListener("loadeddata", () => {
       const videoDuration = videoTag.duration;
       if (videoDuration > MAX_VIDEO_LENGTH) {
@@ -161,16 +167,17 @@ fileDropzone.on("success", function(file, response) {
         fileData.set(file.name, {content: response.data, type: 3, height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
         hasFileLimit = true;
       }
-      videoTag.remove();
+      cleanupVideoTag();
     });
     videoTag.addEventListener("error", () => {
       pushToast(`Unable to process ${file.name}, decoder error occurred`);
       deleteFileOnError();
-      videoTag.remove();
+      cleanupVideoTag();
     });
     document.body.appendChild(videoTag);
   } else if (fileIsGif) {
     const imgObj = new Image();
+    const gifImgURL = URL.createObjectURL(file);
     // This is in seconds, I can't really explain it without trying to go into the gif format myself.
     // from https://stackoverflow.com/a/74236879
     const getGifDuration = (ab) => {
@@ -194,7 +201,13 @@ fileDropzone.on("success", function(file, response) {
       }
     }
     imgObj.onload = async () => {
+      if (imgObj.src === "")
+        return;
+
       const videoDuration = getGifDuration(await file.arrayBuffer());
+      // Cleanup the gif processing stuffs
+      imgObj.src = "";
+      URL.revokeObjectURL(gifImgURL);
       if (videoDuration === null) {
         pushToast(`${file.name} duration could not be processed`, false);
         deleteFileOnError();
@@ -207,7 +220,7 @@ fileDropzone.on("success", function(file, response) {
       }
     };
     // Force the file to load.
-    imgObj.src = URL.createObjectURL(file);
+    imgObj.src = gifImgURL;
   } else {
     fileData.set(file.name, {content: response.data, type: 1});
   }
@@ -386,6 +399,7 @@ function openAltText(file, altTextButton) {
   const altTextImgPreview = document.getElementById("altThumbImg");
   const saveButton = document.getElementById("altTextSaveButton");
   const cancelButton = document.getElementById("altTextCancelButton");
+  const altTextPreviewImgURL = URL.createObjectURL(file);
 
   // Handle page reset
   if (altTextModal.hasAttribute("hasReset") === false) {
@@ -420,6 +434,7 @@ function openAltText(file, altTextButton) {
     cancelButton.removeEventListener("click", closeAltModal);
     altTextModal.removeEventListener("close", unbindAltModal);
     altTextImgPreview.src = "";
+    URL.revokeObjectURL(altTextPreviewImgURL);
     detachTribute(altTextField);
   }
 
@@ -428,7 +443,7 @@ function openAltText(file, altTextButton) {
     closeModal(altTextModal);
   };
 
-  altTextImgPreview.src = URL.createObjectURL(file);
+  altTextImgPreview.src = altTextPreviewImgURL;
   saveButton.addEventListener("click", handleSave);
   cancelButton.addEventListener("click", closeAltModal);
   altTextModal.addEventListener("close", unbindAltModal);

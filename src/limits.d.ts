@@ -24,8 +24,7 @@ export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
 export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
 // Helper conversion math
-export const TO_MB: number = 1024 * 1024;
-export const TO_MiB: number = 1000 * 1000;
+export const MB_TO_BYTES: number = 1000 * 1000;
 export const TO_SEC: number = 60;
 export const TO_MS: number = TO_SEC*1000;
 
@@ -102,11 +101,11 @@ export const BSKY_VIDEO_FILE_EXTS: string = [
 
 // Max size of files that can go to R2 without doing multipart uploads
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
-export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * TO_MiB;
-export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_MAX_SIZE_IN_MB * TO_MiB;
+export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
+export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
+export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_MAX_SIZE_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
-export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * TO_MB;
 // Max size of Cloudflare Images files
-export const CF_FILE_SIZE_LIMIT_IN_MB: number = 70;
-export const CF_FILE_SIZE_LIMIT: number = CF_FILE_SIZE_LIMIT_IN_MB * TO_MB;
+export const CF_IMAGES_FILE_SIZE_LIMIT_IN_MB: number = 70;
+export const CF_IMAGES_FILE_SIZE_LIMIT: number = CF_IMAGES_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const CF_MAX_DIMENSION: number = 10000;
