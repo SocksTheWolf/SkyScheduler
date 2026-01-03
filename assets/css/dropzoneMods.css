@@ -5,11 +5,22 @@
 .dropzone .dz-preview .dz-details {
   opacity: 0.7;
   color: unset;
+  text-align: right;
+}
+
+.dropzone .dz-preview .dz-details .dz-filename span, .dropzone .dz-preview .dz-details .dz-size span {
+  background-color: unset;
 }
 
 .dropzone .dz-preview .dz-details .dz-filename:hover span {
   border: unset;
-  background-color: rgba(255,255,255,.4);
+  /*background-color: rgba(255,255,255,.4);*/
+  background-color: unset;
+}
+
+.dz-filename { 
+  width: 65%;
+  float: right;
 }
 
 html {

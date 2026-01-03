@@ -236,6 +236,8 @@ fileDropzone.on("success", function(file, response) {
     // and the quality compression as well
     const fileQualityLevel = Dropzone.createElement(`<div class="dz-size"><span>Quality: ${response.qualityLevel || 100}%</span></div>`);
     detailsArea.insertBefore(fileQualityLevel, fileSizeElement);
+    // add a tooltip to the filename field
+    file.previewElement.querySelector(".dz-filename").setAttribute("title", file.name);
   } catch (err) {
     console.error(err);
   }
