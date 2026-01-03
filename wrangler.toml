@@ -55,7 +55,7 @@ USE_IMAGE_TRANSFORMS=true
 USE_BSKY_IMAGE_DIMENSIONS=false
 
 # how many image quality steps should we attempt and how much of a percentage per step should we take off of quality
-MAX_IMAGE_QUALITY_STEPS=6
+MAX_IMAGE_QUALITY_STEPS=2
 IMAGE_DEGRADE_PER_STEP=5
 
 # Signup options

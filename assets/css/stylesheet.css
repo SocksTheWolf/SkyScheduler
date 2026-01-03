@@ -28,7 +28,13 @@
   color: red;
 }
 
-.btn-error:not(.outline) {
+.btn-error:hover {
+  --error-color-hover: rgb(252, 60, 60);
+  border: var(--pico-border-width) solid var(--error-color-hover); 
+  color: var(--error-color-hover);
+}
+
+.btn-error:not(.outline), .btn-error:not(.outline):hover {
   background-color: red;
   color: white;
 }

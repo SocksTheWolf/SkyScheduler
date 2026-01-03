@@ -54,7 +54,7 @@ export function PostCreation() {
                   <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must 
                   <ul>
                     <li>have a resolution less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
-                    <li>be smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to intelligently compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>, but may fail)</li>
+                    <li>have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>, but may fail)</li>
                   </ul></li>
                   <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must 
                   <ul>

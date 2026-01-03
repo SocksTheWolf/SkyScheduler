@@ -113,14 +113,14 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
         const qualityLevel: number = 100 - degradePerStep*attempts;
         transformRules.quality = qualityLevel;
 
-        const response = (
+        const response = await (
           await env.IMAGES.input(file.stream())
             .transform(transformRules)
             .output({ format: "image/jpeg" })
         ).response();
 
         // Break the responses into two streams so that we can read the data as both an info as well as the actual R2 upload
-        const [infoStream, dataStream] = await response.body.tee();
+        const [infoStream, dataStream] = response.body.tee();
 
         // Figure out how big of a transform this was
         const transformInfo = await env.IMAGES.info(infoStream);
