@@ -19,10 +19,6 @@ kv_namespaces = [
   { binding = "INVITE_POOL", id = "45e1cff45cad45c28b22c4fbcd30db00" } # Invite key pool
 ]
 
-[observability]
-enabled = true
-head_sampling_rate = 1
-
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
@@ -35,8 +31,10 @@ migrations_dir = "migrations"
 binding = "R2"
 bucket_name = "skyembeds"
 
-[images]
-binding = "IMAGES"
+# temporary storage to get CF Images working
+[[r2_buckets]]
+binding = "R2RESIZE" 
+bucket_name = "skyscheduler-resize"
 
 [triggers]
 # Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:
@@ -46,20 +44,21 @@ crons = [ "0 * * * *", "30 17 * * sun" ]
 [dev]
 ip = "127.0.0.1"
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
-# If we should use cf image transforms
-USE_IMAGE_TRANSFORMS=true
-USE_BSKY_IMAGE_DIMENSIONS=false
-
-# how many image quality steps should we attempt and how much of a percentage per step should we take off of quality
-MAX_IMAGE_QUALITY_STEPS=2
-IMAGE_DEGRADE_PER_STEP=5
+# If we should use cf image transforms & how much of a quality percentage should we try
+IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75]}
 
 # Signup options
 USE_TURNSTILE_CAPTCHA=true
+
+# If invites should be used
 USE_INVITE_KEYS=false
 
 # link to invite threads

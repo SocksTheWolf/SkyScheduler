@@ -243,9 +243,6 @@ fileDropzone.on("success", function(file, response) {
   }
   
   addOnUnloadBlocker();
-
-  if (fileIsImage)
-    this.createThumbnailFromUrl(file, response.data);
 });
 
 fileDropzone.on("error", function(file, msg) {

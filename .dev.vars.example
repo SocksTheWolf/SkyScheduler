@@ -7,3 +7,4 @@ TURNSTILE_PUBLIC_KEY=cf-public-keycode
 TURNSTILE_SECRET_KEY=cf-secret-keycode
 RESET_BOT_USERNAME=skyscheduler.work
 RESET_BOT_APP_PASS=bsky-app-password-for-user-with-dm-access
+RESIZE_SECRET_HEADER=somecoollongstring

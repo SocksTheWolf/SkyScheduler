@@ -7,6 +7,7 @@ import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
+import truncate from 'just-truncate';
 
 type FileMetaData = {
   name: string,
@@ -59,8 +60,9 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
   }
 };
 
-const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
+const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   const originalName = file.name;
+  const env: Bindings = c.env;
   // The maximum size of CF Image transforms.
   if (file.size > CF_IMAGES_FILE_SIZE_LIMIT) {
     return {"success": false, "error": `An image has a maximum file size of ${CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB`};
@@ -74,13 +76,8 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
 
   // if the image is over the cf image transforms, then return an error.
   if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION) {
-    return {"success": false, "error": 
-      `Image dimensions are too large to autosize. Make sure your files fit the requirements listed.`};
+    return {"success": false, "error": "image dimensions are too large to autosize. make sure your files fit the limits."};
   }
-
-  // Check if the image is over the bluesky image dimension limits
-  const imageDimensionsTooLarge: boolean = imageMetaData.width > BSKY_IMG_MAX_WIDTH || 
-    imageMetaData.height > BSKY_IMG_MAX_HEIGHT;
 
   // If the image is over any bsky limits, we will need to resize it
   let finalFileSize: number = file.size;
@@ -90,58 +87,71 @@ const uploadImageToR2 = async(env: Bindings, file: File, userId: string) => {
   // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
   let fileToProcess: ArrayBuffer|ReadableStream|null = null;
 
-  // if we should force to bsky image dimensions
-  const fitToBSkyDim: boolean = env.USE_BSKY_IMAGE_DIMENSIONS;
-  if (file.size > BSKY_IMG_SIZE_LIMIT || (fitToBSkyDim && imageDimensionsTooLarge)) {
+  if (file.size > BSKY_IMG_SIZE_LIMIT) {
     let failedToResize = true;
 
-    if (env.USE_IMAGE_TRANSFORMS) {
-      // number of attempts to fit the image to BSky's requirements
-      var attempts: number = 1;
-      // quality of the degrade per steps
-      const degradePerStep: number = env.IMAGE_DEGRADE_PER_STEP;
+    if (env.IMAGE_SETTINGS.enabled) {
+      const resizeFilename = uuidv4();
+      const resizeBucketPush = await env.R2RESIZE.put(resizeFilename, await file.bytes(), {
+        customMetadata: {"user": userId },
+        httpMetadata: {contentType: file.type }
+      });
 
-      const transformRules: LooseObj = { metadata: "copyright" };
-      // Fit to aspect ratio, but only if we're too large.
-      if (fitToBSkyDim) {
-        transformRules.width = BSKY_IMG_MAX_WIDTH;
-        transformRules.height = BSKY_IMG_MAX_HEIGHT;
-        transformRules.fit = "scale-down";
+      if (!resizeBucketPush) {
+        console.error(`Failed to push ${file.name} to the resizing bucket`);
+        return {"success": false, "error": "unable to handle image for resize, please make it smaller"}
       }
-      do {
-        // Set the quality level for this step
-        const qualityLevel: number = 100 - degradePerStep*attempts;
-        transformRules.quality = qualityLevel;
 
-        const response = await (
-          await env.IMAGES.input(file.stream())
-            .transform(transformRules)
-            .output({ format: "image/jpeg" })
-        ).response();
+      for (var i = 0; i < env.IMAGE_SETTINGS.steps.length; ++i) {
+        const qualityLevel = env.IMAGE_SETTINGS.steps[i];
+        const response = await fetch(`https://resize.skyscheduler.work/${resizeFilename}`, {
+          headers: {
+            "X-SkyScheduler-Helper": env.RESIZE_SECRET_HEADER
+          },
+          cf: {
+            image: {
+              quality: qualityLevel,
+              metadata: "copyright",
+              format: "jpeg"
+            }
+          }
+        });
+        if (response.ok) {
+          const resizedHeader = response.headers.get("Cf-Resized");
+          const returnType = response.headers.get("Content-Type") || "";
+          const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
+          const resizeHadError = resizedHeader === null || resizedHeader.indexOf("err=") !== -1;
+          
+          if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
+            console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
+            
+            // If we make the file size less than the actual limit 
+            if (transformFileSize < BSKY_IMG_SIZE_LIMIT && transformFileSize !== 0) {
+              console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
+              failedToResize = false;
+              // Set some extra variables
+              finalQualityLevel = qualityLevel;
+              finalFileSize = transformFileSize;
+              fileToProcess = response.body;
+              break;
+            } else {
+              if (transformFileSize !== 0) {
+                // Print how over the image was if we cannot properly resize it
+                console.log(`${originalName}: file size ${transformFileSize - BSKY_IMG_SIZE_LIMIT} over the appropriate size`);
+              }
 
-        // Break the responses into two streams so that we can read the data as both an info as well as the actual R2 upload
-        const [infoStream, dataStream] = response.body.tee();
-
-        // Figure out how big of a transform this was
-        const transformInfo = await env.IMAGES.info(infoStream);
-        console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformInfo.fileSize}`);
-
-        // If we make the file size less than the actual limit 
-        if (transformInfo.fileSize < BSKY_IMG_SIZE_LIMIT) {
-          console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
-          failedToResize = false;
-          // Set some extra variables
-          finalQualityLevel = qualityLevel;
-          finalFileSize = transformInfo.fileSize;
-          fileToProcess = dataStream;
-          break;
+              // dispose the body
+              await response.body?.cancel();
+            }
+          } else {
+            console.warn(`File ${file.name} was not handled ${response.statusText}`);
+          }
         } else {
-          // Print how over the image was if we cannot properly resize it
-          console.log(`${originalName}: file size was ${transformInfo.fileSize} which is 
-            ${transformInfo.fileSize - BSKY_IMG_SIZE_LIMIT} over the appropriate size`);
+          console.error(`image tfs got error: ${response.statusText}`);
         }
-        ++attempts;
-      } while (attempts < env.MAX_IMAGE_QUALITY_STEPS);
+      }
+      // Delete the file from the resize bucket.
+      c.executionCtx.waitUntil(env.R2RESIZE.delete(resizeFilename));
     }
 
     if (failedToResize) {
@@ -176,7 +186,7 @@ const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
   return await rawUploadToR2(env, await file.stream(), fileMetaData);
 };
 
-export const uploadFileR2 = async (env: Bindings, file: File|string, userId: string) => {
+export const uploadFileR2 = async (c: Context, file: File|string, userId: string) => {
   if (!(file instanceof File)) {
     console.warn("Failed to upload");
     return {"success": false, "error": "data invalid"};
@@ -189,9 +199,9 @@ export const uploadFileR2 = async (env: Bindings, file: File|string, userId: str
 
   const fileType: string = file.type.toLowerCase();
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
-    return await uploadImageToR2(env, file, userId);
+    return await uploadImageToR2(c, file, userId);
   } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType) || BSKY_GIF_MIME_TYPES.includes(fileType)) {
-    return await uploadVideoToR2(env, file, userId);
+    return await uploadVideoToR2(c.env, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};
 };
