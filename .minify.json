@@ -1,0 +1,13 @@
+{
+  "js": {
+    "type": "terser",
+    "putout": {
+      "quote": "'",
+      "mangle": false,
+      "mangleClassNames": false,
+      "removeUnusedVariables": false,
+      "removeConsole": true,
+      "removeUselessSpread": true
+    }
+  }
+}

@@ -10,6 +10,9 @@
     "migrate:local": "wrangler d1 migrations apply skyposts --local",
     "migrate:prod": "wrangler d1 migrations apply skyposts --remote",
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
+    "minify:post": "minify assets/js/postHelper.js > assets/js/postHelper.min.js",
+    "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
+    "minify": "npx run-p minify:*",
     "types": "wrangler types src/wrangler.d.ts"
   },
   "dependencies": {
@@ -32,6 +35,8 @@
   "devDependencies": {
     "@types/node": "^24.10.4",
     "drizzle-kit": "^0.31.8",
+    "minify": "^14.1.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.7.4",
     "wrangler": "^4.54.0"
   },
