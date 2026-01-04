@@ -1,7 +1,7 @@
 import { Bindings, ScheduledContext, Post, Repost } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
-import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts } from './dbQuery';
+import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts, purgePostedPosts } from './dbQuery';
 import { createPostObject, createRepostObject } from './helpers';
 import isEmpty from 'just-is-empty';
 
@@ -47,6 +47,9 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
 };
 
 export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
+  const purgedPosts: number = await purgePostedPosts(env);
+  console.log(`Purged ${purgedPosts} old posts from the database`);
+
   const removedIds: string[] = await pruneBskyPosts(env);
   if (!isEmpty(removedIds)) {
     if (await deletePosts(env, removedIds))

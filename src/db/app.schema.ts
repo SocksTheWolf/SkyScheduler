@@ -17,12 +17,15 @@ export const posts = sqliteTable('posts', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
   userId: text("user")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 }, (table) => [
   index("scheduledDate_idx").on(table.scheduledDate),
-  index("user_idx").on(table.userId)
+  index("user_idx").on(table.userId),
+  index("postedUpdate_idx").on(table.updatedAt, table.posted)
 ]);
 
 export const reposts = sqliteTable('reposts', {
@@ -33,6 +36,7 @@ export const reposts = sqliteTable('reposts', {
   scheduledDate: integer('scheduled_date', { mode: 'timestamp_ms' }).notNull(),
 }, (table) => [
   index("repost_scheduledDate_idx").on(table.scheduledDate),
+  index("repost_postid_idx").on(table.uuid)
 ]);
 
 export const violations = sqliteTable('violations', {

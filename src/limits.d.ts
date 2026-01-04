@@ -5,6 +5,8 @@ export const MIN_LENGTH: number = 1;
 export const MAX_REPOST_INTERVAL: number = 10;
 // max amount of time something can be reposted over
 export const MAX_REPOST_DAYS: number = 7;
+// max amount of days to hold a post after it's been posted and has no reposts before it's purged from the DB
+export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;

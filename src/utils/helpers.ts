@@ -36,6 +36,6 @@ export function floorCurrentTime() {
   return startOfHour(new Date());
 }
 
-export function floorGivenTime(given:Date) {
+export function floorGivenTime(given: Date) {
   return startOfHour(given);
 }

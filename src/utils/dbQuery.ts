@@ -1,12 +1,12 @@
 import { Context } from "hono";
 import { DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { sql, and, gt, eq, lte, inArray, desc, count, getTableColumns, notInArray, ne } from "drizzle-orm";
+import { sql, and, gt, eq, lte, inArray, desc, count, getTableColumns, notInArray, ne, isNull } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
 import { Bindings, LooseObj, PlatformLoginResponse, PostLabel, Violation } from "../types.d";
-import { MAX_POSTED_LENGTH } from "../limits.d";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
 import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 import { isAfter, addHours } from "date-fns";
@@ -15,6 +15,7 @@ import has from "just-has";
 import isEmpty from "just-is-empty";
 import flatten from "just-flatten-it";
 import truncate from "just-truncate";
+import unique from "just-unique";
 
 type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 
@@ -203,7 +204,7 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
           eq(posts.posted, false)
         )
       ),
-      notInArray(posts.userId, violationUsers)
+      notInArray(posts.userId, violationUsers) /* Ignore any users that have violations on them */
     )
     ).all();
 };
@@ -312,39 +313,29 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
   return true;
 };
 
-export const compactPostedPosts = async (env: Bindings) => {
+export const purgePostedPosts = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  // Create a posted query that also checks for valid json and content length
-  const postedQuery = db.select({
-    ...getTableColumns(posts),
-    contentLength: sql<number>`length(${posts.content})`.as("conLength"),
-    isValidJson: sql<number>`cast(length(${posts.embedContent}) as int)`.as("json"),
-    }).from(posts).where(eq(posts.posted, true)).as("postedQuery");
-  // Then select from those posts that are too long or have too many characters
-  const jsonFix = await db.select({id: postedQuery.uuid}).from(postedQuery).where(gt(postedQuery.isValidJson, 2));
-  const postTruncation = await db.select({id: postedQuery.uuid, content: postedQuery.content }).from(postedQuery).where(gt(postedQuery.contentLength, MAX_POSTED_LENGTH));
-
-  // Run the invalid json fix
-  if (jsonFix.length > 0) {
-    console.log(`Attempting to clean up/empty old JSON data for ${jsonFix.length} posts`);
-    let invalidJsonFix:string[] = [];
-    jsonFix.forEach(item => { invalidJsonFix.push(item.id)});
-    await db.update(posts).set({ embedContent: [] }).where(inArray(posts.uuid, invalidJsonFix));
+  const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
+  const dbQuery = await db.select({ data: posts.uuid }).from(posts).leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+  .where(
+    and(
+      isNull(reposts.uuid),
+      and(
+        eq(posts.posted, true), lte(posts.updatedAt, sql`${dateString}`)
+      )
+    )
+  ).all();
+  const postsToDelete = unique(dbQuery.map((item) => { return item.data }));
+  const {success, meta } = await db.delete(posts).where(inArray(posts.uuid, postsToDelete));
+  if (!success) {
+    console.warn(`Encountered an issue when trying to purge DB`);
   }
-
-  // Post truncation
-  if (postTruncation.length > 0) {
-    console.log(`Attempting to clean up post truncation for ${postTruncation.length} posts`);
-    // it would be nicer to do bulking of this, but the method to do so in drizzle leaves me uneasy (and totally not about to sql inject myself)
-    // so we do each query uniquely instead.
-    postTruncation.forEach(async item => {
-      await db.update(posts).set({ content: truncate(item.content, MAX_POSTED_LENGTH) }).where(eq(posts.uuid, item.id));
-    });
-  }
-};
+  return meta.changes;
+}
 
 export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
-  const NoHandleState:PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
+  const NoHandleState:PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
+    PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
     console.warn(`createViolationForUser got a not valid add request for user ${userId} with violation ${violationType}`);
@@ -397,4 +388,40 @@ export const getViolationsForCurrentUser = async(c: Context) => {
   } else {
     return {success: false, results: []};
   }
+};
+
+/** Maintenance operations **/
+export const runMaintenenceUpdates = async (env: Bindings) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  // Create a posted query that also checks for valid json and content length
+  const postedQuery = db.select({
+    ...getTableColumns(posts),
+    contentLength: sql<number>`length(${posts.content})`.as("conLength"),
+    isValidJson: sql<number>`cast(length(${posts.embedContent}) as int)`.as("json"),
+    }).from(posts).where(eq(posts.posted, true)).as("postedQuery");
+  // Then select from those posts that are too long or have too many characters
+  const jsonFix = await db.select({id: postedQuery.uuid}).from(postedQuery).where(gt(postedQuery.isValidJson, 2));
+  const postTruncation = await db.select({id: postedQuery.uuid, content: postedQuery.content }).from(postedQuery).where(gt(postedQuery.contentLength, MAX_POSTED_LENGTH));
+
+  // Run the invalid json fix
+  if (jsonFix.length > 0) {
+    console.log(`Attempting to clean up/empty old JSON data for ${jsonFix.length} posts`);
+    let invalidJsonFix:string[] = [];
+    jsonFix.forEach(item => { invalidJsonFix.push(item.id)});
+    await db.update(posts).set({ embedContent: [] }).where(inArray(posts.uuid, invalidJsonFix));
+  }
+
+  // Post truncation
+  if (postTruncation.length > 0) {
+    console.log(`Attempting to clean up post truncation for ${postTruncation.length} posts`);
+    // it would be nicer to do bulking of this, but the method to do so in drizzle leaves me uneasy (and totally not about to sql inject myself)
+    // so we do each query uniquely instead.
+    postTruncation.forEach(async item => {
+      console.log(`Updating post ${item.id}`);
+      await db.update(posts).set({ content: truncate(item.content, MAX_POSTED_LENGTH) }).where(eq(posts.uuid, item.id));
+    });
+  }
+
+  // push timestamps
+  await db.update(posts).set({updatedAt: sql`CURRENT_TIMESTAMP`}).where(isNull(posts.updatedAt));
 };
