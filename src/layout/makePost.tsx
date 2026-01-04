@@ -2,7 +2,8 @@ import { html } from "hono/html";
 import { MAX_LENGTH, CF_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
-  R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE } from "../limits.d"
+  R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE, 
+  CURRENT_SCRIPT_VERSION } from "../limits.d"
 import { PreloadRules } from "../types.d";
 import { ConstScript, ConstScriptPreload } from "./constScript";
 
@@ -16,6 +17,7 @@ export const PreloadPostCreation: PreloadRules[] = [
 ];
 
 export function PostCreation() {
+  const postHelperScriptStr: string = `/js/postHelper.min.js?v=${CURRENT_SCRIPT_VERSION}`;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
@@ -141,7 +143,7 @@ export function PostCreation() {
         updateAllTimes();
       `}
       </script>
-      <script type="text/javascript" src="/js/postHelper.js"></script>
+      <script type="text/javascript" src={postHelperScriptStr}></script>
     </article>
   </section>
   );

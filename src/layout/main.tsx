@@ -2,6 +2,7 @@ import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
 import MetaTags from './metaTags';
 import { PreloadRules } from '../types.d';
+import { CURRENT_SCRIPT_VERSION } from '../limits.d';
 
 type BaseLayoutProps = {
   children: Child;
@@ -34,7 +35,7 @@ export const BaseLayout = ({
       <script type="text/javascript" src="/dep/toastify.js"></script>
       <link rel="stylesheet" href="/dep/pico.min.css" />
       <link rel="stylesheet" href="/css/stylesheet.css" />
-      <script type="text/javascript" src="/js/main.js"></script>
+      <script type="text/javascript" src="/js/main.min.js?v=${CURRENT_SCRIPT_VERSION}"></script>
       <title>${title}</title>
       ${<MetaTags />}
     </head>

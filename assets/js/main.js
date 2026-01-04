@@ -31,8 +31,13 @@ function refreshPosts() {
   document.getElementById("refresh-posts-force").click();
 }
 
-document.addEventListener("showDeleteMsg", function(evt) {
+document.addEventListener("postDeleted", function() {
   pushToast("Post deleted", true);
+});
+
+document.addEventListener("postFailedDelete", function() {
+  pushToast("Post failed to delete, try again", false);
+  refreshPosts();
 });
 
 document.addEventListener("timeSidebar", function() {

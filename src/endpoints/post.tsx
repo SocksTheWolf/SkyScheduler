@@ -126,9 +126,11 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
 post.delete("/delete/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
-    if (await deletePost(c, id) === true)
-      c.header("HX-Trigger-After-Swap", "showDeleteMsg");
+    if (await deletePost(c, id) === true) {
+      c.header("HX-Trigger-After-Swap", "postDeleted");
+      return c.html(<></>);
+    }
   }
-
-  return c.redirect("/post/all");
+  c.header("HX-Trigger-After-Swap", "postFailedDelete");
+  return c.html(<></>);
 });

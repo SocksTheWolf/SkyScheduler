@@ -1,5 +1,5 @@
 import { PreloadRules } from "../types.d";
-import { CONST_SCRIPT_VERSION } from "../utils/scriptGen";
+import { CONST_SCRIPT_VERSION } from "../utils/constScriptGen";
 
 export const ConstScriptPreload: PreloadRules[] = [
   {type: "script", href: `/js/consts.js?v=${CONST_SCRIPT_VERSION}`}, 

@@ -22,6 +22,10 @@ export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 // generation is done on client side using canvas elements.
 export const MAX_THUMBNAIL_SIZE: number = 15;
 
+// Change this value to break out of any caching that might be happening
+// for the runtime scripts (ex: main.js & postHelper.js)
+export const CURRENT_SCRIPT_VERSION: string = "1.2.4";
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

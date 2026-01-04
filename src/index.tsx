@@ -13,7 +13,7 @@ import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { compactPostedPosts } from "./utils/dbQuery";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
-import { makeConstScript } from "./utils/scriptGen";
+import { makeConstScript } from "./utils/constScriptGen";
 import { authMiddleware } from "./middleware/auth";
 import { authAdminOnlyMiddleware } from "./middleware/adminOnly";
 import { corsHelperMiddleware } from "./middleware/corsHelper";

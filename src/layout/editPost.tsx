@@ -19,7 +19,7 @@ export default function PostEdit({post}:EditedPostProps) {
     <form id={`editPost${post.postid}`} hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
         hx-swap="innerHTML" hx-indicator={`#${editSpinner}`}>
       <section>
-        <textarea name="content" id={`content${post.postid}`} rows={8} style="resize: none" required>
+        <textarea name="content" id={`edit${post.postid}`} rows={8} style="resize: none" required>
           {post.text}
         </textarea>
         <small>Character Count: <span id={`editCount${post.postid}`}>0/{MAX_LENGTH}</span></small>
@@ -30,11 +30,11 @@ export default function PostEdit({post}:EditedPostProps) {
         <div id={editResponse}>
         </div>
         <button>Update Post</button> 
-        <a role="button" onclick={html`detachTribute(document.getElementById('content${post.postid}'));refreshPosts();`} class="secondary">Cancel</a>
+        <a role="button" onclick={html`detachTribute(document.getElementById('edit${post.postid}'));refreshPosts();`} class="secondary">Cancel</a>
       </center>
       <script type="text/javascript">{html`
-        addCounter("content${post.postid}", "editCount${post.postid}", ${MAX_LENGTH});
-        tributeToElement(document.getElementById("content${post.postid}"));
+        addCounter("edit${post.postid}", "editCount${post.postid}", ${MAX_LENGTH});
+        tributeToElement(document.getElementById("edit${post.postid}"));
       `}</script>
     </form>
   );
