@@ -26,6 +26,11 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 // for the runtime scripts (ex: main.js & postHelper.js)
 export const CURRENT_SCRIPT_VERSION: string = "1.2.4";
 
+// empty this string if you want to serve the full scripts
+// scripts have to be minimized by hand because I was lazy when I wrote them
+// I used https://minify-js.com/
+export const USE_SCRIPT_MIN: string = ".min";
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
