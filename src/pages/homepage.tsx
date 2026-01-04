@@ -33,7 +33,7 @@ export default function Home() {
               <li>Schedule your posts any time in the future (to the nearest hour)</li>
               <li>Supports embeds, links, tagging, mentions</li>
               <li>Post <span data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with content labels and full support for alt text</li>
-              <li>Automatically repost your posts at an interval of your choosing, up to {MAX_REPOST_INTERVAL} times every {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
+              <li>Automatically retweet your posts at an interval of your choosing, up to {MAX_REPOST_INTERVAL} times every {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
               <li>Edit the content of pending posts before they are posted</li>
             </ul>
           </p>
