@@ -94,6 +94,14 @@ npm run migrate:all
 
 Ensure you have configured the `.dev.vars` file with the necessary credentials and settings. The file is git-ignored to protect your sensitive information.
 
+### Application Variables
+
+Most of the application can be modified either through the `wrangler.toml` vars section or via `src/limits.d.ts`. These are usually heavily commented to explain what the options control.
+
+### Minimization
+
+The application by default is configured to use the minified versions of the scripts in `assets/js`. You can either turn off this behavior in `src/limits.d.ts` or run `npm run minify` whenever those files change.
+
 ## Project Structure
 
 ```text
@@ -103,15 +111,18 @@ skyscheduler/
 │   ├── auth/
 │   ├── db/
 │   ├── endpoints/
-│   ├── middleware/
 │   ├── layout/
+│   ├── middleware/
 │   ├── pages/
 │   ├── utils/
 │   └── validation/
 ├── migrations/
 ├── .dev.vars
+├── .node-version
+├── .minify.json
 ├── drizzle.config.ts
 ├── package.json
+├── tsconfig.json
 └── wrangler.toml
 ```
 

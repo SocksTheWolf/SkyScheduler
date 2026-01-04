@@ -28,7 +28,7 @@ export const CURRENT_SCRIPT_VERSION: string = "1.2.4";
 
 // empty this string if you want to serve the full scripts
 // you can run the "npm run minify" script to minify the js files
-export const USE_SCRIPT_MIN: string = ".min";
+export const USE_SCRIPT_MIN: string = true ? ".min" : "";
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
