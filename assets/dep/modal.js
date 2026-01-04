@@ -4,6 +4,7 @@
  * Pico.css - https://picocss.com
  * Copyright 2019-2025 - Licensed under MIT
  * Modified by Yohn https://github.com/Yohn/PicoCSS
+ * Modified by Socks https://github.com/SocksTheWolf/SkyScheduler/commit/bedc90a432df6c4c13fd4a41fa6e0050e7a241c8
  */
 //document.addEventListener("DOMContentLoaded", () => {
 	// Config

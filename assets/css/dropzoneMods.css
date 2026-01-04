@@ -18,7 +18,6 @@
 
 .dropzone .dz-preview .dz-details .dz-filename:hover span {
   border: unset;
-  /*background-color: rgba(255,255,255,.4);*/
   background-color: unset;
 }
 
