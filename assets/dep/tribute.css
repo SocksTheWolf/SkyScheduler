@@ -7,7 +7,6 @@
   display: block;
   z-index: 999999;
   margin-top: 20px;
-  /*background-color: var(--pico-code-background-color);*/
   background-color: var(--pico-card-sectioning-background-color);
   box-shadow: 3px 2px lightgray;
 }

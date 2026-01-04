@@ -10,7 +10,7 @@ import { ConstScript, ConstScriptPreload } from "./constScript";
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
   {type: "script", href: "/dep/dropzone-min.js"}, 
-  {type: "style", href: "/dep/dropzone.css"}, 
+  {type: "style", href: "/dep/dropzone.min.css"}, 
   {type: "style", href: "/css/dropzoneMods.css"},
   {type: "style", href: "/dep/tribute.css"},
   {type: "script", href: "/dep/tribute.min.js"}
@@ -24,7 +24,7 @@ export function PostCreation() {
     <script type="text/javascript" src="/dep/dropzone-min.js"></script>
     <script type="text/javascript" src="/dep/tribute.min.js"></script>
     <ConstScript />
-    <link href="/dep/dropzone.css" rel="stylesheet" type="text/css" />
+    <link href="/dep/dropzone.min.css" rel="stylesheet" type="text/css" />
     <link href="/dep/tribute.css" rel="stylesheet" type="text/css" />
     <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
     <article>
