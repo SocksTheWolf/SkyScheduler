@@ -25,7 +25,8 @@ export const posts = sqliteTable('posts', {
 }, (table) => [
   index("scheduledDate_idx").on(table.scheduledDate),
   index("user_idx").on(table.userId),
-  index("postedUpdate_idx").on(table.updatedAt, table.posted)
+  index("postedUpdate_idx").on(table.updatedAt, table.posted),
+  index("postedUUID_idx").on(table.uuid, table.posted)
 ]);
 
 export const reposts = sqliteTable('reposts', {

@@ -1,0 +1,1 @@
+CREATE INDEX `postedUUID_idx` ON `posts` (`uuid`,`posted`);
