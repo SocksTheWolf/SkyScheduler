@@ -41,7 +41,8 @@ export default function Signup(props:any) {
           Bluesky App Password
           <BSkyAppPasswordField required={true} />
           <small>
-            If you need a bluesky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.
+            If you need a BlueSky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.<br />
+            If you use a separate PDS, you can change that in your account settings once you login.
           </small>
         </label>
 
