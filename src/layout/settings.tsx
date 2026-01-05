@@ -18,7 +18,7 @@ export function Settings() {
         <br />
         <section>
           <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse" 
-            hx-swap="innerHTML" hx-indicator="#spinner" hx-disabled-elt="#settingsButtons button, find input">
+            hx-swap="innerHTML swap:1s" hx-indicator="#spinner" hx-disabled-elt="#settingsButtons button, find input">
 
             <UsernameField required={false} title="BlueSky Handle:" hintText="Only change this if you have recently changed your Bluesky handle" />
 
@@ -58,7 +58,7 @@ export function Settings() {
           <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMANENT</u>.</center>
         </p>
         <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete" hx-target="#accountDeleteResponse" hx-disabled-elt="#accountDeleteButtons button, find input"
-            hx-swap="innerHTML" hx-indicator="#delSpinner">
+            hx-swap="innerHTML swap:1s" hx-indicator="#delSpinner">
           <label>
             Dashboard Pass: <input id="deleteAccountPass" type="password" name="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
             <small>The password to access the SkyScheduler Dashboard</small>

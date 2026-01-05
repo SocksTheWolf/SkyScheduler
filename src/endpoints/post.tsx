@@ -109,6 +109,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const originalPost = await getPostById(c, id);
   // get the original data for the post so that we can just inline edit it via a push
   if (isEmpty(originalPost)) {
+    c.header("HX-Trigger-After-Settle", "refreshPosts");
     return c.html(<b class="btn-error">Could not find post to edit</b>);
   }
 
@@ -116,6 +117,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   // Create an original post object for this object
   const originalPostData = createPostObject(originalPost[0]);
   if (originalPostData.posted === true) {
+    c.header("HX-Trigger-After-Settle", "refreshPosts");
     return c.html(<b class="btn-error">This post has already been posted</b>);
   }
 
@@ -123,6 +125,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   if (altEdits !== undefined && !isEmpty(altEdits)) {
     // Check to see if this post had editable data
     if (originalPostData.embeds === undefined) {
+      c.header("HX-Trigger-After-Settle", "refreshPosts");
       return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
     }
 
@@ -137,6 +140,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
       let embedData = originalPostData.embeds[i];
       // if we have anything other than an image, this is an error
       if (embedData.type !== EmbedDataType.Image) {
+        c.header("HX-Trigger-After-Settle", "refreshPosts");
         return c.html(<b class="btn-error">Invalid operation performed</b>);
       }
       // Check to see if this text was edited
