@@ -10,8 +10,9 @@ import { AltTextDialog } from "../layout/altTextModal";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
-  const defaultDashboardPreloads:PreloadRules[] = [
+  const defaultDashboardPreloads: PreloadRules[] = [
     {href: "/dep/countable.min.js", type: "script"},
+    {href: "/dep/form-json.min.js", type: "script"},
     {href: "/dep/modal.js", type: "script"}
   ];
   
@@ -20,11 +21,12 @@ export default function Dashboard(props:any) {
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads]}>
       <script src="/dep/countable.min.js" type="application/javascript"></script>
       <script src="/dep/modal.js" type="application/javascript"></script>
+      <script src="/dep/form-json.min.js" type="application/javascript"></script>
       <div class="grid">
         <section class="max-width-50">
           <article>
             <header>
-              <h4>SkyScheduler Dash</h4>
+              <h4>SkyScheduler Dashboard</h4>
               <div>
                 <small>Schedule Bluesky posts effortlessly.</small><br />
                 <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
