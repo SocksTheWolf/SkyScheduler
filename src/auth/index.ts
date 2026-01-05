@@ -115,6 +115,11 @@ If you did not request a password reset, please ignore this message.`);
         enabled: false,
       }
     },
+    account: {
+      accountLinking: {
+        enabled: false
+      },
+    },
     telemetry: { 
       enabled: false
     },
