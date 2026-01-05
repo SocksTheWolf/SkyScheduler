@@ -34,7 +34,8 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
       "/cloudflare/geolocation",
       "/is-username-available",
       "/delete-user/callback",
-      "/change-password"
+      "/change-password",
+      "/is-username-available"
     ],
     ...withCloudflare(
       {
@@ -76,7 +77,8 @@ If you did not request a password reset, please ignore this message.`);
         },
         plugins: [
           username({
-            minUsernameLength: BSKY_MIN_USERNAME_LENGTH
+            minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
+            maxUsernameLength: 500
           })
         ],
         rateLimit: {
