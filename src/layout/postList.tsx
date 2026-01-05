@@ -3,6 +3,7 @@ import { html, raw } from "hono/html";
 import { getPostsForUser, getUsernameForUser } from "../utils/dbQuery";
 import { createPostObject } from "../utils/helpers";
 import { Post } from "../types.d";
+import isEmpty from "just-is-empty";
 
 type PostContentObjectProps = {
   text: string;
@@ -45,7 +46,9 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         ${hasBeenPosted ? 
           raw(`<a class="secondary" data-uri="${content.uri}" href="https://bsky.app/profile/${username}/post${postURIID}" target="_blank" title="link to post">Posted on</a>:`) : 
           'Scheduled for:' } 
-          <span class="timestamp">${content.scheduledDate}</span>${content.repostCount! ? ' | Reposts Left: ' + content.repostCount : ''}
+          <span class="timestamp">${content.scheduledDate}</span>
+          ${!isEmpty(content.embeds) ? ' | Embeds: ' + content.embeds?.length : ''} 
+          ${content.repostCount! ? ' | Reposts Left: ' + content.repostCount : ''}
       </small>
     </footer>
   </article>`;
