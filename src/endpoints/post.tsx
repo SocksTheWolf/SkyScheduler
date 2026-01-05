@@ -115,6 +115,11 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   let hasEmbedEdits = false;
   // Create an original post object for this object
   const originalPostData = createPostObject(originalPost[0]);
+  if (originalPostData.posted === true) {
+    return c.html(<b class="btn-error">This post has already been posted</b>);
+  }
+
+  // Handle alt text and stuffs
   if (altEdits !== undefined && !isEmpty(altEdits)) {
     // Check to see if this post had editable data
     if (originalPostData.embeds === undefined) {
@@ -151,7 +156,8 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   if (await updatePostForUser(c, id, payload)) {
     originalPostData.text = content;
     const username = await getUsernameForUser(c);
-    c.header("HX-Trigger-After-Swap", "timeSidebar");
+    c.header("HX-Trigger-After-Swap", "postUpdatedNotice");
+    c.header("HX-Trigger-After-Settle", "timeSidebar");
     return c.html(<ScheduledPost post={originalPostData} user={username} dynamic={true} />);
   }
 

@@ -44,6 +44,10 @@ document.addEventListener("timeSidebar", function() {
   updateAllTimes();
 });
 
+document.addEventListener("postUpdatedNotice", function() {
+  pushToast("Post updated successfully!", true);
+})
+
 document.addEventListener("accountUpdated", function(ev) {
   closeModal(document.getElementById("changeInfo"));
   document.getElementById("settingsData").reset();
