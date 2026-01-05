@@ -6,7 +6,7 @@ export default function FooterCopyright() {
       <span class="credits">
         <a rel="author" title="project author" href="https://socksthewolf.com">SocksTheWolf</a><br />
         <small>
-          <a class="secondary" target="_blank" title="tip project maintainer" href="https://ko-fi.com/socksthewolf">Tip</a> - 
+          <a class="secondary" target="_blank" title="tip project maintainer" href="/tip">Tip</a> - 
           <a class="secondary" href="/tos" title="Terms of Service document">Terms</a> - 
           <a class="secondary" href="/privacy" title="Privacy Policy document">Privacy</a>
         </small>
