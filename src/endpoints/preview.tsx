@@ -6,6 +6,7 @@ import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { BSKY_IMG_MIME_TYPES } from "../limits.d";
 import { FileContentSchema } from "../validation/mediaSchema";
+import isEmpty from "just-is-empty";
 
 export const preview = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -26,7 +27,11 @@ preview.get("/file/:id", authMiddleware, async (c: Context) => {
   
   const contentType = fetchedFile.httpMetadata?.contentType || fetchedFile.customMetadata["type"];
   if (BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
-    console.log("failed images types");
+    return c.redirect("/thumbs/image.png");
+  }
+
+  const uploaderId = fetchedFile.customMetadata["user"];
+  if (isEmpty(uploaderId) || c.get("userId") !== uploaderId) {
     return c.redirect("/thumbs/image.png");
   }
   
