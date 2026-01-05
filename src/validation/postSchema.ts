@@ -5,10 +5,14 @@ import { FileContentSchema } from "./mediaSchema";
 import * as z from "zod/v4";
 import isEmpty from "just-is-empty";
 
+const AltTextSchema = z.object({
+  alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault("")
+});
+
 const ImageEmbedSchema = z.object({
   ...FileContentSchema.shape,
   type: z.literal(EmbedDataType.Image),
-  alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault(""),
+  ...AltTextSchema.shape,
 });
 
 const VideoEmbedSchema = z.object({
@@ -93,4 +97,10 @@ export const PostSchema = z.object({
   }
 });
 
-export const EditSchema = TextContent;
+export const EditSchema = z.object({
+  ...TextContent.shape,
+  altEdits: z.object({
+    ...FileContentSchema.shape,
+    ...AltTextSchema.shape
+  }).array().optional()
+});

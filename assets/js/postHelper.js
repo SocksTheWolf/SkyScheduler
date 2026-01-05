@@ -101,7 +101,13 @@ fileDropzone.on("addedfile", file => {
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    openAltText(file, addAltText);
+    openAltText(file, addAltText, () => {
+      return fileData.get(file.name).alt;
+    }, (newAltText) => {
+      const existingData = fileData.get(file.name);
+      existingData.alt = newAltText;
+      fileData.set(file.name, existingData);
+    });
   });
 
   // Listen to the click event
@@ -404,14 +410,15 @@ function showPostProgress(shouldShow) {
   }
 }
 
-function openAltText(file, altTextButton) {
+function openAltText(file, altTextButton, loadCallback, saveCallback) {
   // A bunch of DOM elements
   const altTextModal = document.getElementById("altTextDialog");
   const altTextField = document.getElementById("altTextField");
   const altTextImgPreview = document.getElementById("altThumbImg");
   const saveButton = document.getElementById("altTextSaveButton");
   const cancelButton = document.getElementById("altTextCancelButton");
-  const altTextPreviewImgURL = URL.createObjectURL(file);
+  const isFileInstance = file instanceof File;
+  const altTextPreviewImgURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
 
   // Handle page reset
   if (altTextModal.hasAttribute("hasReset") === false) {
@@ -423,21 +430,18 @@ function openAltText(file, altTextButton) {
     altTextModal.setAttribute("hasReset", true);
   }
 
-  const existingData = fileData.get(file.name);
-  altTextField.value = existingData.alt || "";
+  altTextField.value = loadCallback() || "";
   recountCounter("altTextCount");
   tributeToElement(altTextField);
   const handleSave = (ev) => {
     ev.preventDefault();
     const newAltTextData = altTextField.value;
-    existingData.alt = newAltTextData;
-    fileData.set(file.name, existingData);
+    saveCallback(newAltTextData);
     if (newAltTextData === "") {
       altTextButton.classList.remove("btn-success");
     } else {
       altTextButton.classList.add("btn-success");
     }
-    //console.log(`Updated alt data for ${file.name} which is ${newAltTextData}`);
     closeAltModal();
   };
 
@@ -446,7 +450,8 @@ function openAltText(file, altTextButton) {
     cancelButton.removeEventListener("click", closeAltModal);
     altTextModal.removeEventListener("close", unbindAltModal);
     altTextImgPreview.src = "";
-    URL.revokeObjectURL(altTextPreviewImgURL);
+    if (isFileInstance)
+      URL.revokeObjectURL(altTextPreviewImgURL);
     detachTribute(altTextField);
   }
 
@@ -510,6 +515,15 @@ function tributeToElement(el) {
 
 function detachTribute(el) {
   el.dispatchEvent(new Event("detach"));
+}
+
+function openPostAltEditor(file) {
+  const editorLocation = document.querySelector(`div[alteditfor="${file}"]`);
+  const editorDataLocation = editorLocation.querySelector("input[data-alt]");
+  openAltText(file, editorLocation.querySelector("a"), () => editorDataLocation.getAttribute("value"), 
+    (newAltValue) => {
+      editorDataLocation.setAttribute("value", newAltValue);
+  });
 }
 
 // Handle character counting

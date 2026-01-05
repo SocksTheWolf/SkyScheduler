@@ -1,18 +1,17 @@
-import { Bindings, ScheduledContext, EmbedData, EmbedDataType, LooseObj } from '../types.d';
-import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, CF_IMAGES_FILE_SIZE_LIMIT, 
-  BSKY_IMG_MAX_WIDTH, BSKY_IMG_MAX_HEIGHT, MB_TO_BYTES, BSKY_VIDEO_MIME_TYPES, 
-  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES, 
-  R2_FILE_SIZE_LIMIT,
-  R2_FILE_SIZE_LIMIT_IN_MB} from "../limits.d";
+import { Bindings, ScheduledContext, EmbedData, EmbedDataType } from '../types.d';
+import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
+  CF_IMAGES_FILE_SIZE_LIMIT, R2_FILE_SIZE_LIMIT,
+  MB_TO_BYTES, BSKY_VIDEO_MIME_TYPES, R2_FILE_SIZE_LIMIT_IN_MB,
+  BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES } from "../limits.d";
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
-import truncate from 'just-truncate';
 
 type FileMetaData = {
   name: string,
   size: number,
-  user: string
+  user: string,
+  type: string,
   qualityLevel?: number;
 };
 
@@ -33,7 +32,6 @@ export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedDat
 };
 
 export const deleteFromR2 = (c: Context|ScheduledContext, embeds: string[]|string) => {
-  // TODO: consider pushing this data into another D1 table
   if (embeds.length <= 0)
     return;
 
@@ -49,7 +47,7 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
   const R2UploadRes = await env.R2.put(fileName, buffer, {
-    customMetadata: {"user": metaData.user}
+    customMetadata: {"user": metaData.user, "type": metaData.type }
   });
   if (R2UploadRes) {
     return {"success": true, "data": R2UploadRes.key, 
@@ -164,6 +162,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
     name: originalName,
     size: finalFileSize,
     user: userId,
+    type: file.type,
     qualityLevel: finalQualityLevel
   };
 
@@ -181,6 +180,7 @@ const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
   const fileMetaData: FileMetaData = {
     name: file.name,
     size: file.size,
+    type: file.type,
     user: userId
   };
   return await rawUploadToR2(env, await file.stream(), fileMetaData);

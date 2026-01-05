@@ -1,7 +1,7 @@
 import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import { validate as isValid  } from 'uuid';
-import { Bindings } from "../types";
+import { Bindings, EmbedDataType, LooseObj } from "../types.d";
 import { ContextVariables } from "../auth";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
@@ -12,7 +12,8 @@ import { makePost } from "../utils/bskyApi";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { createPost, deletePost, getPostById, getUsernameForUser, setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
 import { ScheduledPost, ScheduledPostList } from "../layout/postList";
-import PostEdit from "../layout/editPost";
+import { PostEdit } from "../layout/editPost";
+import isEmpty from "just-is-empty";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -98,28 +99,63 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     return c.html(<b class="btn-error">Post was invalid</b>, 400);
   }
 
-  const body = await c.req.parseBody();
+  const body = await c.req.json();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
     return c.html(<b class="btn-error">New post had invalid data</b>);
   }
 
-  const { content } = validation.data;
-  const payload = {content: content};
-  if (await updatePostForUser(c, id, payload)) {
-    const postInfo = await getPostById(c, id);
-    if (postInfo.length > 0) {
-      const postData = createPostObject(postInfo[0]);
-      const username = await getUsernameForUser(c);
-      c.header("HX-Trigger-After-Swap", "timeSidebar");
-      return c.html(<ScheduledPost post={postData} user={username} dynamic={true} />);
-    } else {
-      c.header("HX-Trigger-After-Swap", "refreshPosts");
-      return c.html(<></>);
-    }
-  } else {
-    return c.html(<b class="btn-error">Failed to process</b>);
+  const { content, altEdits } = validation.data;
+  const originalPost = await getPostById(c, id);
+  // get the original data for the post so that we can just inline edit it via a push
+  if (isEmpty(originalPost)) {
+    return c.html(<b class="btn-error">Could not find post to edit</b>);
   }
+
+  let hasEmbedEdits = false;
+  // Create an original post object for this object
+  const originalPostData = createPostObject(originalPost[0]);
+  if (altEdits !== undefined && !isEmpty(altEdits)) {
+    // Check to see if this post had editable data
+    if (originalPostData.embeds === undefined) {
+      return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
+    }
+
+    // Create an easy map to match content with quickly
+    let editsMap = new Map();
+    altEdits.forEach((item) => {
+      editsMap.set(item.content, item.alt);
+    });
+
+    // process and match up all of the alt text properly
+    for (let i = 0; i < originalPostData.embeds?.length; ++i) {
+      let embedData = originalPostData.embeds[i];
+      // if we have anything other than an image, this is an error
+      if (embedData.type !== EmbedDataType.Image) {
+        return c.html(<b class="btn-error">Invalid operation performed</b>);
+      }
+      // Check to see if this text was edited
+      const newAltText = editsMap.get(embedData.content);
+      if (newAltText !== undefined) {
+        // it was
+        originalPostData.embeds[i].alt = newAltText;
+      }
+    }
+    hasEmbedEdits = true;
+  }
+  const payload: LooseObj = { content: content };
+  // push embedContent as ediable yes.
+  if (hasEmbedEdits)
+    payload.embedContent = originalPostData.embeds;
+  
+  if (await updatePostForUser(c, id, payload)) {
+    originalPostData.text = content;
+    const username = await getUsernameForUser(c);
+    c.header("HX-Trigger-After-Swap", "timeSidebar");
+    return c.html(<ScheduledPost post={originalPostData} user={username} dynamic={true} />);
+  }
+
+  return c.html(<b class="btn-error">Failed to process</b>);
 });
 
 // delete a post

@@ -95,7 +95,7 @@
   }
 }
 
-#count {
+#count, .editImgThumb, .editAltBlock {
   display: inline-block;
 }
 
@@ -107,7 +107,7 @@
   margin-top: 0.6rem;
 }
 
-.controls > button {
+.controls > button, .controls > a {
   margin-right: 10px;
   margin-bottom: 5px;
 }
@@ -170,7 +170,7 @@ dialog button.btn-error {
   float: left;
 }
 
-.uploadGuidelines {
+.uploadGuidelines, .editAltBlock {
   margin-left: 10px;
 }
 
@@ -178,7 +178,7 @@ dialog button.btn-error {
   margin-top: 10px;
 }
 
-#altThumbImg {
+#altThumbImg, .editImgThumb {
   max-width: 25vw;
   max-height: 25vh;
   overflow: hidden;
@@ -186,6 +186,12 @@ dialog button.btn-error {
 
 textarea {
   resize: none;
+}
+
+.editPostAlt {
+  margin-right: 5px;
+  font-size: 0.75rem;
+  padding: 5px;
 }
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */

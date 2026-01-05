@@ -20,6 +20,7 @@ import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { account } from "./endpoints/account";
 import { post } from "./endpoints/post";
+import { preview } from "./endpoints/preview";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -47,6 +48,10 @@ app.route("/account", account);
 // Posts endpoints
 app.use("/post/**", corsHelperMiddleware);
 app.route("/post", post);
+
+// Image preview endpoint
+app.use("/preview/**", corsHelperMiddleware);
+app.route("/preview", preview);
 
 // Root route
 app.all("/", (c) => c.html(<Home />));
