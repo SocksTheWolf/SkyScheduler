@@ -32,7 +32,8 @@ export enum EmbedDataType {
   None = 0,
   Image = 1,
   WebLink,
-  Video = 3
+  Video = 3,
+  Record = 4,
 };
 
 export type EmbedData = {
@@ -57,6 +58,7 @@ export enum PostLabel {
 
 // Basically a copy of the schema
 export type Post = {
+  // guid for post
   postid: string;
   // SkyScheduler User Id
   user: string;
@@ -124,5 +126,10 @@ export type ScheduledContext = {
 
 export type BskyEmbedWrapper = {
   type: EmbedDataType;
-  data: any;
+  data?: any;
 };
+
+export type BskyRecordWrapper = {
+  cid?: string;
+  uri?: string;
+}

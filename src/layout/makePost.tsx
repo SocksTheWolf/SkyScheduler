@@ -53,17 +53,18 @@ export function PostCreation() {
                 </div>
                 <footer>
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
-                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> must 
+                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> 
                   <ul>
-                    <li>be less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
-                    <li>have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
+                    <li>must be less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
+                    <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
-                    <li>if an image fails, it's recommended to use a lower resolution file instead</li>
+                    <li>don't upload and fail, it's recommended to use a lower resolution file instead</li>
                   </ul></li>
-                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> must 
+                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> 
                   <ul>
-                    <li>be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
-                    <li>be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
+                    <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
+                    <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
+                    <li>will be processed on BSky after they're posted. This will show a temporary "Media not Found"/black screen for a bit after posting.</li>
                   </ul></li>
                   </ul></small></div>
                 </footer>
@@ -90,6 +91,16 @@ export function PostCreation() {
                   <option value="Graphic">Graphic Media (gore/violence)</option>
                 </select>
                 <small>Remember to set the appropriate content label for your content</small>
+              </article>
+            </section>
+          </details>
+          <details>
+            <summary title="click to toggle section" role="button" class="outline secondary">Add Record (Quote Post)</summary>
+            <section>
+              <article>
+                <header>Post/Feed/List Link</header>
+                <input id="recordBox" placeholder="https://" />
+                <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
           </details>

@@ -20,8 +20,8 @@ export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedDat
 
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach((data) => {
-      // We don't store any data locally for weblinks
-      if (data.type !== EmbedDataType.WebLink) {
+      // We don't store any data locally for weblinks/records
+      if (data.type === EmbedDataType.Image || data.type === EmbedDataType.Video) {
         console.log(`Pushing ${data.content} for deletion...`);
         itemsToDelete.push(data.content.toLowerCase());
       }

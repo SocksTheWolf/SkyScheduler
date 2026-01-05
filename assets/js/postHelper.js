@@ -2,6 +2,7 @@ const repostCheckbox = document.getElementById('makeReposts');
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
 const urlCardBox = document.getElementById('urlCard');
+const recordUrlBox = document.getElementById('recordBox');
 const content = document.getElementById('content');
 let hasFileLimit = false;
 let fileData = new Map();
@@ -72,6 +73,7 @@ document.addEventListener("resetPost", () => {
   postNowCheckbox.checked = false;
   hasFileLimit = false;
   urlCardBox.value = "";
+  recordUrlBox.value = "";
   resetCounter("count");
 
   // Remove all data in the dropzone as well
@@ -308,7 +310,9 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
 
     const hasFiles = fileData.size > 0;
     const linkCardURL = urlCardBox.value;
+    const recordURL = recordUrlBox.value;
     const hasWebEmbed = linkCardURL.length > 0;
+    const hasRecord = recordURL.length > 0;
     if (hasFiles || hasWebEmbed) {
       postObject.embeds = [];
       if (hasFiles) {
@@ -344,6 +348,16 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       }
       postObject.label = document.getElementById("contentLabels").value;
     }
+    if (hasRecord) {
+      if (postObject.embeds === undefined)
+        postObject.embeds = [];
+
+      const recordObj = {
+        content: recordURL,
+        type: 4
+      }
+      postObject.embeds.push(recordObj);
+    }
 
     const payload = JSON.stringify(postObject);
     const response = await fetch('/post/create', {
@@ -356,6 +370,7 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     if (response.ok) {
       pushToast(data.message, true);
       document.dispatchEvent(new Event("resetPost"));
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       refreshPosts();
     } else {
       pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);

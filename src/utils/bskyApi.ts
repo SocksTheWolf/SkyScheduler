@@ -1,6 +1,6 @@
 import { Context, ExecutionContext } from 'hono';
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper } from '../types.d';
+import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper, BskyRecordWrapper } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
 import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
@@ -8,6 +8,7 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import truncate from "just-truncate";
 import isEmpty from "just-is-empty";
 import has from 'just-has';
+import { postRecordURI } from '../validation/regexCases';
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -191,13 +192,29 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
 
     // Upload any embeds to this post
     if (content.embeds?.length) {
-      let finalEmbed: BskyEmbedWrapper|null = null;
+      let mediaEmbeds: BskyEmbedWrapper = { type: EmbedDataType.None };
       let imagesArray = [];
+      let bskyRecordInfo: BskyRecordWrapper = {};
       let embedsProcessed: number = 0;
-      // go until we run out of embeds or have hit the amount of embeds per post
-      for (; embedsProcessed < MAX_EMBEDS_PER_POST && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
-        const currentEmbed:EmbedData = content.embeds[currentEmbedIndex];
+      const isRecordViolation = (attemptToWrite: EmbedDataType) => {
+        return mediaEmbeds.type != EmbedDataType.None && mediaEmbeds.type != attemptToWrite 
+        && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
+      }
+      // go until we run out of embeds or have hit the amount of embeds per post (+1 because there could be a record with media)
+      for (; embedsProcessed < MAX_EMBEDS_PER_POST + 1 && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
+        const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
         const currentEmbedType: EmbedDataType = currentEmbed.type;
+
+        // If we never saw any record info, and the current type is not record itself, then we're on an overflow and need to back out.
+        if (embedsProcessed > MAX_EMBEDS_PER_POST && currentEmbedType != EmbedDataType.Record && isEmpty(bskyRecordInfo)) {
+          break;
+        }
+
+        // If we have encountered a record violation (illegal mixed media types), then we should stop processing further.
+        if (isRecordViolation(currentEmbedType)) {
+          console.error(`${content.postid} had a mixed media types of ${mediaEmbeds.type} trying to write ${currentEmbedType}`);
+          break;
+        }
 
         // Handle weblinks
         if (currentEmbedType == EmbedDataType.WebLink) {
@@ -223,8 +240,87 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
               console.warn(`Failed to fetch thumbnail ${err} for embed ${currentEmbed.content}, removing thumb`);
             }
           }
-          finalEmbed = {type: EmbedDataType.WebLink, data: externalData};
-          break;
+          mediaEmbeds = {type: EmbedDataType.WebLink, data: externalData};
+          continue;
+        } else if (currentEmbedType == EmbedDataType.Record) {
+          let changedRecord = false;
+          // Write the record type if we don't have one set already 
+          // (others can override this and the post will become a record with media instead)
+          if (mediaEmbeds.type == EmbedDataType.None) {
+            mediaEmbeds.type = EmbedDataType.Record;
+            changedRecord = true;
+          }
+
+          if (!isEmpty(bskyRecordInfo)) {
+            console.warn(`${content.postid} attempted to write two record info objects`);
+            continue;
+          }
+
+          const {account, type, postid} = postRecordURI.exec(currentEmbed.content)?.groups as {account?: string, type?: string, postid?: string};
+          if (account === undefined || type === undefined || postid === undefined) {
+            console.error(`Unable to get account, type or post id from ${currentEmbed.content}`);
+            // Change the record back.
+            if (changedRecord)
+                mediaEmbeds.type = EmbedDataType.None;
+            continue;
+          }
+          let typeURI: string = "";
+          switch (type) {
+            case "feed":
+              typeURI = "app.bsky.feed.generator";
+            break;
+            default:
+            case "post":
+              typeURI = "app.bsky.feed.post";
+            break;
+            case "lists":
+              typeURI = "app.bsky.graph.list";
+            break;
+            case "follows":
+              typeURI = "app.bsky.graph.follow";
+            break;
+          }
+          // get the did for the account, we are logged in so this should always be a value
+          let resolvedDID: string = agent.did!;
+          // if the account does not match we need to resolve the did
+          // also check to see if the link had a did in it already.
+          if (account !== user && account !== resolvedDID) {
+            console.log(`need to resolve did for ${account}`);
+            const didResponse = await lookupBskyHandle(account);
+            if (didResponse === null) {
+              console.error(`Unable to resolve did for user ${account}`);
+              // Change the record back.
+              if (changedRecord)
+                mediaEmbeds.type = EmbedDataType.None;
+              continue;
+            }
+            resolvedDID = didResponse;
+          }
+          // create the uri for the record info
+          const uri = `at://${resolvedDID}/${typeURI}/${postid}`;
+          // Fetch the record info
+          const uriResolve: string[] = [ uri ];
+          const resolvePost = await getAgentPostRecords(agent, uriResolve);
+          if (resolvePost === null) {
+            console.error(`Unable to resolve record information for ${content.postid} with ${uri}`);
+            // Change the record back.
+            if (changedRecord)
+                mediaEmbeds.type = EmbedDataType.None;
+            continue;
+          }          
+          if (resolvePost.length == 0) {
+            console.error(`could not resolve cid for post ${uri}`);
+            // Change the record back.
+            if (changedRecord)
+                mediaEmbeds.type = EmbedDataType.None;
+            continue;
+          }
+          // Got the record info, push it to our object.
+          bskyRecordInfo = {
+            cid: resolvePost[0].cid,
+            uri: uri
+          }
+          continue;
         }
 
         // Otherwise pull files from storage
@@ -269,6 +365,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
           }
           // Push the image data to the array.
           imagesArray.push(bskyMetadata);
+          mediaEmbeds = { type: EmbedDataType.Image };
 
           // Handle videos
         } else if (currentEmbedType == EmbedDataType.Video) {
@@ -279,36 +376,61 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
               height: currentEmbed.height
             }
           }
-          finalEmbed = {type: EmbedDataType.Video, data: bskyMetadata};
-          break;
+          mediaEmbeds = { type: EmbedDataType.Video, data: bskyMetadata };
+          continue;
         }
       }
-      if (imagesArray.length > 0 && finalEmbed == null)
-        finalEmbed = {type: EmbedDataType.Image, data: imagesArray};
+      // Write the images array
+      if (imagesArray.length > 0 && mediaEmbeds.type == EmbedDataType.Image)
+        mediaEmbeds.data = imagesArray;
 
-      switch (finalEmbed?.type) {
-        case EmbedDataType.Image:
-        (postRecord as any).embed = {
-          "$type": "app.bsky.embed.images",
-          "images": finalEmbed.data
+      const writeRecord = () => {
+        return {
+          "$type": "app.bsky.embed.record",
+          "record": {
+            "cid": bskyRecordInfo?.cid,
+            "uri": bskyRecordInfo?.uri
+          }
         }
-        break;
-        case EmbedDataType.WebLink:
-          (postRecord as any).embed = {
+      };
+
+      const getMediaRecord = () => {
+        switch (mediaEmbeds?.type) {
+          case EmbedDataType.Image:
+          return {
+            "$type": "app.bsky.embed.images",
+            "images": mediaEmbeds.data
+          }
+          case EmbedDataType.WebLink:
+          return {
             "$type": "app.bsky.embed.external",
-            "external": finalEmbed.data
+            "external": mediaEmbeds.data
           }
-        break;
-        case EmbedDataType.Video:
-          (postRecord as any).embed = {
+          case EmbedDataType.Video:
+          return {
             "$type": "app.bsky.embed.video",
-            "video": finalEmbed.data.blob,
-            "aspectRatio": finalEmbed.data.ar
+            "video": mediaEmbeds.data.blob,
+            "aspectRatio": mediaEmbeds.data.ar
           }
-        break;
+          case EmbedDataType.Record:
+          return {...writeRecord()};
+        }
+      };
+
+      // Write a record with media if we have some record info
+      const isRecordWithMedia = !isEmpty(bskyRecordInfo) && mediaEmbeds?.type != EmbedDataType.Record;
+      if (isRecordWithMedia) {
+        (postRecord as any).embed = {
+          "$type": "app.bsky.embed.recordWithMedia",
+          "media": {...getMediaRecord()},
+          "record": {...writeRecord()}
+        }
+      } else if (mediaEmbeds.type != EmbedDataType.None) {
+        // Otherwise, write media regularly.
+        (postRecord as any).embed = {...getMediaRecord()}
       }
     }
-
+    console.log(postRecord);
     try {
       const response = await agent.post(postRecord);
       posts.push(response);
@@ -333,13 +455,16 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
 }
 
 export const getPostRecords = async (records:string[]) => {
+  // Access the bsky public API
+  const agent = new AtpAgent({
+    service: new URL('https://public.api.bsky.app'),
+  });
+  return await getAgentPostRecords(agent, records);
+}
+
+export const getAgentPostRecords = async (agent: AtpAgent, records: string[]) => {
   try
   {
-    // Access the bsky public API
-    const agent = new AtpAgent({
-      service: new URL('https://public.api.bsky.app'),
-    });
-
     const response = await agent.app.bsky.feed.getPosts({uris: records});
     if (response.success)
       return response.data.posts;
