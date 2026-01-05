@@ -430,7 +430,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         (postRecord as any).embed = {...getMediaRecord()}
       }
     }
-    console.log(postRecord);
+
     try {
       const response = await agent.post(postRecord);
       posts.push(response);
