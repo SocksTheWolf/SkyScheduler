@@ -5,7 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { Bindings } from "../types";
-import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
+import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
@@ -78,7 +78,7 @@ If you did not request a password reset, please ignore this message.`);
         plugins: [
           username({
             minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
-            maxUsernameLength: 500
+            maxUsernameLength: BSKY_MAX_USERNAME_LENGTH
           })
         ],
         rateLimit: {

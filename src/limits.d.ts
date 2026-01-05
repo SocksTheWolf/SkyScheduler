@@ -78,6 +78,7 @@ export const BSKY_IMG_FILE_EXTS: string = [
 
 // BSky limits that are inferred
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
+export const BSKY_MAX_USERNAME_LENGTH: number = 256; // since these are domains, they should be about 256
 export const BSKY_MAX_APP_PASSWORD_LENGTH: number = 20;
 export const MAX_EMBEDS_PER_POST: number = 4;
 

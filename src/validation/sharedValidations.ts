@@ -1,12 +1,13 @@
 import * as z from "zod/v4";
 import { appPasswordRegex } from "./regexCases";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, BSKY_MAX_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 
 export const UsernameSchema = z.object({
   username: z.string().trim().toLowerCase()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
     .regex(z.regexes.domain, "username should be in a format like username.bsky.social or a domain")
+    .max(BSKY_MAX_USERNAME_LENGTH, "username too long")
     .nonoptional()
 });
 
