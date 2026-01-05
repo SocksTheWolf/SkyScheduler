@@ -73,7 +73,7 @@ export const PostSchema = z.object({
     LinkEmbedSchema,
     VideoEmbedSchema
   ], "invalid media type").array().optional(),
-  label: z.nativeEnum(PostLabel, "content label must be set").optional(),
+  label: z.enum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   repostData: z.object({
     hours: z.coerce.number().min(1).max(MAX_REPOST_IN_HOURS),
