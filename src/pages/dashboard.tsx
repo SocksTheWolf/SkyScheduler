@@ -7,6 +7,7 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import FooterCopyright from "../layout/footer";
 import { PreloadRules } from "../types.d";
 import { AltTextDialog } from "../layout/altTextModal";
+import { DependencyTags } from "../layout/depTags";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -19,9 +20,7 @@ export default function Dashboard(props:any) {
   return (
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads]}>
-      <script src="/dep/countable.min.js" type="application/javascript"></script>
-      <script src="/dep/modal.js" type="application/javascript"></script>
-      <script src="/dep/form-json.min.js" type="application/javascript"></script>
+      <DependencyTags scripts={defaultDashboardPreloads} />
       <div class="grid">
         <section class="max-width-50">
           <article>

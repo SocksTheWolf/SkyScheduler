@@ -3,6 +3,7 @@ import { Child } from 'hono/jsx';
 import MetaTags from './metaTags';
 import { PreloadRules } from '../types.d';
 import { CURRENT_SCRIPT_VERSION, USE_SCRIPT_MIN } from '../limits.d';
+import { PreloadDependencyTags } from './depTags';
 
 type BaseLayoutProps = {
   children: Child;
@@ -17,10 +18,6 @@ export const BaseLayout = ({
   mainClass = "",
   preloads = []
 }: BaseLayoutProps) => {
-  const preloadHTML = preloads?.map((el: PreloadRules) => {
-    return (<link rel="preload" href={el.href} as={el.type} />);
-  });
-
   return html`<!DOCTYPE html>
   <html data-theme="dark">
     <head>
@@ -28,7 +25,7 @@ export const BaseLayout = ({
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="preload" href="/dep/htmx.min.js" as="script" />
       <link rel="preload" href="/dep/toastify.js" as="script" />
-      ${preloadHTML}
+      ${<PreloadDependencyTags scripts={preloads} />}
 
       <link rel="stylesheet" type="text/css" href="/dep/toastify.min.css" />
       <script type="text/javascript" src="/dep/htmx.min.js"></script>

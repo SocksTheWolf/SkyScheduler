@@ -4,12 +4,13 @@ import { MAX_LENGTH, CF_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
   R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE, 
   CURRENT_SCRIPT_VERSION, USE_SCRIPT_MIN } from "../limits.d"
+import { ConstScriptPreload } from "../utils/constScriptGen";
 import { PreloadRules } from "../types.d";
-import { ConstScript, ConstScriptPreload } from "./constScript";
+import { DependencyTags } from "./depTags";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
-  {type: "script", href: "/dep/dropzone-min.js"}, 
+  {type: "script", href: "/dep/dropzone.min.js"}, 
   {type: "style", href: "/dep/dropzone.min.css"}, 
   {type: "style", href: "/css/dropzoneMods.css"},
   {type: "style", href: "/dep/tribute.css"},
@@ -21,12 +22,7 @@ export function PostCreation() {
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
-    <script type="text/javascript" src="/dep/dropzone-min.js"></script>
-    <script type="text/javascript" src="/dep/tribute.min.js"></script>
-    <ConstScript />
-    <link href="/dep/dropzone.min.css" rel="stylesheet" type="text/css" />
-    <link href="/dep/tribute.css" rel="stylesheet" type="text/css" />
-    <link href="/css/dropzoneMods.css" rel="stylesheet" type="text/css" />
+    <DependencyTags scripts={PreloadPostCreation} />
     <article>
       <form id="postForm">
         <header>
@@ -64,7 +60,7 @@ export function PostCreation() {
                   <ul>
                     <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-                    <li>will be processed on BSky after they're posted. This will show a temporary "Media not Found"/black screen for a bit after posting.</li>
+                    <li>will be processed on BSky after they're posted. This may show a temporary "Media not Found"/black screen for a bit after posting.</li>
                   </ul></li>
                   </ul></small></div>
                 </footer>

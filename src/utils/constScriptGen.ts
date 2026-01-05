@@ -1,12 +1,17 @@
 import {BSKY_NAME_LOOKUP_LIMIT, BSKY_NAME_TYPE_AHEAD_CHARS, BSKY_GIF_MIME_TYPES,
   BSKY_IMG_MIME_TYPES, BSKY_VIDEO_MIME_TYPES, BSKY_VIDEO_LENGTH_LIMIT, 
   MAX_LENGTH, MAX_ALT_TEXT, R2_FILE_SIZE_LIMIT, MAX_THUMBNAIL_SIZE } from "../limits.d";
+import { PreloadRules } from "../types.d";
+
+export const CONST_SCRIPT_VERSION: number = 5;
 
 const makeFileTypeStr = (typeMap: string[]) => {
   return typeMap.map((type) => `"${type}"`).join()
 };
 
-export const CONST_SCRIPT_VERSION: number = 5;
+export const ConstScriptPreload: PreloadRules[] = [
+  {type: "script", href: `/js/consts.js?v=${CONST_SCRIPT_VERSION}`}, 
+];
 
 export function makeConstScript() {
     return `const fileTypesSupported = [${makeFileTypeStr([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES, ...BSKY_GIF_MIME_TYPES])}];
