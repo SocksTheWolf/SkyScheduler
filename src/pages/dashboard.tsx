@@ -52,7 +52,7 @@ export default function Dashboard(props:any) {
                 </button>
               </div>
               <hr />
-              <FooterCopyright />
+              <FooterCopyright inNewWindow={true} />
             </footer>
           </article>
         </section>
