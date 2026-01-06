@@ -6,7 +6,9 @@ import * as z from "zod/v4";
 import isEmpty from "just-is-empty";
 
 export const AltTextSchema = z.object({
-  alt: z.string().trim().max(MAX_ALT_TEXT, "alt text is too long").prefault("")
+  alt: z.string().trim()
+    .max(MAX_ALT_TEXT, "alt text is too long")
+    .prefault("")
 });
 
 export const ImageEmbedSchema = z.object({
@@ -49,13 +51,15 @@ export const LinkEmbedSchema = z.object({
   }),
   type: z.literal(EmbedDataType.WebLink),
   title: z.string().trim().default(""),
-  /* uri is the link to the website */
+  /* NOTE: uri is the link to the website here, 
+    content is used as the thumbnail */
   uri: z.url({
     normalize: true, 
     protocol: /^https?$/,
     hostname: z.regexes.domain,
     error: "provided weblink is not in the correct form of an url"
-  }).trim().nonoptional("link embeds require a url"),
+  }).trim()
+    .nonoptional("link embeds require a url"),
   description: z.string().trim().default("")
 });
 
@@ -65,6 +69,9 @@ export const PostRecordSchema = z.object({
     protocol: /^https?$/,
     hostname: z.regexes.domain,
     error: "post/feed/list/followgraph record url is invalid"
-  }).trim().toLowerCase().regex(postRecordURI, "url is not a post/feed/list/followgraph record").nonoptional("post/feed/list/followgraph records require a url"),
+  }).trim()
+    .toLowerCase()
+    .regex(postRecordURI, "url is not a post/feed/list/followgraph record")
+    .nonoptional("post/feed/list/followgraph records require a url"),
   type: z.literal(EmbedDataType.Record),
 });
