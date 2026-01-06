@@ -64,6 +64,13 @@
       "when": 1767566050928,
       "tag": "0008_purple_richard_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1767672841247,
+      "tag": "0009_first_black_cat",
+      "breakpoints": true
     }
   ]
 }

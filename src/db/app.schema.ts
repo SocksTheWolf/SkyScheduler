@@ -25,8 +25,13 @@ export const posts = sqliteTable('posts', {
 }, (table) => [
   index("scheduledDate_idx").on(table.scheduledDate),
   index("user_idx").on(table.userId),
-  index("postedUpdate_idx").on(table.updatedAt, table.posted),
-  index("postedUUID_idx").on(table.uuid, table.posted)
+  index("postedUpdate_idx")
+    .on(table.updatedAt, table.posted)
+    .where(sql`posted = 1`), /* eq function will not work */
+  index("postedUUID_idx").on(table.uuid, table.posted),
+  index("postNowScheduledDatePosted_idx")
+    .on(table.posted, table.scheduledDate, table.postNow)
+    .where(sql`posted = 0 and postNow <> 0`),
 ]);
 
 export const reposts = sqliteTable('reposts', {
