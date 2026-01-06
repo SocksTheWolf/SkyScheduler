@@ -1,9 +1,8 @@
 import { Context } from "hono";
 import { BaseLayout } from "../layout/main";
-import { isUsingInviteKeys } from "../utils/inviteKeys";
+import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import NavTags from "../layout/navTags";
-import isEmpty from "just-is-empty";
 import AccountHandler from "../layout/account";
 import { UsernameField } from "../layout/usernameField";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
@@ -13,8 +12,8 @@ import { PWAutoCompleteSettings } from "../types.d";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
-  const linkToInvites = isUsingInviteKeys(ctx) && !isEmpty(ctx.env.INVITE_THREAD) ? 
-    (<a href={ctx.env.INVITE_THREAD} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) : 
+  const linkToInvites = isUsingInviteKeys(ctx) ? 
+    (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) : 
     "You can ask for the maintainer for it";
 
   return (

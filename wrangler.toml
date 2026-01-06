@@ -4,6 +4,7 @@ compatibility_date = "2024-12-13"
 compatibility_flags = [ "nodejs_compat" ]
 send_metrics = false
 minify = true
+upload_source_maps = true
 preview_urls = false
 # File assets
 assets = { run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
@@ -47,6 +48,10 @@ ip = "127.0.0.1"
 [observability]
 enabled = true
 head_sampling_rate = 1
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.5
+persist = true
 
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
@@ -56,14 +61,9 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75]}
 RESIZE_BUCKET_URL="https://resize.skyscheduler.work/"
 
-# Signup options
+# Signup options and if keys should be used
 USE_TURNSTILE_CAPTCHA=true
+INVITE_SETTINGS = {invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
 
-# If invites should be used
-USE_INVITE_KEYS=false
-
-# link to invite threads
-INVITE_THREAD="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"
-
-# contact link
-CONTACT_LINK="https://bsky.app/profile/skyscheduler.work"
+# redirect links
+REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}

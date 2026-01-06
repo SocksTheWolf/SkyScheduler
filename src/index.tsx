@@ -65,8 +65,9 @@ app.get("/js/consts.js", (c) => {
   });
 });
 
-// Add contact link
-app.all("/contact", (c) => c.redirect(c.env.CONTACT_LINK));
+// Add redirects
+app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
+app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
 
 // Legal linkies
 app.get("/tos", (c) => c.html(<TermsOfService />));

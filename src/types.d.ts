@@ -1,10 +1,22 @@
 import { ExecutionContext } from "hono";
 
+/*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
   enabled: boolean;
   steps: number[];
 };
 
+type InviteConfigSettings = {
+  invite_only: boolean;
+  invite_thread: string;
+}
+
+type RedirectConfigSettings = {
+  contact: string;
+  tip: string;
+}
+
+/** Types, types, types **/
 export interface Bindings {
   DB: D1Database;
   R2: R2Bucket;
@@ -12,6 +24,7 @@ export interface Bindings {
   KV: KVNamespace;
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
+  INVITE_SETTINGS: InviteConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -19,13 +32,12 @@ export interface Bindings {
   BETTER_AUTH_URL: string;
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
-  USE_INVITE_KEYS: boolean;
   USE_TURNSTILE_CAPTCHA: boolean;
   RESIZE_SECRET_HEADER: string;
   RESIZE_BUCKET_URL: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
-  CONTACT_LINK: string;
+  REDIRECTS: RedirectConfigSettings;
 };
 
 export enum EmbedDataType {

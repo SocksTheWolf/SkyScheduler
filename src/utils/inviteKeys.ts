@@ -3,7 +3,11 @@ import humanId from "human-id";
 import has from "just-has";
 
 export const isUsingInviteKeys = (c: Context) => {
-  return has(c.env, "INVITE_POOL") && c.env.USE_INVITE_KEYS;
+  return has(c.env, "INVITE_POOL") && c.env.INVITE_SETTINGS.invite_only;
+}
+
+export const getInviteThread = (c: Context) => {
+  return c.env.INVITE_SETTINGS.invite_thread;
 }
 
 export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|undefined) => {
