@@ -52,7 +52,7 @@ export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
 
   const removedIds: string[] = await pruneBskyPosts(env);
   if (!isEmpty(removedIds)) {
-    if (await deletePosts(env, removedIds))
-      console.log(`Deleted ${removedIds.length} missing posts from the db`);
+    const deletedItems: number = await deletePosts(env, removedIds);
+    console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
 };

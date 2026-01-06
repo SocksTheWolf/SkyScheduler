@@ -212,6 +212,8 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
+  // TODO: this could probably be left joined to some degree
+  // but it currently doesn't have a high read count
   const query = db.select({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
@@ -309,8 +311,14 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
     return false;
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  await db.delete(posts).where(and(inArray(posts.uuid, postsToDelete), eq(posts.posted, true)));
-  return true;
+  let deleteQueries: BatchItem<"sqlite">[] = [];
+  postsToDelete.forEach((itm) => {
+    deleteQueries.push(db.delete(posts).where(and(eq(posts.uuid, itm), eq(posts.posted, true))));
+  });
+  // Batching this should improve db times
+  const batchResponse = await db.batch(deleteQueries as BatchQuery);
+  // Return the number of items that have been deleted
+  return batchResponse.reduce((val, item) => val + item.success, 0);
 };
 
 export const purgePostedPosts = async (env: Bindings) => {
@@ -326,11 +334,7 @@ export const purgePostedPosts = async (env: Bindings) => {
     )
   ).all();
   const postsToDelete = unique(dbQuery.map((item) => { return item.data }));
-  const {success, meta } = await db.delete(posts).where(inArray(posts.uuid, postsToDelete));
-  if (!success) {
-    console.warn(`Encountered an issue when trying to purge DB`);
-  }
-  return meta.changes;
+  return await deletePosts(env, postsToDelete);
 }
 
 export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
