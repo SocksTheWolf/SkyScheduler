@@ -11,7 +11,7 @@ import { LoginSchema } from "../validation/loginSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, getUsernameForUser, updateUserData } from "../utils/dbQuery";
-import { doesInviteKeyHaveValues, useInviteKey } from "../utils/inviteKeys";
+import { doesInviteKeyHaveValues, consumeInviteKey } from "../utils/inviteKeys";
 import { doesHandleExist } from "../utils/bskyApi";
 import { deleteFromR2 } from "../utils/r2Query";
 import isEmpty from "just-is-empty";
@@ -170,7 +170,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   // check success of user creation
   if (createUser.token !== null) {
     // Burn the invite key
-    c.executionCtx.waitUntil(useInviteKey(c, signupToken));
+    c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
 
     console.log(`user ${username} created! with code ${signupToken||'none'}`);
     return c.json({ok: true, message: "signup success"});

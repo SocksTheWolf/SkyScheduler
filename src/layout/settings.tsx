@@ -45,7 +45,7 @@ export function Settings() {
         <footer id="settingsButtons">
           <button id="deleteAccountButton" class="btn-error">Delete Account</button>
           <button form="settingsData">Save</button>
-          <button class="secondary" onclick='closeSettingsModal();'>Cancel</button>
+          <button class="secondary" id="closeSettingsButton">Cancel</button>
         </footer>
       </article>
     </dialog>
@@ -53,7 +53,7 @@ export function Settings() {
       <article>
         <header>Delete Account</header>
         <p>To delete your SkyScheduler account, please type your password below.<br />
-            All pending, scheduled tweets + all unposted media will be deleted from this service.
+            All pending, scheduled posts + all unposted media will be deleted from this service.
           
           <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMANENT</u>.</center>
         </p>
@@ -69,7 +69,7 @@ export function Settings() {
           </div>
         <footer id="accountDeleteButtons">
           <button class="btn-error" form="delAccountForm">Delete</button>
-          <button class="secondary" onclick='closeDeleteModal();'>Cancel</button>
+          <button class="secondary" id="closeDeleteButton">Cancel</button>
         </footer>
       </article>
     </dialog>
@@ -86,25 +86,9 @@ export function Settings() {
         document.getElementById("accountDeleteResponse").innerHTML = "";
       }
 
-      function closeSettingsModal() {
-        closeModal(changeInfoModal);
-      }
-      function closeDeleteModal() {
-        closeModal(deleteAccountModal);
-      }
-
       addUsernameFieldWatchers();
-      document.getElementById("deleteAccountButton").addEventListener("click", (ev) => {
-        ev.preventDefault();
-        clearSettingsData();
-        openModal(deleteAccountModal);
-      });
-
-      document.getElementById("settingsButton").addEventListener("click", (ev) => {
-        ev.preventDefault();
-        clearSettingsData();
-        openModal(changeInfoModal);
-      });
+      addEasyModalOpen("deleteAccountButton", deleteAccountModal, "closeDeleteButton");
+      addEasyModalOpen("settingsButton", changeInfoModal, "closeSettingsButton");
     `}</script>
     </>
   );

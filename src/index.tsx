@@ -10,7 +10,7 @@ import ForgotPassword from "./pages/forgot";
 import TermsOfService from "./pages/tos";
 import PrivacyPolicy from "./pages/privacy";
 import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
-import { runMaintenenceUpdates } from "./utils/dbQuery";
+import { runMaintenanceUpdates } from "./utils/dbQuery";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
 import { makeConstScript } from "./utils/constScriptGen";
@@ -108,7 +108,7 @@ app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
 });
 
 app.get("/db-update", authAdminOnlyMiddleware, (c) => {
-  c.executionCtx.waitUntil(runMaintenenceUpdates(c.env));
+  c.executionCtx.waitUntil(runMaintenanceUpdates(c.env));
   return c.text("ran");
 });
 

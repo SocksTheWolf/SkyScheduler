@@ -3,7 +3,7 @@ import {BSKY_NAME_LOOKUP_LIMIT, BSKY_NAME_TYPE_AHEAD_CHARS, BSKY_GIF_MIME_TYPES,
   MAX_LENGTH, MAX_ALT_TEXT, R2_FILE_SIZE_LIMIT, MAX_THUMBNAIL_SIZE } from "../limits.d";
 import { PreloadRules } from "../types.d";
 
-export const CONST_SCRIPT_VERSION: number = 5;
+const CONST_SCRIPT_VERSION: number = 5;
 
 const makeFileTypeStr = (typeMap: string[]) => {
   return typeMap.map((type) => `"${type}"`).join()

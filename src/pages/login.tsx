@@ -21,7 +21,7 @@ export default function Login() {
         <label hx-history="false">
           Dashboard Password
           <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} required={true} />
-          <small><b>NOTE</b>: This password is not related to your bluesky account!</small>
+          <small><b>NOTE</b>: This password is not related to your Bluesky account!</small>
         </label>
       </AccountHandler>
     </BaseLayout>

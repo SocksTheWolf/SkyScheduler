@@ -92,7 +92,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
       const resizeFilename = uuidv4();
       const resizeBucketPush = await env.R2RESIZE.put(resizeFilename, await file.bytes(), {
         customMetadata: {"user": userId },
-        httpMetadata: {contentType: file.type }
+        httpMetadata: { contentType: file.type }
       });
 
       if (!resizeBucketPush) {

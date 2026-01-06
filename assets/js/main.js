@@ -220,3 +220,15 @@ function easySetup(url, successMessage, successLocation) {
     redirectAfterDelay(successLocation);
   });
 }
+
+function addEasyModalOpen(buttonID, modalEl, closeButtonID) {
+  document.getElementById(buttonID).addEventListener("click", (ev) => {
+    ev.preventDefault();
+    clearSettingsData();
+    openModal(modalEl);
+  });
+  document.getElementById(closeButtonID).addEventListener("click", (ev) => {
+    ev.preventDefault();
+    closeModal(modalEl);
+  });
+}

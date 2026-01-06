@@ -32,7 +32,7 @@ export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|unde
   return true;
 };
 
-export const useInviteKey = async(c: Context, inviteKey: string|undefined) => {
+export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return;

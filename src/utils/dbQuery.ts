@@ -391,7 +391,7 @@ export const getViolationsForCurrentUser = async(c: Context) => {
 };
 
 /** Maintenance operations **/
-export const runMaintenenceUpdates = async (env: Bindings) => {
+export const runMaintenanceUpdates = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   // Create a posted query that also checks for valid json and content length
   const postedQuery = db.select({

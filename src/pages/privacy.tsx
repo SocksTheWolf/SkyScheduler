@@ -44,10 +44,10 @@ export default function PrivacyPolicy() {
             <div style="margin-left: 15px">
               <strong>Note that</strong>:
               <ul>
-                <li>Data is not accessible to the maintainers of the website</li>
+                <li>Data is not accessible to the maintainers of this service</li>
                 <li>We do not sell your data to any third party</li>
                 <li>No data is used for genAI purposes nor for training generative AI models</li>
-                <li>You can verify all of this by just looking at <a href="https://github.com/socksthewolf/skyscheduler" class="secondary" ref="noopener nofollow">the source code</a></li>
+                <li>You can verify this by just looking at <a href="https://github.com/socksthewolf/skyscheduler" class="secondary" ref="noopener nofollow">the source code</a></li>
               </ul>
             </div>
           </p>

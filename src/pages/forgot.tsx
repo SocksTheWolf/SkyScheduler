@@ -16,14 +16,15 @@ export default function ForgotPassword(props:any) {
       <AccountHandler title="Forgot Password Reset" 
         submitText="Request Password Reset"
         loadingText="Requesting Password Reset..." endpoint="/account/forgot" 
-        successText="Success! Check your bsky dms for info. Redirecting to home.." 
+        successText="Success! Check your DMs for info. Redirecting to home.." 
         redirect="/"
         footerHTML={<FooterCopyright />}>
 
         <center hx-history="false">
           <p>You will receive a Direct Message from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on Bluesky with a link to reset your password.<br /><br />
             If you encounter errors, your Bluesky Communication settings might be set to forbid contact via Direct Messages from accounts you don't follow.<br />
-            It is <u>heavily recommended</u> that <a href={botAccountURL} target="_blank">you follow the service account</a>.</p>
+            It is <u>heavily recommended</u> that <a href={botAccountURL} target="_blank">you follow the service account</a>.<br />
+            <b>NOTE</b>: DMs are sent one way. Your account reset URL can only be seen by you.</p>
         </center>
 
         <UsernameField />

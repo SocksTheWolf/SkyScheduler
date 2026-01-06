@@ -6,6 +6,11 @@
   display: none;
 }
 
+.sidebar-block {
+  margin-top: -1.3rem;
+  padding-bottom: 0.5rem;
+}
+
 #repostScheduleSimple {
   select {
     width: 10%;

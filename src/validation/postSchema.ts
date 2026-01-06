@@ -1,8 +1,9 @@
 import { MIN_LENGTH, MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, MAX_LENGTH } from "../limits.d";
-import { AltTextSchema, ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
+import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { EmbedDataType, PostLabel } from "../types.d";
 import * as z from "zod/v4";
+import { AltTextSchema } from "./sharedValidations";
 
 const TextContent = z.object({
   content: z.string().trim()
@@ -35,6 +36,7 @@ export const PostSchema = z.object({
     }
   }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
 }).superRefine(({embeds, label}, ctx) => {
+  // Check that labels are properly set if we have embed data
   if (embeds !== undefined && embeds.length > 0 && label === undefined) {
     // If it's only a quote post and nothing else, then no content label is required.
     if (embeds.length == 1 && embeds[0].type == EmbedDataType.Record)

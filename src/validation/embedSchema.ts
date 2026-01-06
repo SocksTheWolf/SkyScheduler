@@ -1,15 +1,10 @@
-import { MAX_ALT_TEXT, BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
+import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType } from "../types.d";
+import { AltTextSchema } from "./sharedValidations";
 import { FileContentSchema } from "./mediaSchema";
 import { postRecordURI } from "./regexCases";
 import * as z from "zod/v4";
 import isEmpty from "just-is-empty";
-
-export const AltTextSchema = z.object({
-  alt: z.string().trim()
-    .max(MAX_ALT_TEXT, "alt text is too long")
-    .prefault("")
-});
 
 export const ImageEmbedSchema = z.object({
   ...FileContentSchema.shape,
@@ -46,7 +41,7 @@ export const LinkEmbedSchema = z.object({
       return false;
     }
   }, {
-    message: "The link embed contained invalid data, please check your URL and try again",
+    message: "the link to embed failed to parse, is it accessible?",
     path: ["content"]
   }),
   type: z.literal(EmbedDataType.WebLink),
@@ -57,7 +52,7 @@ export const LinkEmbedSchema = z.object({
     normalize: true, 
     protocol: /^https?$/,
     hostname: z.regexes.domain,
-    error: "provided weblink is not in the correct form of an url"
+    error: "provided link is not an URL, please check URL and try again"
   }).trim()
     .nonoptional("link embeds require a url"),
   description: z.string().trim().default("")

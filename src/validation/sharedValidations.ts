@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 import { appPasswordRegex } from "./regexCases";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, BSKY_MAX_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, BSKY_MAX_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS, MAX_ALT_TEXT } from "../limits.d";
 
 export const UsernameSchema = z.object({
   username: z.string().trim().toLowerCase()
@@ -24,4 +24,10 @@ export const BSkyAppPasswordSchema = z.object({
     .nonempty("missing bsky app password")
     .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
     .regex(appPasswordRegex, "please go back and recreate your app password from your bsky settings")
+});
+
+export const AltTextSchema = z.object({
+  alt: z.string().trim()
+    .max(MAX_ALT_TEXT, "alt text is too long")
+    .prefault("")
 });

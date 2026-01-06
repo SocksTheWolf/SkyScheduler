@@ -26,8 +26,8 @@ export default function Dashboard(props:any) {
           <article>
             <header>
               <h4>SkyScheduler Dashboard</h4>
-              <div>
-                <small>Schedule Bluesky posts effortlessly.</small><br />
+              <div class="sidebar-block">
+                <small><i>Schedule Bluesky posts effortlessly</i>.</small><br />
                 <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
               <center class="controls">

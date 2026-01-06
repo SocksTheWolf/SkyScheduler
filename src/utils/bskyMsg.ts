@@ -33,7 +33,7 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
       try {
         await agent.chat.bsky.convo.deleteMessageForSelf({convoId: convoId, messageId: messageId}, chatHeaders);
       } catch(err) {
-        console.error(`failed to delete message for self, got error ${err}`);
+        console.error(`failed to delete reset message for self, got error ${err}`);
       }
       // Message has been sent.      
       return true;
