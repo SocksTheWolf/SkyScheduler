@@ -80,6 +80,8 @@ document.addEventListener("resetPost", () => {
   fileDropzone.removeAllFiles();
   // Clear the file data map
   fileData.clear();
+
+  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 });
 
 fileDropzone.on("reset", () => {
@@ -370,9 +372,13 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
     if (response.ok) {
       pushToast(data.message, true);
       document.dispatchEvent(new Event("resetPost"));
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       refreshPosts();
     } else {
+      // For postnow, we try again, immediate failures still add to the DB
+      if (response.status === 302 && postNow) {
+        document.dispatchEvent(new Event("resetPost"));
+        refreshPosts();
+      }
       pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);
     }
   } catch (err) {
