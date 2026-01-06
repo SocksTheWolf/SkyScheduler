@@ -17,17 +17,17 @@ preview.get("/file/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   const validation = FileContentSchema.safeParse({content: id});
   if (!validation.success) {
-    return c.redirect("/thumbs/image.png");
+    return c.redirect("/thumbs/missing.png");
   }
 
   const fetchedFile = await c.env.R2.get(id);
   if (fetchedFile === null) {
-    return c.redirect("/thumbs/image.png");
+    return c.redirect("/thumbs/missing.png");
   }
   
   const contentType = fetchedFile.httpMetadata?.contentType || fetchedFile.customMetadata["type"];
   if (BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
-    return c.redirect("/thumbs/image.png");
+    return c.redirect("/thumbs/missing.png");
   }
 
   const uploaderId = fetchedFile.customMetadata["user"];

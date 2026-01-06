@@ -16,7 +16,7 @@ export function PostAltTextEdit({post}: EditedPostProps) {
 
     return (
       <div class="editAltBlock" alteditfor={embedData.content}>
-        <img width="128px" height="128px" class="editImgThumb" src={`preview/file/${embedData.content}`} /><br />
+        <img width="120px" height="120px" class="editImgThumb" src={`preview/file/${embedData.content}`} /><br />
         <center>
           <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
           <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
