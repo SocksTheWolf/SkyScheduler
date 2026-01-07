@@ -46,9 +46,10 @@ export const reposts = sqliteTable('reposts', {
 ]);
 
 export const violations = sqliteTable('violations', {
+  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   userId: text("user")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }).primaryKey(),
+    .references(() => users.id, { onDelete: "cascade" }),
   tosViolation: integer('tosViolation', { mode: 'boolean' }).default(false),
   userPassInvalid: integer('userPassInvalid', { mode: 'boolean' }).default(false),
   accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),

@@ -71,6 +71,13 @@
       "when": 1767672841247,
       "tag": "0009_first_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1767758958868,
+      "tag": "0010_smiling_namorita",
+      "breakpoints": true
     }
   ]
 }
