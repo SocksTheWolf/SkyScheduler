@@ -18,14 +18,22 @@ type RedirectConfigSettings = {
   tip: string;
 }
 
+type QueueConfigSettings = {
+  enabled: boolean;
+  post_queues: string[];
+  repost_queues: string[];
+}
+
 /** Types, types, types **/
 export interface Bindings {
-  USE_QUEUES: boolean;
   DB: D1Database;
   R2: R2Bucket;
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
-  POST_QUEUE: Queue;
+  POST_QUEUE1: Queue;
+  POST_QUEUE2: Queue;
+  REPOST_QUEUE: Queue;
+  QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
   SIGNUP_SETTINGS: SignupConfigSettings;

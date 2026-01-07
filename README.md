@@ -26,7 +26,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - Node.js (v24.x or later)
 - Package Manager
-- Cloudflare Pro Workers account (for CPU and Queues [can be disabled with `USE_QUEUES` set to false])
+- Cloudflare Pro Workers account (for CPU and Queues [can be disabled with `QUEUE_SETTINGS.enabled` set to false])
 
 ### Installation
 

@@ -46,12 +46,24 @@ head_sampling_rate = 1
 [observability.traces]
 enabled = true
 head_sampling_rate = 0.5
+persist = true
 
 [[queues.producers]]
 queue = "skyscheduler-post-queue"
-binding = "POST_QUEUE"
+binding = "POST_QUEUE1"
+[[queues.producers]]
+queue = "skyscheduler-post-queue2"
+binding = "POST_QUEUE2"
+[[queues.producers]]
+queue = "skyscheduler-repost-queue"
+binding = "REPOST_QUEUE"
+
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
+[[queues.consumers]]
+queue = "skyscheduler-post-queue2"
+[[queues.consumers]]
+queue = "skyscheduler-repost-queue"
 
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
@@ -63,7 +75,8 @@ IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.sky
 # Signup options and if keys should be used
 SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
 
-USE_QUEUES=false
+# queue handling, pushing information
+QUEUE_SETTINGS={enabled=false, post_queues=["POST_QUEUE1", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
 
 # redirect links
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}

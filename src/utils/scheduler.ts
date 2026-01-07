@@ -4,6 +4,8 @@ import { pruneBskyPosts } from './bskyPrune';
 import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts, purgePostedPosts } from './dbQuery';
 import { createPostObject, createRepostObject } from './helpers';
 import isEmpty from 'just-is-empty';
+import random from 'just-random';
+import get from 'just-safe-get';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, isQueued: boolean = false) => {
   const madePost = await makePost(runtime, postData, isQueued);
@@ -24,6 +26,17 @@ export const handleRepostTask = async(runtime: ScheduledContext, postData: Repos
   return madeRepost;
 };
 
+// picks a random queue to publish data to
+const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
+  const queueListNames: string[] = get(env.QUEUE_SETTINGS, listName, []);
+  if (isEmpty(queueListNames))
+    return null;
+
+  const queueName: string = random(queueListNames) || "";
+  console.log(`Picked ${queueName} from ${listName}`);
+  return get(env, queueName, null);
+};
+
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts = await getAllPostsForCurrentTime(env);
   const scheduledReposts = await getAllRepostsForCurrentTime(env);
@@ -38,8 +51,12 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
     console.log(`handling ${scheduledPosts.length} posts...`);
     scheduledPosts.forEach(async (post) => {
       const postData: Post = createPostObject(post);
-      if (env.USE_QUEUES)
-        env.POST_QUEUE.send({type: QueueTaskType.Post, post: postData} as QueueTaskData, { contentType: queueContentType });
+      if (env.QUEUE_SETTINGS.enabled) {
+        // Pick a random consumer to handle this post
+        const queueConsumer: Queue|null = getRandomQueue(env, "post_queues");
+        if (queueConsumer !== null)
+          queueConsumer.send({type: QueueTaskType.Post, post: postData} as QueueTaskData, { contentType: queueContentType });
+      }
       else
         ctx.waitUntil(handlePostTask(runtimeWrapper, postData));
     });
@@ -52,8 +69,12 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
     console.log(`handling ${scheduledReposts.length} reposts`);
     scheduledReposts.forEach(async (post) => {
       const postData: Repost = createRepostObject(post);
-      if (env.USE_QUEUES)
-        env.POST_QUEUE.send({type: QueueTaskType.Repost, repost: postData} as QueueTaskData, { contentType: queueContentType });
+      if (env.QUEUE_SETTINGS.enabled) {
+        // Pick a random consumer to handle this repost
+        const queueConsumer: Queue|null = getRandomQueue(env, "repost_queues");
+        if (queueConsumer !== null)
+          queueConsumer.send({type: QueueTaskType.Repost, repost: postData} as QueueTaskData, { contentType: queueContentType });
+      }
       else
         ctx.waitUntil(handleRepostTask(runtimeWrapper, postData));
     });
