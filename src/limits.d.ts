@@ -26,7 +26,7 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 
 // Change this value to break out of any caching that might be happening
 // for the runtime scripts (ex: main.js & postHelper.js)
-export const CURRENT_SCRIPT_VERSION: string = "1.2.8";
+export const CURRENT_SCRIPT_VERSION: string = "1.2.9";
 
 // empty this string if you want to serve the full scripts
 // you can run the "npm run minify" script to minify the js files

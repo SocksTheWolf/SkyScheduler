@@ -54,6 +54,10 @@ urlCardBox.addEventListener("input", () => {
 let fileDropzone = new Dropzone("#fileUploads", { 
   url: "/post/upload", 
   autoProcessQueue: true,
+  /* We process this ourselves */
+  addRemoveLinks: false,
+  maxFiles: FILE_DROP_MAX_FILES,
+  dictMaxFilesExceeded: "max files",
   maxFilesize: FILE_DROP_MAX_SIZE,
   maxThumbnailFilesize: FILE_DROP_MAX_THUMB_SIZE,
   acceptedFiles: fileTypesSupported.toString()
@@ -269,11 +273,29 @@ fileDropzone.on("success", function(file, response) {
 });
 
 fileDropzone.on("error", function(file, msg) {
-  pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
+  if (msg.error !== undefined) {
+    pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
+  } else if (msg !== "max files") {
+    console.error(`file error was ${msg}`);
+    pushToast(`Error: ${file.name} had an unexpected error`, false);
+  }
+  
   fileDropzone.removeFile(file);
   if (fileData.length == 0) {
     setElementVisible(linkAttachmentSection, true);
   }
+});
+
+fileDropzone.on("uploadprogress", function(file, progress, bytesSent) {
+  const progressObject = file.previewElement.querySelector(".dz-upload");
+  progressObject.innerHTML = `${progress}%`;
+  if ((progress === 100 || bytesSent == file.size) && progressObject) {
+    progressObject.innerHTML = "Processing...please wait. This may take a bit!";
+  }
+});
+
+fileDropzone.on("maxfilesexceeded", () => {
+  pushToast("The maximum amount of files for this post has been reached!", false);
 });
 
 // Handle form submission
