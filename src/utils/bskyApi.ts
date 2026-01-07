@@ -76,22 +76,27 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
   return PlatformLoginResponse.UnhandledError;
 }
 
-export const makePost = async (c: Context|ScheduledContext, content: Post) => {
+export const makePost = async (c: Context|ScheduledContext, content: Post, isQueued: boolean=false) => {
   const env = c.env;
   const newPost: PostResponseObject|null = await makePostRaw(env, content);
   if (newPost !== null) {
     // update post data in the d1
-    c.executionCtx.waitUntil(updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
-      content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] }));
+    const postDataUpdate: Promise<void> = updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
+      content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] });
+    if (isQueued)
+      await postDataUpdate;
+    else
+      c.executionCtx.waitUntil(postDataUpdate);
 
     // Delete any embeds if they exist.
-    deleteEmbedsFromR2(c, content.embeds);
+    deleteEmbedsFromR2(c, content.embeds, isQueued);
     return true;
   }
   return false;
 }
 
-export const makeRepost = async (env: Bindings, content: Repost) => {
+export const makeRepost = async (c: Context|ScheduledContext, content: Repost) => {
+  const env = c.env;
   let bWasSuccess = true;
   const loginCreds = await getBskyUserPassForId(env, content.userId);
   const {user, pass, pds} = loginCreds[0];

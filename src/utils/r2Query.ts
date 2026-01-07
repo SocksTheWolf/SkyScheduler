@@ -15,7 +15,7 @@ type FileMetaData = {
   qualityLevel?: number;
 };
 
-export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedData[]|undefined) => {
+export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
   let itemsToDelete:string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
@@ -26,17 +26,21 @@ export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedDat
         itemsToDelete.push(data.content.toLowerCase());
       }
     });
-    deleteFromR2(c, itemsToDelete);
+    deleteFromR2(c, itemsToDelete, isQueued);
   }
   return itemsToDelete;
 };
 
-export const deleteFromR2 = (c: Context|ScheduledContext, embeds: string[]|string) => {
+export const deleteFromR2 = async (c: Context|ScheduledContext, embeds: string[]|string, isQueued: boolean=false) => {
   if (embeds.length <= 0)
     return;
 
   console.log(`Deleting ${embeds}`);
-  c.executionCtx.waitUntil(c.env.R2.delete(embeds));
+  const killFilesPromise = c.env.R2.delete(embeds);
+  if (isQueued)
+    await killFilesPromise;
+  else 
+    c.executionCtx.waitUntil(killFilesPromise);
 };
 
 const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
@@ -102,7 +106,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
 
       for (var i = 0; i < env.IMAGE_SETTINGS.steps.length; ++i) {
         const qualityLevel = env.IMAGE_SETTINGS.steps[i];
-        const response = await fetch(new URL(resizeFilename, env.RESIZE_BUCKET_URL), {
+        const response = await fetch(new URL(resizeFilename, env.IMAGE_SETTINGS.bucket_url), {
           headers: {
             "x-skyscheduler-helper": env.RESIZE_SECRET_HEADER
           },

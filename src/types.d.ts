@@ -4,9 +4,11 @@ import { ExecutionContext } from "hono";
 type ImageConfigSettings = {
   enabled: boolean;
   steps: number[];
+  bucket_url: string;
 };
 
-type InviteConfigSettings = {
+type SignupConfigSettings = {
+  use_captcha: boolean;
   invite_only: boolean;
   invite_thread: string;
 }
@@ -18,13 +20,15 @@ type RedirectConfigSettings = {
 
 /** Types, types, types **/
 export interface Bindings {
+  USE_QUEUES: boolean;
   DB: D1Database;
   R2: R2Bucket;
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
+  POST_QUEUE: Queue;
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
-  INVITE_SETTINGS: InviteConfigSettings;
+  SIGNUP_SETTINGS: SignupConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -32,9 +36,7 @@ export interface Bindings {
   BETTER_AUTH_URL: string;
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
-  USE_TURNSTILE_CAPTCHA: boolean;
   RESIZE_SECRET_HEADER: string;
-  RESIZE_BUCKET_URL: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
   REDIRECTS: RedirectConfigSettings;
@@ -88,6 +90,11 @@ export type Repost = {
   uri: string;
   cid: string;
   userId: string;
+};
+
+export type QueueBatchData = {
+  post?: Post;
+  repost?: Repost;
 };
 
 export type Violation = {

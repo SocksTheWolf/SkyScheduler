@@ -6,15 +6,10 @@ send_metrics = false
 minify = true
 upload_source_maps = true
 preview_urls = false
-# File assets
+
 assets = { run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
+routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
-# Website Domain
-routes = [
-  { pattern = "skyscheduler.work", custom_domain = true }
-]
-
-# KV Data
 kv_namespaces = [
   { binding = "KV", id = "0ecd892014ac47eea38c72be94586e7b" }, # Redis for sessions
   { binding = "INVITE_POOL", id = "45e1cff45cad45c28b22c4fbcd30db00" } # Invite key pool
@@ -51,19 +46,24 @@ head_sampling_rate = 1
 [observability.traces]
 enabled = true
 head_sampling_rate = 0.5
-persist = true
+
+[[queues.producers]]
+queue = "skyscheduler-post-queue"
+binding = "POST_QUEUE"
+[[queues.consumers]]
+queue = "skyscheduler-post-queue"
 
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
-IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75]}
-RESIZE_BUCKET_URL="https://resize.skyscheduler.work/"
+IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # Signup options and if keys should be used
-USE_TURNSTILE_CAPTCHA=true
-INVITE_SETTINGS = {invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
+SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
+
+USE_QUEUES=false
 
 # redirect links
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}

@@ -2,7 +2,7 @@ import { Context } from "hono";
 
 // Middleware that handles turnstile verification.
 export async function verifyTurnstile(c: Context, next: any) {
-  if (c.env.USE_TURNSTILE_CAPTCHA) {
+  if (c.env.SIGNUP_SETTINGS.use_captcha) {
     const body = await c.req.json();
     const userIP: string|undefined = c.req.header("CF-Connecting-IP");
     const token = body["cf-turnstile-response"];
