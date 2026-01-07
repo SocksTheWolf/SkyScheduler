@@ -27,19 +27,18 @@ export const handleRepostTask = async(runtime: ScheduledContext, postData: Repos
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts = await getAllPostsForCurrentTime(env);
   const scheduledReposts = await getAllRepostsForCurrentTime(env);
+  const queueContentType = 'json';
   const runtimeWrapper: ScheduledContext = {
     executionCtx: ctx,
     env: env
   };
-
-  const useQueues: boolean = env.USE_QUEUES;
-  const queueContentType = 'json';
-
+  
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
+    console.log(`handling ${scheduledPosts.length} posts...`);
     scheduledPosts.forEach(async (post) => {
       const postData: Post = createPostObject(post);
-      if (useQueues)
+      if (env.USE_QUEUES)
         env.POST_QUEUE.send({post: postData} as QueueBatchData, { contentType: queueContentType });
       else
         ctx.waitUntil(handlePostTask(runtimeWrapper, postData));
@@ -50,9 +49,10 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
 
   // Push any reposts
   if (!isEmpty(scheduledReposts)) {
+    console.log(`handling ${scheduledReposts.length} reposts`);
     scheduledReposts.forEach(async (post) => {
       const postData: Repost = createRepostObject(post);
-      if (useQueues)
+      if (env.USE_QUEUES)
         env.POST_QUEUE.send({repost: postData} as QueueBatchData, { contentType: queueContentType });
       else
         ctx.waitUntil(handleRepostTask(runtimeWrapper, postData));

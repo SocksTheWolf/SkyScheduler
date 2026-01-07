@@ -1,6 +1,6 @@
 import { Env, Hono } from "hono";
 import { createAuth, ContextVariables } from "./auth";
-import { Bindings } from "./types.d";
+import { Bindings, QueueBatchData, ScheduledContext } from "./types.d";
 import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
@@ -9,7 +9,7 @@ import ResetPassword from "./pages/reset";
 import ForgotPassword from "./pages/forgot";
 import TermsOfService from "./pages/tos";
 import PrivacyPolicy from "./pages/privacy";
-import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
+import { cleanUpPostsTask, handlePostTask, handleRepostTask, schedulePostTask } from "./utils/scheduler";
 import { runMaintenanceUpdates } from "./utils/dbQuery";
 import { setupAccounts } from "./utils/setup";
 import { makeInviteKey } from "./utils/inviteKeys";
@@ -98,9 +98,9 @@ app.get("/invite", authAdminOnlyMiddleware, (c) => {
 });
 
 // Admin Maintenance Cleanup
-app.get("/cron", authAdminOnlyMiddleware, (c) => {
-  schedulePostTask(c.env, c.executionCtx);
-  return c.text("ran");
+app.get("/cron", authAdminOnlyMiddleware, async (c) => {
+  await schedulePostTask(c.env, c.executionCtx);
+  return c.html("ran");
 });
 
 app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
@@ -128,6 +128,28 @@ export default {
       case "0 * * * *":
         ctx.waitUntil(schedulePostTask(env, ctx));
       break;
+    }
+  },
+  async queue(batch: MessageBatch<QueueBatchData>, environment: Env, ctx: ExecutionContext) {
+    const runtimeWrapper: ScheduledContext = {
+      executionCtx: ctx,
+      env: environment as Bindings
+    };
+
+    let wasSuccess = false;
+    for (const message of batch.messages) {
+      // Process our messages
+      if (message.body.post) {
+        wasSuccess = await handlePostTask(runtimeWrapper, message.body.post, true);
+      } else if (message.body.repost) {
+        wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost);
+      }
+      // Handle queue acknowledgement on success/failure
+      if (!wasSuccess) {
+        message.retry({delaySeconds: 3*(message.attempts+1)});
+      } else {
+        message.ack();
+      }
     }
   },
   fetch(request: Request, env: Env, ctx: ExecutionContext) {

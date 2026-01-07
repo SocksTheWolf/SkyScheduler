@@ -2,6 +2,7 @@
   "name": "skyscheduler",
   "scripts": {
     "dev": "wrangler dev --live-reload",
+    "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
     "auth": "npm run auth:generate && npm run auth:format",
     "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
