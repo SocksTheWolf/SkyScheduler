@@ -1,5 +1,5 @@
 import { Bindings, ScheduledContext, EmbedData, EmbedDataType } from '../types.d';
-import { CF_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
+import { CF_IMAGES_MAX_DIMENSION, BSKY_IMG_SIZE_LIMIT, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
   CF_IMAGES_FILE_SIZE_LIMIT, R2_FILE_SIZE_LIMIT,
   MB_TO_BYTES, BSKY_VIDEO_MIME_TYPES, R2_FILE_SIZE_LIMIT_IN_MB,
   BSKY_IMG_MIME_TYPES, BSKY_VIDEO_SIZE_LIMIT, BSKY_GIF_MIME_TYPES } from "../limits.d";
@@ -77,7 +77,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   }
 
   // if the image is over the cf image transforms, then return an error.
-  if (imageMetaData.width > CF_MAX_DIMENSION || imageMetaData.height > CF_MAX_DIMENSION) {
+  if (imageMetaData.width > CF_IMAGES_MAX_DIMENSION || imageMetaData.height > CF_IMAGES_MAX_DIMENSION) {
     return {"success": false, "error": "image dimensions are too large to autosize. make sure your files fit the limits."};
   }
 

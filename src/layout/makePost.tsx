@@ -1,9 +1,9 @@
 import { html } from "hono/html";
-import { MAX_LENGTH, CF_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
+import { MAX_LENGTH, CF_IMAGES_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
   BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
   R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE, 
-  CURRENT_SCRIPT_VERSION, USE_SCRIPT_MIN } from "../limits.d"
+  CURRENT_SCRIPT_VERSION } from "../limits.d"
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { PreloadRules } from "../types.d";
 import { DependencyTags } from "./depTags";
@@ -18,7 +18,7 @@ export const PreloadPostCreation: PreloadRules[] = [
 ];
 
 export function PostCreation() {
-  const postHelperScriptStr: string = `/js/postHelper${USE_SCRIPT_MIN}.js?v=${CURRENT_SCRIPT_VERSION}`;
+  const postHelperScriptStr: string = `/js/postHelper.min.js?v=${CURRENT_SCRIPT_VERSION}`;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
@@ -51,7 +51,7 @@ export function PostCreation() {
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
                   <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> 
                   <ul>
-                    <li>must be less than {CF_MAX_DIMENSION}x{CF_MAX_DIMENSION} pixels</li>
+                    <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
                     <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
                     <li>don't upload and fail, it's recommended to use a lower resolution file instead</li>

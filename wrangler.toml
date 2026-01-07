@@ -65,6 +65,9 @@ queue = "skyscheduler-post-queue2"
 [[queues.consumers]]
 queue = "skyscheduler-repost-queue"
 
+[build]
+command = "npm run minify"
+
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"

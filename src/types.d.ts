@@ -139,6 +139,7 @@ export enum PlatformLoginResponse {
   TakenDown,
   InvalidAccount,
   PlatformOutage,
+  MediaTooBig,
   UnhandledError
 };
 

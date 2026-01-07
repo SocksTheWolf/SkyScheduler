@@ -16,7 +16,7 @@ export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
 
 // max amount of returns from bsky handle search
-export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the default from bsky
+export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the same value bsky uses
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 
@@ -26,11 +26,7 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 
 // Change this value to break out of any caching that might be happening
 // for the runtime scripts (ex: main.js & postHelper.js)
-export const CURRENT_SCRIPT_VERSION: string = "1.2.9";
-
-// empty this string if you want to serve the full scripts
-// you can run the "npm run minify" script to minify the js files
-export const USE_SCRIPT_MIN: string = true ? ".min" : "";
+export const CURRENT_SCRIPT_VERSION: string = "1.2.10";
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
@@ -123,4 +119,4 @@ export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
 // Max size of Cloudflare Images files
 export const CF_IMAGES_FILE_SIZE_LIMIT_IN_MB: number = 70;
 export const CF_IMAGES_FILE_SIZE_LIMIT: number = CF_IMAGES_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
-export const CF_MAX_DIMENSION: number = 10000;
+export const CF_IMAGES_MAX_DIMENSION: number = 10000;

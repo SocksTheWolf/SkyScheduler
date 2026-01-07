@@ -370,6 +370,9 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
     case PlatformLoginResponse.Deactivated:
       valuesUpdate.accountGone = true;
     break;
+    case PlatformLoginResponse.MediaTooBig:
+      valuesUpdate.mediaTooBig = true;
+    break;
     default:
       console.warn(`createViolationForUser was not properly handled for ${violationType}`);
       return false;

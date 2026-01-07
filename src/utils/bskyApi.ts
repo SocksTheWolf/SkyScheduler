@@ -345,7 +345,8 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         try {
           uploadFile = await agent.uploadBlob(fileBlob, {encoding: file.httpMetadata?.contentType });
         } catch (err) {
-          // TODO: Give violation mediaTooBig if the file is too large.
+          // Give violation mediaTooBig if the file is too large.
+          await createViolationForUser(env, content.user, PlatformLoginResponse.MediaTooBig);
           console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
           return false;
         }
