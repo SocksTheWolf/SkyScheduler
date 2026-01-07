@@ -397,8 +397,9 @@ document.getElementById('postForm').addEventListener('submit', async (e) => {
       refreshPosts();
     } else {
       // For postnow, we try again, immediate failures still add to the DB
-      if (response.status === 302 && postNow) {
+      if (response.status === 406 && postNow) {
         document.dispatchEvent(new Event("resetPost"));
+        htmx.trigger("body", "accountViolations");
         refreshPosts();
       }
       pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);

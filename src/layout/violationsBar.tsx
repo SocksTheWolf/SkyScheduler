@@ -20,12 +20,10 @@ export async function ViolationNoticeBar(props: any) {
       errorStr = "You currently have media that's too large for Bluesky (like a video), please delete those posts";
     }
     return (
-      <div id="violationBar" class="warning-box">
+      <div id="violationBar" class="warning-box" hx-trigger="accountViolations from:body" hx-swap="outerHTML" hx-get="/account/violations" hx-target="this">
         <span class="warning"><b>WARNING</b>: Account error found! {errorStr}</span>
       </div>
     );
   }
-  return (
-    <></>
-  );
+  return (<div hx-trigger="accountViolations from:body" hidden id="hiddenViolations" hx-get="/account/violations" hx-swap="outerHTML" hx-target="this"></div>);
 };

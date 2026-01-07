@@ -15,6 +15,7 @@ import { doesInviteKeyHaveValues, consumeInviteKey } from "../utils/inviteKeys";
 import { doesHandleExist } from "../utils/bskyApi";
 import { deleteFromR2 } from "../utils/r2Query";
 import isEmpty from "just-is-empty";
+import { ViolationNoticeBar } from "../layout/violationsBar";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -98,6 +99,7 @@ account.post("/update", authMiddleware, async (c) => {
   const userUpdated = await updateUserData(c, newObject);
   if (userUpdated) {
     c.header("HX-Trigger", "accountUpdated");
+    c.header("HX-Trigger-After-Swap", "accountViolations");
     return c.html(<></>);
   }
   return c.html(<b class="btn-error">Unknown error occurred</b>);
@@ -108,6 +110,11 @@ account.get("/username", authMiddleware, async (c) => {
   const username = await getUsernameForUser(c);
   return c.text(username || "");
 });
+
+// endpoint that returns any violations
+account.get("/violations", authMiddleware, async (c) => {
+  return c.html(<ViolationNoticeBar ctx={c} />);
+})
 
 // proxy the logout call because of course this wouldn't work properly anyways
 account.post("/logout", authMiddleware, async (c) => {

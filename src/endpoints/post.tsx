@@ -58,7 +58,7 @@ post.post("/create", authMiddleware, async (c: Context) => {
       const postResponse: boolean = await makePost(c, createPostObject(postInfo[0]));
       if (postResponse === false) {
         c.executionCtx.waitUntil(setPostNowOffForPost(c.env, response.postId));
-        return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${response.postId}`}, 302);
+        return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${response.postId}`}, 406);
       }
       return c.json({message: "Created Post!" });
     } else {

@@ -51,10 +51,6 @@ document.addEventListener("postUpdatedNotice", function() {
 document.addEventListener("accountUpdated", function(ev) {
   closeModal(document.getElementById("changeInfo"));
   document.getElementById("settingsData").reset();
-  const violations = document.getElementById("violationBar");
-  if (violations) {
-    violations.setAttribute("hidden", "true");
-  }
   pushToast("Settings Updated!", true);
 });
 
