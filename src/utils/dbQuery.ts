@@ -198,10 +198,10 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
   .where(
     and(
       and(
-        ne(posts.postNow, true), /* Ignore any posts that are marked for post now */
+        eq(posts.posted, false),
         and(
           lte(posts.scheduledDate, currentTime), 
-          eq(posts.posted, false)
+          ne(posts.postNow, true) /* Ignore any posts that are marked for post now */
         )
       ),
       notInArray(posts.userId, violationUsers) /* Ignore any users that have violations on them */
