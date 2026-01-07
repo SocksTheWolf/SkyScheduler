@@ -15,7 +15,7 @@ type FileMetaData = {
   qualityLevel?: number;
 };
 
-export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
+export const deleteEmbedsFromR2 = async (c: Context|ScheduledContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
   let itemsToDelete:string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
@@ -26,7 +26,7 @@ export const deleteEmbedsFromR2 = (c: Context|ScheduledContext, embeds: EmbedDat
         itemsToDelete.push(data.content.toLowerCase());
       }
     });
-    deleteFromR2(c, itemsToDelete, isQueued);
+    await deleteFromR2(c, itemsToDelete, isQueued);
   }
   return itemsToDelete;
 };

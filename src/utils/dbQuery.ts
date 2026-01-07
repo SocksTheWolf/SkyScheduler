@@ -117,7 +117,7 @@ export const deletePost = async (c: Context, id: string) => {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postQuery[0].posted)
-      deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
+      await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
 
     c.executionCtx.waitUntil(db.delete(posts).where(eq(posts.uuid, id)));
     return true;

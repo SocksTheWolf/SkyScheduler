@@ -89,7 +89,7 @@ export const makePost = async (c: Context|ScheduledContext, content: Post, isQue
       c.executionCtx.waitUntil(postDataUpdate);
 
     // Delete any embeds if they exist.
-    deleteEmbedsFromR2(c, content.embeds, isQueued);
+    await deleteEmbedsFromR2(c, content.embeds, isQueued);
     return true;
   }
   return false;
