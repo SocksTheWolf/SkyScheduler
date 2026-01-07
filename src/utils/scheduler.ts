@@ -1,4 +1,4 @@
-import { Bindings, ScheduledContext, Post, Repost, QueueBatchData } from '../types.d';
+import { Bindings, ScheduledContext, Post, Repost, QueueTaskData, QueueTaskType } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
 import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts, purgePostedPosts } from './dbQuery';
@@ -39,7 +39,7 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
     scheduledPosts.forEach(async (post) => {
       const postData: Post = createPostObject(post);
       if (env.USE_QUEUES)
-        env.POST_QUEUE.send({post: postData} as QueueBatchData, { contentType: queueContentType });
+        env.POST_QUEUE.send({type: QueueTaskType.Post, post: postData} as QueueTaskData, { contentType: queueContentType });
       else
         ctx.waitUntil(handlePostTask(runtimeWrapper, postData));
     });
@@ -53,7 +53,7 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
     scheduledReposts.forEach(async (post) => {
       const postData: Repost = createRepostObject(post);
       if (env.USE_QUEUES)
-        env.POST_QUEUE.send({repost: postData} as QueueBatchData, { contentType: queueContentType });
+        env.POST_QUEUE.send({type: QueueTaskType.Repost, repost: postData} as QueueTaskData, { contentType: queueContentType });
       else
         ctx.waitUntil(handleRepostTask(runtimeWrapper, postData));
     });

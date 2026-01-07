@@ -92,7 +92,14 @@ export type Repost = {
   userId: string;
 };
 
-export type QueueBatchData = {
+export enum QueueTaskType {
+  None,
+  Post,
+  Repost,
+};
+
+export type QueueTaskData = {
+  type: QueueTaskType;
   post?: Post;
   repost?: Repost;
 };

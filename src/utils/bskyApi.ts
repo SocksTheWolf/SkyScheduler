@@ -1,14 +1,14 @@
-import { Context, ExecutionContext } from 'hono';
+import { Context } from 'hono';
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper, BskyRecordWrapper } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
-import { updatePostData, getBskyUserPassForId, createViolationForUser } from './dbQuery';
+import { updatePostData, getBskyUserPassForId, createViolationForUser, isPostAlreadyPosted } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import { imageDimensionsFromStream } from 'image-dimensions';
+import { postRecordURI } from '../validation/regexCases';
 import truncate from "just-truncate";
 import isEmpty from "just-is-empty";
 import has from 'just-has';
-import { postRecordURI } from '../validation/regexCases';
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -78,6 +78,11 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
 
 export const makePost = async (c: Context|ScheduledContext, content: Post, isQueued: boolean=false) => {
   const env = c.env;
+  // make a check to see if the post has already been posted onto bsky
+  if (await isPostAlreadyPosted(env, content.postid)) {
+    console.log(`Dropped handling make post for post ${content.postid}, already posted.`)
+    return true;
+  }
   const newPost: PostResponseObject|null = await makePostRaw(env, content);
   if (newPost !== null) {
     // update post data in the d1

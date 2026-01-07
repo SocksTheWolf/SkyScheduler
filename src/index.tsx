@@ -1,6 +1,6 @@
 import { Env, Hono } from "hono";
 import { createAuth, ContextVariables } from "./auth";
-import { Bindings, QueueBatchData, ScheduledContext } from "./types.d";
+import { Bindings, QueueTaskData, QueueTaskType, ScheduledContext } from "./types.d";
 import Home from "./pages/homepage";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
@@ -130,7 +130,7 @@ export default {
       break;
     }
   },
-  async queue(batch: MessageBatch<QueueBatchData>, environment: Env, ctx: ExecutionContext) {
+  async queue(batch: MessageBatch<QueueTaskData>, environment: Env, ctx: ExecutionContext) {
     const runtimeWrapper: ScheduledContext = {
       executionCtx: ctx,
       env: environment as Bindings
@@ -138,11 +138,18 @@ export default {
 
     let wasSuccess = false;
     for (const message of batch.messages) {
-      // Process our messages
-      if (message.body.post) {
-        wasSuccess = await handlePostTask(runtimeWrapper, message.body.post, true);
-      } else if (message.body.repost) {
-        wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost);
+      switch (message.body.type) {
+        case QueueTaskType.Post:
+          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, true);
+        break;
+        case QueueTaskType.Repost:
+          wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost!);
+        break;
+        default:
+        case QueueTaskType.None:
+          console.error("Got a message queue task type that was invalid");
+          message.ack();
+          return;
       }
       // Handle queue acknowledgement on success/failure
       if (!wasSuccess) {

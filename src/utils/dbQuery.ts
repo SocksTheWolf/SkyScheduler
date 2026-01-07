@@ -304,6 +304,16 @@ export const getAllPostedPosts = async (env: Bindings) => {
     .all();
 };
 
+export const isPostAlreadyPosted = async (env: Bindings, postId: string) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const query = await db.select({posted: posts.posted}).from(posts).where(eq(posts.uuid, postId)).all();
+  if (isEmpty(query) || query[0].posted === null) {
+    // if the post does not exist, return true anyways
+    return true;
+  }
+  return query[0].posted;
+}
+
 // deletes multiple posted posts from a database.
 export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
   // Don't do anything on empty arrays.
