@@ -4,6 +4,7 @@ const scheduledDate = document.getElementById('scheduledDate');
 const urlCardBox = document.getElementById('urlCard');
 const recordUrlBox = document.getElementById('recordBox');
 const content = document.getElementById('content');
+const postForm = document.getElementById('postForm');
 let hasFileLimit = false;
 let fileData = new Map();
 
@@ -65,7 +66,8 @@ let fileDropzone = new Dropzone("#fileUploads", {
 
 // Fires whenever a post is made or the form needs to reset
 document.addEventListener("resetPost", () => {
-  document.getElementById('postForm').reset();
+  postForm.reset();
+  postForm.removeAttribute("disabled");
   setElementVisible(imageAttachmentSection, true);
   setElementVisible(linkAttachmentSection, true);
   showContentLabeler(false);
@@ -299,7 +301,7 @@ fileDropzone.on("maxfilesexceeded", () => {
 });
 
 // Handle form submission
-document.getElementById('postForm').addEventListener('submit', async (e) => {
+postForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   showPostProgress(true);
   const contentVal = content.value;
@@ -448,10 +450,11 @@ function showPostProgress(shouldShow) {
   const el = document.getElementById("makingPostRequest");
   el.setAttribute("aria-busy", shouldShow);
   setElementDisabled(el, shouldShow);
+  setElementDisabled(postForm, shouldShow);
   if (shouldShow) {
-    el.innerHTML = "Making Post...";
+    el.textContent = "Making Post...";
   } else {
-    el.innerHTML = "Schedule Post";
+    el.textContent = "Schedule Post";
   }
 }
 
