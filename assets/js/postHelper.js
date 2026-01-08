@@ -79,13 +79,12 @@ document.addEventListener("resetPost", () => {
   urlCardBox.value = "";
   recordUrlBox.value = "";
   resetCounter("count");
+  setTimeout(scrollTop, 400);
 
   // Remove all data in the dropzone as well
   fileDropzone.removeAllFiles();
   // Clear the file data map
   fileData.clear();
-
-  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 });
 
 fileDropzone.on("reset", () => {
@@ -180,7 +179,8 @@ fileDropzone.on("success", function(file, response) {
         pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
         deleteFileOnError();
       } else {
-        fileData.set(file.name, {content: response.data, type: 3, height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
+        fileData.set(file.name, {content: response.data, type: 3, 
+          height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
         hasFileLimit = true;
       }
       cleanupVideoTag();
@@ -427,7 +427,8 @@ postNowCheckbox.addEventListener('click', (e) => {
 });
 
 function setSelectDisable(disable) {
-  document.querySelectorAll("select:not(#contentLabels)").forEach((el) => setElementDisabled(el, disable));
+  document.querySelectorAll("select:not(#contentLabels)").forEach(
+    (el) => setElementDisabled(el, disable));
 }
 
 function showContentLabeler(shouldShow) {
@@ -570,10 +571,37 @@ function openPostAltEditor(file) {
   });
 }
 
+function addOnEditInputHandles(elTarget) {
+  elTarget.querySelectorAll(".editPostAlt").forEach((altEl) => {
+    altEl.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        altEl.click();
+      }
+    });
+  });
+  const cancelButton = elTarget.querySelector(".cancelEditButton");
+  if (cancelButton) {
+    cancelButton.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        cancelButton.click();
+      }
+    });
+  }
+}
+
+function cancelPostEdit(elName) {
+  detachTribute(document.getElementById(elName));
+  refreshPosts();
+  scrollTop();
+}
+
 // Handle character counting
 addCounter("content", "count", MAX_LENGTH);
 addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
 // Add mentions
 tributeToElement(content);
+document.dispatchEvent(new Event("timeSidebar"));
 document.dispatchEvent(new Event("resetPost"));
 

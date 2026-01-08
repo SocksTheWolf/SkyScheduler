@@ -20,7 +20,8 @@ export function PostAltTextEdit({post}: EditedPostProps) {
         <center>
           <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
           <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
-          <a role="button" class="editPostAlt secondary outline" onclick={`openPostAltEditor("${embedData.content}");`}>Edit Alt</a>
+          {/* Accessible handlers will be added in via addOnEditInputHandles */}
+          <a tabindex={0} role="button" class="editPostAlt secondary outline" onclick={`openPostAltEditor("${embedData.content}");`}>Edit Alt</a>
         </center>
       </div>
     );
@@ -53,7 +54,7 @@ export function PostEdit({post}:EditedPostProps) {
     <form id={`editPost${post.postid}`} hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
         hx-swap="innerHTML swap:1s" hx-indicator={`#${editSpinner}`}>
       <section>
-        <textarea name="content" id={`edit${post.postid}`} rows={6} style="resize: none" required>
+        <textarea autofocus name="content" id={`edit${post.postid}`} rows={6} tabindex={0} style="resize: none" required>
           {post.text}
         </textarea>
         <small>Character Count: <span id={`editCount${post.postid}`}>0/{MAX_LENGTH}</span></small>
@@ -64,12 +65,14 @@ export function PostEdit({post}:EditedPostProps) {
       <center class="controls">
         <div id={editResponse}>
         </div>
-        <button>Update Post</button> 
-        <a role="button" onclick={html`detachTribute(document.getElementById('edit${post.postid}'));refreshPosts();`} class="secondary">Cancel</a>
+        <button tabindex={0}>Update Post</button> 
+        <a tabindex={0} role="button" class="secondary cancelEditButton"
+          onclick={html`cancelPostEdit('edit${post.postid}')`}>Cancel</a>
       </center>
       <script type="text/javascript">{html`
         addCounter("edit${post.postid}", "editCount${post.postid}", ${MAX_LENGTH});
         tributeToElement(document.getElementById("edit${post.postid}"));
+        addOnEditInputHandles(document.getElementById("editPost${post.postid}"));
       `}</script>
     </form>
   );

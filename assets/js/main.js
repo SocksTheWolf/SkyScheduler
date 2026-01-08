@@ -8,6 +8,10 @@ function pushToast(msg, isSuccess) {
   }).showToast();
 }
 
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function formatDate(date) {
   return new Date(date).toLocaleString(undefined, {
     year: "numeric",
@@ -22,13 +26,14 @@ function updateAllTimes() {
     if (el.hasAttribute("corrected"))
       return;
     
-    el.innerHTML = formatDate(el.innerHTML);
+    el.textContent = formatDate(el.innerText);
     el.setAttribute("corrected", true);
   });
 }
 
 function refreshPosts() {
-  document.getElementById("refresh-posts-force").click();
+  htmx.trigger("body", "refreshPosts");
+  document.dispatchEvent(new Event("refreshPosts"));
 }
 
 document.addEventListener("postDeleted", function() {
@@ -44,6 +49,10 @@ document.addEventListener("timeSidebar", function() {
   updateAllTimes();
 });
 
+document.addEventListener("scrollTop", function() {
+  scrollTop();
+});
+
 document.addEventListener("postUpdatedNotice", function() {
   pushToast("Post updated successfully!", true);
 })
@@ -56,10 +65,6 @@ document.addEventListener("accountUpdated", function(ev) {
 
 document.addEventListener("accountDeleted", function(ev) {
   pushToast("Account deleted!", true);
-});
-
-document.addEventListener("refreshPosts", function(ev) {
-  refreshPosts();
 });
 
 const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;

@@ -38,7 +38,8 @@ export default function Dashboard(props:any) {
                   hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
               <center class="controls">
-                <button id="refresh-posts" hx-get="/post/all" hx-target="#posts" hx-trigger="click throttle:3s" 
+                <button id="refresh-posts" hx-get="/post/all" hx-target="#posts" 
+                    hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s" 
                     hx-on-htmx-before-request="this.classList.add('svgAnim');" 
                     hx-on-htmx-after-request="setTimeout(() => {this.classList.remove('svgAnim')}, 3000)">
                   <span>Refresh Posts</span>
@@ -70,7 +71,6 @@ export default function Dashboard(props:any) {
         </div>
       </div>
       <Settings />
-      <span id="refresh-posts-force" hidden hx-get="/post/all" hx-target="#posts" hx-trigger="accountUpdated from:body, click" />
     </BaseLayout>
   );
 }

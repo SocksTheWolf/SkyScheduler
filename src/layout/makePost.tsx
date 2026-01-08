@@ -1,4 +1,3 @@
-import { html } from "hono/html";
 import {
   BSKY_IMG_FILE_EXTS,
   BSKY_IMG_SIZE_LIMIT_IN_MB,
@@ -153,11 +152,6 @@ export function PostCreation() {
           </button>
         </footer>
       </form>
-      <script type="text/javascript">
-      {html`
-        updateAllTimes();
-      `}
-      </script>
       <script type="text/javascript" src={postHelperScriptStr}></script>
     </article>
   </section>

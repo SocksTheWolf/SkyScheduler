@@ -137,10 +137,6 @@
   z-index: 20;
 }
 
-#refresh-posts-force {
-  display: none;
-}
-
 #footerLinks span:not(:last-child):after {
   content: " | "
 }
