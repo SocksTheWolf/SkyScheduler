@@ -59,8 +59,8 @@
 
 .btn-delete {
   float: right;
-  svg {
-    margin-top: -10px;
+  svg, img {
+    margin-top: -7px;
   }
 }
 
@@ -73,7 +73,7 @@
   grid-column: auto / span 1;
 }
 
-.max-width-50 article, .dashboard, .homepage {
+/*.max-width-50 article,*/ .dashboard, .homepage {
   padding-bottom: 0px;
 }
 
@@ -189,11 +189,27 @@ textarea {
   resize: none;
 }
 
+.editPostKeyboard {
+  svg, img {
+    margin-top: -7px;
+  }
+  text-decoration: none;
+  padding: 0;
+  color: white;
+  display: inline-block;
+}
+
 .editPostAlt {
   margin-right: 5px;
   font-size: 0.75rem;
   padding: 5px;
 }
+/*
+#posts article {
+  padding-top: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}*/
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
@@ -201,7 +217,7 @@ textarea {
     transform:rotate(-360deg)
   }
 }
-.svgAnim svg {
+.svgAnim svg, .svgAnim img {
   transform-origin:center;
   animation:refreshPostSpinner .75s infinite linear;
 }

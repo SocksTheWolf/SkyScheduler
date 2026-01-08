@@ -33,7 +33,15 @@ function updateAllTimes() {
 
 function refreshPosts() {
   htmx.trigger("body", "refreshPosts");
-  document.dispatchEvent(new Event("refreshPosts"));
+}
+
+function addKeyboardListener(el, callback) {
+  el.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      callback(ev);
+    }
+  });
 }
 
 document.addEventListener("postDeleted", function() {

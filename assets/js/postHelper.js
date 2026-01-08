@@ -605,12 +605,7 @@ document.addEventListener("editPost", function(event) {
       ev.preventDefault();
       callback();
     });
-    el.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") {
-        ev.preventDefault();
-        callback();
-      }
-    });
+    addKeyboardListener(el, (ev) => callback());
   }
   editField.addEventListener("keydown", cancelEditField);
   editForm.querySelectorAll(".editPostAlt").forEach((altEl) => {
@@ -619,20 +614,23 @@ document.addEventListener("editPost", function(event) {
     });
   });
 
-  cancelButton.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter" || ev.key === " ") {
-      ev.preventDefault();
-      cancelButton.click();
-    }
-  });
+  addKeyboardListener(cancelButton, (ev) => cancelButton.click());
 
   editField.selectionStart = editField.value.length;
   editField.focus();
 });
 
 document.addEventListener("scrollListTop", function() {
-  document.getElementById("posts").scroll({top:0, behavior:'smooth'});
-})
+  const postsList = document.getElementById("posts");
+  if (postsList) {
+    postsList.scroll({top:0, behavior:'smooth'});
+    const tabInvalidate = postsList.querySelector(".invalidateTab");
+    if (tabInvalidate) {
+      tabInvalidate.focus();
+      tabInvalidate.blur();
+    }
+  }
+});
 
 // Handle character counting
 addCounter("content", "count", MAX_LENGTH);
@@ -641,4 +639,3 @@ addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
 tributeToElement(content);
 document.dispatchEvent(new Event("timeSidebar"));
 document.dispatchEvent(new Event("resetPost"));
-
