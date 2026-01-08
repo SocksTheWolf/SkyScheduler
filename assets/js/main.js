@@ -197,15 +197,17 @@ function rawSubmitHandler(url, successCallback) {
 
       if (response.ok) {
         successCallback();
+        return;
       } else {
         const data = await response.json();
         pushToast(translateErrorObject(data, data.msg), false);
       }
-      submitButton.removeAttribute("disabled");
     } catch (err) {
       pushToast("An error occurred", false);
       console.error(err);
     }
+    loadingBar.setAttribute("hidden", true);
+    submitButton.removeAttribute("disabled");
   });
 }
 
