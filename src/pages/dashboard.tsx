@@ -8,6 +8,7 @@ import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
+import { appScriptStrs } from "../utils/appScripts";
 
 function RefreshPostIcon() {
   return (
@@ -22,10 +23,14 @@ export default function Dashboard(props:any) {
     {href: "/dep/form-json.min.js", type: "script"},
     {href: "/dep/modal.js", type: "script"}
   ];
+
+  const dashboardScripts: PreloadRules[] = appScriptStrs.map((itm) => {
+    return {href: itm, type: "script"};
+  });
   
   return (
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
-      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads]}>
+      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
       <DependencyTags scripts={defaultDashboardPreloads} />
       <div class="grid">
         <section class="max-width-50">

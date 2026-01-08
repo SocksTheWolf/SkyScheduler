@@ -34,5 +34,4 @@ lerna-debug.log*
 misc/generated.css
 src/css.ts
 *.db
-assets/js/main.min.js
-assets/js/postHelper.min.js
+assets/js/*.min.js

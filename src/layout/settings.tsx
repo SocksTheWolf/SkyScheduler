@@ -1,6 +1,6 @@
-import { html } from "hono/html";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import { PWAutoCompleteSettings } from "../types.d";
+import { settingsScriptStr } from "../utils/appScripts";
 import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
 import { UsernameField } from "./usernameField";
 
@@ -73,23 +73,7 @@ export function Settings() {
         </footer>
       </article>
     </dialog>
-    <script type="text/javascript">{html`
-      const changeInfoModal = document.getElementById("changeInfo");
-      const deleteAccountModal = document.getElementById("deleteAccount");
-      deleteAccountModal.addEventListener("close", clearSettingsData);
-      changeInfoModal.addEventListener("close", clearSettingsData);
-
-      function clearSettingsData() {
-        document.querySelectorAll("#changeInfo input").forEach((el) => el.value = "");
-        document.querySelectorAll("#deleteAccount input").forEach((el) => el.value = "");
-        document.getElementById("accountResponse").innerHTML = "";
-        document.getElementById("accountDeleteResponse").innerHTML = "";
-      }
-
-      addUsernameFieldWatchers();
-      addEasyModalOpen("deleteAccountButton", deleteAccountModal, "closeDeleteButton");
-      addEasyModalOpen("settingsButton", changeInfoModal, "closeSettingsButton");
-    `}</script>
+    <script type="text/javascript" src={settingsScriptStr}></script>
     </>
   );
 }

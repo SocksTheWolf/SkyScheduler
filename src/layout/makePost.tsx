@@ -5,7 +5,6 @@ import {
   BSKY_VIDEO_MAX_DURATION,
   CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
-  CURRENT_SCRIPT_VERSION,
   MAX_LENGTH,
   MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS,
   MAX_THUMBNAIL_SIZE,
@@ -13,6 +12,7 @@ import {
 } from "../limits.d";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
+import { postHelperScriptStr } from "../utils/appScripts";
 import { DependencyTags } from "./depTags";
 
 export const PreloadPostCreation: PreloadRules[] = [
@@ -25,7 +25,6 @@ export const PreloadPostCreation: PreloadRules[] = [
 ];
 
 export function PostCreation() {
-  const postHelperScriptStr: string = `/js/postHelper.min.js?v=${CURRENT_SCRIPT_VERSION}`;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>

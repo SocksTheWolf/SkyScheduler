@@ -19,6 +19,7 @@
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
     "minify:post": "minify assets/js/postHelper.js > assets/js/postHelper.min.js",
     "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
+    "minify:settings": "minify assets/js/settings.js > assets/js/settings.min.js",
     "minify": "run-p minify:*",
     "types": "wrangler types src/wrangler.d.ts"
   },
