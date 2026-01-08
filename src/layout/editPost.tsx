@@ -1,4 +1,3 @@
-import { html } from "hono/html";
 import { MAX_LENGTH } from "../limits.d";
 import { EmbedDataType, Post } from "../types.d";
 import { PostContentObject } from "./postList";
@@ -20,8 +19,9 @@ export function PostAltTextEdit({post}: EditedPostProps) {
         <center>
           <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
           <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
-          {/* Accessible handlers will be added in via addOnEditInputHandles */}
-          <a tabindex={0} role="button" class="editPostAlt secondary outline" onclick={`openPostAltEditor("${embedData.content}");`}>Edit Alt</a>
+          {/* Accessible handlers will be added in via the htmx header */}
+          <a tabindex={0} role="button" data-file={embedData.content} 
+            class="editPostAlt secondary outline">Edit Alt</a>
         </center>
       </div>
     );
@@ -52,9 +52,9 @@ export function PostEdit({post}:EditedPostProps) {
   const editResponse:string = `editResponse${post.postid}`;
   return (
     <form id={`editPost${post.postid}`} hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
-        hx-swap="innerHTML swap:1s" hx-indicator={`#${editSpinner}`}>
+        hx-swap="innerHTML swap:0.2s" hx-indicator={`#${editSpinner}`}>
       <section>
-        <textarea autofocus name="content" id={`edit${post.postid}`} rows={6} tabindex={0} style="resize: none" required>
+        <textarea autofocus name="content" id={`edit${post.postid}`} rows={6} tabindex={0} required>
           {post.text}
         </textarea>
         <small>Character Count: <span id={`editCount${post.postid}`}>0/{MAX_LENGTH}</span></small>
@@ -66,14 +66,8 @@ export function PostEdit({post}:EditedPostProps) {
         <div id={editResponse}>
         </div>
         <button tabindex={0}>Update Post</button> 
-        <a tabindex={0} role="button" class="secondary cancelEditButton"
-          onclick={html`cancelPostEdit('edit${post.postid}')`}>Cancel</a>
+        <a tabindex={0} role="button" class="secondary cancelEditButton">Cancel</a>
       </center>
-      <script type="text/javascript">{html`
-        addCounter("edit${post.postid}", "editCount${post.postid}", ${MAX_LENGTH});
-        tributeToElement(document.getElementById("edit${post.postid}"));
-        addOnEditInputHandles(document.getElementById("editPost${post.postid}"));
-      `}</script>
     </form>
   );
 }

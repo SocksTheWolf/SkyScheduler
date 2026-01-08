@@ -571,31 +571,46 @@ function openPostAltEditor(file) {
   });
 }
 
-function addOnEditInputHandles(elTarget) {
-  elTarget.querySelectorAll(".editPostAlt").forEach((altEl) => {
-    altEl.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") {
-        ev.preventDefault();
-        altEl.click();
-      }
+// HTMX will call this
+document.addEventListener("editPost", function(event) {
+  const postid = event.detail.value;
+  const editField = document.getElementById(`edit${postid}`);
+  const editForm = document.getElementById(`editPost${postid}`);
+  const cancelButton = editForm.querySelector(".cancelEditButton");
+  
+  addCounter(`edit${postid}`, `editCount${postid}`, MAX_LENGTH);
+  tributeToElement(editField);
+
+  const addEventListeners = (el, callback) => {
+    el.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      callback();
     });
-  });
-  const cancelButton = elTarget.querySelector(".cancelEditButton");
-  if (cancelButton) {
-    cancelButton.addEventListener("keydown", (ev) => {
+    el.addEventListener("keydown", (ev) => {
       if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
-        cancelButton.click();
+        callback();
       }
     });
   }
-}
 
-function cancelPostEdit(elName) {
-  detachTribute(document.getElementById(elName));
-  refreshPosts();
-  scrollTop();
-}
+  editForm.querySelectorAll(".editPostAlt").forEach((altEl) => {
+    addEventListeners(altEl, () => {
+      openPostAltEditor(altEl.getAttribute("data-file") || "");
+    });
+  });
+
+  addEventListeners(cancelButton, () => {
+    detachTribute(editField);
+    refreshPosts();
+    scrollTop();
+    document.dispatchEvent(new Event("scrollListTop"));
+  });
+});
+
+document.addEventListener("scrollListTop", function() {
+  document.getElementById("posts").scroll({top:0, behavior:'smooth'});
+})
 
 // Handle character counting
 addCounter("content", "count", MAX_LENGTH);

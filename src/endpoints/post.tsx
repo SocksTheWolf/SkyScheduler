@@ -89,6 +89,7 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
 
   const postInfo = await getPostById(c, id);
   if (postInfo !== null) {
+    c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
     return c.html(
       <PostEdit post={postInfo} />
     );
@@ -98,8 +99,10 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
 
 post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
+  const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
+  const swapSuccessEvents: string = "postUpdatedNotice, timeSidebar, scrollTop, scrollListTop";
   if (!isValid(id)) {
-    c.header("HX-Trigger-After-Swap", "refreshPosts, scrollTop");
+    c.header("HX-Trigger-After-Swap", swapErrEvents);
     return c.html(<b class="btn-error">Post was invalid</b>, 400);
   }
 
@@ -113,13 +116,13 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const originalPost = await getPostById(c, id);
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
-    c.header("HX-Trigger-After-Settle", "refreshPosts, scrollTop");
+    c.header("HX-Trigger-After-Settle", swapErrEvents);
     return c.html(<b class="btn-error">Could not find post to edit</b>);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
-    c.header("HX-Trigger-After-Settle", "refreshPosts, scrollTop");
+    c.header("HX-Trigger-After-Settle", "scrollTop");
     return c.html(<b class="btn-error">This post has already been posted</b>);
   }
 
@@ -127,7 +130,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   if (altEdits !== undefined && !isEmpty(altEdits)) {
     // Check to see if this post had editable data
     if (originalPost.embeds === undefined) {
-      c.header("HX-Trigger-After-Settle", "refreshPosts, scrollTop");
+      c.header("HX-Trigger-After-Settle", swapErrEvents);
       return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
     }
 
@@ -142,7 +145,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
       let embedData = originalPost.embeds[i];
       // if we have anything other than an image, this is an error
       if (embedData.type !== EmbedDataType.Image) {
-        c.header("HX-Trigger-After-Settle", "refreshPosts, scrollTop");
+        c.header("HX-Trigger-After-Settle", swapErrEvents);
         return c.html(<b class="btn-error">Invalid operation performed</b>);
       }
       // Check to see if this text was edited
@@ -162,7 +165,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   if (await updatePostForUser(c, id, payload)) {
     originalPost.text = content;
     const username = await getUsernameForUser(c);
-    c.header("HX-Trigger-After-Swap", "postUpdatedNotice, timeSidebar, scrollTop");
+    c.header("HX-Trigger-After-Swap", swapSuccessEvents);
     return c.html(<ScheduledPost post={originalPost} user={username} dynamic={true} />);
   }
 

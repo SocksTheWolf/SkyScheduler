@@ -1,4 +1,3 @@
-import { html } from "hono/html";
 import AccountHandler from "../layout/account";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
@@ -29,17 +28,7 @@ export default function ResetPassword() {
           <input type="password" name="confirmPassword" id="confirmPassword" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
         </label>
       </AccountHandler>
-      <script type="text/javascript">
-      {html`
-        if (resetToken = new URLSearchParams(window.location.search).get("token")) {
-          document.getElementById("resetToken").value = encodeURI(resetToken);
-          const submitButton = document.getElementById("submitButton");
-          submitButton.removeAttribute("disabled");
-        } else {
-          pushToast("Reset token is invalid! Request a new reset token to continue", false);
-        }
-      `}
-      </script>
+      <script type="text/javascript" src="js/reset.js"></script>
     </BaseLayout>
   );
 }
