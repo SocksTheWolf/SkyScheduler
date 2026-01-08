@@ -172,9 +172,12 @@ function translateErrorObject(obj, defaultString) {
 
 function rawSubmitHandler(url, successCallback) {
   const loadingBar = document.getElementById("loading");
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  const loginForm = document.getElementById('loginForm');
+  const submitButton = loginForm.querySelector('button[type="submit"]');
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     loadingBar.removeAttribute("hidden");
+    submitButton.setAttribute("disabled", true);
     let postObject = {};
     document.querySelectorAll("input").forEach((el) => {
       if (el.getAttribute("type") === "checkbox")
@@ -190,18 +193,15 @@ function rawSubmitHandler(url, successCallback) {
         },
         body: JSON.stringify(postObject)
       });
+      loadingBar.setAttribute("hidden", true);
 
-      // Hide loading bar after delay
-      setTimeout(function() {
-        loadingBar.setAttribute("hidden", true);
-      }, 1000);
-
-      if (response.ok)
+      if (response.ok) {
         successCallback();
-      else {
+      } else {
         const data = await response.json();
         pushToast(translateErrorObject(data, data.msg), false);
       }
+      submitButton.removeAttribute("disabled");
     } catch (err) {
       pushToast("An error occurred", false);
       console.error(err);
