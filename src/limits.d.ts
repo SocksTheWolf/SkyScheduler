@@ -26,7 +26,7 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 
 // Change this value to break out of any caching that might be happening
 // for the runtime scripts (ex: main.js & postHelper.js)
-export const CURRENT_SCRIPT_VERSION: string = "1.2.10";
+export const CURRENT_SCRIPT_VERSION: string = "1.2.11";
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
