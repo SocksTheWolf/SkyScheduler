@@ -1,8 +1,8 @@
+import AccountHandler from "../layout/account";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
-import AccountHandler from "../layout/account";
-import { UsernameField } from "../layout/usernameField";
 import { DashboardPasswordField } from "../layout/passwordFields";
+import { UsernameField } from "../layout/usernameField";
 import { PWAutoCompleteSettings } from "../types.d";
 
 export default function Login() {

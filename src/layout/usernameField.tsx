@@ -1,4 +1,4 @@
-import { html, raw } from "hono/html";
+import { raw } from "hono/html";
 import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
 
 type UsernameFieldProps = {

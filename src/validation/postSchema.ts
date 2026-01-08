@@ -1,8 +1,8 @@
-import { MIN_LENGTH, MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, MAX_LENGTH } from "../limits.d";
+import * as z from "zod/v4";
+import { MAX_LENGTH, MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, MIN_LENGTH } from "../limits.d";
+import { EmbedDataType, PostLabel } from "../types.d";
 import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
-import { EmbedDataType, PostLabel } from "../types.d";
-import * as z from "zod/v4";
 import { AltTextSchema } from "./sharedValidations";
 
 const TextContent = z.object({

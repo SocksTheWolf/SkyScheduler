@@ -1,8 +1,8 @@
 import { html } from "hono/html";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
-import { UsernameField } from "./usernameField";
-import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
 import { PWAutoCompleteSettings } from "../types.d";
+import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
+import { UsernameField } from "./usernameField";
 
 export function Settings() {
   return (

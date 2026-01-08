@@ -1,21 +1,24 @@
 import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
+import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
-import { Bindings, LooseObj } from "../types";
+import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
-import { AccountResetSchema } from "../validation/accountResetSchema";
-import { SignupSchema } from "../validation/signupSchema";
-import { LoginSchema } from "../validation/loginSchema";
-import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
-import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
-import { doesUserExist, getAllMediaOfUser, getUserEmailForHandle, getUsernameForUser, updateUserData } from "../utils/dbQuery";
-import { doesInviteKeyHaveValues, consumeInviteKey } from "../utils/inviteKeys";
+import { Bindings, LooseObj } from "../types";
 import { doesHandleExist } from "../utils/bskyApi";
+import {
+  doesUserExist, getAllMediaOfUser, getUserEmailForHandle,
+  getUsernameForUser, updateUserData
+} from "../utils/dbQuery";
+import { consumeInviteKey, doesInviteKeyHaveValues } from "../utils/inviteKeys";
 import { deleteFromR2 } from "../utils/r2Query";
-import isEmpty from "just-is-empty";
-import { ViolationNoticeBar } from "../layout/violationsBar";
+import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
+import { AccountResetSchema } from "../validation/accountResetSchema";
+import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
+import { LoginSchema } from "../validation/loginSchema";
+import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 

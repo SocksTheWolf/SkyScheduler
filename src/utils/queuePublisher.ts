@@ -1,7 +1,7 @@
-import { Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
+import { Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
 
 const queueContentType = 'json';
 

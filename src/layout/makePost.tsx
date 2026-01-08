@@ -1,11 +1,19 @@
 import { html } from "hono/html";
-import { MAX_LENGTH, CF_IMAGES_MAX_DIMENSION, CF_IMAGES_FILE_SIZE_LIMIT_IN_MB, 
-  MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, BSKY_VIDEO_MAX_DURATION, 
-  BSKY_IMG_FILE_EXTS, BSKY_VIDEO_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
-  R2_FILE_SIZE_LIMIT_IN_MB, MAX_THUMBNAIL_SIZE, 
-  CURRENT_SCRIPT_VERSION } from "../limits.d"
-import { ConstScriptPreload } from "../utils/constScriptGen";
+import {
+  BSKY_IMG_FILE_EXTS,
+  BSKY_IMG_SIZE_LIMIT_IN_MB,
+  BSKY_VIDEO_FILE_EXTS,
+  BSKY_VIDEO_MAX_DURATION,
+  CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
+  CF_IMAGES_MAX_DIMENSION,
+  CURRENT_SCRIPT_VERSION,
+  MAX_LENGTH,
+  MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS,
+  MAX_THUMBNAIL_SIZE,
+  R2_FILE_SIZE_LIMIT_IN_MB
+} from "../limits.d";
 import { PreloadRules } from "../types.d";
+import { ConstScriptPreload } from "../utils/constScriptGen";
 import { DependencyTags } from "./depTags";
 
 export const PreloadPostCreation: PreloadRules[] = [

@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { MAX_LENGTH } from "../limits.d"
+import { MAX_LENGTH } from "../limits.d";
 import { EmbedDataType, Post } from "../types.d";
 import { PostContentObject } from "./postList";
 

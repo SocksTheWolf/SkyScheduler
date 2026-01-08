@@ -1,14 +1,14 @@
 import { Context } from "hono";
-import { BaseLayout } from "../layout/main";
-import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
-import NavTags from "../layout/navTags";
 import AccountHandler from "../layout/account";
-import { UsernameField } from "../layout/usernameField";
-import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
 import FooterCopyright from "../layout/footer";
+import { BaseLayout } from "../layout/main";
+import NavTags from "../layout/navTags";
 import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
+import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
+import { UsernameField } from "../layout/usernameField";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import { PWAutoCompleteSettings } from "../types.d";
+import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;

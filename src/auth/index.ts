@@ -1,11 +1,11 @@
-import { betterAuth, Session, User } from "better-auth";
-import { username } from "better-auth/plugins";
+import { betterAuth, Session } from "better-auth";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { username } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
-import { Bindings } from "../types";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
+import { Bindings } from "../types";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
@@ -149,4 +149,4 @@ type ContextVariables = {
 };
 
 // Export for runtime usage
-export { createAuth, ContextVariables };
+export { ContextVariables, createAuth };

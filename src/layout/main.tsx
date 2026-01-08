@@ -1,9 +1,9 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
-import MetaTags from './metaTags';
-import { PreloadRules } from '../types.d';
 import { CURRENT_SCRIPT_VERSION } from '../limits.d';
+import { PreloadRules } from '../types.d';
 import { PreloadDependencyTags } from './depTags';
+import MetaTags from './metaTags';
 
 type BaseLayoutProps = {
   children: Child;

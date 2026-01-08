@@ -1,6 +1,12 @@
 import * as z from "zod/v4";
+import {
+  BSKY_MAX_APP_PASSWORD_LENGTH,
+  BSKY_MAX_USERNAME_LENGTH,
+  BSKY_MIN_USERNAME_LENGTH,
+  MAX_ALT_TEXT,
+  MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
+} from "../limits.d";
 import { appPasswordRegex } from "./regexCases";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH, BSKY_MAX_USERNAME_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS, MAX_ALT_TEXT } from "../limits.d";
 
 export const UsernameSchema = z.object({
   username: z.string().trim().toLowerCase()

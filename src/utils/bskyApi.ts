@@ -1,14 +1,21 @@
-import { Context } from 'hono';
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
-import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper, BskyRecordWrapper } from '../types.d';
-import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
-import { updatePostData, getBskyUserPassForId, createViolationForUser, isPostAlreadyPosted, setPostNowOffForPost } from './dbQuery';
-import { deleteEmbedsFromR2 } from './r2Query';
+import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
-import { postRecordURI } from '../validation/regexCases';
-import truncate from "just-truncate";
-import isEmpty from "just-is-empty";
 import has from 'just-has';
+import isEmpty from "just-is-empty";
+import truncate from "just-truncate";
+import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
+import {
+  Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
+  LooseObj, PlatformLoginResponse, Post, PostLabel,
+  PostResponseObject, Repost, ScheduledContext
+} from '../types.d';
+import { postRecordURI } from '../validation/regexCases';
+import {
+  createViolationForUser, getBskyUserPassForId,
+  isPostAlreadyPosted, setPostNowOffForPost, updatePostData
+} from './dbQuery';
+import { deleteEmbedsFromR2 } from './r2Query';
 
 export const doesHandleExist = async (user: string) => {
   try {

@@ -1,7 +1,7 @@
 import { Context } from "hono";
-import { getViolationsForCurrentUser } from "../utils/dbQuery";
-import { Violation } from "../types.d";
 import isEmpty from "just-is-empty";
+import { Violation } from "../types.d";
+import { getViolationsForCurrentUser } from "../utils/dbQuery";
 
 export async function ViolationNoticeBar(props: any) {
   const ctx: Context = props.ctx;
@@ -21,10 +21,12 @@ export async function ViolationNoticeBar(props: any) {
       errorStr = "You currently have media that's too large for Bluesky (like a video), please delete those posts";
     }
     return (
-      <div id="violationBar" class="warning-box" hx-trigger="accountViolations from:body" hx-swap="outerHTML" hx-get="/account/violations" hx-target="this">
+      <div id="violationBar" class="warning-box" hx-trigger="accountViolations from:body" 
+        hx-swap="outerHTML" hx-get="/account/violations" hx-target="this">
         <span class="warning"><b>WARNING</b>: Account error found! {errorStr}</span>
       </div>
     );
   }
-  return (<div hx-trigger="accountViolations from:body" hidden id="hiddenViolations" hx-get="/account/violations" hx-swap="outerHTML" hx-target="this"></div>);
+  return (<div hx-trigger="accountViolations from:body" hidden id="hiddenViolations" 
+    hx-get="/account/violations" hx-swap="outerHTML" hx-target="this"></div>);
 };

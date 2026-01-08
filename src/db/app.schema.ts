@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { users } from "./auth.schema";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { EmbedData, PostLabel } from '../types.d';
+import { users } from "./auth.schema";
 
 export const posts = sqliteTable('posts', {
   uuid: text('uuid', {mode: 'text'}).primaryKey(),

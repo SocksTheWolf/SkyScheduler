@@ -1,6 +1,6 @@
+import { startOfHour } from "date-fns";
 import isEmpty from "just-is-empty";
 import { BskyAPILoginCreds, Post, Repost } from "../types.d";
-import { startOfHour } from "date-fns";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);

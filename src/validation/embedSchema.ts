@@ -1,10 +1,10 @@
+import isEmpty from "just-is-empty";
+import * as z from "zod/v4";
 import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType } from "../types.d";
-import { AltTextSchema } from "./sharedValidations";
 import { FileContentSchema } from "./mediaSchema";
 import { postRecordURI } from "./regexCases";
-import * as z from "zod/v4";
-import isEmpty from "just-is-empty";
+import { AltTextSchema } from "./sharedValidations";
 
 export const ImageEmbedSchema = z.object({
   ...FileContentSchema.shape,

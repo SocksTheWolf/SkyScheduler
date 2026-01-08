@@ -1,6 +1,6 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { loginToBsky } from './bskyApi';
 import { Bindings, PlatformLoginResponse } from '../types.d';
+import { loginToBsky } from './bskyApi';
 
 export const createDMWithUser = async (env: Bindings, user: string, msg: string) => {
   const agent = new AtpAgent({
