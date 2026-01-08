@@ -30,12 +30,13 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         hx-trigger="click once" hx-target="#post${content.postid}" hx-swap="innerHTML show:#editPost${content.postid}:top"`);
   return html`
   <article id="postBase${content.postid}" ${oobSwapStr}>
-    <header ${hasBeenPosted ? 'hidden>' : raw(`>
+    <header ${hasBeenPosted ? raw('hidden>') : raw(`>
       <button class="editPostKeyboard btn-sm primary outline" listening="false" data-tooltip="Edit this post" data-placement="right" ${editAttributes}>
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </button>
       <button type="submit" hx-delete="/post/delete/${content.postid}" 
-        hx-confirm="Are you sure you want to delete this post?" data-placement="left" data-tooltip="Delete this post" hx-target="#postBase${content.postid}" 
+        hx-confirm="Are you sure you want to delete this post?" title="Click to delete this post" 
+        data-placement="left" data-tooltip="Delete this post" hx-target="#postBase${content.postid}" 
         hx-swap="outerHTML" hx-trigger="click" class="btn-sm btn-error outline btn-delete">
         <img src="/icons/trash.svg" alt="trash icon" width="20px" height="20px" />
       </button>`)}
