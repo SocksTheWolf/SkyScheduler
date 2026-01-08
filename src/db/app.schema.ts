@@ -23,12 +23,15 @@ export const posts = sqliteTable('posts', {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 }, (table) => [
-  index("scheduledDate_idx").on(table.scheduledDate),
+  // finding posts by user
   index("user_idx").on(table.userId),
+  // for purging posted posts after a set time
   index("postedUpdate_idx")
     .on(table.updatedAt, table.posted)
-    .where(sql`posted = 1`), /* eq function will not work */
+    .where(sql`posted = 1`),
+  // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
+  // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)
     .where(sql`posted = 0 and postNow <> 1`),
@@ -41,7 +44,9 @@ export const reposts = sqliteTable('reposts', {
     .references(() => posts.uuid, {onDelete: "cascade"}),
   scheduledDate: integer('scheduled_date', { mode: 'timestamp_ms' }).notNull(),
 }, (table) => [
+  // cron queries
   index("repost_scheduledDate_idx").on(table.scheduledDate),
+  // used for left joining and matching with posts field
   index("repost_postid_idx").on(table.uuid)
 ]);
 
@@ -59,5 +64,6 @@ export const violations = sqliteTable('violations', {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 }, (table) => [
+  // joining and querying against the table's data
   index("violations_user_idx").on(table.userId)
 ]);

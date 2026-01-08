@@ -10,7 +10,6 @@ import flatten from "just-flatten-it";
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import unique from "just-unique";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
@@ -228,7 +227,7 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date):
   const db: DrizzleD1Database = drizzle(env.DB);
   // TODO: this could probably be left joined to some degree
   // but it currently doesn't have a high read count
-  const query = db.select({uuid: reposts.uuid}).from(reposts)
+  const query = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
   const results = await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
@@ -372,16 +371,16 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promi
 export const purgePostedPosts = async (env: Bindings): Promise<number> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
-  const dbQuery = await db.select({ data: posts.uuid }).from(posts).leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+  const dbQuery = await db.selectDistinct({ data: posts.uuid }).from(posts).leftJoin(reposts, eq(posts.uuid, reposts.uuid))
   .where(
     and(
-      isNull(reposts.uuid),
       and(
         eq(posts.posted, true), lte(posts.updatedAt, sql`${dateString}`)
-      )
+      ),
+      isNull(reposts.uuid)
     )
   ).all();
-  const postsToDelete = unique(dbQuery.map((item) => { return item.data }));
+  const postsToDelete = dbQuery.map((item) => { return item.data });
   return await deletePosts(env, postsToDelete);
 }
 

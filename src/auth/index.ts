@@ -77,6 +77,9 @@ If you did not request a password reset, please ignore this message.`);
         },
         plugins: [
           username({
+            /* we do our own normalization in the zod schemas */
+            usernameNormalization: false,
+            displayUsernameNormalization: false,
             minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
             maxUsernameLength: BSKY_MAX_USERNAME_LENGTH
           })
