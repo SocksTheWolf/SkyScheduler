@@ -82,7 +82,7 @@ export function SettingsButton() {
   return (
     <button class="outline contrast" id="settingsButton">
       <span>Account Settings</span>
-      <img src="/icons/settings.svg" />
+      <img src="/icons/settings.svg" alt="settings gear" />
     </button>
   )
 }

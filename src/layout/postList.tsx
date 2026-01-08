@@ -9,9 +9,7 @@ type PostContentObjectProps = {
 };
 
 export function PostContentObject({text}: PostContentObjectProps) {
-  return html`
-    <p class="truncate">${text}</p>
-  `;
+  return (<p class="truncate">{text}</p>);
 }
 
 type ScheduledPostOptions = {
@@ -33,19 +31,17 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   return html`
   <article id="postBase${content.postid}" ${oobSwapStr}>
     <header ${hasBeenPosted ? 'hidden>' : raw(`>
-      <button tabindex="0" class="editPostKeyboard btn-sm primary outline" listening="false" data-tooltip="Edit this post" data-placement="right" ${editAttributes}>
-        <img src="/icons/edit.svg" width="20px" height="20px" />
+      <button class="editPostKeyboard btn-sm primary outline" listening="false" data-tooltip="Edit this post" data-placement="right" ${editAttributes}>
+        <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </button>
       <button type="submit" hx-delete="/post/delete/${content.postid}" 
         hx-confirm="Are you sure you want to delete this post?" data-placement="left" data-tooltip="Delete this post" hx-target="#postBase${content.postid}" 
         hx-swap="outerHTML" hx-trigger="click" class="btn-sm btn-error outline btn-delete">
-        <img src="/icons/trash.svg" width="20px" height="20px" />
+        <img src="/icons/trash.svg" alt="trash icon" width="20px" height="20px" />
       </button>`)}
     </header>
     <div id="post${content.postid}">
-      <div ${editAttributes}>
-        ${<PostContentObject text={content.text}/>}
-      </div>
+      ${<PostContentObject text={content.text}/>}
     </div>
     <footer>
       <small>

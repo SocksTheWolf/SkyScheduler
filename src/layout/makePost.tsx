@@ -36,7 +36,7 @@ export function PostCreation() {
         </header>
         <div>
           <article>
-            <header>Post Content</header>
+            <header><label for="content">Post Content</label></header>
             <section>
               <textarea id="content" rows={8} placeholder="Post text here" required></textarea>
               <small>Character Count: <span id="count">0/{MAX_LENGTH}</span></small>
@@ -110,9 +110,9 @@ export function PostCreation() {
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
             <section>
               <article>
-                <header>Schedule Date</header>
+                <header><label for="scheduledDate">Schedule Date</label></header>
                 <input type="datetime-local" id="scheduledDate" placeholder="" required />
-                <input type="checkbox" id="postNow" /> Make Post Now?
+                <input type="checkbox" id="postNow" /> <label for="postNow">Make Post Now?</label>
                 <footer>
                   <small>
                     <i>You can schedule posts in the future, hourly. Time is rounded down to the nearest hour.</i>

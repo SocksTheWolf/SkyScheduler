@@ -205,6 +205,10 @@ textarea {
   padding: 5px;
 }
 
+.logout {
+  color: orangered;
+}
+
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
   100% {
