@@ -90,9 +90,7 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
   const postInfo = await getPostById(c, id);
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
-    return c.html(
-      <PostEdit post={postInfo} />
-    );
+    return c.html(<PostEdit post={postInfo} />);
   }
   return c.html(<></>, 400);
 });
@@ -169,7 +167,27 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     return c.html(<ScheduledPost post={originalPost} user={username} dynamic={true} />);
   }
 
-  return c.html(<b class="btn-error">Failed to process</b>);
+  c.header("HX-Trigger-After-Settle", swapErrEvents);
+  return c.html(<b class="btn-error">Failed to process edit</b>);
+});
+
+post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
+  const { id } = c.req.param();
+  if (!isValid(id))
+    return c.html(<></>, 400);
+
+  c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
+  
+  const postInfo = await getPostById(c, id);
+  // Get the original post to replace with
+  if (postInfo !== null) {
+    const username = await getUsernameForUser(c);
+    return c.html(<ScheduledPost post={postInfo} user={username} dynamic={true} />);
+  }
+
+  // Refresh sidebar otherwise
+  c.header("HX-Trigger-After-Swap", "refreshPosts, timeSidebar, scrollListTop, scrollTop");
+  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
 });
 
 // delete a post

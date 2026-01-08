@@ -581,6 +581,20 @@ document.addEventListener("editPost", function(event) {
   addCounter(`edit${postid}`, `editCount${postid}`, MAX_LENGTH);
   tributeToElement(editField);
 
+  const cancelEditField = (ev) => {
+    if (ev.key === "Escape") {
+      ev.preventDefault();
+      cancelButton.click();
+    }
+  };
+
+  editField.addEventListener("tribute-active-true", () => {
+    editField.removeEventListener("keydown", cancelEditField);
+  });
+  editField.addEventListener("tribute-active-false", () => {
+    editField.addEventListener("keydown", cancelEditField);
+  });
+  
   const addEventListeners = (el, callback) => {
     el.addEventListener("click", (ev) => {
       ev.preventDefault();
@@ -593,18 +607,18 @@ document.addEventListener("editPost", function(event) {
       }
     });
   }
-
+  editField.addEventListener("keydown", cancelEditField);
   editForm.querySelectorAll(".editPostAlt").forEach((altEl) => {
     addEventListeners(altEl, () => {
       openPostAltEditor(altEl.getAttribute("data-file") || "");
     });
   });
 
-  addEventListeners(cancelButton, () => {
-    detachTribute(editField);
-    refreshPosts();
-    scrollTop();
-    document.dispatchEvent(new Event("scrollListTop"));
+  cancelButton.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      cancelButton.click();
+    }
   });
 });
 
