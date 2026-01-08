@@ -476,6 +476,7 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
   }
 
   altTextField.value = loadCallback() || "";
+  altTextField.selectionStart = altTextField.value.length;
   recountCounter("altTextCount");
   tributeToElement(altTextField);
   const handleSave = (ev) => {
@@ -510,6 +511,7 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
   cancelButton.addEventListener("click", closeAltModal);
   altTextModal.addEventListener("close", unbindAltModal);
   openModal(altTextModal);
+  altTextField.focus();
 }
 
 function searchBSkyMentions(query, callback) {
@@ -620,6 +622,9 @@ document.addEventListener("editPost", function(event) {
       cancelButton.click();
     }
   });
+
+  editField.selectionStart = editField.value.length;
+  editField.focus();
 });
 
 document.addEventListener("scrollListTop", function() {
