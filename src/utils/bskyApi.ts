@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
 import { Bindings, Post, Repost, PostLabel, EmbedData, PostResponseObject, LooseObj, PlatformLoginResponse, EmbedDataType, ScheduledContext, BskyEmbedWrapper, BskyRecordWrapper } from '../types.d';
 import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
-import { updatePostData, getBskyUserPassForId, createViolationForUser, isPostAlreadyPosted } from './dbQuery';
+import { updatePostData, getBskyUserPassForId, createViolationForUser, isPostAlreadyPosted, setPostNowOffForPost } from './dbQuery';
 import { deleteEmbedsFromR2 } from './r2Query';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import { postRecordURI } from '../validation/regexCases';
@@ -99,6 +99,14 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
     // Delete any embeds if they exist.
     await deleteEmbedsFromR2(c, content.embeds, isQueued);
     return true;
+  }
+  
+  // Turn off the post now flag if we failed.
+  if (content.postNow) {
+    if (isQueued)
+      await setPostNowOffForPost(env, content.postid);
+    else
+      c.executionCtx.waitUntil(setPostNowOffForPost(env, content.postid));
   }
   return false;
 }

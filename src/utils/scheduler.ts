@@ -1,10 +1,10 @@
-import { Bindings, ScheduledContext, Post, Repost, QueueTaskData, QueueTaskType } from '../types.d';
+import { Bindings, ScheduledContext, Post, Repost } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
-import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, deletePosts, purgePostedPosts } from './dbQuery';
+import { getAllPostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, getAllRepostsForCurrentTime, 
+  deletePosts, purgePostedPosts } from './dbQuery';
+import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
 import isEmpty from 'just-is-empty';
-import random from 'just-random';
-import get from 'just-safe-get';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, isQueued: boolean = false) => {
   const madePost = await makePost(runtime, postData, isQueued);
@@ -25,21 +25,11 @@ export const handleRepostTask = async(runtime: ScheduledContext, postData: Repos
   return madeRepost;
 };
 
-// picks a random queue to publish data to
-const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
-  const queueListNames: string[] = get(env.QUEUE_SETTINGS, listName, []);
-  if (isEmpty(queueListNames))
-    return null;
-
-  const queueName: string = random(queueListNames) || "";
-  console.log(`Picked ${queueName} from ${listName}`);
-  return get(env, queueName, null);
-};
-
 export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(env);
-  const queueContentType = 'json';
+  const queueEnabled: boolean = isQueueEnabled(env);
+
   const runtimeWrapper: ScheduledContext = {
     executionCtx: ctx,
     env: env
@@ -48,13 +38,9 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
     console.log(`handling ${scheduledPosts.length} posts...`);
-    scheduledPosts.forEach(async (post) => {
-      if (env.QUEUE_SETTINGS.enabled) {
-        // Pick a random consumer to handle this post
-        const queueConsumer: Queue|null = getRandomQueue(env, "post_queues");
-        if (queueConsumer !== null)
-          queueConsumer.send({type: QueueTaskType.Post, post: post} as QueueTaskData, { contentType: queueContentType });
-      }
+    scheduledPosts.forEach((post) => {
+      if (queueEnabled)
+        enqueuePost(env, post); 
       else
         ctx.waitUntil(handlePostTask(runtimeWrapper, post));
     });
@@ -65,15 +51,11 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   // Push any reposts
   if (!isEmpty(scheduledReposts)) {
     console.log(`handling ${scheduledReposts.length} reposts`);
-    scheduledReposts.forEach(async (post) => {
-      if (env.QUEUE_SETTINGS.enabled) {
-        // Pick a random consumer to handle this repost
-        const queueConsumer: Queue|null = getRandomQueue(env, "repost_queues");
-        if (queueConsumer !== null)
-          queueConsumer.send({type: QueueTaskType.Repost, repost: post} as QueueTaskData, { contentType: queueContentType });
-      }
+    scheduledReposts.forEach((repost) => {
+      if (queueEnabled)
+        enqueueRepost(env, repost);
       else
-        ctx.waitUntil(handleRepostTask(runtimeWrapper, post));
+        ctx.waitUntil(handleRepostTask(runtimeWrapper, repost));
     });
     ctx.waitUntil(deleteAllRepostsBeforeCurrentTime(env));
   } else {

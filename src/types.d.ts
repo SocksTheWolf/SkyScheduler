@@ -20,6 +20,7 @@ type RedirectConfigSettings = {
 
 type QueueConfigSettings = {
   enabled: boolean;
+  postNowEnabled?: boolean;
   post_queues: string[];
   repost_queues: string[];
 }
@@ -87,6 +88,7 @@ export type Post = {
   text: string;
   embeds?: EmbedData[];
   label: PostLabel;
+  postNow: boolean;
   posted?: boolean;
   scheduledDate?: string;
   repostCount?: number;

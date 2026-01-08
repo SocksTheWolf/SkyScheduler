@@ -1,7 +1,7 @@
 import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import { validate as isValid  } from 'uuid';
-import { Bindings, CreatePostQueryResponse, EmbedDataType, LooseObj } from "../types.d";
+import { Bindings, CreatePostQueryResponse, EmbedDataType, LooseObj, Post } from "../types.d";
 import { ContextVariables } from "../auth";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
@@ -14,6 +14,7 @@ import { createPost, deletePost, getPostById, getUsernameForUser,
 import { ScheduledPost, ScheduledPostList } from "../layout/postList";
 import { PostEdit } from "../layout/editPost";
 import isEmpty from "just-is-empty";
+import { enqueuePost, isQueueEnabled, shouldPostNowQueue } from "../utils/queuePublisher";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -53,12 +54,14 @@ post.post("/create", authMiddleware, async (c: Context) => {
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
   } else if (response.postNow && response.postId) {
-    const postInfo = await getPostById(c, response.postId);
+    const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
-      const postResponse: boolean = await makePost(c, postInfo);
-      if (postResponse === false) {
-        c.executionCtx.waitUntil(setPostNowOffForPost(c.env, response.postId));
-        return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${response.postId}`}, 406);
+      const env: Bindings = c.env;
+      if (isQueueEnabled(env) && shouldPostNowQueue(env)) {
+        enqueuePost(env, postInfo!);
+      } else {
+        if (!await makePost(c, postInfo))
+          return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
       }
       return c.json({message: "Created Post!" });
     } else {

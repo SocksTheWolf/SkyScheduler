@@ -9,6 +9,7 @@ export function createPostObject(data: any) {
   postData.embeds = data.embedContent;
   postData.label = data.contentLabel;
   postData.text = data.content;
+  postData.postNow = data.postNow;
   if (data.repostCount)
     postData.repostCount = data.repostCount;
   if (data.posted)
