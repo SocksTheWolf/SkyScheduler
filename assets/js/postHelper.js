@@ -612,7 +612,7 @@ document.addEventListener("editPost", function(event) {
   editField.addEventListener("keydown", cancelEditField);
   editForm.querySelectorAll(".editPostAlt").forEach((altEl) => {
     addEventListeners(altEl, () => {
-      openPostAltEditor(altEl.getAttribute("data-file") || "");
+      openPostAltEditor(encodeURIComponent(altEl.getAttribute("data-file")) || "");
     });
   });
 
