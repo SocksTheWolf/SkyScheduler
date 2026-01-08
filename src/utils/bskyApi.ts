@@ -307,9 +307,6 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
             case "lists":
               typeURI = "app.bsky.graph.list";
             break;
-            case "follows":
-              typeURI = "app.bsky.graph.follow";
-            break;
           }
           // get the did for the account, we are logged in so this should always be a value
           let resolvedDID: string = agent.did!;
@@ -329,26 +326,61 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
           }
           // create the uri for the record info
           const uri = `at://${resolvedDID}/${typeURI}/${postid}`;
-          // Fetch the record info
-          const uriResolve: string[] = [ uri ];
-          const resolvePost = await getAgentPostRecords(agent, uriResolve);
-          if (resolvePost === null) {
-            console.error(`Unable to resolve record information for ${content.postid} with ${uri}`);
-            // Change the record back.
-            if (changedRecord)
-                mediaEmbeds.type = EmbedDataType.None;
-            continue;
-          }          
-          if (resolvePost.length == 0) {
+          let cid: string = "";
+
+          // do the appropriate look ups
+          switch (type) {
+            case "post": {
+              // Fetch the record info
+              const uriResolve: string[] = [ uri ];
+              const resolvePost = await getAgentPostRecords(agent, uriResolve);
+              if (resolvePost === null) {
+                console.error(`Unable to resolve record information for ${content.postid} with ${uri}`);
+                // Change the record back.
+                if (changedRecord)
+                    mediaEmbeds.type = EmbedDataType.None;
+                continue;
+              }          
+              if (resolvePost.length !== 0)
+                cid = resolvePost[0].cid;
+            }
+            break;
+            case "feed": {
+              const resolveFeed = await getAgentFeedRecord(agent, uri);
+              if (resolveFeed === null) {
+                // Change record back
+                if (changedRecord)
+                    mediaEmbeds.type = EmbedDataType.None;
+                continue;
+              }
+              cid = resolveFeed.cid;
+            }
+            break;
+            case "lists": {
+              const resolveList = await getAgentListRecord(agent, uri);
+              if (resolveList === null) {
+                // Change record back
+                if (changedRecord)
+                    mediaEmbeds.type = EmbedDataType.None;
+                continue;
+              }
+              cid = resolveList.cid;
+            }
+            break;
+          }
+
+          // check cid
+          if (isEmpty(cid)) {
             console.error(`could not resolve cid for post ${uri}`);
             // Change the record back.
             if (changedRecord)
                 mediaEmbeds.type = EmbedDataType.None;
             continue;
           }
+
           // Got the record info, push it to our object.
           bskyRecordInfo = {
-            cid: resolvePost[0].cid,
+            cid: cid,
             uri: uri
           }
           continue;
@@ -502,6 +534,30 @@ export const getAgentPostRecords = async (agent: AtpAgent, records: string[]) =>
       return response.data.posts;
   } catch(err) {
     console.error(`Unable to get post records for ${records} had error ${err}`);
+  }
+  return null;
+}
+
+export const getAgentFeedRecord = async (agent: AtpAgent, feedURI: string) => {
+  try {
+    const response = await agent.app.bsky.feed.getFeedGenerator({feed: feedURI});
+    if (response.success && response.data.isValid) {
+      return response.data.view;
+    }
+  } catch (err) {
+    console.error(`Unable to get feed record for ${feedURI} had error ${err}`);
+  }
+  return null;
+}
+
+export const getAgentListRecord = async (agent: AtpAgent, listURI: string) => {
+  try {
+    const response = await agent.app.bsky.graph.getList({list: listURI, limit: 1});
+    if (response.success) {
+      return response.data.list;
+    }
+  } catch(err) {
+    console.error(`Unable to resolve list record for ${listURI} had error ${err}`);
   }
   return null;
 }

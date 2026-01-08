@@ -63,10 +63,10 @@ export const PostRecordSchema = z.object({
     normalize: true,
     protocol: /^https?$/,
     hostname: z.regexes.domain,
-    error: "post/feed/list/followgraph record url is invalid"
+    error: "post/feed/list record url is invalid"
   }).trim()
     .toLowerCase()
-    .regex(postRecordURI, "url is not a post/feed/list/followgraph record")
-    .nonoptional("post/feed/list/followgraph records require a url"),
+    .regex(postRecordURI, "url is not a post/feed/list record")
+    .nonoptional("post/feed/list records require a url"),
   type: z.literal(EmbedDataType.Record),
 });
