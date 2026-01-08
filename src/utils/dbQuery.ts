@@ -333,7 +333,7 @@ export const getAllPostedPosts = async (env: Bindings): Promise<GetAllPostedBatc
 };
 
 export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promise<boolean> => {
-  if (uuidValid(postId))
+  if (!uuidValid(postId))
     return true;
 
   const db: DrizzleD1Database = drizzle(env.DB);
