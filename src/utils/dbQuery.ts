@@ -208,20 +208,18 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime: Date = floorCurrentTime();
 
-  const violationUsers = db.select({data: violations.userId}).from(violations);
-  const results = await db.select().from(posts)
+  const violationUsers = db.select({violators: violations.userId}).from(violations);
+  const postsToMake = db.$with('scheduledPosts').as(db.select().from(posts)
   .where(
     and(
       and(
         eq(posts.posted, false),
-        and(
-          lte(posts.scheduledDate, currentTime), 
-          ne(posts.postNow, true) /* Ignore any posts that are marked for post now */
-        )
+        ne(posts.postNow, true) // Ignore any posts that are marked for post now
       ),
-      notInArray(posts.userId, violationUsers) /* Ignore any users that have violations on them */
+      lte(posts.scheduledDate, currentTime)
     )
-    ).all();
+  ));
+  const results = await db.with(postsToMake).select().from(postsToMake).where(notInArray(postsToMake.userId, violationUsers)).all();
   return results.map((item) => createPostObject(item));
 };
 

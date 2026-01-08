@@ -31,7 +31,7 @@ export const posts = sqliteTable('posts', {
   index("postedUUID_idx").on(table.uuid, table.posted),
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)
-    .where(sql`posted = 0 and postNow <> 0`),
+    .where(sql`posted = 0 and postNow <> 1`),
 ]);
 
 export const reposts = sqliteTable('reposts', {
