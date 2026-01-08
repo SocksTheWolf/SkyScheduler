@@ -60,14 +60,13 @@ type ScheduledPostListProps = {
 
 export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
-    const response: Object[]|null = await getPostsForUser(ctx);
+    const response: Post[]|null = await getPostsForUser(ctx);
     const username = await getUsernameForUser(ctx);
     if (response !== null) {
-      if (response.length > 0) {
+      if (!isEmpty(response)) {
         return (
           <>
-          {response.map((message:any) => {
-            const data: Post = createPostObject(message);
+          {response.map((data: Post) => {
             return <ScheduledPost post={data} user={username} />;
           })}
           </>

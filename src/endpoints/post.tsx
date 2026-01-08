@@ -1,16 +1,16 @@
 import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import { validate as isValid  } from 'uuid';
-import { Bindings, EmbedDataType, LooseObj } from "../types.d";
+import { Bindings, CreatePostQueryResponse, EmbedDataType, LooseObj } from "../types.d";
 import { ContextVariables } from "../auth";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
-import { createPostObject } from "../utils/helpers";
 import { makePost } from "../utils/bskyApi";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
-import { createPost, deletePost, getPostById, getUsernameForUser, setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
+import { createPost, deletePost, getPostById, getUsernameForUser, 
+  setPostNowOffForPost, updatePostForUser } from "../utils/dbQuery";
 import { ScheduledPost, ScheduledPostList } from "../layout/postList";
 import { PostEdit } from "../layout/editPost";
 import isEmpty from "just-is-empty";
@@ -49,13 +49,13 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
 // Create post
 post.post("/create", authMiddleware, async (c: Context) => {
   const body = await c.req.json();
-  const response = await createPost(c, body);
+  const response: CreatePostQueryResponse = await createPost(c, body);
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
-  } else if (response.postNow) {
+  } else if (response.postNow && response.postId) {
     const postInfo = await getPostById(c, response.postId);
-    if (postInfo.length > 0) {
-      const postResponse: boolean = await makePost(c, createPostObject(postInfo[0]));
+    if (!isEmpty(postInfo)) {
+      const postResponse: boolean = await makePost(c, postInfo);
       if (postResponse === false) {
         c.executionCtx.waitUntil(setPostNowOffForPost(c.env, response.postId));
         return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${response.postId}`}, 406);
@@ -83,10 +83,9 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
     return c.html(<></>, 400);
 
   const postInfo = await getPostById(c, id);
-  if (postInfo.length > 0) {
-    const postData = createPostObject(postInfo[0]);
+  if (postInfo !== null) {
     return c.html(
-      <PostEdit post={postData} />
+      <PostEdit post={postInfo} />
     );
   }
   return c.html(<></>, 400);
@@ -108,15 +107,13 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const { content, altEdits } = validation.data;
   const originalPost = await getPostById(c, id);
   // get the original data for the post so that we can just inline edit it via a push
-  if (isEmpty(originalPost)) {
+  if (originalPost === null) {
     c.header("HX-Trigger-After-Settle", "refreshPosts");
     return c.html(<b class="btn-error">Could not find post to edit</b>);
   }
 
   let hasEmbedEdits = false;
-  // Create an original post object for this object
-  const originalPostData = createPostObject(originalPost[0]);
-  if (originalPostData.posted === true) {
+  if (originalPost.posted === true) {
     c.header("HX-Trigger-After-Settle", "refreshPosts");
     return c.html(<b class="btn-error">This post has already been posted</b>);
   }
@@ -124,7 +121,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   // Handle alt text and stuffs
   if (altEdits !== undefined && !isEmpty(altEdits)) {
     // Check to see if this post had editable data
-    if (originalPostData.embeds === undefined) {
+    if (originalPost.embeds === undefined) {
       c.header("HX-Trigger-After-Settle", "refreshPosts");
       return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
     }
@@ -136,8 +133,8 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     });
 
     // process and match up all of the alt text properly
-    for (let i = 0; i < originalPostData.embeds?.length; ++i) {
-      let embedData = originalPostData.embeds[i];
+    for (let i = 0; i < originalPost.embeds?.length; ++i) {
+      let embedData = originalPost.embeds[i];
       // if we have anything other than an image, this is an error
       if (embedData.type !== EmbedDataType.Image) {
         c.header("HX-Trigger-After-Settle", "refreshPosts");
@@ -147,7 +144,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
       const newAltText = editsMap.get(embedData.content);
       if (newAltText !== undefined) {
         // it was
-        originalPostData.embeds[i].alt = newAltText;
+        originalPost.embeds[i].alt = newAltText;
       }
     }
     hasEmbedEdits = true;
@@ -155,14 +152,14 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const payload: LooseObj = { content: content };
   // push embedContent as editable yes.
   if (hasEmbedEdits)
-    payload.embedContent = originalPostData.embeds;
+    payload.embedContent = originalPost.embeds;
   
   if (await updatePostForUser(c, id, payload)) {
-    originalPostData.text = content;
+    originalPost.text = content;
     const username = await getUsernameForUser(c);
     c.header("HX-Trigger-After-Swap", "postUpdatedNotice");
     c.header("HX-Trigger-After-Settle", "timeSidebar");
-    return c.html(<ScheduledPost post={originalPostData} user={username} dynamic={true} />);
+    return c.html(<ScheduledPost post={originalPost} user={username} dynamic={true} />);
   }
 
   return c.html(<b class="btn-error">Failed to process</b>);

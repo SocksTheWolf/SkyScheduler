@@ -1,4 +1,5 @@
-import { Post, Repost } from "../types";
+import isEmpty from "just-is-empty";
+import { BskyAPILoginCreds, Post, Repost } from "../types.d";
 import { startOfHour } from "date-fns";
 
 export function createPostObject(data: any) {
@@ -30,7 +31,20 @@ export function createRepostObject(data: any) {
   repostObj.uri = data.uri;
   repostObj.userId = data.userId;
   return repostObj;
-};
+}
+
+export function createLoginCredsObj(data: any) {
+  const loginCreds: BskyAPILoginCreds = (new Object() as BskyAPILoginCreds);
+  if (isEmpty(data)) {
+    loginCreds.password = loginCreds.username = loginCreds.pds = "";
+  } else {
+    loginCreds.pds = data.pds;
+    loginCreds.username = data.user;
+    loginCreds.password = data.pass;
+  }
+  loginCreds.valid = !isEmpty(data.user) && !isEmpty(data.pass);
+  return loginCreds;
+}
 
 export function floorCurrentTime() {
   return startOfHour(new Date());

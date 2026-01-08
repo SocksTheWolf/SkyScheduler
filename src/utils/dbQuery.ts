@@ -5,12 +5,13 @@ import { BatchItem } from "drizzle-orm/batch";
 import { posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { PostSchema } from "../validation/postSchema";
-import { Bindings, LooseObj, PlatformLoginResponse, PostLabel, Violation } from "../types.d";
+import { Bindings, BskyAPILoginCreds, CreatePostQueryResponse, GetAllPostedBatch, LooseObj, 
+  PlatformLoginResponse, Post, PostLabel, Repost, Violation } from "../types.d";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
-import { createPostObject, floorCurrentTime, floorGivenTime } from "./helpers";
+import { createLoginCredsObj, createPostObject, createRepostObject, floorCurrentTime, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 import { isAfter, addHours } from "date-fns";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import flatten from "just-flatten-it";
@@ -35,12 +36,12 @@ export const doesAdminExist = async (c: Context) => {
   return result.length > 0;
 };
 
-export const getPostsForUser = async (c: Context) => {
+export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
   try {
     const userId = c.get("userId");
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
-      return await db.select({
+      const results = await db.select({
             ...getTableColumns(posts),
             repostCount: count(reposts.uuid) 
         })
@@ -48,6 +49,11 @@ export const getPostsForUser = async (c: Context) => {
         .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
         .groupBy(posts.uuid)
         .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
+      
+      if (isEmpty(results))
+        return null;
+
+      return results.map((itm) => createPostObject(itm));
     }
   } catch(err) {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
@@ -55,10 +61,10 @@ export const getPostsForUser = async (c: Context) => {
   return null;
 };
 
-export const getAllMediaOfUser = async (env: Bindings, userId: string) => {
+export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<string[]> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const mediaList = await db.select({embeds: posts.embedContent}).from(posts).where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
-  let messyArray:string[][] = [];
+  let messyArray: string[][] = [];
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;
     messyArray.push(postMedia.map(media => media.content));
@@ -66,7 +72,7 @@ export const getAllMediaOfUser = async (env: Bindings, userId: string) => {
   return flatten(messyArray);
 };
 
-export const updateUserData = async (c: Context, newData: any) => {
+export const updateUserData = async (c: Context, newData: any): Promise<boolean> => {
   const userId = c.get("userId");
   try {
     if (userId) {
@@ -104,7 +110,7 @@ export const updateUserData = async (c: Context, newData: any) => {
   return false;
 };
 
-export const deletePost = async (c: Context, id: string) => {
+export const deletePost = async (c: Context, id: string): Promise<boolean> => {
   const userId = c.get("userId");
   if (!userId) {
     console.log("no user data");
@@ -125,7 +131,7 @@ export const deletePost = async (c: Context, id: string) => {
   return false;
 };
 
-export const createPost = async (c: Context, body: any) => {
+export const createPost = async (c: Context, body: any): Promise<CreatePostQueryResponse> => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
 
   const userId = c.get("userId");
@@ -148,8 +154,8 @@ export const createPost = async (c: Context, body: any) => {
   // Check if account is in violation
   const hasViolations = await getViolationsForUser(db, userId);
   if (hasViolations.success) {
-    if (hasViolations.results.length > 0) {
-      const violationData:Violation = (hasViolations.results[0] as Violation);
+    if (!isEmpty(hasViolations.results)) {
+      const violationData: Violation = (hasViolations.results[0] as Violation);
       if (violationData.tosViolation) {
         return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
       } else if (violationData.userPassInvalid) {
@@ -185,16 +191,16 @@ export const createPost = async (c: Context, body: any) => {
   // Batch the query
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
-  return { ok: success, postNow: makePostNow, postId: postUUID };
+  return { ok: success, postNow: makePostNow, postId: postUUID, msg: "success" };
 };
 
-export const getAllPostsForCurrentTime = async (env: Bindings) => {
+export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> => {
   // Get all scheduled posts for current time
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime: Date = floorCurrentTime();
 
   const violationUsers = db.select({data: violations.userId}).from(violations);
-  return await db.select().from(posts)
+  const results = await db.select().from(posts)
   .where(
     and(
       and(
@@ -207,9 +213,10 @@ export const getAllPostsForCurrentTime = async (env: Bindings) => {
       notInArray(posts.userId, violationUsers) /* Ignore any users that have violations on them */
     )
     ).all();
+  return results.map((item) => createPostObject(item));
 };
 
-export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) => {
+export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
   // TODO: this could probably be left joined to some degree
@@ -217,13 +224,15 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date) 
   const query = db.select({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
-  return await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
+  const results = await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
     .from(posts)
     .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
     .all();
+
+  return results.map((item) => createRepostObject(item));
 };
 
-export const getAllRepostsForCurrentTime = async (env: Bindings) => {
+export const getAllRepostsForCurrentTime = async (env: Bindings): Promise<Repost[]> => {
   return await getAllRepostsForGivenTime(env, floorCurrentTime());
 };
 
@@ -233,18 +242,26 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime));
 };
 
-export const updatePostData = async (env: Bindings, id: string, newData: Object) => {
+/* This function should only be used by anything that is an internal helper (such as a task)
+  Should not be used for standard post modification */
+export const updatePostData = async (env: Bindings, id: string, newData: Object): Promise<boolean> => {
+  if (!uuidValid(id))
+    return false;
+
   const db: DrizzleD1Database = drizzle(env.DB);
-  await db.update(posts).set(newData).where(eq(posts.uuid, id));
+  const {success} = await db.update(posts).set(newData).where(eq(posts.uuid, id));
+  return success;
 };
 
 export const setPostNowOffForPost = async (env: Bindings, id: string) => {
-  await updatePostData(env, id, {postNow: false});
+  const didUpdate = await updatePostData(env, id, {postNow: false});
+  if (!didUpdate)
+    console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
 export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
   const userId = c.get("userId");
-  if (!userId)
+  if (!userId || !uuidValid(id))
     return false;
 
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -252,25 +269,29 @@ export const updatePostForUser = async (c: Context, id: string, newData: Object)
   return success;
 };
 
-export const getPostById = async(c: Context, id: string) => {
+export const getPostById = async(c: Context, id: string): Promise<Post|null> => {
   const userId = c.get("userId");
-  if (!userId)
-    return [];
+  if (!userId || !uuidValid(id))
+    return null;
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).limit(1).all();
+  const result = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).limit(1).all();
+  if (!isEmpty(result))
+    return createPostObject(result[0]);
+  return null;
 };
 
-export const getBskyUserPassForId = async (env: Bindings, userid: string) => {
+export const getBskyUserPassForId = async (env: Bindings, userid: string): Promise<BskyAPILoginCreds> => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
+  const response = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
     .from(users)
     .where(eq(users.id, userid))
-    .limit(1);
+    .limit(1).all();
+  return createLoginCredsObj(response[0] || null);
 };
 
-export const getUsernameForUser = async (c: Context) => {
+export const getUsernameForUser = async (c: Context): Promise<string|null> => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const userId = c.get("userId");
   if (!userId)
@@ -283,12 +304,19 @@ export const getUsernameForUser = async (c: Context) => {
   return null;
 };
 
-export const getUserEmailForHandle = async (env: Bindings, userhandle: string) => {
+// This is a super dumb query that's needed to get around better auth's forgot password system
+// because you cannot make the call with just an username, you need to also have the email
+// but we never update the email past the original time you first signed up, so instead
+// we use big brain tactics to spoof the email
+export const getUserEmailForHandle = async (env: Bindings, userhandle: string): Promise<string|null> => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
+  const result = await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
+  if (!isEmpty(result))
+    return result[0].email;
+  return null;
 };
 
-export const getAllPostedPostsOfUser = async(env: Bindings, userid: string) => {
+export const getAllPostedPostsOfUser = async(env: Bindings, userid: string): Promise<GetAllPostedBatch[]> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
@@ -296,7 +324,7 @@ export const getAllPostedPostsOfUser = async(env: Bindings, userid: string) => {
     .all();
 };
 
-export const getAllPostedPosts = async (env: Bindings) => {
+export const getAllPostedPosts = async (env: Bindings): Promise<GetAllPostedBatch[]> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
@@ -304,7 +332,10 @@ export const getAllPostedPosts = async (env: Bindings) => {
     .all();
 };
 
-export const isPostAlreadyPosted = async (env: Bindings, postId: string) => {
+export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promise<boolean> => {
+  if (uuidValid(postId))
+    return true;
+
   const db: DrizzleD1Database = drizzle(env.DB);
   const query = await db.select({posted: posts.posted}).from(posts).where(eq(posts.uuid, postId)).all();
   if (isEmpty(query) || query[0].posted === null) {
@@ -315,10 +346,10 @@ export const isPostAlreadyPosted = async (env: Bindings, postId: string) => {
 }
 
 // deletes multiple posted posts from a database.
-export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
+export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promise<number> => {
   // Don't do anything on empty arrays.
   if (isEmpty(postsToDelete))
-    return false;
+    return 0;
 
   const db: DrizzleD1Database = drizzle(env.DB);
   let deleteQueries: BatchItem<"sqlite">[] = [];
@@ -331,7 +362,7 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]) => {
   return batchResponse.reduce((val, item) => val + item.success, 0);
 };
 
-export const purgePostedPosts = async (env: Bindings) => {
+export const purgePostedPosts = async (env: Bindings): Promise<number> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
   const dbQuery = await db.select({ data: posts.uuid }).from(posts).leftJoin(reposts, eq(posts.uuid, reposts.uuid))
@@ -347,8 +378,8 @@ export const purgePostedPosts = async (env: Bindings) => {
   return await deletePosts(env, postsToDelete);
 }
 
-export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
-  const NoHandleState:PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
+export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse): Promise<boolean> => {
+  const NoHandleState: PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
     PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
@@ -358,8 +389,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
 
   const db: DrizzleD1Database = drizzle(env.DB);
   let valuesUpdate:LooseObj = {};
-  switch (violationType)
-  {
+  switch (violationType) {
     case PlatformLoginResponse.InvalidAccount:
       valuesUpdate.userPassInvalid = true;
     break;

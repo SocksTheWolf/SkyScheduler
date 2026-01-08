@@ -100,7 +100,7 @@ app.get("/invite", authAdminOnlyMiddleware, (c) => {
 // Admin Maintenance Cleanup
 app.get("/cron", authAdminOnlyMiddleware, async (c) => {
   await schedulePostTask(c.env, c.executionCtx);
-  return c.html("ran");
+  return c.text("ran");
 });
 
 app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {

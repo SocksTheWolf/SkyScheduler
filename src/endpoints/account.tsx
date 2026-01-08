@@ -199,12 +199,11 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "user doesn't exist"}, 401);
   }
 
-  const dbResult = await getUserEmailForHandle(c.env, username);
-  if (dbResult.length === 0) {
+  const userEmail = await getUserEmailForHandle(c.env, username);
+  if (isEmpty(userEmail)) {
     return c.json({ok: false, message: "user data is missing"}, 401);
   }
 
-  const userEmail = dbResult[0].email;
   const auth = c.get("auth");
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);

@@ -167,4 +167,24 @@ export type BskyEmbedWrapper = {
 export type BskyRecordWrapper = {
   cid?: string;
   uri?: string;
-}
+};
+
+export type CreatePostQueryResponse = {
+  ok: boolean;
+  msg: string;
+  postNow?: boolean;
+  postId?: string;
+};
+
+export type BskyAPILoginCreds = {
+  pds: string;
+  username: string;
+  password: string;
+  valid: boolean;
+};
+
+// Used for the pruning and database operations
+export type GetAllPostedBatch = {
+  id: string; 
+  uri: string|null;
+};

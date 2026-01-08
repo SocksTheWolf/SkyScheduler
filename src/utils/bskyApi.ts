@@ -76,7 +76,10 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
   return PlatformLoginResponse.UnhandledError;
 }
 
-export const makePost = async (c: Context|ScheduledContext, content: Post, isQueued: boolean=false) => {
+export const makePost = async (c: Context|ScheduledContext, content: Post|null, isQueued: boolean=false) => {
+  if (content === null)
+    return false;
+  
   const env = c.env;
   // make a check to see if the post has already been posted onto bsky
   if (await isPostAlreadyPosted(env, content.postid)) {
@@ -86,7 +89,7 @@ export const makePost = async (c: Context|ScheduledContext, content: Post, isQue
   const newPost: PostResponseObject|null = await makePostRaw(env, content);
   if (newPost !== null) {
     // update post data in the d1
-    const postDataUpdate: Promise<void> = updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
+    const postDataUpdate: Promise<boolean> = updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
       content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] });
     if (isQueued)
       await postDataUpdate;
@@ -104,17 +107,17 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost) =
   const env = c.env;
   let bWasSuccess = true;
   const loginCreds = await getBskyUserPassForId(env, content.userId);
-  const {user, pass, pds} = loginCreds[0];
+  if (loginCreds.valid === false) {
+    console.error(`bsky credentials for repost ${content.uri} were invalid`);
+    return false;
+  }
+
+  const {username, password, pds} = loginCreds
   const agent = new AtpAgent({
     service: new URL(pds),
   });
 
-  if (user === null || pass === null) {
-    console.error(`The username/pass for userid ${content.userId} is invalid!`);
-    return false;
-  }
-
-  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, user, pass);
+  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, username, password);
   if (loginResponse != PlatformLoginResponse.Ok) {
     const addViolation:boolean = await createViolationForUser(env, content.userId, loginResponse);
     if (addViolation)
@@ -142,16 +145,16 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost) =
 
 export const makePostRaw = async (env: Bindings, content: Post) => {
   const loginCreds = await getBskyUserPassForId(env, content.user);
-  const {user, pass, pds} = loginCreds[0];
-  // Login to bsky
-  const agent = new AtpAgent({ service: new URL(pds) });
-
-  if (user === null || pass === null) {
-    console.error(`The username/pass for userid ${content.user} is invalid!`);
+  if (loginCreds.valid === false) {
+    console.error(`credentials for post ${content.postid} were invalid`);
     return null;
   }
 
-  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, user, pass);
+  const {username, password, pds} = loginCreds;
+  // Login to bsky
+  const agent = new AtpAgent({ service: new URL(pds) });
+
+  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, username, password);
   if (loginResponse != PlatformLoginResponse.Ok) {
     const addViolation: boolean = await createViolationForUser(env, content.user, loginResponse);
     if (addViolation)
@@ -294,7 +297,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
           let resolvedDID: string = agent.did!;
           // if the account does not match we need to resolve the did
           // also check to see if the link had a did in it already.
-          if (account !== user && account !== resolvedDID) {
+          if (account !== username && account !== resolvedDID) {
             console.log(`need to resolve did for ${account}`);
             const didResponse = await lookupBskyHandle(account);
             if (didResponse === null) {

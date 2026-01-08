@@ -8,7 +8,7 @@ import isEmpty from 'just-is-empty';
 // are still on the network or not. If they are not, then this prunes the posts from
 // the database. This call is quite expensive and should only be ran on a weekly
 // cron job.
-export const pruneBskyPosts = async (env: Bindings, userId?:string) => {
+export const pruneBskyPosts = async (env: Bindings, userId?: string) => {
   const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(env, userId) : await getAllPostedPosts(env);
   let removePostIds: string[] = [];
   let postedGroups = split(allPostedPosts, 25);
