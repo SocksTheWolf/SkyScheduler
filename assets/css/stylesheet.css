@@ -73,7 +73,7 @@
   grid-column: auto / span 1;
 }
 
-/*.max-width-50 article,*/ .dashboard, .homepage {
+.max-width-50:first-child, .dashboard, .homepage {
   padding-bottom: 0px;
 }
 
@@ -204,12 +204,6 @@ textarea {
   font-size: 0.75rem;
   padding: 5px;
 }
-/*
-#posts article {
-  padding-top: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}*/
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
