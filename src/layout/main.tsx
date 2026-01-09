@@ -19,7 +19,7 @@ export const BaseLayout = ({
   preloads = []
 }: BaseLayoutProps) => {
   const layout = (
-  <html data-theme="dark">
+  <html data-theme="dark" lang="en">
     <head>
       <meta charset="UTF-8" />
       <title>{title}</title>

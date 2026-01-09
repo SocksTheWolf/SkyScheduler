@@ -18,6 +18,7 @@ export default function Home() {
               <figure>
                 <img
                   src="/dashboard.png"
+                  fetchpriority="high"
                   alt="Picture of SkyScheduler Dashboard"
                   height="619px"
                   width="1200px"
