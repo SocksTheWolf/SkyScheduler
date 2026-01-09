@@ -1,18 +1,33 @@
+import { raw } from "hono/html";
+
 export default function MetaTags() {
+  const Title: string = "SkyScheduler";
+  const URL: string = "https://skyscheduler.work";
+  const Description: string = "Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!";
+  const SocialImage: string = "https://skyscheduler.work/dashboard.png";
+
   return (
     <>
-      <meta name="title" content="SkyScheduler" />
-      <meta name="description" content="Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!" />
+      <meta name="title" content={Title} />
+      <meta name="description" content={Description} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://skyscheduler.work/" />
-      <meta property="og:title" content="SkyScheduler" />
-      <meta property="og:description" content="Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!" />
-      <meta property="og:image" content="https://skyscheduler.work/dashboard.png" />
+      <meta property="og:url" content={URL} />
+      <meta property="og:title" content={Title} />
+      <meta property="og:description" content={Description} />
+      <meta property="og:image" content={SocialImage} />
       <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content="https://skyscheduler.work/" />
-      <meta property="twitter:title" content="SkyScheduler" />
-      <meta property="twitter:description" content="Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!" />
-      <meta property="twitter:image" content="https://skyscheduler.work/dashboard.png" />
+      <meta property="twitter:url" content={URL} />
+      <meta property="twitter:title" content={Title} />
+      <meta property="twitter:description" content={Description} />
+      <meta property="twitter:image" content={SocialImage} />
+      <script type="application/ld+json">
+      {raw(`{
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "${Title}",
+        "url": "${URL}"
+      }`)}
+      </script>
     </>
   );
 };
