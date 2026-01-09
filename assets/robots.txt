@@ -1,5 +1,4 @@
 User-Agent: *
-Disallow: /dashboard
 Disallow: *.js$
 Disallow: *.css$
 
