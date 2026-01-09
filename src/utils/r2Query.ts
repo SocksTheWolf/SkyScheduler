@@ -205,6 +205,11 @@ export const uploadFileR2 = async (c: Context, file: File|string, userId: string
     return {"success": false, "error": "data invalid"};
   }
 
+  // Invalid file size check
+  if (file.size <= 0) {
+    return {"success": false, "error": "file had an invalid file size"};
+  }
+
   // The file size limit for R2 before having to do a multipart upload.
   if (file.size > R2_FILE_SIZE_LIMIT) {
     return {"success": false, "error": `max file size is ${R2_FILE_SIZE_LIMIT_IN_MB}MB`};
