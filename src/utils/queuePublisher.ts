@@ -3,7 +3,7 @@ import random from 'just-random';
 import get from 'just-safe-get';
 import { Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
 
-const queueContentType = 'json';
+const queueContentType = 'v8';
 
 // picks a random queue to publish data to
 const getRandomQueue = (env: Bindings, listName: string): Queue|null => {

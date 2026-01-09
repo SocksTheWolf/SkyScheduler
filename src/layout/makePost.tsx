@@ -66,7 +66,7 @@ export function PostCreation() {
                   <ul>
                     <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-                    <li>will be processed on BSky after they're posted. This may show a temporary "Media not Found"/black screen for a bit after posting.</li>
+                    <li>will be processed on BSky after they're posted. This may show a temporary "Video not Found"/black screen for a bit after posting.</li>
                   </ul></li>
                   </ul></small></div>
                 </footer>
