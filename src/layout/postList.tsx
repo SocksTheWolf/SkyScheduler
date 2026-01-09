@@ -66,17 +66,15 @@ export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
     const response: Post[]|null = await getPostsForUser(ctx);
     const username = await getUsernameForUser(ctx);
-    if (response !== null) {
-      if (!isEmpty(response)) {
-        return (
-          <>
-          <a hidden tabindex={-1} class="invalidateTab hidden"></a>
-          {response.map((data: Post) => {
-            return <ScheduledPost post={data} user={username} />;
-          })}
-          </>
-        );
-      }
+    if (!isEmpty(response)) {
+      return (
+        <>
+        <a hidden tabindex={-1} class="invalidateTab hidden"></a>
+        {response!.map((data: Post) => {
+          return <ScheduledPost post={data} user={username} />;
+        })}
+        </>
+      );
     }
   }
 

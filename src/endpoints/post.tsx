@@ -56,6 +56,7 @@ post.post("/create", authMiddleware, async (c: Context) => {
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
   } else if (response.postNow && response.postId) {
+    // Handling posting right now.
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
       const env: Bindings = c.env;

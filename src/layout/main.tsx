@@ -18,30 +18,32 @@ export const BaseLayout = ({
   mainClass = "",
   preloads = []
 }: BaseLayoutProps) => {
-  return html`<!DOCTYPE html>
+  const layout = (
   <html data-theme="dark">
     <head>
       <meta charset="UTF-8" />
+      <title>{title}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="preload" href="/dep/htmx.min.js" as="script" />
       <link rel="preload" href="/dep/toastify.js" as="script" />
-      ${<PreloadDependencyTags scripts={preloads} />}
+      <PreloadDependencyTags scripts={preloads} />
 
       <link rel="stylesheet" type="text/css" href="/dep/toastify.min.css" />
       <script type="text/javascript" src="/dep/htmx.min.js"></script>
       <script type="text/javascript" src="/dep/toastify.js"></script>
       <link rel="stylesheet" href="/dep/pico.min.css" />
       <link rel="stylesheet" href="/css/stylesheet.css" />
-      <script type="text/javascript" src="${mainScriptStr}"></script>
-      <title>${title}</title>
-      ${<MetaTags />}
+      <script type="text/javascript" src={mainScriptStr}></script>
+      <MetaTags />
     </head>
     <body>
-      <main class="${mainClass}">
-        ${children}
+      <main class={mainClass}>
+        {children}
       </main>
     </body>
-  </html>
-`;
+  </html>);
+  return html`<!DOCTYPE html>
+  ${layout}`;
+
 }
 

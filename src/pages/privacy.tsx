@@ -2,7 +2,6 @@ import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
 
-
 export default function PrivacyPolicy() {
   return (
     <BaseLayout title="SkyScheduler - Privacy Policy" mainClass="homepage">

@@ -9,7 +9,9 @@ type UsernameFieldProps = {
 
 export function UsernameField(props?: UsernameFieldProps) {
   const hintText = props?.hintText ? raw(props.hintText) :
-     raw("This is your Bluesky username/handle, in the format of a custom domain or <code>USERNAME.bsky.social</code>.<br />Profile/post links will attempt to be converted to the correct format.");
+     (<span>This is your Bluesky username/handle, in the format of a custom domain or <code>USERNAME.bsky.social</code>.
+     <br />Profile/post links will attempt to be converted to the correct format.
+     </span>);
   // default required true.
   const inputRequired = (props) ? (props?.required || false) : true;
   return (
