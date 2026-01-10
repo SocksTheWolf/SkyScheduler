@@ -156,10 +156,10 @@ function resetCounter(counter) {
   counterEl.dispatchEvent(new Event("reset"));
 }
 
-function redirectAfterDelay(url) {
+function redirectAfterDelay(url, customDelay=0) {
   setTimeout(function() {
     window.location.href = url;
-  }, 1200);
+  }, customDelay != 0 ? customDelay : 1200);
 }
 
 function translateErrorObject(obj, defaultString) {
@@ -224,11 +224,12 @@ function rawSubmitHandler(url, successCallback) {
   });
 }
 
-function easySetup(url, successMessage, successLocation) {
+function easySetup(url, successMessage, successLocation, customDelay=0) {
   addUsernameFieldWatchers();
   rawSubmitHandler(url, function() {
     pushToast(successMessage, true);
-    redirectAfterDelay(successLocation);
+    if (successLocation !== "")
+      redirectAfterDelay(successLocation, customDelay);
   });
 }
 

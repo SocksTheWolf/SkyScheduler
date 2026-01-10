@@ -17,6 +17,7 @@ type AccountFormProps = {
   endpoint: string;
   successText: string;
   redirect: string;
+  customRedirectDelay?: number;
   footerLinks?: FooterLink[]
   footerHTML?: string | Promise<HtmlEscapedString>
 };
@@ -52,7 +53,7 @@ export default function AccountHandler(props: AccountFormProps) {
       </article>
       <script type="text/javascript">
       {html`
-        easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}");
+        easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
       `}
       </script>
     </section>

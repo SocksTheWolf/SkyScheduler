@@ -16,8 +16,9 @@ export default function ForgotPassword(props:any) {
       <AccountHandler title="Forgot Password Reset" 
         submitText="Request Password Reset"
         loadingText="Requesting Password Reset..." endpoint="/account/forgot" 
-        successText="Success! Check your DMs for info. Redirecting to home.." 
-        redirect="/"
+        successText="Attempted to send DM. If you do not have it, please make sure you are following the account." 
+        redirect="/login"
+        customRedirectDelay={2000}
         footerHTML={<FooterCopyright />}>
 
         <center hx-history="false">
