@@ -413,12 +413,21 @@ postForm.addEventListener('submit', async (e) => {
   showPostProgress(false);
 });
 
-// rounddown minutes
-scheduledDate.addEventListener('change', (e) => {
-  const date = new Date(scheduledDate.value);
+function convertTimeValueLocally(number) {
+  const date = new Date(number);
   date.setMinutes(0 - date.getTimezoneOffset());
-  scheduledDate.value = date.toISOString().slice(0,16);
-});
+  return date.toISOString().slice(0,16);
+}
+
+if (scheduledDate) {
+  // rounddown minutes
+  scheduledDate.addEventListener('change', (e) => {
+    scheduledDate.value = convertTimeValueLocally(scheduledDate.value);
+  });
+
+  // push a minimum date to make it easier (less chance of typing 2025 by accident)
+  scheduledDate.setAttribute("min", convertTimeValueLocally(Date.now()));
+}
 
 repostCheckbox.addEventListener('click', (e) => {
   setSelectDisable(!repostCheckbox.checked);

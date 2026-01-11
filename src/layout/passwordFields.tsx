@@ -1,6 +1,7 @@
 import { html } from "hono/html";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
 import { PWAutoCompleteSettings } from "../types.d";
+import { appPasswordRegex } from "../validation/regexCases";
 
 type PasswordFieldSettings = {
   required?: boolean
@@ -13,8 +14,11 @@ type DashboardPasswordFieldSettings = {
 
 export function BSkyAppPasswordField(props: PasswordFieldSettings) {
   const requiredAttr:string = props.required ? "required" : "";
-  return html`<input type="password" name="bskyAppPassword" maxlength=${BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" ${requiredAttr} 
-            data-1p-ignore data-bwignore data-lpignore="true" data-protonpass-ignore="true" autocomplete="off" />`;
+  return html`<input type="password" name="bskyAppPassword" title="Bluesky account's App Password"
+            maxlength=${BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" ${requiredAttr} 
+            data-1p-ignore data-bwignore data-lpignore="true"
+            data-protonpass-ignore="true" pattern="${appPasswordRegex.toString()}" 
+            autocomplete="off"></input>`;
 }
 
 export function DashboardPasswordField(props: DashboardPasswordFieldSettings) {

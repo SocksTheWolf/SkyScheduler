@@ -32,7 +32,6 @@ export interface Bindings {
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
   POST_QUEUE1: Queue;
-  POST_QUEUE2: Queue;
   REPOST_QUEUE: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL: KVNamespace;
@@ -48,6 +47,7 @@ export interface Bindings {
   RESIZE_SECRET_HEADER: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
+  IN_DEV: string;
   REDIRECTS: RedirectConfigSettings;
 };
 

@@ -14,6 +14,7 @@ import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { postHelperScriptStr } from "../utils/appScripts";
 import { DependencyTags } from "./depTags";
+import { postRecordURI } from "../validation/regexCases";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
@@ -101,7 +102,7 @@ export function PostCreation() {
             <section>
               <article>
                 <header>Post/Feed/List Link</header>
-                <input id="recordBox" placeholder="https://" />
+                <input id="recordBox" placeholder="https://" pattern={postRecordURI.toString()} title="Must be a link to a ATProto powered record" />
                 <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
