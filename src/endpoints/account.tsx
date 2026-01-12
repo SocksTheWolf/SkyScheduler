@@ -7,7 +7,8 @@ import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
 import { Bindings, LooseObj } from "../types";
-import { doesHandleExist } from "../utils/bskyApi";
+import { doesHandleExist, lookupBskyHandle } from "../utils/bskyApi";
+import { checkIfCanDMUser } from "../utils/bskyMsg";
 import {
   doesUserExist, getAllMediaOfUser, getUserEmailForHandle,
   getUsernameForUser, updateUserData
@@ -212,6 +213,18 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
   }
 
+  // Look up handle
+  const bskyUserId = await lookupBskyHandle(username);
+  if (bskyUserId === null) {
+    return c.json({ok: false, message: "invalid user id"}, 401);
+  }
+
+  // There has to be a better method for this tbh.
+  const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
+  if (canMessageUser === false) {
+    return c.json({ok: false, message: `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
+  }
+
   const { data, error } = await auth.api.requestPasswordReset({
     body: {
       email: userEmail,
@@ -220,7 +233,7 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
   });
   if (error) {
     console.error(`Password reset encountered an error: ${error}`);
-    return c.json({ok: false, message: `Could not send a direct message to your account. Please check to see if you are following ${c.env.RESET_BOT_USERNAME} on bluesky, or if you are, try again later`}, 401);
+    return c.json({ok: false, message: "encountered reset error, try again later"}, 401);
   }
   return c.json({ok: true, message: "request processed"});
 });
