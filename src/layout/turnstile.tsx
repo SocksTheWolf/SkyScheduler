@@ -1,7 +1,7 @@
 import { Context } from "hono";
 
 export function UseCFTurnstile(ctx: Context): boolean {
-  return ctx.env.SIGNUP_SETTINGS.use_captcha && ctx.env.IN_DEV === "false";
+  return ctx.env.SIGNUP_SETTINGS.use_captcha && ctx.env.IN_DEV === false;
 }
 
 export function TurnstileCaptchaPreloads(ctx: Context) {
