@@ -17,7 +17,7 @@ export function BSkyAppPasswordField(props: PasswordFieldSettings) {
   return html`<input type="password" name="bskyAppPassword" title="Bluesky account's App Password"
             maxlength=${BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" ${requiredAttr} 
             data-1p-ignore data-bwignore data-lpignore="true"
-            data-protonpass-ignore="true" pattern="${appPasswordRegex.toString()}" 
+            data-protonpass-ignore="true" 
             autocomplete="off"></input>`;
 }
 
