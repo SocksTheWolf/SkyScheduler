@@ -102,7 +102,7 @@ export function PostCreation() {
             <section>
               <article>
                 <header>Post/Feed/List Link</header>
-                <input id="recordBox" placeholder="https://" pattern={postRecordURI.toString()} title="Must be a link to a ATProto powered record" />
+                <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto powered record" />
                 <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
