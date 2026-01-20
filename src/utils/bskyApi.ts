@@ -268,7 +268,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
                   // it will fail when you try to make the post record, saying the 
                   // post record is invalid.
                   const imgTransform = (await env.IMAGES.input(imageBlob.stream())
-                    .transform({width: 1000, height: 563, fit: "scale-down"})
+                    .transform({width: 1280, height: 720, fit: "scale-down"})
                     .output({ format: "image/jpeg", quality: 85 })).response();
                   if (imgTransform.ok) {
                     thumbEncode = "image/jpeg";

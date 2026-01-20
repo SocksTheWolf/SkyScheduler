@@ -56,14 +56,14 @@ export function PostCreation() {
                 </div>
                 <footer>
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
-                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span> 
+                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>: 
                   <ul>
                     <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
                     <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
                     <li>don't upload and fail, it's recommended to use a lower resolution file instead</li>
                   </ul></li>
-                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span> 
+                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>: 
                   <ul>
                     <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
@@ -77,7 +77,8 @@ export function PostCreation() {
               <article>
                 <header>Link Embed</header>
                 <input type="text" id="urlCard" placeholder="https://" value="" />
-                <small>Add a social embed card for a link to your post. This link will not count against the {MAX_LENGTH} character limit.</small>
+                <small>Add a social embed card for a link to your post. This link will not count against the {MAX_LENGTH} character limit.<br />
+                Thumbnails may get automatically resized down to fit 1280x720.</small>
                 <footer><div class="uploadGuidelines"><small><b>NOTE</b>: File uploads will <b>always supersede</b> any link embeds.</small></div></footer>
               </article>
             </section>
@@ -101,7 +102,7 @@ export function PostCreation() {
             <summary title="click to toggle section" role="button" class="outline secondary">Add Record (Quote Post)</summary>
             <section>
               <article>
-                <header>Post/Feed/List Link</header>
+                <header>Insert Post/Feed/List Link</header>
                 <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto powered record" />
                 <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
@@ -113,6 +114,7 @@ export function PostCreation() {
               <article>
                 <header><label for="scheduledDate">Schedule Date</label></header>
                 <input type="datetime-local" id="scheduledDate" placeholder="" required />
+                <small>Time is based on your device's current timezone and is automatically converted for you.</small>
                 <input type="checkbox" id="postNow" /> <label for="postNow">Make Post Now?</label>
                 <footer>
                   <small>
