@@ -4,7 +4,7 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import { MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
+import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
 import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, PlatformLoginResponse, Post, PostLabel,
@@ -260,9 +260,24 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
             try {
               const thumbnail = await fetch(currentEmbed.content);
               if (thumbnail.ok) {
-                const imageBlob = await thumbnail.blob();
-                const thumbEncode = thumbnail.headers.get("content-type") || "image/png";
-                const uploadImg = await agent.uploadBlob(imageBlob, {encoding: thumbEncode });
+                let imageBlob = await thumbnail.blob();
+                let thumbEncode = thumbnail.headers.get("content-type") || "image/png";
+                if (imageBlob.size > BSKY_IMG_SIZE_LIMIT) {
+                  // Resize the thumbnail because while the blob service will accept 
+                  // embed thumbnails of any size
+                  // it will fail when you try to make the post record, saying the 
+                  // post record is invalid.
+                  const imgTransform = (await env.IMAGES.input(imageBlob.stream())
+                    .transform({width: 1000, height: 563, fit: "scale-down"})
+                    .output({ format: "image/jpeg", quality: 85 })).response();
+                  if (imgTransform.ok) {
+                    thumbEncode = "image/jpeg";
+                    imageBlob = await imgTransform.blob();
+                  } else {
+                    throw Error("could not image transform thumbnail");
+                  }
+                }
+                const uploadImg = await agent.uploadBlob(imageBlob, { encoding: thumbEncode });
                 externalData.thumb = uploadImg.data.blob;
               } else {
                 console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);

@@ -113,6 +113,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
         return {"success": false, "error": "unable to handle image for resize, please make it smaller"}
       }
 
+      // TODO: use the image wrangler binding
       for (var i = 0; i < env.IMAGE_SETTINGS.steps.length; ++i) {
         const qualityLevel = env.IMAGE_SETTINGS.steps[i];
         const response = await fetch(new URL(resizeFilename, env.IMAGE_SETTINGS.bucket_url), {

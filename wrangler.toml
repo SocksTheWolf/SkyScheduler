@@ -58,9 +58,10 @@ binding = "REPOST_QUEUE"
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
 [[queues.consumers]]
-queue = "skyscheduler-post-queue2"
-[[queues.consumers]]
 queue = "skyscheduler-repost-queue"
+
+[images]
+binding = "IMAGES"
 
 [build]
 command = "npm run minify"
