@@ -54,7 +54,7 @@ export const violations = sqliteTable('violations', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   userId: text("user")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }).unique(),
   tosViolation: integer('tosViolation', { mode: 'boolean' }).default(false),
   userPassInvalid: integer('userPassInvalid', { mode: 'boolean' }).default(false),
   accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),

@@ -24,7 +24,7 @@
     "types": "wrangler types src/wrangler.d.ts"
   },
   "dependencies": {
-    "@atproto/api": "^0.18.16",
+    "@atproto/api": "^0.18.17",
     "better-auth": "^1.4.17",
     "better-auth-cloudflare": "^0.2.9",
     "date-fns": "^4.1.0",
@@ -40,7 +40,7 @@
     "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",
     "uuid": "^13.0.0",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^24.10.9",
@@ -48,7 +48,7 @@
     "minify": "^14.1.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
-    "wrangler": "^4.59.3"
+    "wrangler": "^4.60.0"
   },
   "engines": {
     "node": ">=24.11.1"

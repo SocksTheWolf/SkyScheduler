@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `violations_user_unique` ON `violations` (`user`);
