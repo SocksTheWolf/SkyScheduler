@@ -28,7 +28,7 @@ export function createPostObject(data: any) {
 
 export function createRepostObject(data: any) {
   const repostObj: Repost = (new Object() as Repost);
-  repostObj.uuid = data.uuid;
+  repostObj.postid = data.uuid;
   repostObj.cid = data.cid;
   repostObj.uri = data.uri;
   repostObj.userId = data.userId;
