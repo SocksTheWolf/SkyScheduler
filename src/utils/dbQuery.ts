@@ -17,7 +17,7 @@ import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
 import {
   Bindings, BskyAPILoginCreds, CreatePostQueryResponse,
   GetAllPostedBatch, LooseObj, PlatformLoginResponse,
-  Post, PostLabel, Repost, Violation
+  Post, PostLabel, Repost, ScheduledContext, Violation
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import {
@@ -230,7 +230,7 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date):
   const query = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
-  const results = await db.select({uri: posts.uri, cid: posts.cid, userId: posts.userId })
+  const results = await db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId })
     .from(posts)
     .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
     .all();
@@ -267,6 +267,10 @@ export const setPostNowOffForPost = async (env: Bindings, id: string) => {
 
 export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
   const userId = c.get("userId");
+  return await updatePostForGivenUser(c, userId, id, newData);
+};
+
+export const updatePostForGivenUser = async (c: Context|ScheduledContext, userId: string, id: string, newData: Object) => {
   if (!userId || !uuidValid(id))
     return false;
 

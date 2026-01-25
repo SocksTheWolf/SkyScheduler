@@ -98,6 +98,7 @@ export type Post = {
 };
 
 export type Repost = {
+  uuid: string;
   uri: string;
   cid: string;
   userId: string;
