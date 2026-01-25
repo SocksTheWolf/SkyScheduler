@@ -288,6 +288,26 @@ export const getPostById = async(c: Context, id: string): Promise<Post|null> => 
   return null;
 };
 
+export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Post|null> => {
+  const userId = c.get("userId");
+  if (!userId || !uuidValid(id))
+    return null;
+
+  const env = c.env;
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const result = await db.select({
+      ...getTableColumns(posts),
+      repostCount: count(reposts.uuid) 
+    }).from(posts)
+    .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
+    .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+    .groupBy(posts.uuid).limit(1).all();
+
+  if (!isEmpty(result))
+    return createPostObject(result[0]);
+  return null;   
+};
+
 export const getBskyUserPassForId = async (env: Bindings, userid: string): Promise<BskyAPILoginCreds> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const response = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})

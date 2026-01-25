@@ -10,7 +10,7 @@ import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings, CreatePostQueryResponse, EmbedDataType, LooseObj, Post } from "../types.d";
 import { makePost } from "../utils/bskyApi";
 import {
-  createPost, deletePost, getPostById, getUsernameForUser,
+  createPost, deletePost, getPostById, getPostByIdWithReposts, getUsernameForUser,
   updatePostForUser
 } from "../utils/dbQuery";
 import { enqueuePost, isQueueEnabled, shouldPostNowQueue } from "../utils/queuePublisher";
@@ -112,7 +112,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   }
 
   const { content, altEdits } = validation.data;
-  const originalPost = await getPostById(c, id);
+  const originalPost = await getPostByIdWithReposts(c, id);
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
     c.header("HX-Trigger-After-Settle", swapErrEvents);
@@ -179,7 +179,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
 
   c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
   
-  const postInfo = await getPostById(c, id);
+  const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
   if (postInfo !== null) {
     const username = await getUsernameForUser(c);
