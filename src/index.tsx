@@ -18,8 +18,12 @@ import TermsOfService from "./pages/tos";
 import { Bindings, QueueTaskData, QueueTaskType, ScheduledContext } from "./types.d";
 import { makeConstScript } from "./utils/constScriptGen";
 import { runMaintenanceUpdates } from "./utils/dbQuery";
+import { getAllAbandonedMedia } from "./utils/dbQueryFile";
 import { makeInviteKey } from "./utils/inviteKeys";
-import { cleanUpPostsTask, handlePostTask, handleRepostTask, schedulePostTask } from "./utils/scheduler";
+import {
+  cleanupAbandonedFiles, cleanUpPostsTask, handlePostTask,
+  handleRepostTask, schedulePostTask
+} from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -111,6 +115,17 @@ app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
 app.get("/db-update", authAdminOnlyMiddleware, (c) => {
   c.executionCtx.waitUntil(runMaintenanceUpdates(c.env));
   return c.text("ran");
+});
+
+app.get("/abandoned", authAdminOnlyMiddleware, async (c) => {
+  let returnHTML = "";
+  const abandonedFiles: string[] = await getAllAbandonedMedia(c.env);
+  // print out all abandoned files
+  for (const file of abandonedFiles) {
+    returnHTML += `${file}\n`;
+  }
+  //await cleanupAbandonedFiles(c);
+  return c.text(returnHTML);
 });
 
 // Startup Application

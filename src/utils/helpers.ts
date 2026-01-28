@@ -1,4 +1,4 @@
-import { startOfHour } from "date-fns";
+import { startOfHour, subDays } from "date-fns";
 import isEmpty from "just-is-empty";
 import { BskyAPILoginCreds, Post, Repost } from "../types.d";
 
@@ -54,4 +54,8 @@ export function floorCurrentTime() {
 
 export function floorGivenTime(given: Date) {
   return startOfHour(given);
+}
+
+export function daysAgo(days: number) {
+  return subDays(new Date(), days);
 }

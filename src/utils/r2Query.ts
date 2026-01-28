@@ -14,7 +14,8 @@ import {
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits.d";
-import { Bindings, EmbedData, EmbedDataType, ScheduledContext } from '../types.d';
+import { Bindings, EmbedData, EmbedDataType, R2BucketObject, ScheduledContext } from '../types.d';
+import { addFileListing, deleteFileListings } from './dbQueryFile';
 
 type FileMetaData = {
   name: string,
@@ -46,10 +47,14 @@ export const deleteFromR2 = async (c: Context|ScheduledContext, embeds: string[]
 
   console.log(`Deleting ${embeds}`);
   const killFilesPromise = c.env.R2.delete(embeds);
-  if (isQueued)
+  const deleteFileListingPromise = deleteFileListings(c.env, embeds);
+  if (isQueued) {
     await killFilesPromise;
-  else 
+    await deleteFileListingPromise;
+  } else {
     c.executionCtx.waitUntil(killFilesPromise);
+    c.executionCtx.waitUntil(deleteFileListingPromise);
+  }
 };
 
 const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
@@ -63,6 +68,7 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
     customMetadata: {"user": metaData.user, "type": metaData.type }
   });
   if (R2UploadRes) {
+    await addFileListing(env, fileName, metaData.user);
     return {"success": true, "data": R2UploadRes.key, 
       "originalName": metaData.name, "fileSize": metaData.size, 
       "qualityLevel": metaData.qualityLevel};
@@ -223,4 +229,29 @@ export const uploadFileR2 = async (c: Context, file: File|string, userId: string
     return await uploadVideoToR2(c.env, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};
+};
+
+export const getAllFilesList = async (env: Bindings) => {
+  let options: R2ListOptions = {
+    limit: 1000,
+    include: ["customMetadata"]
+  };
+  let values:R2BucketObject[] = [];
+
+  while (true) {
+    const response = await env.R2.list(options);
+    for (const file of response.objects) {
+      values.push({
+        name: file.key,
+        user: file.customMetadata?.user || null,
+        date: file.uploaded
+      });
+    }
+
+    if (response.truncated)
+      options.cursor = response.cursor;
+    else
+      break;
+  }
+  return values;
 };

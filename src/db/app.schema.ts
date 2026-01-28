@@ -67,3 +67,16 @@ export const violations = sqliteTable('violations', {
   // joining and querying against the table's data
   index("violations_user_idx").on(table.userId)
 ]);
+
+export const mediaFiles = sqliteTable('media', {
+  fileName: text('file', {mode: 'text'}).primaryKey(),
+  hasPost: integer('hasPost', { mode: 'boolean' }).default(false),
+  userId: text("user")
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+}, (table) => [
+  index("media_oldWithNoPost_idx").on(table.hasPost, table.createdAt).where(sql`hasPost = 0`),
+  index("media_userid_idx").on(table.userId)
+]);

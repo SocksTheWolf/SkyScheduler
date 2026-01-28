@@ -11,6 +11,9 @@ import {
   updatePostForGivenUser,
 } from './dbQuery';
 import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
+import { getAllAbandonedMedia } from './dbQueryFile';
+import { Context } from 'hono';
+import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, isQueued: boolean = false) => {
   const madePost = await makePost(runtime, postData, isQueued);
@@ -86,5 +89,18 @@ export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
   if (!isEmpty(removedIds)) {
     const deletedItems: number = await deletePosts(env, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
+  }
+
+  const runtimeWrapper: ScheduledContext = {
+    executionCtx: ctx,
+    env: env
+  };
+  await cleanupAbandonedFiles(runtimeWrapper);
+};
+
+export const cleanupAbandonedFiles = async(c: Context|ScheduledContext) => {
+  const abandonedFiles: string[] = await getAllAbandonedMedia(c.env);
+  if (!isEmpty(abandonedFiles)) {
+    await deleteFromR2(c, abandonedFiles);
   }
 };

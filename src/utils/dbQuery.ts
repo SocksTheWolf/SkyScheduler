@@ -11,22 +11,23 @@ import has from "just-has";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
-import { posts, reposts, violations } from "../db/app.schema";
+import { mediaFiles, posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
 import {
+  BatchQuery,
   Bindings, BskyAPILoginCreds, CreatePostQueryResponse,
+  EmbedDataType,
   GetAllPostedBatch, LooseObj, PlatformLoginResponse,
-  Post, PostLabel, Repost, ScheduledContext, Violation
+  Post, PostLabel, R2BucketObject, Repost, ScheduledContext, Violation
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import {
   createLoginCredsObj, createPostObject, createRepostObject,
   floorCurrentTime, floorGivenTime
 } from "./helpers";
-import { deleteEmbedsFromR2 } from "./r2Query";
-
-type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
+import { deleteEmbedsFromR2, getAllFilesList } from "./r2Query";
+import { addFileListing } from "./dbQueryFile";
 
 export const doesUserExist = async (c: Context, username: string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -75,7 +76,9 @@ export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<
   let messyArray: string[][] = [];
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;
-    messyArray.push(postMedia.map(media => media.content));
+    messyArray.push(postMedia
+      .filter(media => media.type == EmbedDataType.Image || media.type == EmbedDataType.Video)
+      .map(media => media.content));
   });
   return flatten(messyArray);
 };
@@ -185,6 +188,16 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
         userId: userId
     })
   ];
+
+  if (!isEmpty(embeds)) {
+    // Loop through all data within an embed blob so we can mark it as posted
+    for (const embed of embeds!) {
+      if (embed.type === EmbedDataType.Image || embed.type === EmbedDataType.Video) {
+        dbOperations.push(
+          db.update(mediaFiles).set({hasPost: true}).where(eq(mediaFiles.fileName, embed.content)));
+      }
+    }
+  }
 
   // Add repost data to the table
   if (repostData) {
@@ -501,4 +514,24 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
 
   // push timestamps
   await db.update(posts).set({updatedAt: sql`CURRENT_TIMESTAMP`}).where(isNull(posts.updatedAt));
+
+  // populate existing media table with post data
+  const allBucketFiles:R2BucketObject[] = await getAllFilesList(env);
+  try {
+    for (const bucketFile of allBucketFiles) {
+      await addFileListing(env, bucketFile.name, bucketFile.user, bucketFile.date);
+    }
+  } catch(err) {
+    console.error(`Adding file listings got error ${err}`);
+  }
+
+  let batchedMediaQuery:BatchItem<"sqlite">[] = []; 
+  // Flag if the media file has embed data
+  const allUsers = await db.select({id: users.id}).from(users).all();
+  for (const user of allUsers) {
+    const userMedia = await getAllMediaOfUser(env, user.id);
+    batchedMediaQuery.push(db.update(mediaFiles).set({hasPost: true})
+      .where(inArray(mediaFiles.fileName, flatten(userMedia))));
+  }
+  await db.batch(batchedMediaQuery as BatchQuery);
 };

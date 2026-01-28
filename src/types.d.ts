@@ -1,4 +1,5 @@
 import { ExecutionContext } from "hono";
+import { BatchItem } from "drizzle-orm/batch";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -192,3 +193,11 @@ export type GetAllPostedBatch = {
   id: string; 
   uri: string|null;
 };
+
+export type R2BucketObject = {
+  name: string;
+  user: string|null;
+  date: Date
+}
+
+export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
