@@ -124,7 +124,7 @@ app.get("/abandoned", authAdminOnlyMiddleware, async (c) => {
   for (const file of abandonedFiles) {
     returnHTML += `${file}\n`;
   }
-  //await cleanupAbandonedFiles(c);
+  await cleanupAbandonedFiles(c);
   return c.text(returnHTML);
 });
 
