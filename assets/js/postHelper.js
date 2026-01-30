@@ -647,9 +647,11 @@ function runPageReactors() {
     // push a minimum date to make it easier (less chance of typing 2025 by accident)
     dateScheduler.setAttribute("min", convertTimeValueLocally(Date.now()));
 
-    scheduledPostNowBox.addEventListener('click', (e) => {
-      setElementRequired(dateScheduler, !e.target.checked);
-    });
+    if (scheduledPostNowBox) {
+      scheduledPostNowBox.addEventListener('click', (e) => {
+        setElementRequired(dateScheduler, !e.target.checked);
+      });
+    }
   });
 
   // Handle character counting

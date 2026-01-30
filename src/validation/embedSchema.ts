@@ -3,7 +3,7 @@ import * as z from "zod/v4";
 import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits.d";
 import { EmbedDataType } from "../types.d";
 import { FileContentSchema } from "./mediaSchema";
-import { postRecordURI } from "./regexCases";
+import { atpRecordURI } from "./regexCases";
 import { AltTextSchema } from "./sharedValidations";
 
 export const ImageEmbedSchema = z.object({
@@ -66,7 +66,7 @@ export const PostRecordSchema = z.object({
     error: "post/feed/list record url is invalid"
   }).trim()
     .toLowerCase()
-    .regex(postRecordURI, "url is not a post/feed/list record")
+    .regex(atpRecordURI, "url is not a post/feed/list record")
     .nonoptional("post/feed/list records require a url"),
   type: z.literal(EmbedDataType.Record),
 });

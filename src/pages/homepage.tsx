@@ -30,7 +30,7 @@ export default function Home() {
             </center>
             <h6 class="inline-header">Features:</h6>
             <ul>
-              <li>Handles multiple users/accounts easily, supports custom PDS instances</li>
+              <li>Handles multiple users/accounts easily, supports most PDS instances</li>
               <li>Schedule your posts any time in the future (to the nearest hour)</li>
               <li>Supports embeds, quote posts, links, tagging, mentions</li>
               <li>Post <span data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with content labels and full support for alt text</li>

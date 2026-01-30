@@ -4,11 +4,12 @@ import { DependencyTags } from "../layout/depTags";
 import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
+import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
-import { appScriptStrs, postHelperScriptStr } from "../utils/appScripts";
+import { appScriptStrs, postHelperScriptStr, repostHelperScriptStr } from "../utils/appScripts";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -68,12 +69,22 @@ export default function Dashboard(props:any) {
           </article>
         </section>
         <div class="col-9">
-          <AltTextDialog />
           <ViolationNoticeBar ctx={ctx} />
-          <PostCreation />
+          <div role="tablist">
+            <button id="tabone" role="tab" aria-selected="true" aria-controls="postTab">New Post</button>
+            <div id="postTab" role="tabpanel" aria-labelledby="tabone" >
+              <PostCreation />
+            </div>
+            <button id="tabtwo" role="tab" aria-controls="repostTab">New Retweet</button>
+            <div id="repostTab" role="tabpanel" aria-labelledby="tabtwo" hidden>
+              <MakeRetweet />
+            </div>
+          </div>
         </div>
       </div>
+      <AltTextDialog />
       <script type="text/javascript" src={postHelperScriptStr}></script>
+      <script type="text/javascript" src={repostHelperScriptStr}></script>
       <Settings />
     </BaseLayout>
   );

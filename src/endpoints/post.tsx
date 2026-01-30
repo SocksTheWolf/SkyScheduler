@@ -7,10 +7,13 @@ import { PostEdit } from "../layout/editPost";
 import { ScheduledPost, ScheduledPostList } from "../layout/postList";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
-import { Bindings, CreatePostQueryResponse, EmbedDataType, LooseObj, Post } from "../types.d";
+import {
+  Bindings, CreateObjectResponse, CreatePostQueryResponse,
+  EmbedDataType, LooseObj, Post
+} from "../types.d";
 import { makePost } from "../utils/bskyApi";
 import {
-  createPost, deletePost, getPostById, getPostByIdWithReposts, getUsernameForUser,
+  createPost, createRepost, deletePost, getPostById, getPostByIdWithReposts, getUsernameForUser,
   updatePostForUser
 } from "../utils/dbQuery";
 import { enqueuePost, isQueueEnabled, shouldPostNowQueue } from "../utils/queuePublisher";
@@ -72,6 +75,16 @@ post.post("/create", authMiddleware, async (c: Context) => {
     }
   }
   return c.json({ message: "Post scheduled successfully!" });
+});
+
+// Create repost
+post.post("/create/repost", authMiddleware, async (c: Context) => {
+  const body = await c.req.json();
+  const response: CreateObjectResponse = await createRepost(c, body);
+  if (!response.ok) {
+    return c.json({message: response.msg}, 400);
+  }
+  return c.json({ message: "Repost scheduled successfully!"});
 });
 
 // Get all posts

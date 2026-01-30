@@ -16,7 +16,7 @@ import { accounts, users } from "../db/auth.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
 import {
   BatchQuery,
-  Bindings, BskyAPILoginCreds, CreatePostQueryResponse,
+  Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,
   EmbedDataType,
   GetAllPostedBatch, LooseObj, PlatformLoginResponse,
   Post, PostLabel, R2BucketObject, Repost, ScheduledContext, Violation
@@ -28,6 +28,7 @@ import {
 } from "./helpers";
 import { deleteEmbedsFromR2, getAllFilesList } from "./r2Query";
 import { addFileListing } from "./dbQueryFile";
+import { RepostSchema } from "../validation/repostSchema";
 
 export const doesUserExist = async (c: Context, username: string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -212,7 +213,68 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   // Batch the query
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
-  return { ok: success, postNow: makePostNow, postId: postUUID, msg: "success" };
+  return { ok: success, postNow: makePostNow, postId: postUUID, msg: success ? "success" : "fail" };
+};
+
+export const createRepost = async (c: Context, body: any): Promise<CreateObjectResponse> => {
+  const db: DrizzleD1Database = drizzle(c.env.DB);
+
+  const userId = c.get("userId");
+  if (!userId)
+    return { ok: false, msg: "Your user session has expired, please login again"};
+
+  const validation = RepostSchema.safeParse(body);
+  if (!validation.success) {
+    return { ok: false, msg: validation.error.toString() };
+  }
+  const { url, uri, cid, scheduledDate, repostData } = validation.data;
+  const scheduleDate = floorGivenTime(new Date(scheduledDate));
+  const timeNow = new Date();
+  // Ensure scheduled date is in the future
+  if (!isAfter(scheduleDate, timeNow)) {
+    return { ok: false, msg: "Scheduled date must be in the future" };
+  }
+
+  // Check if account is in violation
+  const hasViolations = await getViolationsForUser(db, userId);
+  if (hasViolations.success) {
+    if (!isEmpty(hasViolations.results)) {
+      const violationData: Violation = (hasViolations.results[0] as Violation);
+      if (violationData.tosViolation) {
+        return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+      } else if (violationData.userPassInvalid) {
+        return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
+      }
+    }
+  }
+
+  // Create the posts
+  const postUUID = uuidv4();
+  let dbOperations: BatchItem<"sqlite">[] = [
+    db.insert(posts).values({
+        content: url,
+        uuid: postUUID,
+        cid: cid,
+        uri: uri,
+        posted: true,
+        isRepost: true,
+        scheduledDate: scheduleDate,
+        userId: userId
+    })
+  ];
+  
+  if (repostData) {
+    for (var i = 0; i <= repostData.times; ++i) {
+      dbOperations.push(db.insert(reposts).values({
+        uuid: postUUID,
+        scheduledDate: addHours(scheduleDate, i*repostData.hours)
+      }));
+    }
+  }
+
+  const batchResponse = await db.batch(dbOperations as BatchQuery);
+  const success = batchResponse.every((el) => el.success);
+  return { ok: success, msg: success ? "success" : "fail" };
 };
 
 export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> => {

@@ -11,6 +11,10 @@
   padding-bottom: 0.5rem;
 }
 
+.postItemHeader {
+  min-height: 50px;
+}
+
 .retweetScheduleSimple {
   select {
     width: 10%;

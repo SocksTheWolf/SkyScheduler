@@ -17,6 +17,7 @@
     "migrate:remote": "npm run migrate:prod",
     "migrate:optimize": "npm run migrate:prod:pragma && npm run migrate:local:pragma",
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
+    "minify:repost": "minify assets/js/repostHelper.js > assets/js/repostHelper.min.js",
     "minify:post": "minify assets/js/postHelper.js > assets/js/postHelper.min.js",
     "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
     "minify:settings": "minify assets/js/settings.js > assets/js/settings.min.js",

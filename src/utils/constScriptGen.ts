@@ -11,8 +11,9 @@ import {
   R2_FILE_SIZE_LIMIT
 } from "../limits.d";
 import { PreloadRules } from "../types.d";
+import { postRecordURI } from "../validation/regexCases";
 
-const CONST_SCRIPT_VERSION: number = 6;
+const CONST_SCRIPT_VERSION: number = 7;
 
 const makeFileTypeStr = (typeMap: string[]) => {
   return typeMap.map((type) => `"${type}"`).join()
@@ -34,5 +35,6 @@ const MAX_AUTO_COMPLETE_NAMES=${BSKY_NAME_LOOKUP_LIMIT};
 const MIN_CHAR_AUTO_COMPLETE_NAMES=${BSKY_NAME_TYPE_AHEAD_CHARS};
 const FILE_DROP_MAX_SIZE=${R2_FILE_SIZE_LIMIT};
 const FILE_DROP_MAX_THUMB_SIZE=${MAX_THUMBNAIL_SIZE};
-const FILE_DROP_MAX_FILES=${MAX_EMBEDS_PER_POST};`;
+const FILE_DROP_MAX_FILES=${MAX_EMBEDS_PER_POST};
+const ATPROTO_RECORD_REGEX=${postRecordURI};`;
 }

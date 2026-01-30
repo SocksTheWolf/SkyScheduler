@@ -13,6 +13,7 @@ export const posts = sqliteTable('posts', {
   embedContent: text('embedContent', {mode: 'json'}).notNull().$type<EmbedData[]>().default(sql`(json_array())`),
   uri: text('uri'),
   cid: text('cid'),
+  isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`CURRENT_TIMESTAMP`)

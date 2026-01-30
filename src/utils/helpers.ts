@@ -17,6 +17,9 @@ export function createPostObject(data: any) {
   if (data.scheduledDate)
     postData.scheduledDate = data.scheduledDate;
 
+  if (data.isRepost)
+    postData.isRepost = data.isRepost;
+
   // ATProto data
   if (data.uri)
     postData.uri = data.uri;

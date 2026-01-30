@@ -93,6 +93,7 @@ export type Post = {
   label: PostLabel;
   postNow: boolean;
   posted?: boolean;
+  isRepost?: boolean;
   scheduledDate?: string;
   repostCount?: number;
   cid?: string;
@@ -175,9 +176,12 @@ export type BskyRecordWrapper = {
   uri?: string;
 };
 
-export type CreatePostQueryResponse = {
+export type CreateObjectResponse = {
   ok: boolean;
   msg: string;
+};
+
+export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
   postId?: string;
 };

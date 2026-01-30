@@ -10,7 +10,7 @@ import {
   LooseObj, PlatformLoginResponse, Post, PostLabel,
   PostResponseObject, Repost, ScheduledContext
 } from '../types.d';
-import { postRecordURI } from '../validation/regexCases';
+import { atpRecordURI } from '../validation/regexCases';
 import {
   createViolationForUser, getBskyUserPassForId,
   isPostAlreadyPosted, setPostNowOffForPost, updatePostData
@@ -302,7 +302,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
             continue;
           }
 
-          const {account, type, postid} = postRecordURI.exec(currentEmbed.content)?.groups as {account?: string, type?: string, postid?: string};
+          const {account, type, postid} = atpRecordURI.exec(currentEmbed.content)?.groups as {account?: string, type?: string, postid?: string};
           if (account === undefined || type === undefined || postid === undefined) {
             console.error(`Unable to get account, type or post id from ${currentEmbed.content}`);
             // Change the record back.
