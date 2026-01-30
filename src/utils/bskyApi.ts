@@ -145,10 +145,10 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost) =
 
   try {
     await agent.deleteRepost(content.uri);
-  } catch(err) {
+  } catch {
     // This probably should not be a warning, and should silently fail.
     // the only thing that actually matters is the object below.
-    console.warn(`failed to unrepost post ${content.uri} with err ${err}`);
+    //console.warn(`failed to unrepost post ${content.uri} with err ${err}`);
   }
   
   try {
