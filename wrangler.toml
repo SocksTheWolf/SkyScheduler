@@ -84,3 +84,5 @@ REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://
 
 # set this to true in your .dev.vars to turn off turnstile
 IN_DEV=false
+
+PRUNE_R2=false

@@ -90,17 +90,17 @@ export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
     const deletedItems: number = await deletePosts(env, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
+  if (env.PRUNE_R2 === true)
+    await cleanupAbandonedFiles(env, ctx);
+};
 
+export const cleanupAbandonedFiles = async(env: Bindings, ctx: ExecutionContext) => {
+  const abandonedFiles: string[] = await getAllAbandonedMedia(env);
   const runtimeWrapper: ScheduledContext = {
     executionCtx: ctx,
     env: env
   };
-  await cleanupAbandonedFiles(runtimeWrapper);
-};
-
-export const cleanupAbandonedFiles = async(c: Context|ScheduledContext) => {
-  const abandonedFiles: string[] = await getAllAbandonedMedia(c.env);
   if (!isEmpty(abandonedFiles)) {
-    await deleteFromR2(c, abandonedFiles);
+    await deleteFromR2(runtimeWrapper, abandonedFiles);
   }
 };

@@ -2,7 +2,7 @@ import { MAX_ALT_TEXT } from "../limits.d";
 
 export function AltTextDialog() {
   return (
-    <dialog id="altTextDialog">
+    <dialog id="altTextDialog" class="modal-lg">
       <article>
         <header><h3>Add Alt Text</h3></header>
         <section>

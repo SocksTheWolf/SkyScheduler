@@ -50,6 +50,7 @@ export interface Bindings {
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
   IN_DEV: boolean;
+  PRUNE_R2: boolean;
   REDIRECTS: RedirectConfigSettings;
 };
 
