@@ -1,12 +1,15 @@
+import isEmpty from "just-is-empty";
 import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits.d";
 
 type RetweetOptionsProps = {
   id: string,
   checked?: boolean;
   hidden?: boolean;
+  timeString?: string;
 };
 
 export function RetweetOptions(props: RetweetOptionsProps) {
+  const repostedFrom = !isEmpty(props.timeString) ? props.timeString : "the post time";
   return (
     <section class="retweetOptions">
       <input class="autoRetweetBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
@@ -25,7 +28,7 @@ export function RetweetOptions(props: RetweetOptionsProps) {
               if (i == 0) return;
               return (<option value={i}>{i}</option>);
             })}
-          </select> times from the post time.
+          </select> times from {repostedFrom}.
       </center>
     </section>
   );

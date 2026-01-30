@@ -109,7 +109,7 @@ export function PostCreation() {
           </details>
           <details open>
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
-            <ScheduleOptions timeID="scheduledDate" checkboxID="postNow" />
+            <ScheduleOptions timeID="scheduledDate" checkboxID="postNow" type="post" />
           </details>
 
           <details>
