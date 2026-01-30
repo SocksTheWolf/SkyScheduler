@@ -635,18 +635,21 @@ function runPageReactors() {
   });
 
   // find the post time scheduler object
-  if (scheduledDate) {
+  document.querySelectorAll(".scheduledDateBlock").forEach(el => {
+    const dateScheduler = el.querySelector(".timeSelector");
+    const scheduledPostNowBox = el.querySelector(".postNow");
+
     // rounddown minutes
-    scheduledDate.addEventListener('change', (e) => {
-      scheduledDate.value = convertTimeValueLocally(scheduledDate.value);
+    dateScheduler.addEventListener('change', () => {
+      dateScheduler.value = convertTimeValueLocally(dateScheduler.value);
     });
 
     // push a minimum date to make it easier (less chance of typing 2025 by accident)
-    scheduledDate.setAttribute("min", convertTimeValueLocally(Date.now()));
-  }
+    dateScheduler.setAttribute("min", convertTimeValueLocally(Date.now()));
 
-  postNowCheckbox.addEventListener('click', (e) => {
-    setElementRequired(scheduledDate, !postNowCheckbox.checked);
+    scheduledPostNowBox.addEventListener('click', (e) => {
+      setElementRequired(dateScheduler, !e.target.checked);
+    });
   });
 
   // Handle character counting

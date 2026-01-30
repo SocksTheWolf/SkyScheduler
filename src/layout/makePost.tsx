@@ -13,6 +13,7 @@ import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { DependencyTags } from "./depTags";
 import { RetweetOptions } from "./retweetOptions";
+import { ScheduleOptions } from "./scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
@@ -108,18 +109,7 @@ export function PostCreation() {
           </details>
           <details open>
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
-            <section>
-              <article>
-                <input type="datetime-local" id="scheduledDate" placeholder="" required />
-                <small>Time is based on your device's current timezone and is automatically converted for you.</small>
-                <input type="checkbox" id="postNow" /> <label class="noselect" for="postNow">Make Post Now?</label>
-                <footer>
-                  <small>
-                    <i>You can schedule posts in the future, hourly. Time is rounded down to the nearest hour.</i>
-                  </small>
-                </footer>
-              </article>
-            </section>
+            <ScheduleOptions timeID="scheduledDate" checkboxID="postNow" />
           </details>
 
           <details>
