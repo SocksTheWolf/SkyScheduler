@@ -6,15 +6,14 @@ import {
   CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
   MAX_LENGTH,
-  MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS,
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits.d";
 import { PreloadRules } from "../types.d";
-import { ConstScriptPreload } from "../utils/constScriptGen";
 import { postHelperScriptStr } from "../utils/appScripts";
+import { ConstScriptPreload } from "../utils/constScriptGen";
 import { DependencyTags } from "./depTags";
-import { postRecordURI } from "../validation/regexCases";
+import { RetweetOptions } from "./retweetOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
@@ -31,16 +30,17 @@ export function PostCreation() {
   <section>
     <DependencyTags scripts={PreloadPostCreation} />
     <article>
-      <form id="postForm">
+      <form id="postForm" novalidate>
         <header>
           <h4>Schedule New Post</h4>
         </header>
         <div>
           <article>
-            <header><label for="content">Post Content</label></header>
-            <section>
-              <textarea id="content" rows={8} placeholder="Post text here" required></textarea>
-              <small>Character Count: <span id="count">0/{MAX_LENGTH}</span></small>
+            <header>Text</header>
+            <section role="form">
+              <textarea id="content" rows={8} placeholder="Post Content" required aria-labelledby="post-content-label"></textarea>
+              <label id="post-content-label" for="content">Post Content</label>
+              <small class="smallLabel">Character Count: <span id="count">0/{MAX_LENGTH}</span></small>
             </section>
           </article>
 
@@ -127,25 +127,7 @@ export function PostCreation() {
 
           <details>
             <summary role="button" title="click to toggle section" class="secondary outline">Auto-Retweet</summary>
-            <section>
-            <input type="checkbox" id="makeReposts" /> Should Auto-Retweet? 
-            <center id="repostScheduleSimple">
-                Automatically retweet this content every 
-                <select id="hoursInterval" disabled>
-                  {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
-                    if (i == 0) return;
-                    const dayStr = i % 24 === 0 ? ` (${i/24} day)` : '';
-                    return (<option value={i}>{i}{dayStr}</option>);
-                  })}
-                </select> hours 
-                <select id="timesInterval" disabled>
-                  {[...Array(MAX_REPOST_INTERVAL_LIMIT)].map((x, i) => {
-                    if (i == 0) return;
-                    return (<option value={i}>{i}</option>);
-                  })}
-                </select> times from the post time.
-            </center>
-          </section>
+            <RetweetOptions id="makeReposts" />
           </details>
         </div>
         <footer>

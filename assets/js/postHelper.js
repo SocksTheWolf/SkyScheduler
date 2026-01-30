@@ -71,7 +71,7 @@ document.addEventListener("resetPost", () => {
   setElementVisible(imageAttachmentSection, true);
   setElementVisible(linkAttachmentSection, true);
   showContentLabeler(false);
-  setSelectDisable(true);
+  setSelectDisable(repostCheckbox.parentElement, true);
   setElementRequired(scheduledDate, true);
   showPostProgress(false);
   clearOnUnloadBlocker();
@@ -328,9 +328,10 @@ postForm.addEventListener('submit', async (e) => {
 
     // Add repost data if we should be making reposts
     if (repostCheckbox.checked) {
+      const repostValues = repostCheckbox.parentElement.querySelectorAll("select");
       postObject.repostData = {
-        hours: document.getElementById("hoursInterval").value,
-        times: document.getElementById("timesInterval").value
+        hours: repostValues[0].value,
+        times: repostValues[1].value
       };
     }
 
@@ -429,16 +430,18 @@ if (scheduledDate) {
   scheduledDate.setAttribute("min", convertTimeValueLocally(Date.now()));
 }
 
-repostCheckbox.addEventListener('click', (e) => {
-  setSelectDisable(!repostCheckbox.checked);
+document.querySelectorAll(".retweetOptions input").forEach(el => {
+  el.addEventListener('click', (e) => {
+    setSelectDisable(e.target.parentElement, !e.target.checked);
+  });
 });
 
 postNowCheckbox.addEventListener('click', (e) => {
   setElementRequired(scheduledDate, !postNowCheckbox.checked);
 });
 
-function setSelectDisable(disable) {
-  document.querySelectorAll("select:not(#contentLabels)").forEach(
+function setSelectDisable(nodeBase, disable) {
+  nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
     (el) => setElementDisabled(el, disable));
 }
 

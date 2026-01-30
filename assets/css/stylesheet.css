@@ -7,11 +7,11 @@
 }
 
 .sidebar-block {
-  margin-top: -1.3rem;
+  margin-top: -.2rem;
   padding-bottom: 0.5rem;
 }
 
-#repostScheduleSimple {
+.retweetScheduleSimple {
   select {
     width: 10%;
     height: 50px;
@@ -68,17 +68,12 @@
   width: 100%;
 }
 
-.max-width-50 {
-  max-width: 100%;
-  grid-column: auto / span 1;
+.dashboard {
+  padding-top: 1px;
 }
 
-.max-width-50:first-child, .dashboard, .homepage {
-  padding-bottom: 0px;
-}
-
-.mainContent {
-  grid-column: auto / span 3;
+.dashboard-sidebar {
+  padding-left: 2px;
 }
 
 #posts {
@@ -141,12 +136,6 @@
   content: " | "
 }
 
-@media (min-width:320px) {
-  .max-width-50 {
-    margin-left: 20px;
-  }
-}
-
 .credits a {
   margin-left: 5px;
 }
@@ -207,6 +196,14 @@ textarea {
 
 .logout {
   color: orangered;
+}
+
+.smallLabel {
+  display: block;
+  width: 100%;
+  margin-top: calc(var(--pico-spacing) * -.75);
+  margin-bottom: var(--pico-spacing);
+  color: var(--pico-muted-color);
 }
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
