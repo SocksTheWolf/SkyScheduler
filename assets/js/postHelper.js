@@ -420,26 +420,6 @@ function convertTimeValueLocally(number) {
   return date.toISOString().slice(0,16);
 }
 
-if (scheduledDate) {
-  // rounddown minutes
-  scheduledDate.addEventListener('change', (e) => {
-    scheduledDate.value = convertTimeValueLocally(scheduledDate.value);
-  });
-
-  // push a minimum date to make it easier (less chance of typing 2025 by accident)
-  scheduledDate.setAttribute("min", convertTimeValueLocally(Date.now()));
-}
-
-document.querySelectorAll(".retweetOptions input").forEach(el => {
-  el.addEventListener('click', (e) => {
-    setSelectDisable(e.target.parentElement, !e.target.checked);
-  });
-});
-
-postNowCheckbox.addEventListener('click', (e) => {
-  setElementRequired(scheduledDate, !postNowCheckbox.checked);
-});
-
 function setSelectDisable(nodeBase, disable) {
   nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
     (el) => setElementDisabled(el, disable));
@@ -644,11 +624,41 @@ document.addEventListener("scrollListTop", function() {
   }
 });
 
-// Handle character counting
-addCounter("content", "count", MAX_LENGTH);
-addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
-// Add mentions
-tributeToElement(content);
-document.dispatchEvent(new Event("timeSidebar"));
-document.dispatchEvent(new Event("resetPost"));
-document.addEventListener("DOMContentLoaded", () => { new PicoTabs('[role="tablist"]');});
+function runPageReactors() {
+  document.querySelectorAll(".autoRetweetBox").forEach(el => {
+    el.addEventListener('click', (e) => {
+      setSelectDisable(e.target.parentElement, !e.target.checked);
+    });
+    if (el.getAttribute("startchecked") == "true") {
+      setSelectDisable(el.parentElement, false);
+    }
+  });
+
+  // find the post time scheduler object
+  if (scheduledDate) {
+    // rounddown minutes
+    scheduledDate.addEventListener('change', (e) => {
+      scheduledDate.value = convertTimeValueLocally(scheduledDate.value);
+    });
+
+    // push a minimum date to make it easier (less chance of typing 2025 by accident)
+    scheduledDate.setAttribute("min", convertTimeValueLocally(Date.now()));
+  }
+
+  postNowCheckbox.addEventListener('click', (e) => {
+    setElementRequired(scheduledDate, !postNowCheckbox.checked);
+  });
+
+  // Handle character counting
+  addCounter("content", "count", MAX_LENGTH);
+  addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
+  // Add mentions
+  tributeToElement(content);
+  document.dispatchEvent(new Event("timeSidebar"));
+  document.dispatchEvent(new Event("resetPost"));
+}
+
+document.addEventListener("DOMContentLoaded", () => { 
+  runPageReactors();
+  new PicoTabs('[role="tablist"]');
+});

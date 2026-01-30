@@ -1,13 +1,16 @@
 import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits.d";
 
 type RetweetOptionsProps = {
-  id: string
+  id: string,
+  checked?: boolean;
+  hidden?: boolean;
 };
 
 export function RetweetOptions(props: RetweetOptionsProps) {
   return (
     <section class="retweetOptions">
-      <input type="checkbox" id={props.id} /> Should Auto-Retweet? 
+      <input class="autoRetweetBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
+      <label hidden={props.hidden} class="noselect" for={props.id}>Should Auto-Retweet?</label>
       <center class="retweetScheduleSimple">
           Automatically retweet this content every 
           <select disabled>

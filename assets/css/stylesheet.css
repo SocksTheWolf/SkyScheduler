@@ -134,6 +134,10 @@
   margin-top: unset;
 }
 
+.noselect {
+  user-select: none;
+}
+
 #deleteAccount {
   z-index: 20;
 }

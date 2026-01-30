@@ -112,7 +112,7 @@ export function PostCreation() {
               <article>
                 <input type="datetime-local" id="scheduledDate" placeholder="" required />
                 <small>Time is based on your device's current timezone and is automatically converted for you.</small>
-                <input type="checkbox" id="postNow" /> <label for="postNow">Make Post Now?</label>
+                <input type="checkbox" id="postNow" /> <label class="noselect" for="postNow">Make Post Now?</label>
                 <footer>
                   <small>
                     <i>You can schedule posts in the future, hourly. Time is rounded down to the nearest hour.</i>
