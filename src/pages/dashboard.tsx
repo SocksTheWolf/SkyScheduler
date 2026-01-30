@@ -64,7 +64,7 @@ export default function Dashboard(props:any) {
                 </button>
               </div>
               <hr />
-              <FooterCopyright inNewWindow={true} />
+              <FooterCopyright inNewWindow={true} showHomepage={true} />
             </footer>
           </article>
         </section>
