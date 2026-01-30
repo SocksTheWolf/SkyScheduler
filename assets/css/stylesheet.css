@@ -72,6 +72,10 @@
   width: 100%;
 }
 
+.w-half {
+  width: 50% !important;
+}
+
 .dashboard {
   padding-top: 1px;
 }
@@ -186,6 +190,10 @@ dialog button.btn-error {
   max-width: 25vw;
   max-height: 25vh;
   overflow: hidden;
+}
+
+[role="tablist"] {
+  display: block;
 }
 
 textarea {
