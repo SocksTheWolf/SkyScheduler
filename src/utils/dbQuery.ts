@@ -252,7 +252,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   const postUUID = uuidv4();
   let dbOperations: BatchItem<"sqlite">[] = [
     db.insert(posts).values({
-        content: url,
+        content: `Repost of ${url}`,
         uuid: postUUID,
         cid: cid,
         uri: uri,
