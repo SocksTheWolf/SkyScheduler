@@ -1,4 +1,5 @@
-const repostForm = document.getElementById("retweetForm");
+const repostForm = document.getElementById("repostForm");
+const repostRecordURL = document.getElementById("repostRecordURL");
 
 async function getAccountHandle(account) {
   const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`);
@@ -25,14 +26,14 @@ document.addEventListener("resetRepost", () => {
   repostForm.reset();
   repostForm.removeAttribute("disabled");
   showRepostProgress(false);
-  document.getElementById("retweetPostURL").value = "";
+  repostRecordURL.value = "";
 });
 
 repostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   showRepostProgress(true);
-  const scheduledDateVal = document.getElementById("retweetTime").value;
-  const postRecordVal = document.getElementById("retweetPostURL").value;
+  const scheduledDateVal = document.getElementById("repostTime").value;
+  const postRecordVal = repostRecordURL.value;
   let dateTime;
   try {
     dateTime = new Date(scheduledDateVal).toISOString();
@@ -48,9 +49,9 @@ repostForm.addEventListener('submit', async (e) => {
   };
 
   // Add repost data if we should be making reposts
-  const retweetCycleOptions = document.getElementById("makeRetweetOptions");
-  if (retweetCycleOptions.checked) {
-    const repostValues = retweetCycleOptions.parentElement.querySelectorAll("select");
+  const repostCycleOptions = document.getElementById("makeRepostOptions");
+  if (repostCycleOptions.checked) {
+    const repostValues = repostCycleOptions.parentElement.querySelectorAll("select");
     postObject.repostData = {
       hours: repostValues[0].value,
       times: repostValues[1].value
@@ -108,8 +109,8 @@ function showRepostProgress(shouldShow) {
   setElementDisabled(el, shouldShow);
   setElementDisabled(postForm, shouldShow);
   if (shouldShow) {
-    el.textContent = "Making Retweet Schedule...";
+    el.textContent = "Scheduling Reposts...";
   } else {
-    el.textContent = "Schedule Retweet";
+    el.textContent = "Schedule Repost";
   }
 }

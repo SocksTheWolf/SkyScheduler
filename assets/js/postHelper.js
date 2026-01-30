@@ -625,7 +625,7 @@ document.addEventListener("scrollListTop", function() {
 });
 
 function runPageReactors() {
-  document.querySelectorAll(".autoRetweetBox").forEach(el => {
+  document.querySelectorAll(".autoRepostBox").forEach(el => {
     el.addEventListener('click', (e) => {
       setSelectDisable(e.target.parentElement, !e.target.checked);
     });

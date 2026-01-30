@@ -26,7 +26,8 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   const hasBeenPosted: boolean = (username !== null && content.posted === true && content.uri !== undefined);
   const postURIID: string|null = content.uri ? content.uri.replace("at://","").replace("app.bsky.feed.","") : null;
 
-  const postType = content.isRepost ? "retweet" : "post";
+  const postType = content.isRepost ? "repost" : "post";
+  const postOnText = content.isRepost ? "Repost on" : "Posted on";
   const editAttributes = hasBeenPosted ? '' : raw(`title="Click to edit post content" hx-get="/post/edit/${content.postid}" 
         hx-trigger="click once" hx-target="#post${content.postid}" hx-swap="innerHTML show:#editPost${content.postid}:top"`);
   const deletePostElement = raw(`<button type="submit" hx-delete="/post/delete/${content.postid}" 
@@ -53,7 +54,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
       <small>
         ${hasBeenPosted ? 
           raw(`<a class="secondary" data-uri="${content.uri}" href="https://bsky.app/profile/${postURIID}" 
-            target="_blank" title="link to post">Posted on</a>:`) : 
+            target="_blank" title="link to post">${postOnText}</a>:`) : 
           'Scheduled for:' } 
           <span class="timestamp">${content.scheduledDate}</span>
           ${!isEmpty(content.embeds) ? ' | Embeds: ' + content.embeds?.length : ''} 
