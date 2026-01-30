@@ -19,7 +19,7 @@ export function MakeRetweet() {
         <RetweetOptions id="makeRetweetOptions" contentType="post" timeString="the time above" checkboxLabel="Should Retweet multiple times?" />
       </article>
       <footer>
-        <button id="makingRepostRequest" type="submit" class="w-full primary">Make Retweet</button>
+        <button id="makingRepostRequest" type="submit" class="w-full primary">Schedule Retweet</button>
       </footer>
     </form>
     </article>

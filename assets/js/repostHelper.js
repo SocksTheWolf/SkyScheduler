@@ -108,8 +108,8 @@ function showRepostProgress(shouldShow) {
   setElementDisabled(el, shouldShow);
   setElementDisabled(postForm, shouldShow);
   if (shouldShow) {
-    el.textContent = "Making Repost...";
+    el.textContent = "Making Retweet Schedule...";
   } else {
-    el.textContent = "Schedule Repost";
+    el.textContent = "Schedule Retweet";
   }
 }
