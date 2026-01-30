@@ -8,8 +8,7 @@ import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
-import { appScriptStrs } from "../utils/appScripts";
-import { raw } from "hono/html";
+import { appScriptStrs, postHelperScriptStr } from "../utils/appScripts";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -74,9 +73,7 @@ export default function Dashboard(props:any) {
           <PostCreation />
         </div>
       </div>
-      <script type="text/javascript">
-      {raw(`document.addEventListener("DOMContentLoaded", () => { new PicoTabs('[role="tablist"]');});`)}
-      </script>
+      <script type="text/javascript" src={postHelperScriptStr}></script>
       <Settings />
     </BaseLayout>
   );

@@ -651,3 +651,4 @@ addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
 tributeToElement(content);
 document.dispatchEvent(new Event("timeSidebar"));
 document.dispatchEvent(new Event("resetPost"));
+document.addEventListener("DOMContentLoaded", () => { new PicoTabs('[role="tablist"]');});

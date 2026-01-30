@@ -10,7 +10,6 @@ import {
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits.d";
 import { PreloadRules } from "../types.d";
-import { postHelperScriptStr } from "../utils/appScripts";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { DependencyTags } from "./depTags";
 import { RetweetOptions } from "./retweetOptions";
@@ -134,7 +133,6 @@ export function PostCreation() {
           </button>
         </footer>
       </form>
-      <script type="text/javascript" src={postHelperScriptStr}></script>
     </article>
   </section>
   );
