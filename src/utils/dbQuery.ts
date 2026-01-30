@@ -263,15 +263,21 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
     })
   ];
   
+  // Push initial repost
+  dbOperations.push(db.insert(reposts).values({
+    uuid: postUUID,
+    scheduledDate: scheduleDate
+  }));
+  
+  // Push other repost times if we have them
   if (repostData) {
-    for (var i = 0; i <= repostData.times; ++i) {
+    for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,
         scheduledDate: addHours(scheduleDate, i*repostData.hours)
       }));
     }
   }
-
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
   return { ok: success, msg: success ? "success" : "fail" };
