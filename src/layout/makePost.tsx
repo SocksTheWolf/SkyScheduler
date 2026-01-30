@@ -112,7 +112,6 @@ export function PostCreation() {
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
             <section>
               <article>
-                <header><label for="scheduledDate">Schedule Date</label></header>
                 <input type="datetime-local" id="scheduledDate" placeholder="" required />
                 <small>Time is based on your device's current timezone and is automatically converted for you.</small>
                 <input type="checkbox" id="postNow" /> <label for="postNow">Make Post Now?</label>

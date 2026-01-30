@@ -73,7 +73,13 @@
 }
 
 .dashboard-sidebar {
-  padding-left: 2px;
+  padding-left: 50px;
+}
+
+@media (max-width:1060px) {
+  .dashboard-sidebar {
+     padding-left: 0px;
+  }
 }
 
 #posts {

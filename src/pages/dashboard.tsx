@@ -9,15 +9,19 @@ import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
 import { appScriptStrs } from "../utils/appScripts";
+import { raw } from "hono/html";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
+  // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
     {href: "/dep/countable.min.js", type: "script"},
     {href: "/dep/form-json.min.js", type: "script"},
-    {href: "/dep/modal.js", type: "script"}
+    {href: "/dep/modal.js", type: "script"},
+    {href: "/dep/tabs.js", type: "script"}
   ];
 
+  // Our own homebrew js files
   const dashboardScripts: PreloadRules[] = appScriptStrs.map((itm) => {
     return {href: itm, type: "script"};
   });
@@ -26,8 +30,8 @@ export default function Dashboard(props:any) {
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
       <DependencyTags scripts={defaultDashboardPreloads} />
-      <div class="grid">
-        <section class="max-width-50">
+      <div class="row-fluid">
+        <section class="col-3 dashboard-sidebar">
           <article>
             <header>
               <h4>SkyScheduler Dashboard</h4>
@@ -64,12 +68,15 @@ export default function Dashboard(props:any) {
             </footer>
           </article>
         </section>
-        <div class="container-fluid mainContent">
+        <div class="col-9">
           <AltTextDialog />
           <ViolationNoticeBar ctx={ctx} />
           <PostCreation />
         </div>
       </div>
+      <script type="text/javascript">
+      {raw(`document.addEventListener("DOMContentLoaded", () => { new PicoTabs('[role="tablist"]');});`)}
+      </script>
       <Settings />
     </BaseLayout>
   );
