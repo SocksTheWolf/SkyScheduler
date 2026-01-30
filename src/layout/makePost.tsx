@@ -36,7 +36,6 @@ export function PostCreation() {
         </header>
         <div>
           <article>
-            <header>Text</header>
             <section role="form">
               <textarea id="content" rows={8} placeholder="Post Content" required aria-labelledby="post-content-label"></textarea>
               <label id="post-content-label" for="content">Post Content</label>
