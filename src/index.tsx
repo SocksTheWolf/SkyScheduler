@@ -124,7 +124,15 @@ app.get("/abandoned", authAdminOnlyMiddleware, async (c) => {
   for (const file of abandonedFiles) {
     returnHTML += `${file}\n`;
   }
-  await cleanupAbandonedFiles(c.env, c.executionCtx);
+  if (c.env.PRUNE_R2 == true) {
+    console.log("pruning abandoned files...");
+    await cleanupAbandonedFiles(c.env, c.executionCtx);
+  }
+
+  if (returnHTML.length == 0) {
+    returnHTML = "no files abandoned";
+  }
+
   return c.text(returnHTML);
 });
 

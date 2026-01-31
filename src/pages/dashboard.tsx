@@ -31,7 +31,7 @@ export default function Dashboard(props:any) {
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
       <DependencyTags scripts={defaultDashboardPreloads} />
       <div class="row-fluid">
-        <section class="col-3 dashboard-sidebar">
+        <section class="col-3">
           <article>
             <header>
               <h4>SkyScheduler Dashboard</h4>

@@ -80,13 +80,15 @@
   padding-top: 1px;
 }
 
-.dashboard-sidebar {
-  padding-left: 50px;
+.row-fluid {
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 @media (max-width:1060px) {
-  .dashboard-sidebar {
-     padding-left: 0px;
+  .row-fluid {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 }
 
