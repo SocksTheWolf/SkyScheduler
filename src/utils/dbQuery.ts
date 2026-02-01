@@ -1,7 +1,7 @@
 import { addHours, isAfter } from "date-fns";
 import {
   and, count, desc, eq, getTableColumns, gt, inArray,
-  isNull, lte, ne, notInArray, sql
+  isNotNull, isNull, lte, ne, notInArray, sql
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
@@ -17,18 +17,17 @@ import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
 import {
   BatchQuery,
   Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,
-  EmbedDataType,
-  GetAllPostedBatch, LooseObj, PlatformLoginResponse,
+  EmbedDataType, GetAllPostedBatch, LooseObj, PlatformLoginResponse,
   Post, PostLabel, R2BucketObject, Repost, ScheduledContext, Violation
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
+import { RepostSchema } from "../validation/repostSchema";
+import { addFileListing } from "./dbQueryFile";
 import {
   createLoginCredsObj, createPostObject, createRepostObject,
   floorCurrentTime, floorGivenTime
 } from "./helpers";
 import { deleteEmbedsFromR2, getAllFilesList } from "./r2Query";
-import { addFileListing } from "./dbQueryFile";
-import { RepostSchema } from "../validation/repostSchema";
 
 export const doesUserExist = async (c: Context, username: string) => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -230,6 +229,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   const { url, uri, cid, scheduledDate, repostData } = validation.data;
   const scheduleDate = floorGivenTime(new Date(scheduledDate));
   const timeNow = new Date();
+  
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, timeNow)) {
     return { ok: false, msg: "Scheduled date must be in the future" };
@@ -309,21 +309,27 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
       lte(posts.scheduledDate, currentTime)
     )
   ));
-  const results = await db.with(postsToMake).select().from(postsToMake).where(notInArray(postsToMake.userId, violationUsers)).all();
+  const results = await db.with(postsToMake).select().from(postsToMake)
+    .where(notInArray(postsToMake.userId, violationUsers)).all();
   return results.map((item) => createPostObject(item));
 };
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
-  // TODO: this could probably be left joined to some degree
-  // but it currently doesn't have a high read count
-  const query = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
-    .where(lte(reposts.scheduledDate, givenDate));
+  // violations filter
   const violationsQuery = db.select({data: violations.userId}).from(violations);
-  const results = await db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId })
-    .from(posts)
-    .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
+  // two subqueries to make the db queries less awful to write
+  const repostsForTime = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
+    .where(lte(reposts.scheduledDate, givenDate)).as('repostsForTime');
+  const postData = db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId}).from(posts)
+    .where(and(notInArray(posts.userId, violationsQuery), eq(posts.posted, true))).as("postData");
+
+  // This incredibly ugly query but scales much better than the original
+  const results = await db.select({uuid: postData.uuid, uri: postData.uri, cid: postData.cid, userId: postData.userId})
+    .from(repostsForTime)
+    .leftJoin(postData, eq(repostsForTime.uuid, postData.uuid))
+    .where(isNotNull(postData.cid))
     .all();
 
   return results.map((item) => createRepostObject(item));
@@ -383,6 +389,7 @@ export const getPostById = async(c: Context, id: string): Promise<Post|null> => 
   return null;
 };
 
+// used for post editing, acts very similar to getPostsForUser
 export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Post|null> => {
   const userId = c.get("userId");
   if (!userId || !uuidValid(id))
