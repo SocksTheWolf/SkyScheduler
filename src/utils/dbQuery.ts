@@ -50,9 +50,10 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     const userId = c.get("userId");
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
+      // Still probably one of the most expensive queries right now
       const results = await db.select({
-            ...getTableColumns(posts),
-            repostCount: count(reposts.uuid) 
+          ...getTableColumns(posts),
+          repostCount: count(reposts.uuid) 
         })
         .from(posts).where(eq(posts.userId, userId))
         .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
@@ -72,7 +73,9 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
 
 export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<string[]> => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  const mediaList = await db.select({embeds: posts.embedContent}).from(posts).where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
+  const mediaList = await db.select({embeds: posts.embedContent}).from(posts)
+    .where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
+  
   let messyArray: string[][] = [];
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;
@@ -179,13 +182,13 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   const postUUID = uuidv4();
   let dbOperations: BatchItem<"sqlite">[] = [
     db.insert(posts).values({
-        content,
-        uuid: postUUID,
-        postNow: makePostNow,
-        scheduledDate: scheduleDate,
-        embedContent: embeds,
-        contentLabel: label || PostLabel.None,
-        userId: userId
+      content,
+      uuid: postUUID,
+      postNow: makePostNow,
+      scheduledDate: scheduleDate,
+      embedContent: embeds,
+      contentLabel: label || PostLabel.None,
+      userId: userId
     })
   ];
 
@@ -493,7 +496,8 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promi
 export const purgePostedPosts = async (env: Bindings): Promise<number> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
-  const dbQuery = await db.selectDistinct({ data: posts.uuid }).from(posts).leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+  const dbQuery = await db.selectDistinct({ data: posts.uuid }).from(posts)
+  .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
   .where(
     and(
       and(
@@ -536,7 +540,8 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
       return false;
   }
 
-  const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate}).onConflictDoUpdate({target: violations.userId, set: valuesUpdate});
+  const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate})
+    .onConflictDoUpdate({target: violations.userId, set: valuesUpdate});
   return success;
 };
 
@@ -576,7 +581,8 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
     }).from(posts).where(eq(posts.posted, true)).as("postedQuery");
   // Then select from those posts that are too long or have too many characters
   const jsonFix = await db.select({id: postedQuery.uuid}).from(postedQuery).where(gt(postedQuery.isValidJson, 2));
-  const postTruncation = await db.select({id: postedQuery.uuid, content: postedQuery.content }).from(postedQuery).where(gt(postedQuery.contentLength, MAX_POSTED_LENGTH));
+  const postTruncation = await db.select({id: postedQuery.uuid, content: postedQuery.content })
+    .from(postedQuery).where(gt(postedQuery.contentLength, MAX_POSTED_LENGTH));
 
   // Run the invalid json fix
   if (jsonFix.length > 0) {
