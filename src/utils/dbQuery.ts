@@ -248,21 +248,31 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
     }
   }
 
-  // Create the posts
-  const postUUID = uuidv4();
-  let dbOperations: BatchItem<"sqlite">[] = [
-    db.insert(posts).values({
-        content: `Repost of ${url}`,
-        uuid: postUUID,
-        cid: cid,
-        uri: uri,
-        posted: true,
-        isRepost: true,
-        scheduledDate: scheduleDate,
-        userId: userId
-    })
-  ];
-  
+  let postUUID;
+  let dbOperations: BatchItem<"sqlite">[] = [];
+
+  // Check to see if the post already exists
+  // (check also against the userId here as well to avoid cross account data collisions)
+  const existingPost = await db.select({id: posts.uuid}).from(posts).where(and(
+    eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
+
+  if (existingPost.length > 1) {
+    postUUID = existingPost[0].id;
+  } else {
+    // Create the post base for this repost
+    postUUID = uuidv4();
+    dbOperations.push(db.insert(posts).values({
+      content: `Repost of ${url}`,
+      uuid: postUUID,
+      cid: cid,
+      uri: uri,
+      posted: true,
+      isRepost: true,
+      scheduledDate: scheduleDate,
+      userId: userId
+    }));
+  }
+
   // Push initial repost
   dbOperations.push(db.insert(reposts).values({
     uuid: postUUID,

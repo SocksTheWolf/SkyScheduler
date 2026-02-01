@@ -36,6 +36,8 @@ export const posts = sqliteTable('posts', {
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)
     .where(sql`posted = 0 and postNow <> 1`),
+  // used to lower down the amount of posts that fill up the post table
+  index("repostAddOn_idx").on(table.userId, table.cid)
 ]);
 
 export const reposts = sqliteTable('reposts', {

@@ -1,0 +1,1 @@
+CREATE INDEX `repostAddOn_idx` ON `posts` (`user`,`cid`);
