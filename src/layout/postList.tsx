@@ -45,7 +45,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   <article id="postBase${content.postid}" ${oobSwapStr}>
     <header class="postItemHeader" ${hasBeenPosted && !content.isRepost ? raw('hidden>') : raw(`>`)}
       ${!hasBeenPosted ? editPostElement : null}
-      ${!hasBeenPosted || content.isRepost ? deletePostElement : null}
+      ${!hasBeenPosted || (content.isRepost && content.repostCount! > 0) ? deletePostElement : null}
     </header>
     <div id="post${content.postid}">
       ${<PostContentObject text={content.text}/>}
