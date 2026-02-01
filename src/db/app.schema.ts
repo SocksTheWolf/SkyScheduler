@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import { EmbedData, PostLabel } from '../types.d';
 import { users } from "./auth.schema";
 
@@ -50,7 +50,8 @@ export const reposts = sqliteTable('reposts', {
   // cron queries
   index("repost_scheduledDate_idx").on(table.scheduledDate),
   // used for left joining and matching with posts field
-  index("repost_postid_idx").on(table.uuid)
+  index("repost_postid_idx").on(table.uuid),
+  unique("repost_noduplicates").on(table.uuid, table.scheduledDate),
 ]);
 
 export const violations = sqliteTable('violations', {

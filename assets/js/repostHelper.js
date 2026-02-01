@@ -2,6 +2,9 @@ const repostForm = document.getElementById("repostForm");
 const repostRecordURL = document.getElementById("repostRecordURL");
 
 async function getAccountHandle(account) {
+  if (account.match(/did\:plc\:/i)) {
+    return account;
+  }
   const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`);
   if (lookupRequest.ok) {
     const response = await lookupRequest.json();

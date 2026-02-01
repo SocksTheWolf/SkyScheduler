@@ -259,7 +259,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   const existingPost = await db.select({id: posts.uuid}).from(posts).where(and(
     eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
 
-  if (existingPost.length > 1) {
+  if (existingPost.length >= 1) {
     postUUID = existingPost[0].id;
   } else {
     // Create the post base for this repost
@@ -278,17 +278,19 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Push initial repost
   dbOperations.push(db.insert(reposts).values({
-    uuid: postUUID,
-    scheduledDate: scheduleDate
-  }));
+        uuid: postUUID,
+        scheduledDate: scheduleDate
+      })
+    .onConflictDoNothing());
   
   // Push other repost times if we have them
   if (repostData) {
     for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
-        uuid: postUUID,
-        scheduledDate: addHours(scheduleDate, i*repostData.hours)
-      }));
+          uuid: postUUID,
+          scheduledDate: addHours(scheduleDate, i*repostData.hours)
+        })
+      .onConflictDoNothing());
     }
   }
   const batchResponse = await db.batch(dbOperations as BatchQuery);
