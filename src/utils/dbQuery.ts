@@ -320,8 +320,10 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
 };
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
+  
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
+  /*
   // violations filter
   const violationsQuery = db.select({data: violations.userId}).from(violations);
   // two subqueries to make the db queries less awful to write
@@ -335,6 +337,17 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date):
     .from(repostsForTime)
     .leftJoin(postData, eq(repostsForTime.uuid, postData.uuid))
     .where(isNotNull(postData.cid))
+    .all();
+  */
+
+  // TODO: this could probably be left joined to some degree
+  // but it currently doesn't have a high read count
+  const query = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
+    .where(lte(reposts.scheduledDate, givenDate));
+  const violationsQuery = db.select({data: violations.userId}).from(violations);
+  const results = await db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId })
+    .from(posts)
+    .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
     .all();
 
   return results.map((item) => createRepostObject(item));
