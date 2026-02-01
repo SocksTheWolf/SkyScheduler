@@ -9,6 +9,15 @@ import { Bindings } from "../types";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
+function createPasswordResetMessage(url: string) {
+  return `Your SkyScheduler password reset url is: 
+${url} 
+
+This URL will expire in about an hour.
+
+If you did not request a password reset, please ignore this message.`;
+}
+
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
   // Use actual DB for runtime, empty object for CLI
@@ -61,12 +70,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
           const userName = (user as any).username;
           const bskyUserId = await lookupBskyHandle(userName);
           if (bskyUserId !== null) {
-            const response = await createDMWithUser(env!, bskyUserId, `Your SkyScheduler password reset url is: 
-${url} 
-
-This URL will expire in about an hour.
-
-If you did not request a password reset, please ignore this message.`);
+            const response = await createDMWithUser(env!, bskyUserId, createPasswordResetMessage(url));
             if (!response)
               throw new Error("FAILED_MESSAGE");
             } else {
