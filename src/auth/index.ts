@@ -44,11 +44,11 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         cf: cf || {},
         d1: env
           ? {
-                db,
-                options: {
-                    usePlural: true,
-                    debugLogs: false,
-                },
+              db,
+              options: {
+                usePlural: true,
+                debugLogs: false,
+              },
             }
           : undefined,
         kv: env?.KV,
@@ -77,6 +77,14 @@ If you did not request a password reset, please ignore this message.`);
         },
         plugins: [
           username({
+            // We validate all of our usernames ahead of time
+            // do not use the validator in betterauth but instead our own ZOD system
+            usernameValidator: (username) => {
+              return true;
+            },
+            displayUsernameValidator: (displayUsername) => {
+              return true;
+            },
             /* we do our own normalization in the zod schemas */
             usernameNormalization: false,
             displayUsernameNormalization: false,

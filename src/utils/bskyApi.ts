@@ -176,7 +176,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
   if (loginResponse != PlatformLoginResponse.Ok) {
     const addViolation: boolean = await createViolationForUser(env, content.user, loginResponse);
     if (addViolation)
-      console.error(`Unable to login to make post ${content.postid} with violation ${loginResponse}`);
+      console.error(`Unable to login to make post ${content.user} with violation ${loginResponse}`);
     return null;
   }
 

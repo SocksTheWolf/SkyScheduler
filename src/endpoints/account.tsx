@@ -166,7 +166,8 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
   }
-
+  
+  console.log(`attempting to create an account for ${username}`);
   // create the user
   const createUser = await auth.api.signUpEmail({
     body: {
