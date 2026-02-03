@@ -254,12 +254,16 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await db.select({id: posts.uuid}).from(posts).where(and(
+  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate}).from(posts).where(and(
     eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
 
   const hasExistingPost = existingPost.length >= 1;
   if (hasExistingPost) {
     postUUID = existingPost[0].id;
+    // Ensure the date asked for is after what the post's schedule date is
+    if (!isAfter(scheduleDate, existingPost[0].date)) {
+      return { ok: false, msg: "Scheduled date must be after the initial post's date" };
+    }
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
