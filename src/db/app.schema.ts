@@ -51,7 +51,7 @@ export const reposts = sqliteTable('reposts', {
   index("repost_scheduledDate_idx").on(table.scheduledDate),
   // used for left joining and matching with posts field
   index("repost_postid_idx").on(table.uuid),
-  unique("repost_noduplicates").on(table.uuid, table.scheduledDate),
+  unique("repost_noduplicates_idx").on(table.uuid, table.scheduledDate),
 ]);
 
 export const violations = sqliteTable('violations', {

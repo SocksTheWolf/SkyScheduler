@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `repost_noduplicates_idx` ON `reposts` (`post_uuid`,`scheduled_date`);

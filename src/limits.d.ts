@@ -24,6 +24,10 @@ export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 // generation is done on client side using canvas elements.
 export const MAX_THUMBNAIL_SIZE: number = 15;
 
+// the maximum amount of repost posts an account can have at any one time.
+// because some people went incredibly overboard.
+export const MAX_REPOST_POSTS: number = 20;
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

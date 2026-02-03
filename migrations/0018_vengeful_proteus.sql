@@ -1,0 +1,1 @@
+DROP INDEX `repost_noduplicates`;

@@ -13,7 +13,7 @@ import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../limits.d";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, MAX_REPOST_POSTS } from "../limits.d";
 import {
   BatchQuery,
   Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,
@@ -50,14 +50,12 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     const userId = c.get("userId");
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
-      // Still probably one of the most expensive queries right now
+      // this query does run hot
       const results = await db.select({
           ...getTableColumns(posts),
-          repostCount: count(reposts.uuid) 
+          repostCount: db.$count(reposts, eq(posts.uuid, reposts.uuid))
         })
         .from(posts).where(eq(posts.userId, userId))
-        .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
-        .groupBy(posts.uuid)
         .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
       
       if (isEmpty(results))
@@ -250,7 +248,6 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
       }
     }
   }
-
   let postUUID;
   let dbOperations: BatchItem<"sqlite">[] = [];
 
@@ -262,6 +259,12 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   if (existingPost.length >= 1) {
     postUUID = existingPost[0].id;
   } else {
+    // Limit of post reposts on the user's account.
+    const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
+    if (accountCurrentReposts >= MAX_REPOST_POSTS) {
+      return {ok: false, msg: `You've hit a limit of the maximum repost posts (${accountCurrentReposts}/${MAX_REPOST_POSTS}) and cannot add more at this time.`};
+    }
+
     // Create the post base for this repost
     postUUID = uuidv4();
     dbOperations.push(db.insert(posts).values({
@@ -320,29 +323,9 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
 };
 
 export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
-  
   // Get all scheduled posts for the given time
   const db: DrizzleD1Database = drizzle(env.DB);
-  /*
-  // violations filter
-  const violationsQuery = db.select({data: violations.userId}).from(violations);
-  // two subqueries to make the db queries less awful to write
-  const repostsForTime = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
-    .where(lte(reposts.scheduledDate, givenDate)).as('repostsForTime');
-  const postData = db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId}).from(posts)
-    .where(and(notInArray(posts.userId, violationsQuery), eq(posts.posted, true))).as("postData");
-
-  // This incredibly ugly query but scales much better than the original
-  const results = await db.select({uuid: postData.uuid, uri: postData.uri, cid: postData.cid, userId: postData.userId})
-    .from(repostsForTime)
-    .leftJoin(postData, eq(repostsForTime.uuid, postData.uuid))
-    .where(isNotNull(postData.cid))
-    .all();
-  */
-
-  // TODO: this could probably be left joined to some degree
-  // but it currently doesn't have a high read count
-  const query = db.selectDistinct({uuid: reposts.uuid}).from(reposts)
+  const query = db.select({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
   const results = await db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId })
@@ -417,11 +400,10 @@ export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Pos
   const db: DrizzleD1Database = drizzle(env.DB);
   const result = await db.select({
       ...getTableColumns(posts),
-      repostCount: count(reposts.uuid) 
+      repostCount: db.$count(reposts, eq(reposts.uuid, posts.uuid)) 
     }).from(posts)
     .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
-    .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
-    .groupBy(posts.uuid).limit(1).all();
+    .limit(1).all();
 
   if (!isEmpty(result))
     return createPostObject(result[0]);
