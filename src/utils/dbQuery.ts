@@ -267,7 +267,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
-    if (accountCurrentReposts >= MAX_REPOST_POSTS) {
+    if (MAX_REPOST_POSTS > 0 && accountCurrentReposts >= MAX_REPOST_POSTS) {
       return {ok: false, msg: 
         `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS})`};
     }
