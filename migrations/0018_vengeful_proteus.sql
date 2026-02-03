@@ -1,1 +1,1 @@
-DROP INDEX `repost_noduplicates`;
+DROP INDEX IF EXISTS `repost_noduplicates`;

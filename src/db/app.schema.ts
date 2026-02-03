@@ -54,6 +54,13 @@ export const reposts = sqliteTable('reposts', {
   unique("repost_noduplicates_idx").on(table.uuid, table.scheduledDate),
 ]);
 
+export const repostCounts = sqliteTable('repostCounts', {
+  uuid: text('post_uuid')
+    .notNull()
+    .references(() => posts.uuid, {onDelete: "cascade"}).primaryKey(),
+  count: integer('count').default(0).notNull()
+});
+
 export const violations = sqliteTable('violations', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   userId: text("user")

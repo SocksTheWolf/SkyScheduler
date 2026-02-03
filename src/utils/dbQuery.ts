@@ -1,7 +1,8 @@
 import { addHours, isAfter } from "date-fns";
 import {
-  and, count, desc, eq, getTableColumns, gt, inArray,
-  isNotNull, isNull, lte, ne, notInArray, sql
+  and,
+  desc, eq, getTableColumns, gt, inArray,
+  isNull, lte, ne, notInArray, sql
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
@@ -11,7 +12,7 @@ import has from "just-has";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
-import { mediaFiles, posts, reposts, violations } from "../db/app.schema";
+import { mediaFiles, posts, repostCounts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, MAX_REPOST_POSTS } from "../limits.d";
 import {
@@ -51,11 +52,9 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
       // this query does run hot
-      const results = await db.select({
-          ...getTableColumns(posts),
-          repostCount: db.$count(reposts, eq(posts.uuid, reposts.uuid))
-        })
+      const results = await db.select({...getTableColumns(posts), repostCount: repostCounts.count})
         .from(posts).where(eq(posts.userId, userId))
+        .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
         .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
       
       if (isEmpty(results))
@@ -125,7 +124,6 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
 export const deletePost = async (c: Context, id: string): Promise<boolean> => {
   const userId = c.get("userId");
   if (!userId) {
-    console.log("no user data");
     return false;
   }
 
@@ -208,6 +206,9 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
         scheduledDate: addHours(scheduleDate, i*repostData.hours)
       }));
     }
+    // Push the repost counts in
+    dbOperations.push(db.insert(repostCounts)
+      .values({uuid: postUUID, count: repostData.times}));
   }
 
   // Batch the query
@@ -256,13 +257,15 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   const existingPost = await db.select({id: posts.uuid}).from(posts).where(and(
     eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
 
-  if (existingPost.length >= 1) {
+  const hasExistingPost = existingPost.length >= 1;
+  if (hasExistingPost) {
     postUUID = existingPost[0].id;
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
     if (accountCurrentReposts >= MAX_REPOST_POSTS) {
-      return {ok: false, msg: `You've hit a limit of the maximum repost posts (${accountCurrentReposts}/${MAX_REPOST_POSTS}) and cannot add more at this time.`};
+      return {ok: false, msg: 
+        `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS})`};
     }
 
     // Create the post base for this repost
@@ -280,6 +283,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   }
 
   // Push initial repost
+  let totalRepostCount = 1;
   dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,
         scheduledDate: scheduleDate
@@ -295,7 +299,18 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
         })
       .onConflictDoNothing());
     }
+    totalRepostCount += repostData.times;
   }
+  // Update repost counts
+  if (hasExistingPost) {
+    const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
+    dbOperations.push(db.update(repostCounts)
+    .set({count: newCount})
+    .where(eq(repostCounts.uuid, postUUID)));
+  }
+  else
+    dbOperations.push(db.insert(repostCounts).values({uuid: postUUID, count: totalRepostCount}));
+
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
   return { ok: success, msg: success ? "success" : "fail" };
@@ -343,7 +358,19 @@ export const getAllRepostsForCurrentTime = async (env: Bindings): Promise<Repost
 export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime = floorCurrentTime();
-  await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime));
+  const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime)).returning({id: reposts.uuid});
+  
+  // This is really stupid and I hate it, but someone has to update repost counts once posted
+  if (deletedPosts.length > 0) {
+    let batchedQueries:BatchItem<"sqlite">[] = []; 
+    for (const deleted of deletedPosts) {
+      const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
+      batchedQueries.push(db.update(repostCounts)
+    .set({count: newCount})
+    .where(eq(repostCounts.uuid, deleted.id)))
+    }
+    await db.batch(batchedQueries as BatchQuery);
+  }
 };
 
 /* This function should only be used by anything that is an internal helper (such as a task)
@@ -398,11 +425,9 @@ export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Pos
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select({
-      ...getTableColumns(posts),
-      repostCount: db.$count(reposts, eq(reposts.uuid, posts.uuid)) 
-    }).from(posts)
+  const result = await db.select({...getTableColumns(posts), repostCount: repostCounts.count}).from(posts)
     .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
+    .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
     .limit(1).all();
 
   if (!isEmpty(result))
@@ -613,13 +638,20 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
     console.error(`Adding file listings got error ${err}`);
   }
 
-  let batchedMediaQuery:BatchItem<"sqlite">[] = []; 
+  let batchedQueries:BatchItem<"sqlite">[] = []; 
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {
     const userMedia = await getAllMediaOfUser(env, user.id);
-    batchedMediaQuery.push(db.update(mediaFiles).set({hasPost: true})
+    batchedQueries.push(db.update(mediaFiles).set({hasPost: true})
       .where(inArray(mediaFiles.fileName, flatten(userMedia))));
   }
-  await db.batch(batchedMediaQuery as BatchQuery);
+
+  const allPosts = await db.select({id: posts.uuid}).from(posts);
+  for (const post of allPosts) {
+    const count = db.$count(reposts, eq(reposts.uuid, post.id));
+    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id, 
+      count: count}).onConflictDoNothing());
+  }
+  await db.batch(batchedQueries as BatchQuery);
 };

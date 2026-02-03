@@ -10,9 +10,8 @@ import {
   purgePostedPosts,
   updatePostForGivenUser,
 } from './dbQuery';
-import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
 import { getAllAbandonedMedia } from './dbQueryFile';
-import { Context } from 'hono';
+import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, isQueued: boolean = false) => {
