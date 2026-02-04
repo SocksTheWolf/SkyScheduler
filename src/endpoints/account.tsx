@@ -304,8 +304,7 @@ account.post("/delete", authMiddleware, async (c) => {
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
       
-      c.header("HX-Redirect", "/");
-      c.header("HX-Trigger", "accountDeleted");
+      c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>);

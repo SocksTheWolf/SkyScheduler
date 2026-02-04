@@ -71,9 +71,13 @@ document.addEventListener("accountUpdated", function(ev) {
   pushToast("Settings Updated!", true);
 });
 
-document.addEventListener("accountDeleted", function(ev) {
-  pushToast("Account deleted!", true);
-});
+function pushDeletedAccountToast() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('deleted')) {
+    pushToast("Account deleted!", true);
+  }
+}
+setTimeout(pushDeletedAccountToast, 1500);
 
 const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
