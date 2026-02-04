@@ -1,8 +1,7 @@
 import { addHours, isAfter } from "date-fns";
 import {
-  and,
   desc, eq, getTableColumns, gt, inArray,
-  isNull, lte, ne, notInArray, sql
+  isNull, lte, ne, notInArray, sql, and
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
@@ -51,7 +50,6 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     const userId = c.get("userId");
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
-      // this query does run hot
       const results = await db.select({...getTableColumns(posts), repostCount: repostCounts.count})
         .from(posts).where(eq(posts.userId, userId))
         .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
@@ -269,7 +267,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
     if (MAX_REPOST_POSTS > 0 && accountCurrentReposts >= MAX_REPOST_POSTS) {
       return {ok: false, msg: 
-        `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS})`};
+        `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS}) repost posts`};
     }
 
     // Create the post base for this repost
@@ -522,17 +520,20 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promi
 export const purgePostedPosts = async (env: Bindings): Promise<number> => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
-  const dbQuery = await db.selectDistinct({ data: posts.uuid }).from(posts)
-  .leftJoin(reposts, eq(posts.uuid, reposts.uuid))
+  const dbQuery = await db.select({ data: posts.uuid }).from(posts)
+  .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
   .where(
     and(
       and(
         eq(posts.posted, true), lte(posts.updatedAt, sql`${dateString}`)
       ),
-      isNull(reposts.uuid)
+      lte(repostCounts.count, 0)
     )
   ).all();
   const postsToDelete = dbQuery.map((item) => { return item.data });
+  if (isEmpty(postsToDelete))
+    return 0;
+
   return await deletePosts(env, postsToDelete);
 }
 
