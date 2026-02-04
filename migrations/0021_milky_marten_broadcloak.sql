@@ -1,0 +1,1 @@
+CREATE INDEX `repostOnlyUser_idx` ON `posts` (`user`,`isRepost`) WHERE isRepost = 1;

@@ -30,6 +30,10 @@ export const posts = sqliteTable('posts', {
   index("postedUpdate_idx")
     .on(table.updatedAt, table.posted)
     .where(sql`posted = 1`),
+  // for reposts of the user
+  index("repostOnlyUser_idx")
+    .on(table.userId, table.isRepost)
+    .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
   // cron job
