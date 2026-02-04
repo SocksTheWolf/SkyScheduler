@@ -15,8 +15,8 @@ export default function PrivacyPolicy() {
           <h4>Data Collected</h4>
           <p>
             <ul>
-              <li>Anything you explicitly provide to us (post content, bsky app password, attached media, etc)</li>
-              <li>Anything you upload for processing in order to fulfill your posts to the BlueSky network</li>
+              <li>Anything you explicitly provide to us (post content, app password, attached media, etc)</li>
+              <li>Anything you upload for processing in order to deliver your posts to the BlueSky network</li>
             </ul>
           </p>
           <h4>Who We Share Data With</h4>
@@ -27,7 +27,7 @@ export default function PrivacyPolicy() {
                   <li>Images are sent to Cloudflare Images compressor to optimize the file size in order to upload onto BlueSky</li>
                   <li>Data is stored in Cloudflare's D1/R2/KV storage containers</li>
                   <li>Media may be scanned by Cloudflare's <a rel="noopener nofollow noindex" href="https://developers.cloudflare.com/cache/reference/csam-scanning/" class="secondary">illicit material detection service</a>.
-                  &nbsp;Said media is not allowed on this service, and your account will be banned.</li>
+                  &nbsp;Said media is not allowed on this service and violators will be banned.</li>
                 </ul>
               </li>
               <li>Bluesky/Custom PDS
@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
 
           </p>
           <h4>How Data is Used</h4>
-          <p>We use the data that you provide to make transmit BlueSky posts on your behalf to the BlueSky PDS (or a PDS of your own choosing).<br />
+          <p>We use the data that you provide to transmit your content to the BlueSky PDS (or a PDS of your own choosing) on your behalf.<br />
             <div style="margin-left: 15px">
               <strong>Note that</strong>:
               <ul>
