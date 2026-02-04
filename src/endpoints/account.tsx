@@ -7,7 +7,7 @@ import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
 import { Bindings, LooseObj } from "../types";
-import { doesHandleExist, lookupBskyHandle } from "../utils/bskyApi";
+import { lookupBskyHandle, lookupBskyPDS } from "../utils/bskyApi";
 import { checkIfCanDMUser } from "../utils/bskyMsg";
 import {
   doesUserExist, getAllMediaOfUser, getUserEmailForHandle,
@@ -157,17 +157,21 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   }
 
   // Check bsky handle existing
-  if (await doesHandleExist(username) === false) {
-    return c.json({ok: false, message: "bsky username returned invalid, please check input"}, 400);
+  const profileDID: string|null = await lookupBskyHandle(username);
+  if (profileDID === null) {
+    return c.json({ok: false, message: "bsky handle returned invalid, please check input"}, 400);
   }
 
+  // Grab the user's pds as well
+  const userPDS: string = await lookupBskyPDS(profileDID);
+  
   // grab our auth object
   const auth = c.get("auth");
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
   }
   
-  console.log(`attempting to create an account for ${username}`);
+  console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
   // create the user
   const createUser = await auth.api.signUpEmail({
     body: {
@@ -175,7 +179,8 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
       email: `${username}@skyscheduler.tld`,
       username: username,
       password: password,
-      bskyAppPass: bskyAppPassword
+      bskyAppPass: bskyAppPassword,
+      pds: userPDS
     }
   });
 

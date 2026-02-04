@@ -26,7 +26,7 @@ export const doesHandleExist = async (user: string) => {
   }
 };
 
-export const lookupBskyHandle = async (user: string) => {
+export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
   const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
     cf: {
       cacheTtlByStatus: {"200-299": 600, 404: 1, "500-599": 0},
@@ -42,6 +42,22 @@ export const lookupBskyHandle = async (user: string) => {
     }
   }
   return null;
+};
+
+export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
+  const lookupRequest = await fetch(`https://plc.directory/${userDID}`);
+  if (lookupRequest.ok) {
+    const response: any = await lookupRequest.json();
+    if (has(response, "service")) {
+      for (const service of response.service) {
+        if (service.type === "AtprotoPersonalDataServer") {
+          return service.serviceEndpoint;
+        }
+      }
+    }
+  }
+  // Fallback is to always return the bsky pds
+  return "https://bsky.social";
 };
 
 export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {

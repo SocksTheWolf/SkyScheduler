@@ -10,6 +10,7 @@ export async function pullAuthData(c: Context, next: any) {
     });
     if (session?.session && session?.user) {
       c.set("userId", session.user.id);
+      c.set("pds", session.user.pds);
       // This can't be changed by anyone specifically because it's not a domain
       // and zod will require your username to be a domain.
       c.set("isAdmin", session.user.name === "admin");
@@ -17,6 +18,7 @@ export async function pullAuthData(c: Context, next: any) {
       c.set("session", session.session);
     } else {
       c.set("userId", null);
+      c.set("pds", "");
       c.set("isAdmin", false);
       c.set("session", null);
     }
@@ -24,6 +26,7 @@ export async function pullAuthData(c: Context, next: any) {
   catch (err) {
     console.error(`Failed to process authentication, got err: ${err}`);
     c.set("userId", null);
+    c.set("pds", "");
     c.set("isAdmin", false);
     c.set("session", null);
   }

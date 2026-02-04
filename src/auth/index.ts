@@ -119,8 +119,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         pds: {
           type: "string",
           defaultValue: "https://bsky.social",
-          required: true,
-          input: false
+          required: true
         }
       },
       changeEmail: {
@@ -161,6 +160,7 @@ type ContextVariables = {
   userId: string;
   isAdmin: boolean;
   session: Session;
+  pds: string;
 };
 
 // Export for runtime usage

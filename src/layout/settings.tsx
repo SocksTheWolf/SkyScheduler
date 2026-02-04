@@ -4,7 +4,12 @@ import { settingsScriptStr } from "../utils/appScripts";
 import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
 import { UsernameField } from "./usernameField";
 
-export function Settings() {
+type SettingsTypeProps = {
+  pds?: string;
+};
+
+export function Settings(props: SettingsTypeProps) {
+  const placeholderPDS = props.pds? props.pds : "https://bsky.social";
   return (
     <>
     <dialog id="changeInfo">
@@ -34,7 +39,7 @@ export function Settings() {
             </label>
             <label>
               BSky PDS: 
-              <input type="text" name="bskyUserPDS" placeholder="https://bsky.social" />
+              <input type="text" name="bskyUserPDS" placeholder={placeholderPDS} />
               <small>If you have not changed your PDS (or do not know what that means), you should leave this blank!</small>
             </label>
           </form>

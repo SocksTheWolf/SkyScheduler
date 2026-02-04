@@ -25,7 +25,6 @@ export default function Dashboard(props:any) {
   const dashboardScripts: PreloadRules[] = appScriptStrs.map((itm) => {
     return {href: itm, type: "script"};
   });
-  
   return (
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
@@ -85,7 +84,7 @@ export default function Dashboard(props:any) {
       <AltTextDialog />
       <script type="text/javascript" src={postHelperScriptStr}></script>
       <script type="text/javascript" src={repostHelperScriptStr}></script>
-      <Settings />
+      <Settings pds={ctx.get("pds")} />
     </BaseLayout>
   );
 }
