@@ -5,7 +5,7 @@ import {
   BSKY_MIN_USERNAME_LENGTH,
   MAX_ALT_TEXT,
   MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
-} from "../limits.d";
+} from "../limits";
 import { appPasswordRegex } from "./regexCases";
 
 export const UsernameSchema = z.object({

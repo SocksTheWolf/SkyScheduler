@@ -13,7 +13,7 @@ import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, repostCounts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, MAX_REPOST_POSTS } from "../limits.d";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, MAX_REPOST_POSTS } from "../limits";
 import {
   BatchQuery,
   Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,

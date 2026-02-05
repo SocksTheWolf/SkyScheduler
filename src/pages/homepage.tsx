@@ -1,7 +1,7 @@
 import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
-import { MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB } from "../limits.d";
+import { MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB } from "../limits";
 
 export default function Home() {
   return (

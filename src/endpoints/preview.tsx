@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
-import { BSKY_IMG_MIME_TYPES } from "../limits.d";
+import { BSKY_IMG_MIME_TYPES } from "../limits";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings } from "../types.d";

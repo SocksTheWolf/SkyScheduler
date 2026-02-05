@@ -1,5 +1,5 @@
 import { raw } from "hono/html";
-import { BSKY_MIN_USERNAME_LENGTH } from "../limits.d";
+import { BSKY_MIN_USERNAME_LENGTH } from "../limits";
 
 type UsernameFieldProps = {
   title?: string;

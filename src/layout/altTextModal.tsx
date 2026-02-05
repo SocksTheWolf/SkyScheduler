@@ -1,4 +1,4 @@
-import { MAX_ALT_TEXT } from "../limits.d";
+import { MAX_ALT_TEXT } from "../limits";
 
 export function AltTextDialog() {
   return (

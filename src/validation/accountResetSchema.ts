@@ -1,5 +1,5 @@
 import * as z from "zod/v4";
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 
 export const AccountResetSchema = z.object({
   resetToken: z.string().nonempty("reset token is missing!"),

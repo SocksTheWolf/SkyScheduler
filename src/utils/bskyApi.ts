@@ -4,7 +4,7 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits.d';
+import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits';
 import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, PlatformLoginResponse, Post, PostLabel,

@@ -12,7 +12,7 @@ export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 // max length of an animated gif in minutes
 export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
-export const GIF_UPLOAD_ALLOWED: boolean = false;
+export const GIF_UPLOAD_ALLOWED: boolean = true;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;

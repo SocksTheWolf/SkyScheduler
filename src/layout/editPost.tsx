@@ -1,4 +1,4 @@
-import { MAX_LENGTH } from "../limits.d";
+import { MAX_LENGTH } from "../limits";
 import { EmbedDataType, Post } from "../types.d";
 import { PostContentObject } from "./postList";
 

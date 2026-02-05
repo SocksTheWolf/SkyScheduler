@@ -8,7 +8,7 @@ import {
   MAX_LENGTH,
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT_IN_MB
-} from "../limits.d";
+} from "../limits";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { DependencyTags } from "./depTags";

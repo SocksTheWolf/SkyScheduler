@@ -1,5 +1,5 @@
 import * as z from "zod/v4";
-import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits.d";
+import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
 import { atProtoPostURI, postRecordURI } from "./regexCases";
 
 export const RepostSchema = z.object({

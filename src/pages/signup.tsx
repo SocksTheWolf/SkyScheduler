@@ -6,7 +6,7 @@ import NavTags from "../layout/navTags";
 import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
 import { UsernameField } from "../layout/usernameField";
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { PWAutoCompleteSettings } from "../types.d";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 

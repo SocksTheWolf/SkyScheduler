@@ -1,5 +1,5 @@
 import isEmpty from "just-is-empty";
-import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits.d";
+import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
 
 type RetweetOptionsProps = {
   id: string;

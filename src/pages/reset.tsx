@@ -1,7 +1,7 @@
 import AccountHandler from "../layout/account";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/navTags";
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 
 export default function ResetPassword() {
   const links = [{title: "Forgot Password", url: "/forgot"}];

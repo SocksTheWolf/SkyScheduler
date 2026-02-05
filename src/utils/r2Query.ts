@@ -13,7 +13,7 @@ import {
   MB_TO_BYTES,
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
-} from "../limits.d";
+} from "../limits";
 import { Bindings, EmbedData, EmbedDataType, R2BucketObject, ScheduledContext } from '../types.d';
 import { addFileListing, deleteFileListings } from './dbQueryFile';
 

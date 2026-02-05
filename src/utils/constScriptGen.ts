@@ -11,7 +11,7 @@ import {
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT,
   GIF_UPLOAD_ALLOWED
-} from "../limits.d";
+} from "../limits";
 import { PreloadRules } from "../types.d";
 import { postRecordURI } from "../validation/regexCases";
 

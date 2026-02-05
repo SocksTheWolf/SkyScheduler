@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits.d";
+import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { PWAutoCompleteSettings } from "../types.d";
 import { appPasswordRegex } from "../validation/regexCases";
 
