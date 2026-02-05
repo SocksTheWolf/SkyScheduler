@@ -64,7 +64,13 @@ post.post("/create", authMiddleware, async (c: Context) => {
     if (!isEmpty(postInfo)) {
       const env: Bindings = c.env;
       if (isQueueEnabled(env) && shouldPostNowQueue(env)) {
-        enqueuePost(env, postInfo!);
+        try
+        {
+          await enqueuePost(env, postInfo!);
+        } catch(err) {
+          console.error(err);
+          return c.json({message: 'Failed to post content, will retry again soon'}, 406);
+        }
       } else {
         if (!await makePost(c, postInfo))
           return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);

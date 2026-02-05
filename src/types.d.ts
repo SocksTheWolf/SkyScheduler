@@ -19,6 +19,11 @@ type RedirectConfigSettings = {
   tip: string;
 }
 
+type R2ConfigSettings = {
+  auto_prune: boolean;
+  prune_days: number;
+}
+
 type QueueConfigSettings = {
   enabled: boolean;
   postNowEnabled?: boolean;
@@ -39,6 +44,7 @@ export interface Bindings {
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
   SIGNUP_SETTINGS: SignupConfigSettings;
+  R2_SETTINGS: R2ConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -50,7 +56,6 @@ export interface Bindings {
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
   IN_DEV: boolean;
-  PRUNE_R2: boolean;
   REDIRECTS: RedirectConfigSettings;
 };
 

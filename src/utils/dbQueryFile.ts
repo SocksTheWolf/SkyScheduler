@@ -28,7 +28,7 @@ export const deleteFileListings = async (env: Bindings, files: string|string[]) 
 
 export const getAllAbandonedMedia = async(env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  const numDaysAgo = daysAgo(2);
+  const numDaysAgo = daysAgo(env.R2_SETTINGS.prune_days);
 
   const results = await db.select().from(mediaFiles)
     .where(

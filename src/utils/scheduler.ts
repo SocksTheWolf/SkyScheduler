@@ -42,7 +42,7 @@ export const handleRepostTask = async(runtime: ScheduledContext, postData: Repos
   return madeRepost;
 };
 
-export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
+export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => {
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(env);
   const queueEnabled: boolean = isQueueEnabled(env);
@@ -55,9 +55,9 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
     console.log(`handling ${scheduledPosts.length} posts...`);
-    scheduledPosts.forEach((post) => {
+    scheduledPosts.forEach(async (post) => {
       if (queueEnabled)
-        enqueuePost(env, post); 
+        await enqueuePost(env, post); 
       else
         ctx.waitUntil(handlePostTask(runtimeWrapper, post));
     });
@@ -68,9 +68,9 @@ export const schedulePostTask = async(env: Bindings, ctx: ExecutionContext) => {
   // Push any reposts
   if (!isEmpty(scheduledReposts)) {
     console.log(`handling ${scheduledReposts.length} reposts`);
-    scheduledReposts.forEach((repost) => {
+    scheduledReposts.forEach(async (repost) => {
       if (queueEnabled)
-        enqueueRepost(env, repost);
+        await enqueueRepost(env, repost);
       else
         ctx.waitUntil(handleRepostTask(runtimeWrapper, repost));
     });
@@ -89,7 +89,7 @@ export const cleanUpPostsTask = async(env: Bindings, ctx: ExecutionContext) => {
     const deletedItems: number = await deletePosts(env, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
-  if (env.PRUNE_R2 === true)
+  if (env.R2_SETTINGS.auto_prune === true)
     await cleanupAbandonedFiles(env, ctx);
 };
 
