@@ -225,7 +225,11 @@ export const uploadFileR2 = async (c: Context, file: File|string, userId: string
   const fileType: string = file.type.toLowerCase();
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
     return await uploadImageToR2(c, file, userId);
-  } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType) || BSKY_GIF_MIME_TYPES.includes(fileType)) {
+  } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
+    return await uploadVideoToR2(c.env, file, userId);
+  } else if (BSKY_GIF_MIME_TYPES.includes(fileType)) {
+    // TODO: modify this in the future to transform the image to a webm
+    // then push to uploadVideo
     return await uploadVideoToR2(c.env, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};

@@ -6,14 +6,16 @@ import {
   BSKY_VIDEO_MIME_TYPES,
   MAX_ALT_TEXT,
   MAX_EMBEDS_PER_POST,
+  MAX_GIF_LENGTH_LIMIT,
   MAX_LENGTH,
   MAX_THUMBNAIL_SIZE,
-  R2_FILE_SIZE_LIMIT
+  R2_FILE_SIZE_LIMIT,
+  GIF_UPLOAD_ALLOWED
 } from "../limits.d";
 import { PreloadRules } from "../types.d";
 import { postRecordURI } from "../validation/regexCases";
 
-const CONST_SCRIPT_VERSION: number = 7;
+const CONST_SCRIPT_VERSION: number = 8;
 
 const makeFileTypeStr = (typeMap: string[]) => {
   return typeMap.map((type) => `"${type}"`).join()
@@ -24,13 +26,18 @@ export const ConstScriptPreload: PreloadRules[] = [
 ];
 
 export function makeConstScript() {
-    return `const fileTypesSupported = [${makeFileTypeStr([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES, ...BSKY_GIF_MIME_TYPES])}];
+  let fileTypeArray = [...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES];
+  if (GIF_UPLOAD_ALLOWED) {
+    fileTypeArray.push(...BSKY_GIF_MIME_TYPES);
+  }
+    return `const fileTypesSupported = [${makeFileTypeStr(fileTypeArray)}];
 const imageTypes = [${makeFileTypeStr(BSKY_IMG_MIME_TYPES)}];
 const videoTypes = [${makeFileTypeStr(BSKY_VIDEO_MIME_TYPES)}];
 const gifTypes = [${makeFileTypeStr(BSKY_GIF_MIME_TYPES)}];
 const MAX_LENGTH=${MAX_LENGTH};
 const MAX_ALT_LENGTH=${MAX_ALT_TEXT};
 const MAX_VIDEO_LENGTH=${BSKY_VIDEO_LENGTH_LIMIT}; /* in seconds */
+const MAX_GIF_LENGTH=${MAX_GIF_LENGTH_LIMIT}; /* in seconds */
 const MAX_AUTO_COMPLETE_NAMES=${BSKY_NAME_LOOKUP_LIMIT};
 const MIN_CHAR_AUTO_COMPLETE_NAMES=${BSKY_NAME_TYPE_AHEAD_CHARS};
 const FILE_DROP_MAX_SIZE=${R2_FILE_SIZE_LIMIT};

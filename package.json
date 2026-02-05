@@ -37,6 +37,7 @@
     "just-has": "^2.3.0",
     "just-is-empty": "^3.4.1",
     "just-random": "^3.2.0",
+    "just-remove": "^3.2.0",
     "just-safe-get": "^4.2.0",
     "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",

@@ -232,7 +232,10 @@ fileDropzone.on("success", function(file, response) {
         pushToast(`${file.name} duration could not be processed`, false);
         deleteFileOnError();
       } else if (videoDuration > MAX_VIDEO_LENGTH) {
-        pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
+        pushToast(`${file.name} is over the maximum video duration by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
+        deleteFileOnError();
+      } else if (videoDuration >= MAX_GIF_LENGTH) {
+        pushToast(`${file.name} is over the maximum length for a gif by ${(videoDuration - MAX_GIF_LENGTH).toFixed(2)} seconds`, false);
         deleteFileOnError();
       } else {
         fileData.set(file.name, { content: response.data, type: 3, height: imageHeight, width: imageWidth, duration: videoDuration });

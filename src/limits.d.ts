@@ -1,3 +1,5 @@
+import remove from "just-remove";
+
 /** APPLICATION CONFIGURATIONS **/
 // minimum length of a post
 export const MIN_LENGTH: number = 1; 
@@ -7,6 +9,10 @@ export const MAX_REPOST_INTERVAL: number = 15;
 export const MAX_REPOST_DAYS: number = 10;
 // max amount of days to hold a post after it's been posted and has no reposts before it's purged from the DB
 export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
+// max length of an animated gif in minutes
+export const MAX_GIF_LENGTH: number = 1;
+// if gifs should be allowed to upload
+export const GIF_UPLOAD_ALLOWED: boolean = false;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;
@@ -95,7 +101,7 @@ export const BSKY_GIF_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_VIDEO_FILE_EXTS: string = [
+export const BSKY_VIDEO_FILE_EXTS: string = remove([
   "mp4",
   "m4v",
   "mp4v",
@@ -107,8 +113,9 @@ export const BSKY_VIDEO_FILE_EXTS: string = [
   "mov",
   "qt",
   "webm",
-  "animated gif" /* This is handled in a special case because bluesky */
-].join(", ");
+   /* This is handled in a special case because bluesky */
+  (GIF_UPLOAD_ALLOWED ? "animated gif" : undefined)
+], [undefined]).join(", ");
 
 // Max size of files that can go to R2 without doing multipart uploads
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
@@ -116,6 +123,7 @@ export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_MAX_SIZE_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
+export const MAX_GIF_LENGTH_LIMIT: number = MAX_GIF_LENGTH * TO_SEC;
 // Max size of Cloudflare Images files
 export const CF_IMAGES_FILE_SIZE_LIMIT_IN_MB: number = 70;
 export const CF_IMAGES_FILE_SIZE_LIMIT: number = CF_IMAGES_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
