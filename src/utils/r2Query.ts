@@ -10,6 +10,7 @@ import {
   CF_IMAGES_FILE_SIZE_LIMIT,
   CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
+  GIF_UPLOAD_ALLOWED,
   MB_TO_BYTES,
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
@@ -227,7 +228,7 @@ export const uploadFileR2 = async (c: Context, file: File|string, userId: string
     return await uploadImageToR2(c, file, userId);
   } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
     return await uploadVideoToR2(c.env, file, userId);
-  } else if (BSKY_GIF_MIME_TYPES.includes(fileType)) {
+  } else if (GIF_UPLOAD_ALLOWED && BSKY_GIF_MIME_TYPES.includes(fileType)) {
     // TODO: modify this in the future to transform the image to a webm
     // then push to uploadVideo
     return await uploadVideoToR2(c.env, file, userId);
