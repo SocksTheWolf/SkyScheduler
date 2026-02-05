@@ -54,8 +54,8 @@ export default function Signup(props:any) {
         ) : ''}
 
           <fieldset>
-            <label>Agree to Terms</label>
-            <input type="checkbox" name="agreeTerms" />
+            <legend><label for="agreeTerms">Agree to Terms</label></legend>
+            <input id="agreeTerms" type="checkbox" name="agreeTerms" />
             Check the box if you agree to our <a href="/privacy" class="secondary" target="_blank" title="link to privacy policy">privacy policy
             </a> and <a href="/tos" class="secondary" target="_blank" title="link to terms of service">terms of service</a>.
           </fieldset>
