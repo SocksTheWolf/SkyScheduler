@@ -16,10 +16,10 @@ export const VideoEmbedSchema = z.object({
   ...FileContentSchema.shape,
   type: z.literal(EmbedDataType.Video),
   width: z.number("media width is not a number")
-    .min(0, "media width value is below 0")
+    .min(1, "media width value is below 1")
     .nonoptional("media width is required"),
   height: z.number("media height is not a number")
-    .min(0, "media height value is below 0")
+    .min(1, "media height value is below 1")
     .nonoptional("media height is required"),
   duration: z.number("media duration is invalid")
     .min(0, "media must be over 0 seconds long")
