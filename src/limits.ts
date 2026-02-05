@@ -103,15 +103,8 @@ export const BSKY_GIF_MIME_TYPES: string[] = [
 // Used for human readable display
 export const BSKY_VIDEO_FILE_EXTS: string = remove([
   "mp4",
-  "m4v",
-  "mp4v",
   "mpeg",
-  "mpg",
-  "m1v",
-  "mp2",
-  "m2v",
   "mov",
-  "qt",
   "webm",
    /* This is handled in a special case because bluesky */
   (GIF_UPLOAD_ALLOWED ? "animated gif" : undefined)
