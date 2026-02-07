@@ -11,6 +11,7 @@ import {
 } from "../limits";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
+import { ContentLabelOptions } from "./contentLabelOptions";
 import { DependencyTags } from "./depTags";
 import { RetweetOptions } from "./retweetOptions";
 import { ScheduleOptions } from "./scheduleOptions";
@@ -82,20 +83,7 @@ export function PostCreation() {
               </article>
             </section>
             <section id="content-label-selector" class="hidden">
-              <article>
-                <header>Content Label</header>
-                <select name="label" id="contentLabels">
-                  <option disabled selected value=""> -- select an option -- </option>
-                  <option value="None">Safe</option>
-                  <option value="Suggestive">Suggestive</option>
-                  <option value="Nudity">Nudity (non-sexual nudity)</option>
-                  <option value="Adult">Adult (porn)</option>
-                  <option disabled value="">---</option>
-                  <option value="Graphic">Graphic Media (gore/violence)</option>
-                  <option value="GraphicAdult">Adult Graphic Media (gore/violence)</option>
-                </select>
-                <small>Remember to set the appropriate content label for your content</small>
-              </article>
+              <ContentLabelOptions id="contentLabels" />
             </section>
           </details>
           <details>
