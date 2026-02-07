@@ -92,6 +92,7 @@ export function PostCreation() {
                   <option value="Adult">Adult (porn)</option>
                   <option disabled value="">---</option>
                   <option value="Graphic">Graphic Media (gore/violence)</option>
+                  <option value="GraphicAdult">Adult Graphic Media (gore/violence)</option>
                 </select>
                 <small>Remember to set the appropriate content label for your content</small>
               </article>

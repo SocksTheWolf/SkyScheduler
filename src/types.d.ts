@@ -84,7 +84,8 @@ export enum PostLabel {
   Suggestive = "Suggestive",
   Nudity = "Nudity",
   Adult = "Adult",
-  Graphic = "Graphic"
+  Graphic = "Graphic",
+  GraphicAdult = "GraphicAdult"
 };
 
 // Basically a copy of the schema

@@ -216,24 +216,28 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
       createdAt: new Date().toISOString(),
     };
     if (content.label !== undefined && content.label !== PostLabel.None) {
-      let contentStr:string = "";
+      let contentValues = [];
       switch (content.label) {
         case PostLabel.Adult:
-          contentStr = "porn";
+          contentValues.push({"val": "porn"});
         break;
         case PostLabel.Graphic:
-          contentStr = "graphic-media";
+          contentValues.push({"val": "graphic-media"});
         break;
         case PostLabel.Nudity:
-          contentStr = "nudity";
+          contentValues.push({"val": "nudity"});
         break;
         case PostLabel.Suggestive:
-          contentStr = "sexual";
+          contentValues.push({"val": "sexual"});
+        break;
+        case PostLabel.GraphicAdult:
+          contentValues.push({"val": "porn"});
+          contentValues.push({"val": "graphic-media"});
         break;
       }
       (postRecord as any).labels = {
         "$type": "com.atproto.label.defs#selfLabels",
-        "values": [{"val": contentStr}]
+        "values": contentValues
       };
     }
 
