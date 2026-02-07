@@ -234,6 +234,10 @@ textarea {
   text-transform: capitalize;
 }
 
+[data-tooltip]:before {
+  white-space: preserve-breaks !important;
+}
+
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
   100% {

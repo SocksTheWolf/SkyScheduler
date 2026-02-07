@@ -1,8 +1,8 @@
 import { Context } from "hono";
 import { html, raw } from "hono/html";
-import { getPostsForUser, getUsernameForUser } from "../utils/dbQuery";
-import { Post } from "../types.d";
 import isEmpty from "just-is-empty";
+import { Post } from "../types.d";
+import { getPostsForUser, getUsernameForUser } from "../utils/dbQuery";
 
 type PostContentObjectProps = {
   text: string;
@@ -40,6 +40,22 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         data-tooltip="Edit this post" data-placement="right" ${editAttributes}>
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </button>`);
+  
+  let repostInfoStr:string = "";
+  if (!isEmpty(content.repostInfo)) {
+    for (const repostItem of content.repostInfo!) {
+      const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
+      if (repostItem.count == 0) {
+        repostInfoStr += `* Repost at ${repostWrapper}`;
+      } else {
+        repostInfoStr += `* Every ${repostItem.hours} hours, ${repostItem.count} times from ${repostWrapper}`;
+      }
+      repostInfoStr += "\n";
+    }
+  }
+  const repostCountElement = content.repostCount ? 
+    (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
+      <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>Reposts Left: {content.repostCount}</span></>) : "";
 
   return html`
   <article id="postBase${content.postid}" ${oobSwapStr}>
@@ -58,7 +74,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
           'Scheduled for:' } 
           <span class="timestamp">${content.scheduledDate}</span>
           ${!isEmpty(content.embeds) ? ' | Embeds: ' + content.embeds?.length : ''} 
-          ${content.repostCount! ? ' | Reposts Left: ' + content.repostCount : ''}
+          ${repostCountElement}
       </small>
     </footer>
   </article>`;

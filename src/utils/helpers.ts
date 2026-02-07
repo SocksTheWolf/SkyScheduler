@@ -1,6 +1,7 @@
 import { startOfHour, subDays } from "date-fns";
+import has from "just-has";
 import isEmpty from "just-is-empty";
-import { BskyAPILoginCreds, Post, Repost } from "../types.d";
+import { BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types.d";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);
@@ -21,6 +22,9 @@ export function createPostObject(data: any) {
   if (data.isRepost)
     postData.isRepost = data.isRepost;
 
+  if (data.repostInfo)
+    postData.repostInfo = data.repostInfo;
+
   // ATProto data
   if (data.uri)
     postData.uri = data.uri;
@@ -36,6 +40,22 @@ export function createRepostObject(data: any) {
   repostObj.cid = data.cid;
   repostObj.uri = data.uri;
   repostObj.userId = data.userId;
+  if (data.scheduleGuid)
+    repostObj.scheduleGuid = data.scheduleGuid;
+  return repostObj;
+}
+
+export function createRepostInfo(id: string, time: Date, repostData: any) {
+  const repostObj: RepostInfo = (new Object() as RepostInfo);
+  repostObj.time = time;
+  repostObj.guid = id;
+  if (has(repostData, "hours") && has(repostData, "times")) {
+    repostObj.hours = repostData.hours;
+    repostObj.count = repostData.times;
+  }
+  else {
+    repostObj.count = repostObj.hours = 0;
+  }
   return repostObj;
 }
 

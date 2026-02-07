@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
-import { EmbedData, PostLabel } from '../types.d';
+import { EmbedData, PostLabel, RepostInfo } from '../types.d';
 import { users } from "./auth.schema";
 
 export const posts = sqliteTable('posts', {
@@ -11,6 +11,7 @@ export const posts = sqliteTable('posts', {
   // This is a flag to help beat any race conditions with our cron jobs
   postNow: integer('postNow', { mode: 'boolean' }).default(false),
   embedContent: text('embedContent', {mode: 'json'}).notNull().$type<EmbedData[]>().default(sql`(json_array())`),
+  repostInfo: text('repostInfo', {mode: 'json'}).$type<RepostInfo[]>(),
   uri: text('uri'),
   cid: text('cid'),
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
@@ -50,11 +51,14 @@ export const reposts = sqliteTable('reposts', {
     .notNull()
     .references(() => posts.uuid, {onDelete: "cascade"}),
   scheduledDate: integer('scheduled_date', { mode: 'timestamp_ms' }).notNull(),
+  scheduleGuid: text('schedule_guid')
 }, (table) => [
   // cron queries
   index("repost_scheduledDate_idx").on(table.scheduledDate),
   // used for left joining and matching with posts field
   index("repost_postid_idx").on(table.uuid),
+  // used for checking if a schedule still has types left
+  index("repost_scheduleGuid_idx").on(table.scheduleGuid),
   unique("repost_noduplicates_idx").on(table.uuid, table.scheduledDate),
 ]);
 

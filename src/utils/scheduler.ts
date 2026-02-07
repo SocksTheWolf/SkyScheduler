@@ -1,5 +1,5 @@
 import isEmpty from 'just-is-empty';
-import { Bindings, LooseObj, Post, Repost, ScheduledContext } from '../types.d';
+import { Bindings, Post, Repost, ScheduledContext } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
 import {
@@ -7,8 +7,7 @@ import {
   deletePosts,
   getAllPostsForCurrentTime,
   getAllRepostsForCurrentTime,
-  purgePostedPosts,
-  updatePostForGivenUser,
+  purgePostedPosts
 } from './dbQuery';
 import { getAllAbandonedMedia } from './dbQueryFile';
 import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
@@ -27,15 +26,6 @@ export const handleRepostTask = async(runtime: ScheduledContext, postData: Repos
   const madeRepost = await makeRepost(runtime, postData);
   if (madeRepost) {
     console.log(`Reposted ${postData.uri} successfully!`);
-    try
-    {
-      // Force update the payload of the db when posted so that it updates the main post record
-      const payload: LooseObj = { posted: true };
-      await updatePostForGivenUser(runtime, postData.userId, postData.postid, payload);
-    } catch(err) {
-      console.error(`Failed to update the timestamp of the repost with error ${err}`);
-    }
-
   } else {
     console.warn(`Failed to repost ${postData.uri}`);
   }

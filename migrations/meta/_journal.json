@@ -155,6 +155,13 @@
       "when": 1770168969451,
       "tag": "0021_milky_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "6",
+      "when": 1770503555129,
+      "tag": "0022_pale_tomas",
+      "breakpoints": true
     }
   ]
 }

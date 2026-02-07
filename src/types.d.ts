@@ -1,5 +1,5 @@
-import { ExecutionContext } from "hono";
 import { BatchItem } from "drizzle-orm/batch";
+import { ExecutionContext } from "hono";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -62,7 +62,7 @@ export interface Bindings {
 export enum EmbedDataType {
   None = 0,
   Image = 1,
-  WebLink,
+  WebLink = 2,
   Video = 3,
   Record = 4,
 };
@@ -77,6 +77,14 @@ export type EmbedData = {
   width?: number;
   height?: number;
   duration?: number;
+};
+
+// Contains the repost info for a post
+export type RepostInfo = {
+  guid: string,
+  time: Date,
+  hours: number,
+  count: number
 };
 
 export enum PostLabel {
@@ -100,6 +108,7 @@ export type Post = {
   postNow: boolean;
   posted?: boolean;
   isRepost?: boolean;
+  repostInfo?: RepostInfo[];
   scheduledDate?: string;
   repostCount?: number;
   cid?: string;
@@ -111,6 +120,7 @@ export type Repost = {
   uri: string;
   cid: string;
   userId: string;
+  scheduleGuid?: string;
 };
 
 export enum QueueTaskType {

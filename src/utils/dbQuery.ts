@@ -1,7 +1,8 @@
-import { addHours, isAfter } from "date-fns";
+import { addHours, isAfter, isEqual } from "date-fns";
 import {
   desc, eq, getTableColumns, gt, inArray,
-  isNull, lte, ne, notInArray, sql, and
+  and, isNotNull,
+  isNull, lte, ne, notInArray, sql
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
@@ -13,18 +14,21 @@ import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, repostCounts, reposts, violations } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, MAX_REPOST_POSTS } from "../limits";
+import {
+  MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH,
+  MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST
+} from "../limits";
 import {
   BatchQuery,
   Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,
   EmbedDataType, GetAllPostedBatch, LooseObj, PlatformLoginResponse,
-  Post, PostLabel, R2BucketObject, Repost, ScheduledContext, Violation
+  Post, PostLabel, R2BucketObject, Repost, RepostInfo, ScheduledContext, Violation
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { addFileListing } from "./dbQueryFile";
 import {
-  createLoginCredsObj, createPostObject, createRepostObject,
+  createLoginCredsObj, createPostObject, createRepostInfo, createRepostObject,
   floorCurrentTime, floorGivenTime
 } from "./helpers";
 import { deleteEmbedsFromR2, getAllFilesList } from "./r2Query";
@@ -172,6 +176,10 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
     }
   }
 
+  // Create repost metadata
+  const scheduleGUID = uuidv4();
+  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, repostData);
+
   // Create the posts
   const postUUID = uuidv4();
   let dbOperations: BatchItem<"sqlite">[] = [
@@ -180,6 +188,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       uuid: postUUID,
       postNow: makePostNow,
       scheduledDate: scheduleDate,
+      repostInfo: [repostInfo],
       embedContent: embeds,
       contentLabel: label || PostLabel.None,
       userId: userId
@@ -201,6 +210,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
     for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,
+        scheduleGuid: scheduleGUID,
         scheduledDate: addHours(scheduleDate, i*repostData.hours)
       }));
     }
@@ -249,19 +259,32 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   }
   let postUUID;
   let dbOperations: BatchItem<"sqlite">[] = [];
+  const scheduleGUID = uuidv4();
+  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, repostData);
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate}).from(posts).where(and(
+  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate, curRepostInfo: posts.repostInfo}).from(posts).where(and(
     eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
 
-  const hasExistingPost = existingPost.length >= 1;
+  const hasExistingPost:boolean = existingPost.length >= 1;
   if (hasExistingPost) {
     postUUID = existingPost[0].id;
+    const existingPostDate = existingPost[0].date;
     // Ensure the date asked for is after what the post's schedule date is
-    if (!isAfter(scheduleDate, existingPost[0].date)) {
+    if (!isAfter(scheduleDate, existingPostDate) && !isEqual(scheduledDate, existingPostDate)) {
       return { ok: false, msg: "Scheduled date must be after the initial post's date" };
     }
+    // Add repost info object to existing array
+    let newRepostInfo:RepostInfo[] = isEmpty(existingPost[0].curRepostInfo) ? [] : existingPost[0].curRepostInfo!;
+    if (newRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
+      return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
+    }
+
+    newRepostInfo.push(repostInfo);
+    // push record update to add to json array
+    dbOperations.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
+      eq(posts.userId, userId), eq(posts.cid, cid))));
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
@@ -279,6 +302,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
       uri: uri,
       posted: true,
       isRepost: true,
+      repostInfo: [repostInfo],
       scheduledDate: scheduleDate,
       userId: userId
     }));
@@ -287,19 +311,19 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   // Push initial repost
   let totalRepostCount = 1;
   dbOperations.push(db.insert(reposts).values({
-        uuid: postUUID,
-        scheduledDate: scheduleDate
-      })
-    .onConflictDoNothing());
+      uuid: postUUID,
+      scheduleGuid: scheduleGUID,
+      scheduledDate: scheduleDate
+    }).onConflictDoNothing());
   
   // Push other repost times if we have them
   if (repostData) {
     for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
-          uuid: postUUID,
-          scheduledDate: addHours(scheduleDate, i*repostData.hours)
-        })
-      .onConflictDoNothing());
+        uuid: postUUID,
+        scheduleGuid: scheduleGUID,
+        scheduledDate: addHours(scheduleDate, i*repostData.hours)
+      }).onConflictDoNothing());
     }
     totalRepostCount += repostData.times;
   }
@@ -360,16 +384,43 @@ export const getAllRepostsForCurrentTime = async (env: Bindings): Promise<Repost
 export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime = floorCurrentTime();
-  const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime)).returning({id: reposts.uuid});
+  const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
+    .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
   
   // This is really stupid and I hate it, but someone has to update repost counts once posted
   if (deletedPosts.length > 0) {
     let batchedQueries:BatchItem<"sqlite">[] = []; 
     for (const deleted of deletedPosts) {
+      // Update counts
       const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
       batchedQueries.push(db.update(repostCounts)
-    .set({count: newCount})
-    .where(eq(repostCounts.uuid, deleted.id)))
+        .set({count: newCount})
+        .where(eq(repostCounts.uuid, deleted.id)));
+
+      // check if the repost data needs to be killed
+      if (!isEmpty(deleted.scheduleGuid)) {
+        // do a search to find if there are any reposts with the same scheduleguid.
+        // if there are none, this schedule should get removed from the repostInfo array
+        const stillHasSchedule = await db.select().from(reposts)
+          .where(and(isNotNull(reposts.scheduleGuid), eq(reposts.scheduleGuid, deleted.scheduleGuid!)))
+          .limit(1).all();
+        
+        // if this is empty, then we need to update the repost info.
+        if (isEmpty(stillHasSchedule)) {
+          // get the existing repost info to filter out this old data
+          const existingRepostInfoArr = (await db.select({repostInfo: posts.repostInfo}).from(posts)
+            .where(eq(posts.uuid, reposts.uuid)).limit(1).all())[0];
+          // check to see if there is anything in the repostInfo array
+          if (!isEmpty(existingRepostInfoArr)) {
+            // create a new array with the deleted out object
+            const newRepostInfoArr = existingRepostInfoArr.repostInfo!.filter((obj) => {
+              return obj.guid !== deleted.scheduleGuid!;
+            });
+            // push the new repost info array
+            batchedQueries.push(db.update(posts).set({repostInfo: newRepostInfoArr}).where(eq(posts.uuid, deleted.id)));
+          }
+        }
+      }
     }
     await db.batch(batchedQueries as BatchQuery);
   }

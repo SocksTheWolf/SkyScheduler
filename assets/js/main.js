@@ -29,6 +29,16 @@ function updateAllTimes() {
     el.textContent = formatDate(el.innerText);
     el.setAttribute("corrected", true);
   });
+  document.querySelectorAll(".repostTimesLeft").forEach(el => {
+    if (el.hasAttribute("data-tooltip"))
+      return;
+
+    if (el.firstElementChild.className == "repostInfoData") {
+      const repostInformation = el.firstElementChild.innerText;
+      if (repostInformation.length > 0)
+        el.setAttribute("data-tooltip", repostInformation);
+    }
+  });
 }
 
 function refreshPosts() {
