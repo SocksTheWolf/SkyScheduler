@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
 import isEmpty from "just-is-empty";
-import { validate as uuidValid } from 'uuid';
 import { users } from "../../db/auth.schema";
 import { Bindings, BskyAPILoginCreds } from "../../types.d";
 import { createLoginCredsObj } from "../helpers";
@@ -33,9 +32,6 @@ export const getBskyUserPassForId = async (env: Bindings, userid: string): Promi
 };
 
 export const getUsernameForUserId = async (env: Bindings, userId: string): Promise<string|null> => {
-  if (!uuidValid(userId))
-    return null;
-
   const db: DrizzleD1Database = drizzle(env.DB);
   const result = await db.select({username: users.username}).from(users)
     .where(eq(users.id, userId)).limit(1);
