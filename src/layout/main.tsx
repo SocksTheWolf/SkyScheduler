@@ -10,8 +10,6 @@ type BaseLayoutProps = {
   children: Child;
   title?: string;
   mainClass?: string;
-  // Allows for out of band insertions without being affected by PicoCSS
-  outerElements?: Promise<HtmlEscapedString>|Child|null;
   preloads?: PreloadRules[]
 };
 
@@ -19,7 +17,6 @@ export const BaseLayout = ({
   children,
   title = "SkyScheduler",
   mainClass = "",
-  outerElements = null,
   preloads = []
 }: BaseLayoutProps) => {
   const layout = (
@@ -46,7 +43,6 @@ export const BaseLayout = ({
           {children}
         </main>
       </container>
-      {outerElements}
     </body>
   </html>);
   return html`<!DOCTYPE html>

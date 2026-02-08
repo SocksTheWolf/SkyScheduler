@@ -76,6 +76,10 @@
   width: 50% !important;
 }
 
+.w-third {
+  width: 33% !important;
+}
+
 .dashboard {
   padding-top: 1px;
 }
