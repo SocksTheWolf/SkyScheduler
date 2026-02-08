@@ -44,13 +44,14 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   let repostInfoStr:string = "";
   if (!isEmpty(content.repostInfo)) {
     for (const repostItem of content.repostInfo!) {
-      const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
-      if (repostItem.count == 0) {
-        repostInfoStr += `* Repost at ${repostWrapper}`;
-      } else {
-        repostInfoStr += `* Every ${repostItem.hours} hours, ${repostItem.count} times from ${repostWrapper}`;
+      if (repostItem.count >= 1) {
+        const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
+        if (repostItem.count == 1)
+          repostInfoStr += `* Repost at ${repostWrapper}`;
+        else
+          repostInfoStr += `* Every ${repostItem.hours} hours, ${repostItem.count} times from ${repostWrapper}`;
+        repostInfoStr += "\n";
       }
-      repostInfoStr += "\n";
     }
   }
   const repostCountElement = content.repostCount ? 
