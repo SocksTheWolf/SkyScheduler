@@ -45,16 +45,16 @@ export function createRepostObject(data: any) {
   return repostObj;
 }
 
-export function createRepostInfo(id: string, time: Date, repostData: any) {
+export function createRepostInfo(id: string, time: Date, isRepost: boolean, repostData: any) {
   const repostObj: RepostInfo = (new Object() as RepostInfo);
   repostObj.time = time;
   repostObj.guid = id;
   if (has(repostData, "hours") && has(repostData, "times")) {
     repostObj.hours = repostData.hours;
     repostObj.count = repostData.times;
-  }
-  else {
-    repostObj.count = repostObj.hours = 0;
+  } else {
+    repostObj.count = (isRepost) ? 1 : 0;
+    repostObj.hours = 0;
   }
   return repostObj;
 }

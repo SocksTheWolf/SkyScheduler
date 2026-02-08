@@ -178,7 +178,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
 
   // Create repost metadata
   const scheduleGUID = uuidv4();
-  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, repostData);
+  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, false, repostData);
 
   // Create the posts
   const postUUID = uuidv4();
@@ -260,7 +260,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   let postUUID;
   let dbOperations: BatchItem<"sqlite">[] = [];
   const scheduleGUID = uuidv4();
-  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, repostData);
+  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, true, repostData);
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
