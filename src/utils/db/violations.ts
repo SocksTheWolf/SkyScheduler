@@ -19,10 +19,9 @@ const createBanForUser = async (env: Bindings, userName: string, reason: string)
   }
 }
 
-export const userHasBan = async (env: Bindings, userDid: string) => {
+export const userHasBan = async (env: Bindings, userDid: string): Promise<boolean> => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  const hasRecords = (await db.select().from(bannedUsers).where(eq(bannedUsers.did, userDid)).limit(1).all()).length > 0;
-  return hasRecords;
+  return (await db.select().from(bannedUsers).where(eq(bannedUsers.did, userDid)).limit(1).all()).length > 0;
 };
 
 export const userHandleHasBan = async (env: Bindings, userName: string) => {
