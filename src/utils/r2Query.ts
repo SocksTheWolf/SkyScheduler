@@ -16,7 +16,7 @@ import {
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import { Bindings, EmbedData, EmbedDataType, R2BucketObject, ScheduledContext } from '../types.d';
-import { addFileListing, deleteFileListings } from './dbQueryFile';
+import { addFileListing, deleteFileListings } from './db/file';
 
 type FileMetaData = {
   name: string,

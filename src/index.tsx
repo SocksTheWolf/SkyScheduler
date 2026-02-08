@@ -17,8 +17,8 @@ import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { Bindings, QueueTaskData, QueueTaskType, ScheduledContext } from "./types.d";
 import { makeConstScript } from "./utils/constScriptGen";
-import { runMaintenanceUpdates } from "./utils/dbQuery";
-import { getAllAbandonedMedia } from "./utils/dbQueryFile";
+import { getAllAbandonedMedia } from "./utils/db/file";
+import { runMaintenanceUpdates } from "./utils/db/maintain";
 import { makeInviteKey } from "./utils/inviteKeys";
 import {
   cleanupAbandonedFiles, cleanUpPostsTask, handlePostTask,

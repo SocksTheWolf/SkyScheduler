@@ -163,7 +163,8 @@ export enum PlatformLoginResponse {
   InvalidAccount,
   PlatformOutage,
   MediaTooBig,
-  UnhandledError
+  UnhandledError,
+  TOSViolation,
 };
 
 export enum PWAutoCompleteSettings {

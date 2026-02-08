@@ -6,13 +6,13 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
-import { Bindings, LooseObj } from "../types";
+import { Bindings, LooseObj } from "../types.d";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bskyApi";
 import { checkIfCanDMUser } from "../utils/bskyMsg";
-import {
-  doesUserExist, getAllMediaOfUser, getUserEmailForHandle,
-  getUsernameForUser, updateUserData
-} from "../utils/dbQuery";
+import { getAllMediaOfUser } from "../utils/db/file";
+import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
+import { userHasBan } from "../utils/db/violations";
+import { updateUserData } from "../utils/dbQuery";
 import { consumeInviteKey, doesInviteKeyHaveValues } from "../utils/inviteKeys";
 import { deleteFromR2 } from "../utils/r2Query";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
@@ -160,6 +160,11 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   const profileDID: string|null = await lookupBskyHandle(username);
   if (profileDID === null) {
     return c.json({ok: false, message: "bsky handle returned invalid, please check input"}, 400);
+  }
+
+  // Check if the user has violated TOS.
+  if (await userHasBan(c.env, profileDID)) {
+    return c.json({ok: false, message: "your account has been forbidden from using this service"}, 400);
   }
 
   // Grab the user's pds as well

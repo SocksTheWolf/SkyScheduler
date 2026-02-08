@@ -5,7 +5,7 @@ import { username } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
-import { Bindings } from "../types";
+import { Bindings } from "../types.d";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 

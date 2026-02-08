@@ -12,8 +12,9 @@ import {
   EmbedDataType, LooseObj, Post
 } from "../types.d";
 import { makePost } from "../utils/bskyApi";
+import { getUsernameForUser } from "../utils/db/userinfo";
 import {
-  createPost, createRepost, deletePost, getPostById, getPostByIdWithReposts, getUsernameForUser,
+  createPost, createRepost, deletePost, getPostById, getPostByIdWithReposts,
   updatePostForUser
 } from "../utils/dbQuery";
 import { enqueuePost, isQueueEnabled, shouldPostNowQueue } from "../utils/queuePublisher";

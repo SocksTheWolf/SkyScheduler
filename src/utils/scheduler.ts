@@ -2,16 +2,10 @@ import isEmpty from 'just-is-empty';
 import { Bindings, Post, Repost, ScheduledContext } from '../types.d';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
-import {
-  deleteAllRepostsBeforeCurrentTime,
-  deletePosts,
-  getAllPostsForCurrentTime,
-  getAllRepostsForCurrentTime,
-  purgePostedPosts
-} from './dbQuery';
-import { getAllAbandonedMedia } from './dbQueryFile';
+import { getAllAbandonedMedia } from './db/file';
 import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
+import { getAllPostsForCurrentTime, getAllRepostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, purgePostedPosts, deletePosts } from './db/data';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, isQueued: boolean = false) => {
   const madePost = await makePost(runtime, postData, isQueued);

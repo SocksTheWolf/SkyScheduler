@@ -2,7 +2,8 @@ import { Context } from "hono";
 import { html, raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { Post } from "../types.d";
-import { getPostsForUser, getUsernameForUser } from "../utils/dbQuery";
+import { getPostsForUser } from "../utils/dbQuery";
+import { getUsernameForUser } from "../utils/db/userinfo";
 
 type PostContentObjectProps = {
   text: string;

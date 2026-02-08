@@ -11,11 +11,10 @@ import {
   PostResponseObject, Repost, ScheduledContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
-import {
-  createViolationForUser, getBskyUserPassForId,
-  isPostAlreadyPosted, setPostNowOffForPost, updatePostData
-} from './dbQuery';
+import { getBskyUserPassForId } from './db/userinfo';
+import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';
+import { isPostAlreadyPosted, setPostNowOffForPost, updatePostData } from './db/data';
 
 export const doesHandleExist = async (user: string) => {
   try {

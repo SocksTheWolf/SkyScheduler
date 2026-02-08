@@ -11,16 +11,22 @@ export const posts = sqliteTable('posts', {
   // This is a flag to help beat any race conditions with our cron jobs
   postNow: integer('postNow', { mode: 'boolean' }).default(false),
   embedContent: text('embedContent', {mode: 'json'}).notNull().$type<EmbedData[]>().default(sql`(json_array())`),
+  // Contains the reposting cadence of this post object, actionable rules are in the reposts table
   repostInfo: text('repostInfo', {mode: 'json'}).$type<RepostInfo[]>(),
+  // bsky/atproto record information once a post is posted
   uri: text('uri'),
   cid: text('cid'),
+  // if this post is a pseudo post (i.e. a repost of anything)
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
+  // bsky content labels
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
+  // metadata timestamps
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  // who created this post
   userId: text("user")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -46,22 +52,28 @@ export const posts = sqliteTable('posts', {
 ]);
 
 export const reposts = sqliteTable('reposts', {
+  // garbage key
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  // reflected post uuid
   uuid: text('post_uuid')
     .notNull()
     .references(() => posts.uuid, {onDelete: "cascade"}),
   scheduledDate: integer('scheduled_date', { mode: 'timestamp_ms' }).notNull(),
+  // bunching schedule cadence actions
   scheduleGuid: text('schedule_guid')
 }, (table) => [
   // cron queries
   index("repost_scheduledDate_idx").on(table.scheduledDate),
   // used for left joining and matching with posts field
   index("repost_postid_idx").on(table.uuid),
-  // used for checking if a schedule still has types left
+  // used for checking if a schedule still has actions left
   index("repost_scheduleGuid_idx").on(table.scheduleGuid),
+  // preventing similar actions from pushing to the table
   unique("repost_noduplicates_idx").on(table.uuid, table.scheduledDate),
 ]);
 
+// cache table for handling repost counts, without having to scan the entire
+// repost table
 export const repostCounts = sqliteTable('repostCounts', {
   uuid: text('post_uuid')
     .notNull()
@@ -69,6 +81,7 @@ export const repostCounts = sqliteTable('repostCounts', {
   count: integer('count').default(0).notNull()
 });
 
+// violations of users of this service
 export const violations = sqliteTable('violations', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   userId: text("user")
@@ -86,6 +99,15 @@ export const violations = sqliteTable('violations', {
   // joining and querying against the table's data
   index("violations_user_idx").on(table.userId)
 ]);
+
+// banned users from skyscheduler, prevents them from signing up
+export const bannedUsers = sqliteTable('bans', {
+  did: text('account_did').primaryKey().notNull(),
+  reason: text('banReason').notNull().default(""),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+  .default(sql`CURRENT_TIMESTAMP`)
+  .notNull(),
+});
 
 export const mediaFiles = sqliteTable('media', {
   fileName: text('file', {mode: 'text'}).primaryKey(),

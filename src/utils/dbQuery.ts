@@ -1,53 +1,28 @@
 import { addHours, isAfter, isEqual } from "date-fns";
-import {
-  desc, eq, getTableColumns, gt, inArray,
-  and, isNotNull,
-  isNull, lte, ne, notInArray, sql
-} from "drizzle-orm";
+import { and, desc, eq, getTableColumns } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
-import flatten from "just-flatten-it";
 import has from "just-has";
 import isEmpty from "just-is-empty";
-import truncate from "just-truncate";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
-import { mediaFiles, posts, repostCounts, reposts, violations } from "../db/app.schema";
+import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import {
-  MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH,
-  MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST
-} from "../limits";
+import { MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import {
   BatchQuery,
-  Bindings, BskyAPILoginCreds, CreateObjectResponse, CreatePostQueryResponse,
-  EmbedDataType, GetAllPostedBatch, LooseObj, PlatformLoginResponse,
-  Post, PostLabel, R2BucketObject, Repost, RepostInfo, ScheduledContext, Violation
+  CreateObjectResponse, CreatePostQueryResponse,
+  EmbedDataType,
+  Post, PostLabel,
+  RepostInfo,
+  Violation
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { addFileListing } from "./dbQueryFile";
-import {
-  createLoginCredsObj, createPostObject, createRepostInfo, createRepostObject,
-  floorCurrentTime, floorGivenTime
-} from "./helpers";
-import { deleteEmbedsFromR2, getAllFilesList } from "./r2Query";
-
-export const doesUserExist = async (c: Context, username: string) => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-  const result = await db.select().from(users)
-    .where(eq(users.username, username))
-    .limit(1).all();
-  return result.length > 0;
-};
-
-export const doesAdminExist = async (c: Context) => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-  const result = await db.select().from(users)
-    .where(eq(users.name, "admin"))
-    .limit(1).all();
-  return result.length > 0;
-};
+import { updatePostForGivenUser } from "./db/data";
+import { getViolationDeleteQueryForUser, getViolationsForUser } from "./db/violations";
+import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
+import { deleteEmbedsFromR2 } from "./r2Query";
 
 export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
   try {
@@ -68,21 +43,6 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
   }
   return null;
-};
-
-export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<string[]> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const mediaList = await db.select({embeds: posts.embedContent}).from(posts)
-    .where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
-  
-  let messyArray: string[][] = [];
-  mediaList.forEach(obj => {
-    const postMedia = obj.embeds;
-    messyArray.push(postMedia
-      .filter(media => media.type == EmbedDataType.Image || media.type == EmbedDataType.Video)
-      .map(media => media.content));
-  });
-  return flatten(messyArray);
 };
 
 export const updateUserData = async (c: Context, newData: any): Promise<boolean> => {
@@ -342,119 +302,9 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   return { ok: success, msg: success ? "success" : "fail" };
 };
 
-export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> => {
-  // Get all scheduled posts for current time
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const currentTime: Date = floorCurrentTime();
-
-  const violationUsers = db.select({violators: violations.userId}).from(violations);
-  const postsToMake = db.$with('scheduledPosts').as(db.select().from(posts)
-  .where(
-    and(
-      and(
-        eq(posts.posted, false),
-        ne(posts.postNow, true) // Ignore any posts that are marked for post now
-      ),
-      lte(posts.scheduledDate, currentTime)
-    )
-  ));
-  const results = await db.with(postsToMake).select().from(postsToMake)
-    .where(notInArray(postsToMake.userId, violationUsers)).all();
-  return results.map((item) => createPostObject(item));
-};
-
-export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
-  // Get all scheduled posts for the given time
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const query = db.select({uuid: reposts.uuid}).from(reposts)
-    .where(lte(reposts.scheduledDate, givenDate));
-  const violationsQuery = db.select({data: violations.userId}).from(violations);
-  const results = await db.select({uuid: posts.uuid, uri: posts.uri, cid: posts.cid, userId: posts.userId })
-    .from(posts)
-    .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
-    .all();
-
-  return results.map((item) => createRepostObject(item));
-};
-
-export const getAllRepostsForCurrentTime = async (env: Bindings): Promise<Repost[]> => {
-  return await getAllRepostsForGivenTime(env, floorCurrentTime());
-};
-
-export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const currentTime = floorCurrentTime();
-  const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
-    .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
-  
-  // This is really stupid and I hate it, but someone has to update repost counts once posted
-  if (deletedPosts.length > 0) {
-    let batchedQueries:BatchItem<"sqlite">[] = []; 
-    for (const deleted of deletedPosts) {
-      // Update counts
-      const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
-      batchedQueries.push(db.update(repostCounts)
-        .set({count: newCount})
-        .where(eq(repostCounts.uuid, deleted.id)));
-
-      // check if the repost data needs to be killed
-      if (!isEmpty(deleted.scheduleGuid)) {
-        // do a search to find if there are any reposts with the same scheduleguid.
-        // if there are none, this schedule should get removed from the repostInfo array
-        const stillHasSchedule = await db.select().from(reposts)
-          .where(and(isNotNull(reposts.scheduleGuid), eq(reposts.scheduleGuid, deleted.scheduleGuid!)))
-          .limit(1).all();
-        
-        // if this is empty, then we need to update the repost info.
-        if (isEmpty(stillHasSchedule)) {
-          // get the existing repost info to filter out this old data
-          const existingRepostInfoArr = (await db.select({repostInfo: posts.repostInfo}).from(posts)
-            .where(eq(posts.uuid, reposts.uuid)).limit(1).all())[0];
-          // check to see if there is anything in the repostInfo array
-          if (!isEmpty(existingRepostInfoArr)) {
-            // create a new array with the deleted out object
-            const newRepostInfoArr = existingRepostInfoArr.repostInfo!.filter((obj) => {
-              return obj.guid !== deleted.scheduleGuid!;
-            });
-            // push the new repost info array
-            batchedQueries.push(db.update(posts).set({repostInfo: newRepostInfoArr}).where(eq(posts.uuid, deleted.id)));
-          }
-        }
-      }
-    }
-    await db.batch(batchedQueries as BatchQuery);
-  }
-};
-
-/* This function should only be used by anything that is an internal helper (such as a task)
-  Should not be used for standard post modification */
-export const updatePostData = async (env: Bindings, id: string, newData: Object): Promise<boolean> => {
-  if (!uuidValid(id))
-    return false;
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const {success} = await db.update(posts).set(newData).where(eq(posts.uuid, id));
-  return success;
-};
-
-export const setPostNowOffForPost = async (env: Bindings, id: string) => {
-  const didUpdate = await updatePostData(env, id, {postNow: false});
-  if (!didUpdate)
-    console.error(`Unable to set PostNow to off for post ${id}`);
-};
-
 export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
   const userId = c.get("userId");
   return await updatePostForGivenUser(c, userId, id, newData);
-};
-
-export const updatePostForGivenUser = async (c: Context|ScheduledContext, userId: string, id: string, newData: Object) => {
-  if (!userId || !uuidValid(id))
-    return false;
-
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-  const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userId)));
-  return success;
 };
 
 export const getPostById = async(c: Context, id: string): Promise<Post|null> => {
@@ -486,228 +336,4 @@ export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Pos
   if (!isEmpty(result))
     return createPostObject(result[0]);
   return null;   
-};
-
-export const getBskyUserPassForId = async (env: Bindings, userid: string): Promise<BskyAPILoginCreds> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const response = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
-    .from(users)
-    .where(eq(users.id, userid))
-    .limit(1).all();
-  return createLoginCredsObj(response[0] || null);
-};
-
-export const getUsernameForUser = async (c: Context): Promise<string|null> => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-  const userId = c.get("userId");
-  if (!userId)
-    return null;
-
-  const result = await db.select({username: users.username}).from(users)
-    .where(eq(users.id, userId)).limit(1);
-  if (result !== null && result.length > 0)
-    return result[0].username;
-  return null;
-};
-
-// This is a super dumb query that's needed to get around better auth's forgot password system
-// because you cannot make the call with just an username, you need to also have the email
-// but we never update the email past the original time you first signed up, so instead
-// we use big brain tactics to spoof the email
-export const getUserEmailForHandle = async (env: Bindings, userhandle: string): Promise<string|null> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select({email: users.email}).from(users).where(eq(users.username, userhandle)).limit(1);
-  if (!isEmpty(result))
-    return result[0].email;
-  return null;
-};
-
-export const getAllPostedPostsOfUser = async(env: Bindings, userid: string): Promise<GetAllPostedBatch[]> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({id: posts.uuid, uri: posts.uri})
-    .from(posts)
-    .where(and(eq(posts.userId, userid), eq(posts.posted, true)))
-    .all();
-};
-
-export const getAllPostedPosts = async (env: Bindings): Promise<GetAllPostedBatch[]> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  return await db.select({id: posts.uuid, uri: posts.uri})
-    .from(posts)
-    .where(eq(posts.posted, true))
-    .all();
-};
-
-export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promise<boolean> => {
-  if (!uuidValid(postId))
-    return true;
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const query = await db.select({posted: posts.posted}).from(posts).where(eq(posts.uuid, postId)).all();
-  if (isEmpty(query) || query[0].posted === null) {
-    // if the post does not exist, return true anyways
-    return true;
-  }
-  return query[0].posted;
-}
-
-// deletes multiple posted posts from a database.
-export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promise<number> => {
-  // Don't do anything on empty arrays.
-  if (isEmpty(postsToDelete))
-    return 0;
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  let deleteQueries: BatchItem<"sqlite">[] = [];
-  postsToDelete.forEach((itm) => {
-    deleteQueries.push(db.delete(posts).where(and(eq(posts.uuid, itm), eq(posts.posted, true))));
-  });
-  // Batching this should improve db times
-  const batchResponse = await db.batch(deleteQueries as BatchQuery);
-  // Return the number of items that have been deleted
-  return batchResponse.reduce((val, item) => val + item.success, 0);
-};
-
-export const purgePostedPosts = async (env: Bindings): Promise<number> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
-  const dbQuery = await db.select({ data: posts.uuid }).from(posts)
-  .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
-  .where(
-    and(
-      and(
-        eq(posts.posted, true), lte(posts.updatedAt, sql`${dateString}`)
-      ),
-      lte(repostCounts.count, 0)
-    )
-  ).all();
-  const postsToDelete = dbQuery.map((item) => { return item.data });
-  if (isEmpty(postsToDelete))
-    return 0;
-
-  return await deletePosts(env, postsToDelete);
-}
-
-export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse): Promise<boolean> => {
-  const NoHandleState: PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
-    PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
-  // Don't do anything in these cases
-  if (violationType in NoHandleState) {
-    console.warn(`createViolationForUser got a not valid add request for user ${userId} with violation ${violationType}`);
-    return false;
-  }
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  let valuesUpdate:LooseObj = {};
-  switch (violationType) {
-    case PlatformLoginResponse.InvalidAccount:
-      valuesUpdate.userPassInvalid = true;
-    break;
-    case PlatformLoginResponse.Suspended:
-      valuesUpdate.accountSuspended = true;
-    break;
-    case PlatformLoginResponse.TakenDown:
-    case PlatformLoginResponse.Deactivated:
-      valuesUpdate.accountGone = true;
-    break;
-    case PlatformLoginResponse.MediaTooBig:
-      valuesUpdate.mediaTooBig = true;
-    break;
-    default:
-      console.warn(`createViolationForUser was not properly handled for ${violationType}`);
-      return false;
-  }
-
-  const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate})
-    .onConflictDoUpdate({target: violations.userId, set: valuesUpdate});
-  return success;
-};
-
-const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: string) => {
-  return db.delete(violations).where(and(eq(violations.userId, userId), 
-    and(ne(violations.tosViolation, true), ne(violations.accountGone, true))));
-};
-
-export const clearViolationForUser = async(env: Bindings, userId: string) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const {success} = await getViolationDeleteQueryForUser(db, userId);
-  return success;
-};
-
-const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
-  return await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
-};
-
-export const getViolationsForCurrentUser = async(c: Context) => {
-  const userId = c.get("userId");
-  if (userId) {
-    const db: DrizzleD1Database = drizzle(c.env.DB);
-    return await getViolationsForUser(db, userId);
-  } else {
-    return {success: false, results: []};
-  }
-};
-
-/** Maintenance operations **/
-export const runMaintenanceUpdates = async (env: Bindings) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  // Create a posted query that also checks for valid json and content length
-  const postedQuery = db.select({
-    ...getTableColumns(posts),
-    contentLength: sql<number>`length(${posts.content})`.as("conLength"),
-    isValidJson: sql<number>`cast(length(${posts.embedContent}) as int)`.as("json"),
-    }).from(posts).where(eq(posts.posted, true)).as("postedQuery");
-  // Then select from those posts that are too long or have too many characters
-  const jsonFix = await db.select({id: postedQuery.uuid}).from(postedQuery).where(gt(postedQuery.isValidJson, 2));
-  const postTruncation = await db.select({id: postedQuery.uuid, content: postedQuery.content })
-    .from(postedQuery).where(gt(postedQuery.contentLength, MAX_POSTED_LENGTH));
-
-  // Run the invalid json fix
-  if (jsonFix.length > 0) {
-    console.log(`Attempting to clean up/empty old JSON data for ${jsonFix.length} posts`);
-    let invalidJsonFix:string[] = [];
-    jsonFix.forEach(item => { invalidJsonFix.push(item.id)});
-    await db.update(posts).set({ embedContent: [] }).where(inArray(posts.uuid, invalidJsonFix));
-  }
-
-  // Post truncation
-  if (postTruncation.length > 0) {
-    console.log(`Attempting to clean up post truncation for ${postTruncation.length} posts`);
-    // it would be nicer to do bulking of this, but the method to do so in drizzle leaves me uneasy (and totally not about to sql inject myself)
-    // so we do each query uniquely instead.
-    postTruncation.forEach(async item => {
-      console.log(`Updating post ${item.id}`);
-      await db.update(posts).set({ content: truncate(item.content, MAX_POSTED_LENGTH) }).where(eq(posts.uuid, item.id));
-    });
-  }
-
-  // push timestamps
-  await db.update(posts).set({updatedAt: sql`CURRENT_TIMESTAMP`}).where(isNull(posts.updatedAt));
-
-  // populate existing media table with post data
-  const allBucketFiles:R2BucketObject[] = await getAllFilesList(env);
-  try {
-    for (const bucketFile of allBucketFiles) {
-      await addFileListing(env, bucketFile.name, bucketFile.user, bucketFile.date);
-    }
-  } catch(err) {
-    console.error(`Adding file listings got error ${err}`);
-  }
-
-  let batchedQueries:BatchItem<"sqlite">[] = []; 
-  // Flag if the media file has embed data
-  const allUsers = await db.select({id: users.id}).from(users).all();
-  for (const user of allUsers) {
-    const userMedia = await getAllMediaOfUser(env, user.id);
-    batchedQueries.push(db.update(mediaFiles).set({hasPost: true})
-      .where(inArray(mediaFiles.fileName, flatten(userMedia))));
-  }
-
-  const allPosts = await db.select({id: posts.uuid}).from(posts);
-  for (const post of allPosts) {
-    const count = db.$count(reposts, eq(reposts.uuid, post.id));
-    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id, 
-      count: count}).onConflictDoNothing());
-  }
-  await db.batch(batchedQueries as BatchQuery);
 };
