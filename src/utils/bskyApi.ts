@@ -1,4 +1,5 @@
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
+import { ResponseType, XRPCError } from '@atproto/xrpc';
 import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
@@ -432,6 +433,12 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
         try {
           uploadFile = await agent.uploadBlob(fileBlob, {encoding: file.httpMetadata?.contentType });
         } catch (err) {
+          if (err instanceof XRPCError) {
+            if (err.status === ResponseType.InternalServerError) {
+              console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${content.postid}`);
+              return false;
+            }
+          }
           // Give violation mediaTooBig if the file is too large.
           await createViolationForUser(env, content.user, PlatformLoginResponse.MediaTooBig);
           console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
