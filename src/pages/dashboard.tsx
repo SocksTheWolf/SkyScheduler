@@ -39,7 +39,7 @@ export default function Dashboard(props:any) {
                 <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" 
                   hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
-              <center class="controls">
+              <center class="postControls">
                 <button id="refresh-posts" hx-get="/post/all" hx-target="#posts" 
                     hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s" 
                     hx-on-htmx-before-request="this.classList.add('svgAnim');" 

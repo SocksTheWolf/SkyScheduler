@@ -62,7 +62,7 @@ export function PostEdit({post}:EditedPostProps) {
 
       <PostAltTextEdit post={post} />
       <progress id={editSpinner} class="htmx-indicator" />
-      <center class="controls">
+      <center class="postControls">
         <div id={editResponse}>
         </div>
         <button tabindex={0}>Update Post</button> 

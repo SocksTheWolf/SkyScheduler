@@ -1,5 +1,6 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
+import { HtmlEscapedString } from 'hono/utils/html';
 import { PreloadRules } from '../types.d';
 import { mainScriptStr } from '../utils/appScripts';
 import { PreloadDependencyTags } from './depTags';
@@ -9,6 +10,8 @@ type BaseLayoutProps = {
   children: Child;
   title?: string;
   mainClass?: string;
+  // Allows for out of band insertions without being affected by PicoCSS
+  outerElements?: Promise<HtmlEscapedString>|Child|null;
   preloads?: PreloadRules[]
 };
 
@@ -16,6 +19,7 @@ export const BaseLayout = ({
   children,
   title = "SkyScheduler",
   mainClass = "",
+  outerElements = null,
   preloads = []
 }: BaseLayoutProps) => {
   const layout = (
@@ -37,13 +41,14 @@ export const BaseLayout = ({
       <MetaTags />
     </head>
     <body>
-      <main class={mainClass}>
-        {children}
-      </main>
+      <container class="pico">
+        <main class={mainClass}>
+          {children}
+        </main>
+      </container>
+      {outerElements}
     </body>
   </html>);
   return html`<!DOCTYPE html>
   ${layout}`;
-
 }
-

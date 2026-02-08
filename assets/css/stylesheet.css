@@ -32,28 +32,28 @@
   text-overflow: ellipsis;
 }
 
-.btn-error {
+.btn-error, .pico .btn-error {
   border: var(--pico-border-width) solid red; 
   color: red;
 }
 
-.btn-error:hover {
+.btn-error:hover, .pico .btn-error:hover {
   --error-color-hover: rgb(252, 60, 60);
   border: var(--pico-border-width) solid var(--error-color-hover); 
   color: var(--error-color-hover);
 }
 
-.btn-error:not(.outline), .btn-error:not(.outline):hover {
+.btn-error:not(.outline), .pico .btn-error:not(.outline):hover {
   background-color: red;
   color: white;
 }
 
-.btn-success {
+.btn-success, .pico .btn-success {
   border: var(--pico-border-width) solid green; 
   color: green;
 }
 
-.btn-sm {
+.btn-sm, .pico .btn-sm {
   width: 25px !important;
   height: 30px;
   padding: unset;
@@ -61,7 +61,7 @@
 
 }
 
-.btn-delete {
+.btn-delete, .pico .btn-delete {
   float: right;
   svg, img {
     margin-top: -7px;
@@ -80,13 +80,13 @@
   padding-top: 1px;
 }
 
-.row-fluid {
+.row-fluid, .pico .row-fluid {
   padding-left: 30px;
   padding-right: 30px;
 }
 
 @media (max-width:1060px) {
-  .row-fluid {
+  .row-fluid, .pico .row-fluid {
     padding-left: 0px;
     padding-right: 0px;
   }
@@ -119,11 +119,11 @@
   margin-right: 5px;
 }
 
-.controls {
+.postControls {
   margin-top: 0.6rem;
 }
 
-.controls > button, .controls > a {
+.postControls > button, .postControls > a {
   margin-right: 10px;
   margin-bottom: 5px;
 }
@@ -194,11 +194,11 @@ dialog button.btn-error {
   overflow: hidden;
 }
 
-[role="tablist"] {
+[role="tablist"], .pico [role="tablist"] {
   display: block;
 }
 
-textarea {
+textarea, .pico textarea {
   resize: none;
 }
 
@@ -234,7 +234,7 @@ textarea {
   text-transform: capitalize;
 }
 
-[data-tooltip]:before {
+[data-tooltip]:before, .pico [data-tooltip]:before {
   white-space: preserve-breaks !important;
 }
 
