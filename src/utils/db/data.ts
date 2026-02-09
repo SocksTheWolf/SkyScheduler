@@ -86,7 +86,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
         if (isEmpty(stillHasSchedule)) {
           // get the existing repost info to filter out this old data
           const existingRepostInfoArr = (await db.select({repostInfo: posts.repostInfo}).from(posts)
-            .where(eq(posts.uuid, reposts.uuid)).limit(1).all())[0];
+            .where(eq(posts.uuid, deleted.id)).limit(1).all())[0];
           // check to see if there is anything in the repostInfo array
           if (!isEmpty(existingRepostInfoArr)) {
             // create a new array with the deleted out object
