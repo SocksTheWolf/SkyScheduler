@@ -142,12 +142,18 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
     }
   }
 
-  // Check to see if this post already exists
-  let rootPostID = undefined;
-  let parentPostID = undefined;
+  // Check to see if this post already exists for thread
+  let rootPostID:string|undefined = undefined;
+  let parentPostID:string|undefined = undefined;
+  let rootPostData: Post|null = null;
   if (uuidValid(rootPost)) {
-    if (await doesPostExist(c.env, userId, rootPost!)) {
-      rootPostID = rootPost!;
+    // returns null if the post doesn't appear on this account
+    rootPostData = await getPostById(c, rootPost!);
+    if (rootPostData !== null) {
+      if (rootPostData.posted) {
+        return { ok: false, msg: "You cannot make threads off already posted posts"};
+      }
+      rootPostID = rootPostData.rootPost!;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
         if (uuidValid(parentPost)) {
@@ -164,15 +170,11 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       return { ok: false, msg: "The given root post cannot be found on your account"};
     }
   }
-  const isThreadedPost: boolean = (rootPostID !== undefined && parentPostID !== undefined);
+  const isThreadedPost:boolean = (rootPostID !== undefined && parentPostID !== undefined);
 
   // Create repost metadata
-  let scheduleGUID:string|undefined;
-  let repostInfo:RepostInfo|undefined;
-  if (!isThreadedPost) {
-    scheduleGUID = uuidv4();
-    repostInfo = createRepostInfo(scheduleGUID, scheduleDate, false, repostData);
-  }
+  const scheduleGUID = (!isThreadedPost) ? uuidv4() : undefined;
+  const repostInfo = (!isThreadedPost) ? createRepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
   
   // Create the posts
   const postUUID = uuidv4();
@@ -181,11 +183,11 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       content,
       uuid: postUUID,
       postNow: makePostNow,
-      scheduledDate: scheduleDate,
+      scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData?.scheduledDate!),
       /*isThread: isThreadedPost,
       rootPost: rootPostID,
       parentPost: parentPostID,*/
-      repostInfo: !isThreadedPost ? [repostInfo!] : [],
+      repostInfo: (!isThreadedPost) ? [repostInfo!] : [],
       embedContent: embeds,
       contentLabel: label || PostLabel.None,
       userId: userId

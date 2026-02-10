@@ -1,5 +1,5 @@
 import {
-  and, eq, inArray,
+  and, eq, inArray, asc,
   lte, ne, notInArray, sql
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
@@ -45,7 +45,7 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
     )
   ));
   const results = await db.with(postsToMake).select().from(postsToMake)
-    .where(notInArray(postsToMake.userId, violationUsers)).all();
+    .where(notInArray(postsToMake.userId, violationUsers)).orderBy(asc(postsToMake.createdAt)).all();
   return results.map((item) => createPostObject(item));
 };
 
