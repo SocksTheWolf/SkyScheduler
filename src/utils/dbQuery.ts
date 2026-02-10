@@ -134,15 +134,12 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   }
 
   // Check if account is in violation
-  const hasViolations = await getViolationsForUser(db, userId);
-  if (hasViolations.success) {
-    if (!isEmpty(hasViolations.results)) {
-      const violationData: Violation = (hasViolations.results[0] as Violation);
-      if (violationData.tosViolation) {
-        return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
-      } else if (violationData.userPassInvalid) {
-        return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
-      }
+  const violationData = await getViolationsForUser(db, userId);
+  if (violationData != null) {
+    if (violationData.tosViolation) {
+      return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+    } else if (violationData.userPassInvalid) {
+      return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
     }
   }
 
@@ -216,15 +213,12 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   }
 
   // Check if account is in violation
-  const hasViolations = await getViolationsForUser(db, userId);
-  if (hasViolations.success) {
-    if (!isEmpty(hasViolations.results)) {
-      const violationData: Violation = (hasViolations.results[0] as Violation);
-      if (violationData.tosViolation) {
-        return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
-      } else if (violationData.userPassInvalid) {
-        return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
-      }
+  const violationData = await getViolationsForUser(db, userId);
+  if (violationData != null) {
+    if (violationData.tosViolation) {
+      return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+    } else if (violationData.userPassInvalid) {
+      return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
     }
   }
   let postUUID;
@@ -234,8 +228,10 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate, curRepostInfo: posts.repostInfo}).from(posts).where(and(
-    eq(posts.userId, userId), eq(posts.cid, cid))).limit(1).all();
+  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate, curRepostInfo: posts.repostInfo})
+    .from(posts).where(and(
+      eq(posts.userId, userId), eq(posts.cid, cid)))
+    .limit(1).all();
 
   const hasExistingPost:boolean = existingPost.length >= 1;
   if (hasExistingPost) {

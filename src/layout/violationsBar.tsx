@@ -5,10 +5,9 @@ import { getViolationsForCurrentUser } from "../utils/db/violations";
 
 export async function ViolationNoticeBar(props: any) {
   const ctx: Context = props.ctx;
-  const {success, results} = await getViolationsForCurrentUser(ctx);
-  if (success && !isEmpty(results)) {
+  const violationData = await getViolationsForCurrentUser(ctx);
+  if (violationData !== null) {
     let errorStr = "";
-    const violationData: Violation = (results[0] as Violation)
     if (violationData.tosViolation) {
       errorStr = "Your account is in violation of SkyScheduler usage.";
     } else if(violationData.userPassInvalid) {

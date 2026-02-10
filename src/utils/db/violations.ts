@@ -2,7 +2,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
 import { bannedUsers, violations } from "../../db/app.schema";
-import { Bindings, LooseObj, PlatformLoginResponse } from "../../types.d";
+import { Bindings, LooseObj, PlatformLoginResponse, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
@@ -34,8 +34,7 @@ export const userHandleHasBan = async (env: Bindings, userName: string) => {
 };
 
 export const userHasViolations = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
-  const response = await getViolationsForUser(db, userId);
-  return response.results.length > 0;
+  return (await getViolationsForUser(db, userId)) != null;
 };
 
 function createObjForValuesChange (violationType: PlatformLoginResponse[], value: boolean) {
@@ -115,15 +114,17 @@ export const removeViolations = async(env: Bindings, userId: string, violationTy
 }
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
-  return await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
+  const {results} = await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
+  if (results.length > 0)
+    return (results[0] as Violation);
+  return null;
 };
 
-export const getViolationsForCurrentUser = async(c: Context) => {
+export const getViolationsForCurrentUser = async(c: Context): Promise<Violation|null> => {
   const userId = c.get("userId");
   if (userId) {
     const db: DrizzleD1Database = drizzle(c.env.DB);
     return await getViolationsForUser(db, userId);
-  } else {
-    return {success: false, results: []};
   }
+  return null;
 };
