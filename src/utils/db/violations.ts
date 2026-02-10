@@ -33,7 +33,7 @@ export const userHandleHasBan = async (env: Bindings, userName: string) => {
   return false;
 };
 
-const userHasViolations = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
+export const userHasViolations = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
   const response = await getViolationsForUser(db, userId);
   return response.results.length > 0;
 };

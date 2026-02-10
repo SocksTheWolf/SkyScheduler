@@ -21,7 +21,7 @@ import {
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { updatePostForGivenUser } from "./db/data";
-import { getViolationsForUser, removeViolation } from "./db/violations";
+import { getViolationsForUser, removeViolation, userHasViolations } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
@@ -95,8 +95,14 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
   if (postQuery.length !== 0) {
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
-    if (!postQuery[0].posted)
+    if (!postQuery[0].posted) {
       await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
+      const hasViolations = await userHasViolations(db, userId);
+      if (hasViolations) {
+        // Remove the media too big violation if it's been given
+        await removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig);
+      }
+    }
 
     c.executionCtx.waitUntil(db.delete(posts).where(eq(posts.uuid, id)));
     return true;
