@@ -25,6 +25,7 @@ export default function MetaTags() {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "${Title}",
+        "headline": "${Title}",
         "url": "${URL}"
       }`)}
       </script>
