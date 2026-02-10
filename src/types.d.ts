@@ -102,17 +102,24 @@ export type Post = {
   postid: string;
   // SkyScheduler User Id
   user: string;
+  // post data
   text: string;
   embeds?: EmbedData[];
   label: PostLabel;
+  // post flags
   postNow: boolean;
   posted?: boolean;
   isRepost?: boolean;
+  // repost metadata
   repostInfo?: RepostInfo[];
   scheduledDate?: string;
   repostCount?: number;
+  // atproto data
   cid?: string;
   uri?: string;
+  // thread data
+  rootPost?: string;
+  parentPost?: string;
 };
 
 export type Repost = {

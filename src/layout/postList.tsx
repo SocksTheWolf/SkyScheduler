@@ -47,7 +47,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
     for (const repostItem of content.repostInfo!) {
       if (repostItem.count >= 1) {
         const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
-        if (repostItem.count == 1)
+        if (repostItem.count == 1 && repostItem.hours == 0)
           repostInfoStr += `* Repost at ${repostWrapper}`;
         else
           repostInfoStr += `* Every ${repostItem.hours} hours, ${repostItem.count} times from ${repostWrapper}`;
@@ -59,8 +59,9 @@ export function ScheduledPost(props: ScheduledPostOptions) {
     (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
       <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>Reposts Left: {content.repostCount}</span></>) : "";
 
-  return html`
-  <article id="postBase${content.postid}" ${oobSwapStr}>
+  const postHTML = html`
+  <article data-root="${content.rootPost || ''}" data-parent="${content.parentPost || ''}" 
+    id="postBase${content.postid}" ${oobSwapStr}>
     <header class="postItemHeader" ${hasBeenPosted && !content.isRepost ? raw('hidden>') : raw(`>`)}
       ${!hasBeenPosted ? editPostElement : null}
       ${!hasBeenPosted || (content.isRepost && content.repostCount! > 0) ? deletePostElement : null}
@@ -80,6 +81,11 @@ export function ScheduledPost(props: ScheduledPostOptions) {
       </small>
     </footer>
   </article>`;
+  // if this is a thread, chain it nicely
+  if (content.parentPost !== undefined)
+    return html`<blockquote>${postHTML}</blockquote>`;
+
+  return postHTML;
 };
 
 type ScheduledPostListProps = {

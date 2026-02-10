@@ -19,7 +19,7 @@ import {
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { updatePostForGivenUser } from "./db/data";
+import { doesPostExist, updatePostForGivenUser } from "./db/data";
 import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -124,7 +124,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
     return { ok: false, msg: validation.error.toString() };
   }
 
-  const { content, scheduledDate, embeds, label, makePostNow, repostData } = validation.data;
+  const { content, scheduledDate, embeds, label, makePostNow, repostData, rootPost, parentPost } = validation.data;
   const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
@@ -142,10 +142,38 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
     }
   }
 
-  // Create repost metadata
-  const scheduleGUID = uuidv4();
-  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, false, repostData);
+  // Check to see if this post already exists
+  let rootPostID = undefined;
+  let parentPostID = undefined;
+  if (uuidValid(rootPost)) {
+    if (await doesPostExist(c.env, userId, rootPost!)) {
+      rootPostID = rootPost!;
+      // If this isn't a direct reply, check directly underneath it
+      if (rootPost !== parentPost) {
+        if (uuidValid(parentPost)) {
+          if (await doesPostExist(c.env, userId, parentPost!)) {
+            parentPostID = parentPost!;
+          } else {
+            return { ok: false, msg: "The given parent post cannot be found on your account"};
+          }
+        }
+      } else {
+        parentPostID = rootPost!;
+      }
+    } else {
+      return { ok: false, msg: "The given root post cannot be found on your account"};
+    }
+  }
+  const isThreadedPost: boolean = (rootPostID !== undefined && parentPostID !== undefined);
 
+  // Create repost metadata
+  let scheduleGUID:string|undefined;
+  let repostInfo:RepostInfo|undefined;
+  if (!isThreadedPost) {
+    scheduleGUID = uuidv4();
+    repostInfo = createRepostInfo(scheduleGUID, scheduleDate, false, repostData);
+  }
+  
   // Create the posts
   const postUUID = uuidv4();
   let dbOperations: BatchItem<"sqlite">[] = [
@@ -154,7 +182,10 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       uuid: postUUID,
       postNow: makePostNow,
       scheduledDate: scheduleDate,
-      repostInfo: [repostInfo],
+      /*isThread: isThreadedPost,
+      rootPost: rootPostID,
+      parentPost: parentPostID,*/
+      repostInfo: !isThreadedPost ? [repostInfo!] : [],
       embedContent: embeds,
       contentLabel: label || PostLabel.None,
       userId: userId
@@ -172,7 +203,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   }
 
   // Add repost data to the table
-  if (repostData) {
+  if (repostData && !isThreadedPost) {
     for (var i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,

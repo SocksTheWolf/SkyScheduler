@@ -25,6 +25,12 @@ export function createPostObject(data: any) {
   if (data.repostInfo)
     postData.repostInfo = data.repostInfo;
 
+  if (data.rootPost)
+    postData.rootPost = data.rootPost;
+
+  if (data.parentPost)
+    postData.parentPost = data.parentPost;
+
   // ATProto data
   if (data.uri)
     postData.uri = data.uri;
