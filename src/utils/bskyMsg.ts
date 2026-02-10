@@ -1,5 +1,5 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { Bindings, PlatformLoginResponse } from '../types.d';
+import { Bindings, AccountStatus } from '../types.d';
 import { loginToBsky } from './bskyApi';
 
 const chatHeaders = {headers: {
@@ -8,7 +8,7 @@ const chatHeaders = {headers: {
 
 async function getDMConvo(agent: AtpAgent, env: Bindings, user: string) {
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
-  if (loginResponse !== PlatformLoginResponse.Ok) {
+  if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
     return null;
   }

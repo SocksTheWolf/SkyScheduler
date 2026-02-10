@@ -2,7 +2,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
 import { bannedUsers, violations } from "../../db/app.schema";
-import { Bindings, LooseObj, PlatformLoginResponse, Violation } from "../../types.d";
+import { Bindings, LooseObj, AccountStatus, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
@@ -37,29 +37,29 @@ export const userHasViolations = async (db: DrizzleD1Database, userId: string): 
   return (await getViolationsForUser(db, userId)) != null;
 };
 
-function createObjForValuesChange (violationType: PlatformLoginResponse[], value: boolean) {
+function createObjForValuesChange (violationType: AccountStatus[], value: boolean) {
   let valuesUpdate:LooseObj = {};
-  if (PlatformLoginResponse.InvalidAccount in violationType)
+  if (AccountStatus.InvalidAccount in violationType)
     valuesUpdate.userPassInvalid = value;
 
-  if (PlatformLoginResponse.Suspended in violationType)
+  if (AccountStatus.Suspended in violationType)
     valuesUpdate.accountSuspended = value;
 
-  if (PlatformLoginResponse.MediaTooBig in violationType)
+  if (AccountStatus.MediaTooBig in violationType)
     valuesUpdate.mediaTooBig = value;
 
-  if (PlatformLoginResponse.TOSViolation in violationType)
+  if (AccountStatus.TOSViolation in violationType)
     valuesUpdate.tosViolation = value;
 
-  if (PlatformLoginResponse.TakenDown in violationType || PlatformLoginResponse.Deactivated in violationType)
+  if (AccountStatus.TakenDown in violationType || AccountStatus.Deactivated in violationType)
     valuesUpdate.accountGone = value;
 
   return valuesUpdate;
 }
 
-export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse): Promise<boolean> => {
-  const NoHandleState: PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
-    PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
+export const createViolationForUser = async(env: Bindings, userId: string, violationType: AccountStatus): Promise<boolean> => {
+  const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage, 
+    AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
     console.warn(`createViolationForUser got a not valid add request for user ${userId} with violation ${violationType}`);
@@ -68,7 +68,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
 
   const db: DrizzleD1Database = drizzle(env.DB);
   const valuesUpdate:LooseObj = createObjForValuesChange([violationType], true);
-  if (violationType === PlatformLoginResponse.TOSViolation) {
+  if (violationType === AccountStatus.TOSViolation) {
     const bskyUsername = await getUsernameForUserId(env, userId);
     if (bskyUsername !== null) {
       await createBanForUser(env, bskyUsername, "tos violation");
@@ -88,11 +88,11 @@ export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: st
   ));
 };
 
-export const removeViolation = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
+export const removeViolation = async(env: Bindings, userId: string, violationType: AccountStatus) => {
   await removeViolations(env, userId, [violationType]);
 };
 
-export const removeViolations = async(env: Bindings, userId: string, violationType: PlatformLoginResponse[]) => {
+export const removeViolations = async(env: Bindings, userId: string, violationType: AccountStatus[]) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   // Check if they have a violation first
   if ((await userHasViolations(db, userId)) == false) {

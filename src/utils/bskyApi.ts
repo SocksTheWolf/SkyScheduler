@@ -8,7 +8,7 @@ import truncate from "just-truncate";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENGTH } from '../limits';
 import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj, PlatformLoginResponse, Post, PostLabel,
+  LooseObj, AccountStatus, Post, PostLabel,
   PostResponseObject, Repost, ScheduledContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
@@ -71,17 +71,17 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
       if (loginResponse.data.active == false) {
         switch (loginResponse.data.status) {
           case "deactivated":
-            return PlatformLoginResponse.Deactivated;
+            return AccountStatus.Deactivated;
           case "suspended":
-            return PlatformLoginResponse.Suspended;
+            return AccountStatus.Suspended;
           case "takendown":
-            return PlatformLoginResponse.TakenDown;
+            return AccountStatus.TakenDown;
         }
-        return PlatformLoginResponse.InvalidAccount;
+        return AccountStatus.InvalidAccount;
       }
-      return PlatformLoginResponse.PlatformOutage;
+      return AccountStatus.PlatformOutage;
     }
-    return PlatformLoginResponse.Ok;
+    return AccountStatus.Ok;
   } catch (err) {
     // Apparently login can rethrow as an XRPCError and completely eat the original throw.
     // so errors don't get handled gracefully.
@@ -90,16 +90,18 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
     if (errorName === "XRPCError") {
       const errCode = errWrap.status;
       if (errCode == 401) {
-        return PlatformLoginResponse.InvalidAccount;
+        // app password is bad
+        return AccountStatus.InvalidAccount;
       } else if (errCode >= 500) {
-        return PlatformLoginResponse.PlatformOutage;
+        return AccountStatus.PlatformOutage;
       }
     } else if (errorName === "XRPCNotSupported") {
-      return PlatformLoginResponse.InvalidAccount;
+      // handle is bad
+      return AccountStatus.InvalidAccount;
     }
     console.error(`encountered exception on login for user ${user}, err ${err}`);
   }
-  return PlatformLoginResponse.UnhandledError;
+  return AccountStatus.UnhandledError;
 }
 
 export const makePost = async (c: Context|ScheduledContext, content: Post|null, isQueued: boolean=false) => {
@@ -151,8 +153,8 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost) =
     service: new URL(pds),
   });
 
-  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, username, password);
-  if (loginResponse != PlatformLoginResponse.Ok) {
+  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
+  if (loginResponse != AccountStatus.Ok) {
     const addViolation:boolean = await createViolationForUser(env, content.userId, loginResponse);
     if (addViolation)
       console.error(`Unable to login to make repost from user ${content.userId} with violation ${loginResponse}`);
@@ -188,8 +190,8 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
   // Login to bsky
   const agent = new AtpAgent({ service: new URL(pds) });
 
-  const loginResponse: PlatformLoginResponse = await loginToBsky(agent, username, password);
-  if (loginResponse != PlatformLoginResponse.Ok) {
+  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
+  if (loginResponse != AccountStatus.Ok) {
     const addViolation: boolean = await createViolationForUser(env, content.user, loginResponse);
     if (addViolation)
       console.error(`Unable to login to make post ${content.user} with violation ${loginResponse}`);
@@ -440,7 +442,7 @@ export const makePostRaw = async (env: Bindings, content: Post) => {
             }
           }
           // Give violation mediaTooBig if the file is too large.
-          await createViolationForUser(env, content.user, PlatformLoginResponse.MediaTooBig);
+          await createViolationForUser(env, content.user, AccountStatus.MediaTooBig);
           console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
           return false;
         }

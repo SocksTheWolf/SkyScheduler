@@ -13,10 +13,9 @@ import {
   BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
   EmbedDataType,
-  PlatformLoginResponse,
+  AccountStatus,
   Post, PostLabel,
-  RepostInfo,
-  Violation
+  RepostInfo
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
@@ -70,7 +69,7 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
         // check if the user has violations
         if (await userHasViolations(db, userId)) {
           // they do, so clear them out
-          await removeViolations(c.env, userId, [PlatformLoginResponse.InvalidAccount, PlatformLoginResponse.Deactivated]);
+          await removeViolations(c.env, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
         }
       }
 
@@ -103,7 +102,7 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
       await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
       if (await userHasViolations(db, userId)) {
         // Remove the media too big violation if it's been given
-        await removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig);
+        await removeViolation(c.env, userId, AccountStatus.MediaTooBig);
       }
     }
 

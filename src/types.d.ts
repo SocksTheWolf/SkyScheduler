@@ -154,7 +154,7 @@ export interface LooseObj {
   [key: string]: any;
 };
 
-export enum PlatformLoginResponse {
+export enum AccountStatus {
   None = 0,
   Ok,
   Suspended,
