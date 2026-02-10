@@ -38,26 +38,23 @@ export const userHasViolations = async (db: DrizzleD1Database, userId: string): 
   return response.results.length > 0;
 };
 
-function createObjForValuesChange (violationType: PlatformLoginResponse, value: boolean) {
+function createObjForValuesChange (violationType: PlatformLoginResponse[], value: boolean) {
   let valuesUpdate:LooseObj = {};
-  switch (violationType) {
-    case PlatformLoginResponse.InvalidAccount:
-      valuesUpdate.userPassInvalid = value;
-    break;
-    case PlatformLoginResponse.Suspended:
-      valuesUpdate.accountSuspended = value;
-    break;
-    case PlatformLoginResponse.TakenDown:
-    case PlatformLoginResponse.Deactivated:
-      valuesUpdate.accountGone = value;
-    break;
-    case PlatformLoginResponse.MediaTooBig:
-      valuesUpdate.mediaTooBig = value;
-    break;
-    case PlatformLoginResponse.TOSViolation:
-      valuesUpdate.tosViolation = value;
-    break;
-  }
+  if (PlatformLoginResponse.InvalidAccount in violationType)
+    valuesUpdate.userPassInvalid = value;
+
+  if (PlatformLoginResponse.Suspended in violationType)
+    valuesUpdate.accountSuspended = value;
+
+  if (PlatformLoginResponse.MediaTooBig in violationType)
+    valuesUpdate.mediaTooBig = value;
+
+  if (PlatformLoginResponse.TOSViolation in violationType)
+    valuesUpdate.tosViolation = value;
+
+  if (PlatformLoginResponse.TakenDown in violationType || PlatformLoginResponse.Deactivated in violationType)
+    valuesUpdate.accountGone = value;
+
   return valuesUpdate;
 }
 
@@ -71,7 +68,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
   }
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  const valuesUpdate:LooseObj = createObjForValuesChange(violationType, true);
+  const valuesUpdate:LooseObj = createObjForValuesChange([violationType], true);
   if (violationType === PlatformLoginResponse.TOSViolation) {
     const bskyUsername = await getUsernameForUserId(env, userId);
     if (bskyUsername !== null) {
@@ -93,6 +90,10 @@ export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: st
 };
 
 export const removeViolation = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
+  await removeViolations(env, userId, [violationType]);
+};
+
+export const removeViolations = async(env: Bindings, userId: string, violationType: PlatformLoginResponse[]) => {
   const db: DrizzleD1Database = drizzle(env.DB);
   // Check if they have a violation first
   if ((await userHasViolations(db, userId)) == false) {

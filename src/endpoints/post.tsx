@@ -216,7 +216,7 @@ post.delete("/delete/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     if (await deletePost(c, id) === true) {
-      c.header("HX-Trigger-After-Swap", "postDeleted");
+      c.header("HX-Trigger-After-Swap", "postDeleted, accountViolations");
       return c.html(<></>);
     }
   }

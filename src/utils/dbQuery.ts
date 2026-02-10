@@ -21,7 +21,7 @@ import {
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { updatePostForGivenUser } from "./db/data";
-import { getViolationsForUser, removeViolation, userHasViolations } from "./db/violations";
+import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
@@ -65,9 +65,13 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
           .where(eq(accounts.userId, userId)));
       }
 
-      // If we have new data about the username, pds, or password, then clear account invalid violations
+      // If we have new data about the username, pds, or password
       if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
-        await removeViolation(c.env, userId, PlatformLoginResponse.InvalidAccount);
+        // check if the user has violations
+        if (await userHasViolations(db, userId)) {
+          // they do, so clear them out
+          await removeViolations(c.env, userId, [PlatformLoginResponse.InvalidAccount, PlatformLoginResponse.Deactivated]);
+        }
       }
 
       if (!isEmpty(newData)) {
@@ -97,10 +101,9 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
     // delete the files from R2
     if (!postQuery[0].posted) {
       await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
-      const hasViolations = await userHasViolations(db, userId);
-      if (hasViolations) {
+      if (await userHasViolations(db, userId)) {
         // Remove the media too big violation if it's been given
-        c.executionCtx.waitUntil(removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig));
+        await removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig);
       }
     }
 
