@@ -1,5 +1,5 @@
 import {
-  and, eq, inArray, isNotNull,
+  and, eq, inArray,
   lte, ne, notInArray, sql
 } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
@@ -79,7 +79,9 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
         // do a search to find if there are any reposts with the same scheduleguid.
         // if there are none, this schedule should get removed from the repostInfo array
         const stillHasSchedule = await db.select().from(reposts)
-          .where(and(isNotNull(reposts.scheduleGuid), eq(reposts.scheduleGuid, deleted.scheduleGuid!)))
+          .where(and(
+            eq(reposts.scheduleGuid, deleted.scheduleGuid!), 
+            eq(reposts.uuid, deleted.id)))
           .limit(1).all();
         
         // if this is empty, then we need to update the repost info.

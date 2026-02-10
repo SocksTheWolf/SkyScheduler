@@ -67,7 +67,7 @@ export const reposts = sqliteTable('reposts', {
   // used for left joining and matching with posts field
   index("repost_postid_idx").on(table.uuid),
   // used for checking if a schedule still has actions left
-  index("repost_scheduleGuid_idx").on(table.scheduleGuid),
+  index("repost_scheduleGuid_idx").on(table.scheduleGuid, table.uuid),
   // preventing similar actions from pushing to the table
   unique("repost_noduplicates_idx").on(table.uuid, table.scheduledDate),
 ]);
