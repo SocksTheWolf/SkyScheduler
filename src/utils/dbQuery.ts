@@ -13,6 +13,7 @@ import {
   BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
   EmbedDataType,
+  PlatformLoginResponse,
   Post, PostLabel,
   RepostInfo,
   Violation
@@ -20,7 +21,7 @@ import {
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { updatePostForGivenUser } from "./db/data";
-import { getViolationDeleteQueryForUser, getViolationsForUser } from "./db/violations";
+import { getViolationsForUser, removeViolation } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
@@ -66,7 +67,7 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
 
       // If we have new data about the username, pds, or password, then clear account invalid violations
       if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
-        queriesToExecute.push(getViolationDeleteQueryForUser(db, userId));
+        await removeViolation(c.env, userId, PlatformLoginResponse.InvalidAccount);
       }
 
       if (!isEmpty(newData)) {

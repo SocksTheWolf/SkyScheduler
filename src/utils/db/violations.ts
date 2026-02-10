@@ -33,6 +33,34 @@ export const userHandleHasBan = async (env: Bindings, userName: string) => {
   return false;
 };
 
+const userHasViolations = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
+  const response = await getViolationsForUser(db, userId);
+  return response.results.length > 0;
+};
+
+function createObjForValuesChange (violationType: PlatformLoginResponse, value: boolean) {
+  let valuesUpdate:LooseObj = {};
+  switch (violationType) {
+    case PlatformLoginResponse.InvalidAccount:
+      valuesUpdate.userPassInvalid = value;
+    break;
+    case PlatformLoginResponse.Suspended:
+      valuesUpdate.accountSuspended = value;
+    break;
+    case PlatformLoginResponse.TakenDown:
+    case PlatformLoginResponse.Deactivated:
+      valuesUpdate.accountGone = value;
+    break;
+    case PlatformLoginResponse.MediaTooBig:
+      valuesUpdate.mediaTooBig = value;
+    break;
+    case PlatformLoginResponse.TOSViolation:
+      valuesUpdate.tosViolation = value;
+    break;
+  }
+  return valuesUpdate;
+}
+
 export const createViolationForUser = async(env: Bindings, userId: string, violationType: PlatformLoginResponse): Promise<boolean> => {
   const NoHandleState: PlatformLoginResponse[] = [PlatformLoginResponse.Ok, PlatformLoginResponse.PlatformOutage, 
     PlatformLoginResponse.None, PlatformLoginResponse.UnhandledError];
@@ -43,33 +71,14 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
   }
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  let valuesUpdate:LooseObj = {};
-  switch (violationType) {
-    case PlatformLoginResponse.InvalidAccount:
-      valuesUpdate.userPassInvalid = true;
-    break;
-    case PlatformLoginResponse.Suspended:
-      valuesUpdate.accountSuspended = true;
-    break;
-    case PlatformLoginResponse.TakenDown:
-    case PlatformLoginResponse.Deactivated:
-      valuesUpdate.accountGone = true;
-    break;
-    case PlatformLoginResponse.MediaTooBig:
-      valuesUpdate.mediaTooBig = true;
-    break;
-    case PlatformLoginResponse.TOSViolation:
-      valuesUpdate.tosViolation = true;      
-      const bskyUsername = await getUsernameForUserId(env, userId);
-      if (bskyUsername !== null) {
-        await createBanForUser(env, bskyUsername, "tos violation");
-      } else {
-        console.warn(`unable to get bsky username for id ${userId}`);
-      }
-    break;
-    default:
-      console.warn(`createViolationForUser was not properly handled for ${violationType}`);
-      return false;
+  const valuesUpdate:LooseObj = createObjForValuesChange(violationType, true);
+  if (violationType === PlatformLoginResponse.TOSViolation) {
+    const bskyUsername = await getUsernameForUserId(env, userId);
+    if (bskyUsername !== null) {
+      await createBanForUser(env, bskyUsername, "tos violation");
+    } else {
+      console.warn(`unable to get bsky username for id ${userId}`);
+    }
   }
 
   const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate})
@@ -79,14 +88,30 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
 
 export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: string) => {
   return db.delete(violations).where(and(eq(violations.userId, userId), 
-    and(ne(violations.tosViolation, true), ne(violations.accountGone, true))));
+    and(ne(violations.tosViolation, true), ne(violations.accountGone, true))
+  ));
 };
 
-export const clearViolationForUser = async(env: Bindings, userId: string) => {
+export const removeViolation = async(env: Bindings, userId: string, violationType: PlatformLoginResponse) => {
   const db: DrizzleD1Database = drizzle(env.DB);
-  const {success} = await getViolationDeleteQueryForUser(db, userId);
-  return success;
-};
+  // Check if they have a violation first
+  if ((await userHasViolations(db, userId)) == false) {
+    return;
+  }
+
+  // Create the update query
+  const valuesUpdate:LooseObj = createObjForValuesChange(violationType, false);
+  await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId));
+  // Delete the record if the user has no other violations
+  await db.delete(violations).where(and(eq(violations.userId, userId), 
+    and(
+      and(
+        and(ne(violations.accountSuspended, true), ne(violations.accountGone, true),
+        and(ne(violations.userPassInvalid, true), ne(violations.mediaTooBig, true))
+        ),
+      ne(violations.tosViolation, true))
+    )));
+}
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
   return await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
