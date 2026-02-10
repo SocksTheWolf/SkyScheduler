@@ -100,7 +100,7 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
       const hasViolations = await userHasViolations(db, userId);
       if (hasViolations) {
         // Remove the media too big violation if it's been given
-        await removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig);
+        c.executionCtx.waitUntil(removeViolation(c.env, userId, PlatformLoginResponse.MediaTooBig));
       }
     }
 
