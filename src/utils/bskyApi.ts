@@ -12,7 +12,7 @@ import {
   PostResponseObject, Repost, ScheduledContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
-import { getBskyUserPassForId } from './db/userinfo';
+import { getBskyUserPassForId, getUsernameForUserId } from './db/userinfo';
 import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';
 import { isPostAlreadyPosted, setPostNowOffForPost, updatePostData } from './db/data';
@@ -104,7 +104,27 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
   return AccountStatus.UnhandledError;
 }
 
-export const makePost = async (c: Context|ScheduledContext, content: Post|null, isQueued: boolean=false) => {
+export const makeAgentForUser = async (env: Bindings, userId: string) => {
+  const loginCreds = await getBskyUserPassForId(env, userId);
+  if (loginCreds.valid === false) {
+    console.error(`credentials for user ${userId} were invalid`);
+    return null;
+  }
+  const {username, password, pds} = loginCreds;
+  // Login to bsky
+  const agent = new AtpAgent({ service: new URL(pds) });
+
+  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
+  if (loginResponse != AccountStatus.Ok) {
+    const addViolation: boolean = await createViolationForUser(env, userId, loginResponse);
+    if (addViolation)
+      console.error(`Unable to login to ${userId} with violation ${loginResponse}`);
+    return null;
+  }
+  return agent;
+}
+
+export const makePost = async (c: Context|ScheduledContext, content: Post|null, isQueued: boolean=false, usingAgent: AtpAgent|null=null) => {
   if (content === null)
     return false;
   
@@ -114,7 +134,13 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
     console.log(`Dropped handling make post for post ${content.postid}, already posted.`)
     return true;
   }
-  const newPost: PostResponseObject|null = await makePostRaw(env, content);
+
+  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(env, content.user) : usingAgent;
+  if (agent === null) {
+    console.warn(`could not make agent for post ${content.postid}`);
+    return false;
+  }
+  const newPost: PostResponseObject|null = await makePostRaw(env, content, agent);
   if (newPost !== null) {
     // update post data in the d1
     const postDataUpdate: Promise<boolean> = updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
@@ -139,25 +165,12 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
   return false;
 }
 
-export const makeRepost = async (c: Context|ScheduledContext, content: Repost) => {
+export const makeRepost = async (c: Context|ScheduledContext, content: Repost, usingAgent: AtpAgent|null=null) => {
   const env = c.env;
   let bWasSuccess = true;
-  const loginCreds = await getBskyUserPassForId(env, content.userId);
-  if (loginCreds.valid === false) {
-    console.error(`bsky credentials for repost ${content.uri} were invalid`);
-    return false;
-  }
-
-  const {username, password, pds} = loginCreds
-  const agent = new AtpAgent({
-    service: new URL(pds),
-  });
-
-  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
-  if (loginResponse != AccountStatus.Ok) {
-    const addViolation:boolean = await createViolationForUser(env, content.userId, loginResponse);
-    if (addViolation)
-      console.error(`Unable to login to make repost from user ${content.userId} with violation ${loginResponse}`);
+  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(env, content.userId) : usingAgent;
+  if (agent === null) {
+    console.warn(`could not make agent for repost ${content.postid}`);
     return false;
   }
 
@@ -179,22 +192,11 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost) =
   return bWasSuccess;
 };
 
-export const makePostRaw = async (env: Bindings, content: Post) => {
-  const loginCreds = await getBskyUserPassForId(env, content.user);
-  if (loginCreds.valid === false) {
-    console.error(`credentials for post ${content.postid} were invalid`);
-    return null;
-  }
-
-  const {username, password, pds} = loginCreds;
-  // Login to bsky
-  const agent = new AtpAgent({ service: new URL(pds) });
-
-  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
-  if (loginResponse != AccountStatus.Ok) {
-    const addViolation: boolean = await createViolationForUser(env, content.user, loginResponse);
-    if (addViolation)
-      console.error(`Unable to login to make post ${content.user} with violation ${loginResponse}`);
+export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent) => {
+  const username = await getUsernameForUserId(env, content.user);
+  // incredibly unlikely but we'll handle it
+  if (username === null) {
+    console.warn(`username for post ${content.postid} was invalid`);
     return null;
   }
 
