@@ -55,6 +55,7 @@ export interface Bindings {
   RESIZE_SECRET_HEADER: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
+  ENCRYPTED_PASS_KEY: string;
   IN_DEV: boolean;
   REDIRECTS: RedirectConfigSettings;
 };
