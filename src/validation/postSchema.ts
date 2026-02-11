@@ -37,14 +37,24 @@ export const PostSchema = z.object({
       return false;
     }
   }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
-}).superRefine(({embeds, label, makePostNow, rootPost, parentPost}, ctx) => {
+}).superRefine(({embeds, label, makePostNow, repostData, rootPost, parentPost}, ctx) => {
   // check that root and parentpost are unset if makePostNow is set
-  if (makePostNow && (rootPost !== undefined || parentPost !== undefined)) {
-    ctx.addIssue({
-      code: "custom",
-      message: "You cannot post now while having prior post records set",
-      path: ["makePostNow"]
-    });
+  if (rootPost !== undefined && parentPost !== undefined) {
+    if (makePostNow) {
+      ctx.addIssue({
+        code: "custom",
+        message: "You cannot post now while making threads",
+        path: ["makePostNow"]
+      });
+    }
+
+    if (repostData !== undefined) {
+      ctx.addIssue({
+        code: "custom",
+        message: "You cannot have repost data with threads",
+        path: ["repostData"]
+      });
+    }
   }
   // Check that labels are properly set if we have embed data
   if (embeds !== undefined && embeds.length > 0 && label === undefined) {

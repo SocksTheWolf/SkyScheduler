@@ -124,6 +124,7 @@ export type Post = {
   cid?: string;
   uri?: string;
   // thread data
+  isThread: boolean;
   rootPost?: string;
   parentPost?: string;
 };
@@ -161,6 +162,12 @@ export type Violation = {
 export type PostResponseObject = {
   uri: string;
   cid: string;
+};
+
+export type PostRecordResponse = PostResponseObject & {
+  postID: string;
+  content: string;
+  embeds?: EmbedData[]; 
 };
 
 export interface LooseObj {
