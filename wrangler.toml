@@ -86,5 +86,8 @@ REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://
 # if we should be removing abandoned files from R2 storage
 R2_SETTINGS={auto_prune=true, prune_days=3}
 
+# various site settings
+SITE_SETTINGS={use_agent_map=false}
+
 # set this to true in your .dev.vars to turn off turnstile
 IN_DEV=false

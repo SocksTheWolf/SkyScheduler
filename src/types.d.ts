@@ -31,6 +31,10 @@ type QueueConfigSettings = {
   repost_queues: string[];
 }
 
+type SiteConfigSettings = {
+  use_agent_map: boolean;
+}
+
 /** Types, types, types **/
 export interface Bindings {
   DB: D1Database;
@@ -44,6 +48,7 @@ export interface Bindings {
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
   SIGNUP_SETTINGS: SignupConfigSettings;
+  SITE_SETTINGS: SiteConfigSettings;
   R2_SETTINGS: R2ConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;

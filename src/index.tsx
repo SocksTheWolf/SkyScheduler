@@ -163,10 +163,10 @@ export default {
     for (const message of batch.messages) {
       switch (message.body.type) {
         case QueueTaskType.Post:
-          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, true);
+          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, null, true);
         break;
         case QueueTaskType.Repost:
-          wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost!);
+          wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost!, null);
         break;
         default:
         case QueueTaskType.None:
