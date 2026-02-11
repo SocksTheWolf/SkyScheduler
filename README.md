@@ -53,8 +53,7 @@ cp .dev.vars.example .dev.vars
    - `TURNSTILE_PUBLIC_KEY` - the turnstile public key for captcha
    - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
    - `RESIZE_SECRET_HEADER` - a header value that will be included on requests while trying to resize images. Protects the resize bucket while still making it accessible to CF Images.
-   - `ENCRYPTED_PASS_KEY` - the encryption key used for storing anything else encrypted (you can generate one from the link before, it should be different than the value of better auth secret)
-
+   
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
 4. Update your `wrangler.toml` with changes that reflect your account.
