@@ -28,7 +28,7 @@ export const getBskyUserPassForId = async (env: Bindings, userid: string): Promi
     .from(users)
     .where(eq(users.id, userid))
     .limit(1).all();
-  return createLoginCredsObj(response[0] || null);
+  return createLoginCredsObj(env, response[0] || null);
 };
 
 export const getUsernameForUserId = async (env: Bindings, userId: string): Promise<string|null> => {

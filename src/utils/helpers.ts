@@ -1,7 +1,7 @@
 import { startOfHour, subDays } from "date-fns";
 import has from "just-has";
 import isEmpty from "just-is-empty";
-import { BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types.d";
+import { Bindings, BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types.d";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);
@@ -65,7 +65,7 @@ export function createRepostInfo(id: string, time: Date, isRepost: boolean, repo
   return repostObj;
 }
 
-export function createLoginCredsObj(data: any) {
+export function createLoginCredsObj(env: Bindings, data: any) {
   const loginCreds: BskyAPILoginCreds = (new Object() as BskyAPILoginCreds);
   if (isEmpty(data)) {
     loginCreds.password = loginCreds.username = loginCreds.pds = "";
