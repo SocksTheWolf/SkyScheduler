@@ -19,7 +19,9 @@ export const posts = sqliteTable('posts', {
   // if this post is a pseudo post (i.e. a repost of anything)
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
   // if this post has a post chain to it, this should only ever apply to the root post
-  //isThread: integer('isThread', {mode: 'boolean'}).default(false),
+  isThread: integer('isThread', {mode: 'boolean'}).default(false),
+  rootPost: text('rootPost'),
+  parentPost: text('parentPost'),
   // bsky content labels
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
   // metadata timestamps
@@ -46,9 +48,9 @@ export const posts = sqliteTable('posts', {
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
   // for checking for post chains
-  /*index("threadUUID_idx")
-    .on(table.uuid, table.isThread, table.rootPost)
-    .where(sql`isThread = 1`),*/
+  index("threadUUID_idx")
+    .on(table.isThread, table.rootPost, table.parentPost)
+    .where(sql`isThread = 1`),
   // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)

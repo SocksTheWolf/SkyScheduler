@@ -1,5 +1,5 @@
 import { addHours, isAfter, isEqual } from "date-fns";
-import { and, desc, eq, getTableColumns } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, or } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
@@ -96,17 +96,29 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
   const db: DrizzleD1Database = drizzle(c.env.DB);
   const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).all();
   if (postQuery.length !== 0) {
+    const postObj = createPostObject(postQuery[0]);
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
-    if (!postQuery[0].posted) {
-      await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
+    if (!postObj.posted) {
+      await deleteEmbedsFromR2(c, postObj.embeds);
       if (await userHasViolations(db, userId)) {
         // Remove the media too big violation if it's been given
         await removeViolation(c.env, userId, AccountStatus.MediaTooBig);
       }
     }
 
-    c.executionCtx.waitUntil(db.delete(posts).where(eq(posts.uuid, id)));
+    // If the parent post is not null, then attempt to find and update the post chain
+    const parentPost = postObj.parentPost;
+    if (parentPost !== null) {
+      // set anyone who had this as their parent to this post chain
+      await db.update(posts).set({parentPost: parentPost})
+        .where(and(eq(posts.isThread, true), 
+          and(eq(posts.rootPost, postObj.rootPost!), eq(posts.parentPost, postObj.postid))));
+    }
+
+    c.executionCtx.waitUntil(db.delete(posts).where(
+      or(eq(posts.uuid, id), 
+      and(eq(posts.isThread, true), eq(posts.rootPost, id)))));
     return true;
   }
   return false;
@@ -184,9 +196,9 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       uuid: postUUID,
       postNow: makePostNow,
       scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData?.scheduledDate!),
-      /*isThread: isThreadedPost,
+      isThread: isThreadedPost,
       rootPost: rootPostID,
-      parentPost: parentPostID,*/
+      parentPost: parentPostID,
       repostInfo: (!isThreadedPost) ? [repostInfo!] : [],
       embedContent: embeds,
       contentLabel: label || PostLabel.None,

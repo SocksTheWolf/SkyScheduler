@@ -9,13 +9,14 @@ import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST, MAX_POSTED_LENG
 import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, AccountStatus, Post, PostLabel,
-  PostResponseObject, Repost, ScheduledContext
+  PostResponseObject, Repost, ScheduledContext,
+  PostRecordResponse
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
 import { getBskyUserPassForId, getUsernameForUserId } from './db/userinfo';
 import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';
-import { isPostAlreadyPosted, setPostNowOffForPost, updatePostData } from './db/data';
+import { bulkUpdatePostedData, isPostAlreadyPosted, setPostNowOffForPost, updatePostData } from './db/data';
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -140,18 +141,19 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
     console.warn(`could not make agent for post ${content.postid}`);
     return false;
   }
-  const newPost: PostResponseObject|null = await makePostRaw(env, content, agent);
-  if (newPost !== null) {
-    // update post data in the d1
-    const postDataUpdate: Promise<boolean> = updatePostData(env, content.postid, { posted: true, uri: newPost.uri, cid: newPost.cid, 
-      content: truncate(content.text, MAX_POSTED_LENGTH), embedContent: [] });
+  const newPostRecords: PostRecordResponse[]|null = await makePostRaw(env, content, agent);
+  if (newPostRecords !== null) {
+    const postDataUpdate = bulkUpdatePostedData(env, newPostRecords);
     if (isQueued)
       await postDataUpdate;
     else
       c.executionCtx.waitUntil(postDataUpdate);
 
     // Delete any embeds if they exist.
-    await deleteEmbedsFromR2(c, content.embeds, isQueued);
+    for (const record of newPostRecords) {
+      await deleteEmbedsFromR2(c, record.embeds, isQueued);
+    }
+    
     return true;
   }
   
@@ -200,28 +202,27 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
     return null;
   }
 
-  const rt = new RichText({
-    text: content.text,
-  });
+  // Easy lookup map for reply mapping for this post chain
+  const postMap = new Map();
 
-  await rt.detectFacets(agent);
+  // Lambda that handles making a post record and submitting it to bsky
+  const postSegment = async (postData: Post) => {
+    let currentEmbedIndex = 0;
 
-  // This used to be so that we could handle posts in threads, but it turns out that threading is more annoying
-  // As if anything fails, you have to roll back pretty hard.
-  // So threading is dropped. But here's the code if we wanted to bring it back in the future.
-  let currentEmbedIndex = 0; 
-  const posts: PostResponseObject[] = [];
+    const rt = new RichText({
+      text: postData.text,
+    });
 
-  const postSegment = async (data: string) => {
+    await rt.detectFacets(agent);
     let postRecord: AppBskyFeedPost.Record = {
       $type: 'app.bsky.feed.post',
-      text: data,
+      text: rt.text,
       facets: rt.facets,
       createdAt: new Date().toISOString(),
     };
-    if (content.label !== undefined && content.label !== PostLabel.None) {
+    if (postData.label !== undefined && postData.label !== PostLabel.None) {
       let contentValues = [];
-      switch (content.label) {
+      switch (postData.label) {
         case PostLabel.Adult:
           contentValues.push({"val": "porn"});
         break;
@@ -246,7 +247,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
     }
 
     // Upload any embeds to this post
-    if (content.embeds?.length) {
+    if (postData.embeds?.length) {
       let mediaEmbeds: BskyEmbedWrapper = { type: EmbedDataType.None };
       let imagesArray = [];
       let bskyRecordInfo: BskyRecordWrapper = {};
@@ -256,8 +257,8 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
       }
       // go until we run out of embeds or have hit the amount of embeds per post (+1 because there could be a record with media)
-      for (; embedsProcessed < MAX_EMBEDS_PER_POST + 1 && currentEmbedIndex < content.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
-        const currentEmbed: EmbedData = content.embeds[currentEmbedIndex];
+      for (; embedsProcessed < MAX_EMBEDS_PER_POST + 1 && currentEmbedIndex < postData.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
+        const currentEmbed: EmbedData = postData.embeds[currentEmbedIndex];
         const currentEmbedType: EmbedDataType = currentEmbed.type;
 
         // If we never saw any record info, and the current type is not record itself, then we're on an overflow and need to back out.
@@ -267,7 +268,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
 
         // If we have encountered a record violation (illegal mixed media types), then we should stop processing further.
         if (isRecordViolation(currentEmbedType)) {
-          console.error(`${content.postid} had a mixed media types of ${mediaEmbeds.type} trying to write ${currentEmbedType}`);
+          console.error(`${postData.postid} had a mixed media types of ${mediaEmbeds.type} trying to write ${currentEmbedType}`);
           break;
         }
 
@@ -322,7 +323,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
           }
 
           if (!isEmpty(bskyRecordInfo)) {
-            console.warn(`${content.postid} attempted to write two record info objects`);
+            console.warn(`${postData.postid} attempted to write two record info objects`);
             continue;
           }
 
@@ -374,7 +375,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
               const uriResolve: string[] = [ uri ];
               const resolvePost = await getAgentPostRecords(agent, uriResolve);
               if (resolvePost === null) {
-                console.error(`Unable to resolve record information for ${content.postid} with ${uri}`);
+                console.error(`Unable to resolve record information for ${postData.postid} with ${uri}`);
                 // Change the record back.
                 if (changedRecord)
                     mediaEmbeds.type = EmbedDataType.None;
@@ -439,13 +440,13 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         } catch (err) {
           if (err instanceof XRPCError) {
             if (err.status === ResponseType.InternalServerError) {
-              console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${content.postid}`);
+              console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
               return false;
             }
           }
           // Give violation mediaTooBig if the file is too large.
-          await createViolationForUser(env, content.user, AccountStatus.MediaTooBig);
-          console.warn(`Unable to upload ${currentEmbed.content} for post ${content.postid} with err ${err}`);
+          await createViolationForUser(env, postData.user, AccountStatus.MediaTooBig);
+          console.warn(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
           return false;
         }
 
@@ -540,27 +541,49 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
       }
     }
 
+    // set up the thread chain
+    if (postData.isThread) {
+      const rootPostRecord:PostResponseObject = postMap.get(postData.rootPost!);
+      const parentPostRecord:PostResponseObject = postMap.get(postData.parentPost!);
+      if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {
+        (postRecord as any).reply = {
+          "root": {
+            "uri": rootPostRecord.uri,
+            "cid": rootPostRecord.cid
+          },
+          "parent": {
+            "uri": parentPostRecord.uri,
+            "cid": parentPostRecord.uri
+          }
+        }
+      }
+    }
+
     try {
       const response = await agent.post(postRecord);
-      posts.push(response);
+      postMap.set(postData.postid, 
+        { ...response, content: truncate(postData.text, MAX_POSTED_LENGTH), 
+          embeds: postData.embeds,
+          postID: postData.postid
+        });
+      console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
     } catch(err) {
       // This will try again in the future, next roundabout.
-      console.error(`encountered error while trying to push post ${content.postid} up to bsky ${err}`);
+      console.error(`encountered error while trying to push post ${postData.postid} up to bsky ${err}`);
     }
     return false;
   };
 
   // Attempt to make the post
-  if (await postSegment(rt.text) === false) {
+  if (await postSegment(content) === false) {
     return null;
   }
 
-  // Make a note that we posted this to BSky
-  console.log(`Posted to Bluesky: ${posts.map(p => p.uri)}`);
+  // TODO: Find all sub content and attempt to make a linked list.
 
-  // store the first uri/cid
-  return posts[0];
+  // Return a nice array for the folks at home
+  return Array.from(postMap.values());
 }
 
 export const getPostRecords = async (records:string[]) => {

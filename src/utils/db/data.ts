@@ -14,6 +14,7 @@ import {
   Bindings,
   GetAllPostedBatch,
   Post,
+  PostRecordResponse,
   Repost,
   ScheduledContext
 } from "../../types.d";
@@ -124,6 +125,19 @@ export const updatePostData = async (env: Bindings, id: string, newData: Object)
   const {success} = await db.update(posts).set(newData).where(eq(posts.uuid, id));
   return success;
 };
+
+export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordResponse[]) => {
+  const db: DrizzleD1Database = drizzle(env.DB);
+  let dbOperations: BatchItem<"sqlite">[] = [];
+
+  for (const record of records) {
+    dbOperations.push(db.update(posts).set(
+      {content: record.content, posted: true, uri: record.uri, cid: record.cid, embedContent: []})
+    .where(eq(posts.uuid, record.postID)));
+  }
+
+  await db.batch(dbOperations as BatchQuery);
+}
 
 export const setPostNowOffForPost = async (env: Bindings, id: string) => {
   const didUpdate = await updatePostData(env, id, {postNow: false});
