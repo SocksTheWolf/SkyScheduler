@@ -18,11 +18,9 @@ export const posts = sqliteTable('posts', {
   cid: text('cid'),
   // if this post is a pseudo post (i.e. a repost of anything)
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
-  isThreadRoot: integer('isThreadRoot', {mode: 'boolean'}).default(false),
-  // if this post has a post chain to it, this should only ever apply to child posts of a thread
-  isChildPost: integer('isChildPost', {mode: 'boolean'}).default(false),
   rootPost: text('rootPost'),
   parentPost: text('parentPost'),
+  threadOrder: integer('threadOrder').default(-1),
   // bsky content labels
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
   // metadata timestamps
@@ -48,11 +46,11 @@ export const posts = sqliteTable('posts', {
     .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
-  // for checking for post chains. I'd personally like to not have to do this
-  // but I don't know how to set up inferred rows in drizzle
+  // TODO: Check these two indexes because they're probably wrong
+  // for checking for post chains.
   index("childPost_set_idx")
-    .on(table.isChildPost, table.rootPost, table.parentPost)
-    .where(sql`isChildPost = 1`),
+    .on(table.rootPost, table.parentPost)
+    .where(sql`parentPost is not NULL`),
   // Updating parent posts
   index("parentPostUUID_idx").on(table.parentPost),
   // cron job

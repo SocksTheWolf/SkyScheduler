@@ -1,22 +1,17 @@
-import {
-  and, eq, inArray, asc,
-  lte, ne, notInArray, sql
-} from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, lte, ne, notInArray, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
-import { Context } from "hono";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from 'uuid';
 import { posts, repostCounts, reposts, violations } from "../../db/app.schema";
-import { MAX_HOLD_DAYS_BEFORE_PURGE } from "../../limits";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
 import {
   BatchQuery,
   Bindings,
   GetAllPostedBatch,
   Post,
   PostRecordResponse,
-  Repost,
-  ScheduledContext
+  Repost
 } from "../../types.d";
 import { createPostObject, createRepostObject, floorCurrentTime } from "../helpers";
 
@@ -29,7 +24,7 @@ export const doesPostExist = async (env: Bindings, userId: string, postId: strin
   return result.length >= 1;
 };
 
-export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> => {
+export const getAllPostsForCurrentTime = async (env: Bindings, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time
   const db: DrizzleD1Database = drizzle(env.DB);
   const currentTime: Date = floorCurrentTime();
@@ -46,7 +41,7 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
         lte(posts.scheduledDate, currentTime)
       ),
       // ignore threads, we'll create this one later.
-      eq(posts.isChildPost, false)
+      removeThreads ? eq(posts.threadOrder, -1) : lte(posts.threadOrder, 0)
     )
   ));
   const results = await db.with(postsToMake).select().from(postsToMake)
@@ -135,8 +130,12 @@ export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordRes
   let dbOperations: BatchItem<"sqlite">[] = [];
 
   for (const record of records) {
+    // skip over invalid records
+    if (record.postID === null)
+      continue;
+
     dbOperations.push(db.update(posts).set(
-      {content: record.content, posted: true, uri: record.uri, cid: record.cid, embedContent: []})
+      {content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH})`, posted: true, uri: record.uri, cid: record.cid, embedContent: []})
     .where(eq(posts.uuid, record.postID)));
   }
 
@@ -149,11 +148,11 @@ export const setPostNowOffForPost = async (env: Bindings, id: string) => {
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
-export const updatePostForGivenUser = async (c: Context|ScheduledContext, userId: string, id: string, newData: Object) => {
+export const updatePostForGivenUser = async (env: Bindings, userId: string, id: string, newData: Object) => {
   if (isEmpty(userId) || !uuidValid(id))
     return false;
 
-  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const db: DrizzleD1Database = drizzle(env.DB);
   const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userId)));
   return success;
 };
@@ -196,20 +195,22 @@ export const getChildPostsOfThread = async (env: Bindings, rootId: string): Prom
     return null;
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  const query = await db.select().from(posts).where(and(eq(posts.isChildPost, true), eq(posts.rootPost, rootId))).all();
+  const query = await db.select().from(posts)
+    .where(and(isNotNull(posts.parentPost), eq(posts.rootPost, rootId)))
+    .orderBy(asc(posts.threadOrder), desc(posts.createdAt)).all();
   if (query.length > 0) {
     return query.map((child) => createPostObject(child));
   }
   return null;
 };
 
-export const getChildPostThreadCount = async (env: Bindings, userId: string, rootId: string): Promise<number> => {
+export const getPostThreadCount = async (env: Bindings, userId: string, rootId: string): Promise<number> => {
   if (!uuidValid(rootId))
     return 0;
 
   const db: DrizzleD1Database = drizzle(env.DB);
   return await db.$count(posts, and(
-        and(eq(posts.isChildPost, true), eq(posts.rootPost, rootId)),
+    eq(posts.rootPost, rootId),
     eq(posts.userId, userId)));
 }
 

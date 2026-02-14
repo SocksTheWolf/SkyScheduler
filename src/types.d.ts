@@ -26,6 +26,7 @@ type R2ConfigSettings = {
 
 type QueueConfigSettings = {
   enabled: boolean;
+  threadEnabled: boolean;
   postNowEnabled?: boolean;
   post_queues: string[];
   repost_queues: string[];
@@ -126,6 +127,7 @@ export type Post = {
   // thread data
   isThreadRoot: boolean;
   isChildPost: boolean;
+  threadOrder: number;
   rootPost?: string;
   parentPost?: string;
 };
@@ -166,9 +168,9 @@ export type PostResponseObject = {
 };
 
 export type PostRecordResponse = PostResponseObject & {
-  postID: string;
+  postID: string|null;
   content: string;
-  embeds?: EmbedData[]; 
+  embeds?: EmbedData[];
 };
 
 export interface LooseObj {

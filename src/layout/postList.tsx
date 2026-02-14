@@ -2,8 +2,8 @@ import { Context } from "hono";
 import { html, raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { Post } from "../types.d";
-import { getPostsForUser } from "../utils/dbQuery";
 import { getUsernameForUser } from "../utils/db/userinfo";
+import { getPostsForUser } from "../utils/dbQuery";
 
 type PostContentObjectProps = {
   text: string;
@@ -63,7 +63,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
     (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
       <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>Reposts Left: {content.repostCount}</span></>) : "";
 
-  const parentMetaAttr = (content.parentPost) ? `data-parent="${content.parentPost}"` : "";
+  const parentMetaAttr = (!content.isThreadRoot) ? `data-parent="${content.postid}"` : "";
 
   const postHTML = html`
   <article

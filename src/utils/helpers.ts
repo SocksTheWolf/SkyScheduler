@@ -11,6 +11,8 @@ export function createPostObject(data: any) {
   postData.label = data.contentLabel;
   postData.text = data.content;
   postData.postNow = data.postNow;
+  postData.threadOrder = data.threadOrder;
+
   if (data.repostCount)
     postData.repostCount = data.repostCount;
 
@@ -25,15 +27,17 @@ export function createPostObject(data: any) {
   if (data.repostInfo)
     postData.repostInfo = data.repostInfo;
 
-  if (data.rootPost && data.parentPost) {
-    postData.parentPost = data.parentPost;
+  if (data.rootPost)
     postData.rootPost = data.rootPost;
+
+  if (data.parentPost) {
+    postData.parentPost = data.parentPost;
     postData.isChildPost = true;
   } else {
     postData.isChildPost = false;
   }
 
-  if (data.isThreadRoot)
+  if (data.threadOrder == 0)
     postData.isThreadRoot = true;
   else
     postData.isThreadRoot = false;

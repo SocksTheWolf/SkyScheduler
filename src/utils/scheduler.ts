@@ -1,12 +1,12 @@
+import AtpAgent from '@atproto/api';
 import isEmpty from 'just-is-empty';
 import { Bindings, Post, Repost, ScheduledContext } from '../types.d';
 import { makeAgentForUser, makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
+import { deleteAllRepostsBeforeCurrentTime, deletePosts, getAllPostsForCurrentTime, getAllRepostsForCurrentTime, purgePostedPosts } from './db/data';
 import { getAllAbandonedMedia } from './db/file';
-import { enqueuePost, enqueueRepost, isQueueEnabled } from './queuePublisher';
+import { enqueuePost, enqueueRepost, isQueueEnabled, shouldPostThreadQueue } from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
-import { getAllPostsForCurrentTime, getAllRepostsForCurrentTime, deleteAllRepostsBeforeCurrentTime, purgePostedPosts, deletePosts } from './db/data';
-import AtpAgent from '@atproto/api';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, agent: AtpAgent|null, isQueued: boolean = false) => {
   const madePost = await makePost(runtime, postData, isQueued, agent);
@@ -31,6 +31,7 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(env);
   const queueEnabled: boolean = isQueueEnabled(env);
+  const threadQueueEnabled: boolean = shouldPostThreadQueue(env);
 
   const runtimeWrapper: ScheduledContext = {
     executionCtx: ctx,
@@ -44,13 +45,15 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
   // TODO: bunching as a part of queues, literally just throw an agent at a queue with instructions and go.
   // this requires queueing to be working properly.
   const AgentList = new Map();
-  const usesAgentMap = (env.SITE_SETTINGS.use_agent_map);
-  
+  const usesAgentMap: boolean = (env.SITE_SETTINGS.use_agent_map) || false;
+
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
     console.log(`handling ${scheduledPosts.length} posts...`);
     scheduledPosts.forEach(async (post) => {
-      if (!queueEnabled) {
+      if (queueEnabled || (post.isThreadRoot && threadQueueEnabled)) {
+        await enqueuePost(env, post);
+      } else {
         let agent = (usesAgentMap) ? AgentList.get(post.user) || null : null;
         if (agent === null) {
           agent = await makeAgentForUser(env, post.user);
@@ -58,10 +61,7 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
             AgentList.set(post.user, agent);
         }
         ctx.waitUntil(handlePostTask(runtimeWrapper, post, agent));
-      } else {
-        await enqueuePost(env, post); 
       }
-        
     });
   } else {
     console.log("no posts scheduled for this time");
@@ -82,7 +82,7 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
       } else {
         await enqueueRepost(env, repost);
       }
-        
+
     });
     ctx.waitUntil(deleteAllRepostsBeforeCurrentTime(env));
   } else {
