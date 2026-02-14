@@ -35,7 +35,7 @@ export function PostCreation() {
         <header>
           <h4 id="postFormTitle"></h4>
           <small class="btn-delete thread-cancel" data-tooltip="Cancel making post in thread">
-            <a id="cancelThreadPost" class="ghost secondary" role="button">Cancel Thread Post</a>
+            <a id="cancelThreadPost" tabindex={0} class="ghost secondary" role="button">Cancel Thread Post</a>
           </small>
         </header>
         <div>

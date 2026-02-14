@@ -20,7 +20,9 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
       <span class="credits">
         <a rel="author" target="_blank" title="Project author" href="https://socksthewolf.com">SocksTheWolf</a><br />
         <small>
-          <a class="secondary" target="_blank" title="Tip the dev" href="/tip">Tip</a> -
+          <a class="secondary" target="_blank"
+            data-tooltip="Tips are not required, the service is free, but if you like this service, tips would help with the costs <3"
+            title="Tip the dev" href="/tip">Tip</a> -
           <a class="secondary" {...newWinAttr} href="/tos" title="Terms of Service">Terms</a> -
           <a class="secondary" {...newWinAttr} href="/privacy" title="Privacy Policy">Privacy</a>
         </small>
