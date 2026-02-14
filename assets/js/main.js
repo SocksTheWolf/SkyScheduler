@@ -85,6 +85,16 @@ document.addEventListener("postFailedDelete", function() {
 
 document.addEventListener("timeSidebar", function() {
   updateAllTimes();
+  document.querySelectorAll(".addThreadPost[listen=false]").forEach(el => {
+    addClickKeyboardListener(el, () => {
+      const threadEvent = new CustomEvent('replyThreadCreate', {
+        detail: {
+          target: el.parentElement
+      }});
+      document.dispatchEvent(threadEvent);
+    });
+    el.setAttribute("listen", true);
+  });
 });
 
 document.addEventListener("scrollTop", function() {

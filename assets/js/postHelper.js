@@ -360,6 +360,8 @@ postForm.addEventListener('submit', async (e) => {
     if (threadField.hasAttribute("rootpost") && threadField.hasAttribute("parentpost")) {
       postObject.parentPost = threadField.getAttribute("parentpost");
       postObject.rootPost = threadField.getAttribute("rootpost");
+      postObject.makePostNow = false;
+      postObject.repostData = undefined;
     }
 
     const hasFiles = fileData.size > 0;
@@ -634,9 +636,15 @@ document.addEventListener("editPost", function(event) {
 });
 
 document.addEventListener("replyThreadCreate", function(ev) {
-  const originalPostDOM = ev.target;
-  threadField.setAttribute("rootpost", originalPostDOM.getAttribute("data-root"));
-  threadField.setAttribute("parentpost", originalPostDOM.getAttribute("data-parent"));
+  const postDOM = ev.detail.target;
+  // check attributes
+  if (!postDOM.hasAttribute("data-root"))
+    return;
+
+  const rootID = postDOM.getAttribute("data-root");
+  threadField.setAttribute("rootpost", rootID);
+  const parentID = postDOM.hasAttribute("data-parent") ? postDOM.getAttribute("data-parent") : rootID;
+  threadField.setAttribute("parentpost", parentID);
 
   setElementVisible(cancelThreadBtn.parentElement, true);
   setElementVisible(sectionRetweet, false);

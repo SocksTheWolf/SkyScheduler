@@ -74,7 +74,8 @@ post.post("/create", authMiddleware, async (c: Context) => {
         }
       } else {
         if (!await makePost(c, postInfo))
-          return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
+          return c.json({message: `Failed to post content, will try again soon.\n\n
+            If it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
       }
       return c.json({message: "Created Post!" });
     } else {
@@ -180,7 +181,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   // push embedContent as editable yes.
   if (hasEmbedEdits)
     payload.embedContent = originalPost.embeds;
-  
+
   if (await updatePostForUser(c, id, payload)) {
     originalPost.text = content;
     const username = await getUsernameForUser(c);
@@ -198,7 +199,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
     return c.html(<></>, 400);
 
   c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
-  
+
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
   if (postInfo !== null) {
