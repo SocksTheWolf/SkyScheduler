@@ -2,7 +2,7 @@ import remove from "just-remove";
 
 /** APPLICATION CONFIGURATIONS **/
 // minimum length of a post
-export const MIN_LENGTH: number = 1; 
+export const MIN_LENGTH: number = 1;
 // max amount of times something can be reposted
 export const MAX_REPOST_INTERVAL: number = 15;
 // max amount of time something can be reposted over
@@ -13,6 +13,8 @@ export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
 export const GIF_UPLOAD_ALLOWED: boolean = false;
+// max posts per thread
+export const MAX_POSTS_PER_THREAD: number = 10;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;

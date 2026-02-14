@@ -12,6 +12,17 @@ function scrollTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function scrollToObject(el) {
+  if (el) {
+    el.scroll({top:0, behavior:'smooth'});
+    const tabInvalidate = el.querySelector(".invalidateTab");
+    if (tabInvalidate) {
+      tabInvalidate.focus();
+      tabInvalidate.blur();
+    }
+  }
+}
+
 function formatDate(date) {
   return new Date(date).toLocaleString(undefined, {
     year: "numeric",
@@ -25,7 +36,7 @@ function updateAllTimes() {
   document.querySelectorAll(".timestamp").forEach(el => {
     if (el.hasAttribute("corrected"))
       return;
-    
+
     el.textContent = formatDate(el.innerText);
     el.setAttribute("corrected", true);
   });
@@ -45,13 +56,22 @@ function refreshPosts() {
   htmx.trigger("body", "refreshPosts");
 }
 
-function addKeyboardListener(el, callback) {
+function addKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
   el.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter" || ev.key === " ") {
-      ev.preventDefault();
+    if (keys.includes(ev.key)) {
+      if (preventDefault)
+        ev.preventDefault();
       callback(ev);
     }
   });
+}
+function addClickKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
+  el.addEventListener("click", (ev) => {
+    if (preventDefault)
+      ev.preventDefault();
+    callback();
+  });
+  addKeyboardListener(el, callback, keys, preventDefault);
 }
 
 document.addEventListener("postDeleted", function() {
@@ -69,6 +89,10 @@ document.addEventListener("timeSidebar", function() {
 
 document.addEventListener("scrollTop", function() {
   scrollTop();
+});
+
+document.addEventListener("scrollListTop", function() {
+  scrollToObject(document.getElementById("posts"));
 });
 
 document.addEventListener("postUpdatedNotice", function() {
@@ -248,13 +272,11 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
 }
 
 function addEasyModalOpen(buttonID, modalEl, closeButtonID) {
-  document.getElementById(buttonID).addEventListener("click", (ev) => {
-    ev.preventDefault();
+  addClickKeyboardListener(document.getElementById(buttonID), () => {
     clearSettingsData();
     openModal(modalEl);
   });
-  document.getElementById(closeButtonID).addEventListener("click", (ev) => {
-    ev.preventDefault();
+  addClickKeyboardListener(document.getElementById(closeButtonID), () => {
     closeModal(modalEl);
   });
 }

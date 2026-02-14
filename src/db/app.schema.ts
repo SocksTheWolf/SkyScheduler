@@ -18,8 +18,9 @@ export const posts = sqliteTable('posts', {
   cid: text('cid'),
   // if this post is a pseudo post (i.e. a repost of anything)
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
-  // if this post has a post chain to it, this should only ever apply to the root post
-  isThread: integer('isThread', {mode: 'boolean'}).default(false),
+  isThreadRoot: integer('isThreadRoot', {mode: 'boolean'}).default(false),
+  // if this post has a post chain to it, this should only ever apply to child posts of a thread
+  isChildPost: integer('isChildPost', {mode: 'boolean'}).default(false),
   rootPost: text('rootPost'),
   parentPost: text('parentPost'),
   // bsky content labels
@@ -47,10 +48,13 @@ export const posts = sqliteTable('posts', {
     .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
-  // for checking for post chains
-  index("threadUUID_idx")
-    .on(table.isThread, table.rootPost, table.parentPost)
-    .where(sql`isThread = 1`),
+  // for checking for post chains. I'd personally like to not have to do this
+  // but I don't know how to set up inferred rows in drizzle
+  index("childPost_set_idx")
+    .on(table.isChildPost, table.rootPost, table.parentPost)
+    .where(sql`isChildPost = 1`),
+  // Updating parent posts
+  index("parentPostUUID_idx").on(table.parentPost),
   // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)
@@ -117,6 +121,7 @@ export const bannedUsers = sqliteTable('bans', {
   .notNull(),
 });
 
+// helper bookkeeping to make sure we don't have a ton of abandoned files in R2
 export const mediaFiles = sqliteTable('media', {
   fileName: text('file', {mode: 'text'}).primaryKey(),
   hasPost: integer('hasPost', { mode: 'boolean' }).default(false),

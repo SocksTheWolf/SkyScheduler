@@ -39,10 +39,14 @@ export const getAllPostsForCurrentTime = async (env: Bindings): Promise<Post[]> 
   .where(
     and(
       and(
-        eq(posts.posted, false),
-        ne(posts.postNow, true) // Ignore any posts that are marked for post now
+        and(
+          eq(posts.posted, false),
+          ne(posts.postNow, true) // Ignore any posts that are marked for post now
+        ),
+        lte(posts.scheduledDate, currentTime)
       ),
-      lte(posts.scheduledDate, currentTime)
+      // ignore threads, we'll create this one later.
+      eq(posts.isChildPost, false)
     )
   ));
   const results = await db.with(postsToMake).select().from(postsToMake)
@@ -93,7 +97,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
             eq(reposts.scheduleGuid, deleted.scheduleGuid!), 
             eq(reposts.uuid, deleted.id)))
           .limit(1).all();
-        
+
         // if this is empty, then we need to update the repost info.
         if (isEmpty(stillHasSchedule)) {
           // get the existing repost info to filter out this old data
@@ -185,6 +189,28 @@ export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promis
     return true;
   }
   return query[0].posted;
+};
+
+export const getChildPostsOfThread = async (env: Bindings, rootId: string): Promise<Post[]|null> => {
+  if (!uuidValid(rootId))
+    return null;
+
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const query = await db.select().from(posts).where(and(eq(posts.isChildPost, true), eq(posts.rootPost, rootId))).all();
+  if (query.length > 0) {
+    return query.map((child) => createPostObject(child));
+  }
+  return null;
+};
+
+export const getChildPostThreadCount = async (env: Bindings, userId: string, rootId: string): Promise<number> => {
+  if (!uuidValid(rootId))
+    return 0;
+
+  const db: DrizzleD1Database = drizzle(env.DB);
+  return await db.$count(posts, and(
+        and(eq(posts.isChildPost, true), eq(posts.rootPost, rootId)),
+    eq(posts.userId, userId)));
 }
 
 // deletes multiple posted posts from a database.

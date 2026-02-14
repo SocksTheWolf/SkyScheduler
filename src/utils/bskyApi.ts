@@ -380,7 +380,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
                 if (changedRecord)
                     mediaEmbeds.type = EmbedDataType.None;
                 continue;
-              }          
+              }
               if (resolvePost.length !== 0)
                 cid = resolvePost[0].cid;
             }
@@ -542,7 +542,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
     }
 
     // set up the thread chain
-    if (postData.isThread) {
+    if (postData.isChildPost) {
       const rootPostRecord:PostResponseObject = postMap.get(postData.rootPost!);
       const parentPostRecord:PostResponseObject = postMap.get(postData.parentPost!);
       if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {

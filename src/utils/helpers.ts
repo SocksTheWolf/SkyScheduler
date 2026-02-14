@@ -28,10 +28,15 @@ export function createPostObject(data: any) {
   if (data.rootPost && data.parentPost) {
     postData.parentPost = data.parentPost;
     postData.rootPost = data.rootPost;
-    postData.isThread = true;
+    postData.isChildPost = true;
   } else {
-    postData.isThread = false;
-  } 
+    postData.isChildPost = false;
+  }
+
+  if (data.isThreadRoot)
+    postData.isThreadRoot = true;
+  else
+    postData.isThreadRoot = false;
 
   // ATProto data
   if (data.uri)

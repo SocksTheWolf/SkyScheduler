@@ -124,7 +124,8 @@ export type Post = {
   cid?: string;
   uri?: string;
   // thread data
-  isThread: boolean;
+  isThreadRoot: boolean;
+  isChildPost: boolean;
   rootPost?: string;
   parentPost?: string;
 };
