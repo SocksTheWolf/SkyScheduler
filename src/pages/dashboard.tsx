@@ -10,6 +10,7 @@ import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
 import { appScriptStrs, postHelperScriptStr, repostHelperScriptStr } from "../utils/appScripts";
+import { SHOW_PROGRESS_BAR } from "../progress";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -26,7 +27,7 @@ export default function Dashboard(props:any) {
     return {href: itm, type: "script"};
   });
   return (
-    <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard" 
+    <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard"
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
       <DependencyTags scripts={defaultDashboardPreloads} />
       <div class="row-fluid">
@@ -36,13 +37,13 @@ export default function Dashboard(props:any) {
               <h4>SkyScheduler Dashboard</h4>
               <div class="sidebar-block">
                 <small><i>Schedule Bluesky posts effortlessly</i>.</small><br />
-                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username" 
+                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username"
                   hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
               <center class="postControls">
-                <button id="refresh-posts" hx-get="/post/all" hx-target="#posts" 
-                    hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s" 
-                    hx-on-htmx-before-request="this.classList.add('svgAnim');" 
+                <button id="refresh-posts" hx-get="/post/all" hx-target="#posts"
+                    hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s"
+                    hx-on-htmx-before-request="this.classList.add('svgAnim');"
                     hx-on-htmx-after-request="setTimeout(() => {this.classList.remove('svgAnim')}, 3000)">
                   <span>Refresh Posts</span>
                   <img src="/icons/refresh.svg" alt="refresh icon" />
@@ -57,13 +58,13 @@ export default function Dashboard(props:any) {
             </div>
             <footer>
               <div>
-                <button class="outline w-full btn-error logout" hx-post="/account/logout" 
+                <button class="outline w-full btn-error logout" hx-post="/account/logout"
                   hx-target="body" hx-confirm="Are you sure you want to logout?">
                   Logout
                 </button>
               </div>
               <hr />
-              <FooterCopyright inNewWindow={true} showHomepage={true} />
+              <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_PROGRESS_BAR} />
             </footer>
           </article>
         </section>
