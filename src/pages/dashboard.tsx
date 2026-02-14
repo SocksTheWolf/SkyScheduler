@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
-import { DependencyTags } from "../layout/depTags";
+import { DependencyTags, ScriptTags } from "../layout/depTags";
 import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
@@ -9,7 +9,7 @@ import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { PreloadRules } from "../types.d";
-import { appScriptStrs, postHelperScriptStr, repostHelperScriptStr } from "../utils/appScripts";
+import { altTextScriptStr, appScriptStr, appScriptStrs, postHelperScriptStr, repostHelperScriptStr, tributeScriptStr } from "../utils/appScripts";
 import { SHOW_PROGRESS_BAR } from "../progress";
 
 export default function Dashboard(props:any) {
@@ -20,6 +20,13 @@ export default function Dashboard(props:any) {
     {href: "/dep/form-json.min.js", type: "script"},
     {href: "/dep/modal.js", type: "script"},
     {href: "/dep/tabs.js", type: "script"}
+  ];
+  const bottomScripts:string[] = [
+    appScriptStr,
+    altTextScriptStr,
+    tributeScriptStr,
+    postHelperScriptStr,
+    repostHelperScriptStr
   ];
 
   // Our own homebrew js files
@@ -83,8 +90,7 @@ export default function Dashboard(props:any) {
         </div>
       </div>
       <AltTextDialog />
-      <script type="text/javascript" src={postHelperScriptStr}></script>
-      <script type="text/javascript" src={repostHelperScriptStr}></script>
+      <ScriptTags scripts={bottomScripts} />
       <Settings pds={ctx.get("pds")} />
     </BaseLayout>
   );

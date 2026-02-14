@@ -7,7 +7,11 @@ export const getAppScriptStr = (scriptName: string) => `/js/${scriptName}.min.js
 // Eventually make this automatically generated.
 export const postHelperScriptStr: string = getAppScriptStr("postHelper");
 export const repostHelperScriptStr: string = getAppScriptStr("repostHelper");
+export const appScriptStr: string = getAppScriptStr("app");
+export const altTextScriptStr: string = getAppScriptStr("altTextHelper");
+export const tributeScriptStr: string = getAppScriptStr("tributeHelper");
 export const mainScriptStr: string = getAppScriptStr("main");
 export const settingsScriptStr: string = getAppScriptStr("settings");
 
-export const appScriptStrs = [postHelperScriptStr, repostHelperScriptStr, mainScriptStr, settingsScriptStr];
+export const appScriptStrs = [mainScriptStr, appScriptStr, altTextScriptStr, tributeScriptStr, 
+  postHelperScriptStr, repostHelperScriptStr, settingsScriptStr];

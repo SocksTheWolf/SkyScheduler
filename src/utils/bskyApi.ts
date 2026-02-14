@@ -7,11 +7,9 @@ import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../limits';
 import {
-  AccountStatus,
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj,
-  Post, PostLabel,
-  PostResponseObject, PostStatus, Repost, ScheduledContext
+  LooseObj, Post, PostLabel, AccountStatus,
+  PostRecordResponse, PostStatus, Repost, ScheduledContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
@@ -549,8 +547,8 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
 
     // set up the thread chain
     if (postData.isChildPost) {
-      const rootPostRecord: PostResponseObject = postMap.get(postData.rootPost!);
-      const parentPostRecord: PostResponseObject = postMap.get(postData.parentPost!);
+      const rootPostRecord: PostRecordResponse = postMap.get(postData.rootPost!);
+      const parentPostRecord: PostRecordResponse = postMap.get(postData.parentPost!);
       if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {
         (postRecord as any).reply = {
           "root": {
@@ -571,7 +569,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         { ...response,
           embeds: postData.embeds,
           postID: postData.postid
-        } as PostResponseObject);
+        } as PostRecordResponse);
       console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
     } catch(err) {

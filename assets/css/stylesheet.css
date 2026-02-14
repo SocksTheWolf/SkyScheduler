@@ -249,6 +249,15 @@ textarea, .pico textarea {
   text-transform: capitalize;
 }
 
+.serverFunds {
+  position: relative;
+  top: -10px;
+}
+
+.highlight, .highlight div, .highlight header, .highlight footer {
+  background-color: rgba(210, 166, 8, 0.891) !important;
+}
+
 [data-tooltip]:before, .pico [data-tooltip]:before {
   white-space: preserve-breaks !important;
 }

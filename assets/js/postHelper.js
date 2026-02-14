@@ -1,7 +1,7 @@
 const repostCheckbox = document.getElementById('makeReposts');
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
-const urlCardBox = document.getElementById('urlCard');
+
 const recordUrlBox = document.getElementById('recordBox');
 const content = document.getElementById('content');
 const postForm = document.getElementById('postForm');
@@ -26,37 +26,6 @@ function addOnUnloadBlocker() {
 function clearOnUnloadBlocker() {
   window.onbeforeunload = null;
 }
-function setElementRequired(el, required) {
-  if (required)
-    el.setAttribute("required", true);
-  else
-    el.removeAttribute("required");
-}
-
-function setElementVisible(el, shouldShow) {
-  if (shouldShow)
-    el.classList.remove("hidden");
-  else
-    el.classList.add("hidden");
-}
-
-function setElementDisabled(el, disabled) {
-  if (disabled)
-    el.setAttribute("disabled", true);
-  else
-    el.removeAttribute("disabled");
-}
-
-urlCardBox.addEventListener("paste", () => {
-  showContentLabeler(true);
-  setElementVisible(sectionImageAttach, false);
-});
-
-urlCardBox.addEventListener("input", () => {
-  const isNotEmpty = urlCardBox.value.length > 0;
-  showContentLabeler(isNotEmpty);
-  setElementVisible(sectionImageAttach, !isNotEmpty);
-});
 
 let fileDropzone = new Dropzone("#fileUploads", {
   url: "/post/upload",
@@ -82,8 +51,15 @@ document.addEventListener("resetPost", () => {
   setElementVisible(cancelThreadBtn.parentElement, false);
   postFormTitle.innerText = "Schedule New Post";
   // remove thread info data
+  if (threadField.hasAttribute("postid")) {
+    const postHighlight = getPostListElement(threadField.getAttribute("postid"));
+    if (postHighlight) {
+      postHighlight.classList.remove("highlight");
+    }
+  }
   threadField.removeAttribute("rootpost");
   threadField.removeAttribute("parentpost");
+  threadField.removeAttribute("postid");
   showContentLabeler(false);
   setSelectDisable(repostCheckbox.parentElement, true);
   setElementRequired(scheduledDate, true);
@@ -92,7 +68,7 @@ document.addEventListener("resetPost", () => {
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
   hasFileLimit = false;
-  urlCardBox.value = "";
+  document.getElementById('urlCard').value = "";
   recordUrlBox.value = "";
   resetCounter("count");
   setTimeout(scrollTop, 400);
@@ -366,7 +342,7 @@ postForm.addEventListener('submit', async (e) => {
     }
 
     const hasFiles = fileData.size > 0;
-    const linkCardURL = urlCardBox.value;
+    const linkCardURL = document.getElementById('urlCard').value;
     const recordURL = recordUrlBox.value;
     const hasWebEmbed = linkCardURL.length > 0;
     const hasRecord = recordURL.length > 0;
@@ -458,8 +434,9 @@ function setSelectDisable(nodeBase, disable) {
 function showContentLabeler(shouldShow) {
   const contentLabelSelector = document.getElementById("content-label-selector");
   const contentLabelSelect = document.getElementById("contentLabels");
+  const urlEmbedBox = document.getElementById('urlCard');
 
-  if (!shouldShow && (fileData.length > 0 || urlCardBox.value.length > 0))
+  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
     return;
 
   setElementVisible(contentLabelSelector, shouldShow);
@@ -479,124 +456,6 @@ function showPostProgress(shouldShow) {
   } else {
     el.textContent = "Schedule Post";
   }
-}
-
-function openAltText(file, altTextButton, loadCallback, saveCallback) {
-  // A bunch of DOM elements
-  const altTextModal = document.getElementById("altTextDialog");
-  const altTextField = document.getElementById("altTextField");
-  const altTextImgPreview = document.getElementById("altThumbImg");
-  const saveButton = document.getElementById("altTextSaveButton");
-  const cancelButton = document.getElementById("altTextCancelButton");
-  const isFileInstance = file instanceof File;
-  const altTextPreviewImgURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
-
-  // Handle page reset
-  if (altTextModal.hasAttribute("hasReset") === false) {
-    document.addEventListener("resetPost", () => {
-      altTextField.value = "";
-      altTextImgPreview.src = "";
-      resetCounter("altTextCount");
-    });
-    altTextModal.setAttribute("hasReset", true);
-  }
-
-  altTextField.value = loadCallback() || "";
-  altTextField.selectionStart = altTextField.value.length;
-  recountCounter("altTextCount");
-  tributeToElement(altTextField);
-  const handleSave = (ev) => {
-    ev.preventDefault();
-    const newAltTextData = altTextField.value;
-    saveCallback(newAltTextData);
-    if (newAltTextData === "") {
-      altTextButton.classList.remove("btn-success");
-    } else {
-      altTextButton.classList.add("btn-success");
-    }
-    closeAltModal();
-  };
-
-  const unbindAltModal = () => {
-    saveButton.replaceWith(saveButton.cloneNode(true));
-    cancelButton.replaceWith(cancelButton.cloneNode(true));
-    altTextModal.removeEventListener("close", unbindAltModal);
-    altTextImgPreview.src = "";
-    if (isFileInstance)
-      URL.revokeObjectURL(altTextPreviewImgURL);
-    detachTribute(altTextField);
-  }
-
-  const closeAltModal = () => {
-    unbindAltModal();
-    closeModal(altTextModal);
-  };
-
-  altTextImgPreview.src = altTextPreviewImgURL;
-  addClickKeyboardListener(saveButton, handleSave);
-  addClickKeyboardListener(cancelButton, closeAltModal);
-  altTextModal.addEventListener("close", unbindAltModal);
-  openModal(altTextModal);
-  altTextField.focus();
-}
-
-function searchBSkyMentions(query, callback) {
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${query}&limit=${MAX_AUTO_COMPLETE_NAMES}`);
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      // Request good
-      if (xhr.status === 200) {
-        try {
-          const returnData = JSON.parse(xhr.responseText);
-          callback(returnData.actors);
-          return;
-        } catch(err) {
-          console.error(`failed to parse bsky mention list ${err}`)
-        }
-      }
-      console.error(`fetching bluesky mentionlist returned ${xhr.status}`);
-      callback([]);
-    }
-  }
-  xhr.send();
-}
-
-function tributeToElement(el) {
-  const mentionTribute = new Tribute({
-    menuItemTemplate: function(item) {
-      const avatarStr = item.original.avatar !== undefined ? `<img src="${item.original.avatar}">` : "";
-      return `${avatarStr}<span><code>${item.original.displayName}</code><br /> <small>@${item.original.handle}</small></span>`;
-    },
-    values: function(text, cb) {
-      searchBSkyMentions(text, item => cb(item));
-    },
-    noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
-    lookup: 'handle',
-    fillAttr: 'handle',
-    spaceSelectsMatch: true,
-    menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
-    menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES,
-    menuContainer: el.parentNode
-  });
-
-  el.addEventListener("detach", () => {
-    mentionTribute.detach(el);
-  });
-  mentionTribute.attach(el);
-}
-
-function detachTribute(el) {
-  el.dispatchEvent(new Event("detach"));
-}
-
-function openPostAltEditor(file) {
-  const editorLocation = document.querySelector(`div[alteditfor="${file}"]`);
-  const editorDataLocation = editorLocation.querySelector("input[data-alt]");
-  openAltText(file, editorLocation.querySelector("a"), () => editorDataLocation.getAttribute("value"),
-    (newAltValue) => {
-      editorDataLocation.setAttribute("value", newAltValue);
-  });
 }
 
 // HTMX will call this
@@ -630,7 +489,7 @@ document.addEventListener("editPost", function(event) {
     });
   });
 
-  addKeyboardListener(cancelButton, (ev) => cancelButton.click());
+  addKeyboardListener(cancelButton, () => cancelButton.click());
 
   editField.selectionStart = editField.value.length;
   editField.focus();
@@ -643,10 +502,23 @@ document.addEventListener("replyThreadCreate", function(ev) {
     return;
 
   const rootID = postDOM.getAttribute("data-root");
+  if (threadField.hasAttribute("rootpost")) {
+    const currentEdit = threadField.getAttribute("rootpost");
+    if (rootID != currentEdit)
+      pushToast("You are already threading a post, please cancel/submit it before continuing", false);
+    return;
+  }
+  
   threadField.setAttribute("rootpost", rootID);
   const parentID = postDOM.hasAttribute("data-parent") ? postDOM.getAttribute("data-parent") : rootID;
   threadField.setAttribute("parentpost", parentID);
-
+  const itemID = postDOM.getAttribute("data-item");
+  threadField.setAttribute("postid", itemID);
+  const postHighlight = getPostListElement(threadField.getAttribute("postid"));
+  if (postHighlight) {
+    postHighlight.classList.add("highlight");
+  }
+  
   setElementVisible(cancelThreadBtn.parentElement, true);
   setElementVisible(sectionRetweet, false);
   setElementVisible(sectionSchedule, false);
@@ -682,6 +554,18 @@ function runPageReactors() {
         setElementRequired(dateScheduler, !e.target.checked);
       });
     }
+  });
+
+  const urlCardBox = document.getElementById('urlCard');
+  urlCardBox.addEventListener("paste", () => {
+    showContentLabeler(true);
+    setElementVisible(sectionImageAttach, false);
+  });
+
+  urlCardBox.addEventListener("input", (ev) => {
+    const isNotEmpty = ev.target.value.length > 0;
+    showContentLabeler(isNotEmpty);
+    setElementVisible(sectionImageAttach, !isNotEmpty);
   });
 
   // Handle character counting

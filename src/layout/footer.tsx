@@ -14,8 +14,8 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
   const progressBarTooltip = `$${PROGRESS_MADE}/$${PROGRESS_TOTAL} for this month`;
   return (
     <center><small>
-      {props.showProgressBar || true ? <><span data-tooltip={progressBarTooltip}>Current Server Costs:</span>
-        <progress value={PROGRESS_MADE} max={PROGRESS_TOTAL} /><br /></> : null}
+      {props.showProgressBar ? <div class="serverFunds"><span data-tooltip={progressBarTooltip}>Current Server Costs:</span>
+        <progress value={PROGRESS_MADE} max={PROGRESS_TOTAL} /></div> : null}
       {props.showHomepage ? homepageURL : projectURL} &copy; {new Date().getFullYear()}
       <span class="credits">
         <a rel="author" target="_blank" title="Project author" href="https://socksthewolf.com">SocksTheWolf</a><br />

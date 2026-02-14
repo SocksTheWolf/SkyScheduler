@@ -17,6 +17,7 @@ type ScheduledPostOptions = {
   post: Post;
   user: string|null;
   // if the object should be dynamically replaced.
+  // usually in edit/cancel edit settings.
   dynamic?: boolean;
 }
 
@@ -69,7 +70,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   const postHTML = html`
   <article
     id="postBase${content.postid}" ${oobSwapStr}>
-    <header class="postItemHeader" data-root="${content.rootPost || content.postid}" ${raw(parentMetaAttr)}
+    <header class="postItemHeader" data-item="${content.postid}" data-root="${content.rootPost || content.postid}" ${raw(parentMetaAttr)}
       ${hasBeenPosted && !content.isRepost ? raw('hidden>') : raw(`>`)}
         ${!hasBeenPosted ? editPostElement : null}
         ${!hasBeenPosted ? threadItemElement : null}
