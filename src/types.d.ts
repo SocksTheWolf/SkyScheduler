@@ -173,6 +173,14 @@ export type PostRecordResponse = PostResponseObject & {
   embeds?: EmbedData[];
 };
 
+export type PostStatus = {
+  records: PostRecordResponse[];
+  // number of expected successes
+  expected: number;
+  // number of successes we got
+  got: number;
+};
+
 export interface LooseObj {
   [key: string]: any;
 };

@@ -11,8 +11,7 @@ import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj,
   Post, PostLabel,
-  PostRecordResponse,
-  PostResponseObject, Repost, ScheduledContext
+  PostResponseObject, PostStatus, Repost, ScheduledContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
@@ -144,23 +143,24 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
     console.warn(`could not make agent for post ${content.postid}`);
     return false;
   }
-  const newPostRecords: PostRecordResponse[]|null = await makePostRaw(env, content, agent);
+  const newPostRecords: PostStatus|null = await makePostRaw(env, content, agent);
   if (newPostRecords !== null) {
-    const postDataUpdate = bulkUpdatePostedData(env, newPostRecords);
+    const postDataUpdate = bulkUpdatePostedData(env, newPostRecords.records);
     if (isQueued)
       await postDataUpdate;
     else
       c.executionCtx.waitUntil(postDataUpdate);
 
     // Delete any embeds if they exist.
-    for (const record of newPostRecords) {
+    for (const record of newPostRecords.records) {
       if (record.postID === null)
         continue;
 
       await deleteEmbedsFromR2(c, record.embeds, isQueued);
     }
 
-    return true;
+    // if we had a total success, return true.
+    return newPostRecords.expected == newPostRecords.got;
   }
 
   // Turn off the post now flag if we failed.
@@ -200,7 +200,7 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost, u
   return bWasSuccess;
 };
 
-export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent) => {
+export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
   const username = await getUsernameForUserId(env, content.user);
   // incredibly unlikely but we'll handle it
   if (username === null) {
@@ -549,8 +549,8 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
 
     // set up the thread chain
     if (postData.isChildPost) {
-      const rootPostRecord:PostResponseObject = postMap.get(postData.rootPost!);
-      const parentPostRecord:PostResponseObject = postMap.get(postData.parentPost!);
+      const rootPostRecord: PostResponseObject = postMap.get(postData.rootPost!);
+      const parentPostRecord: PostResponseObject = postMap.get(postData.parentPost!);
       if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {
         (postRecord as any).reply = {
           "root": {
@@ -571,7 +571,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         { ...response,
           embeds: postData.embeds,
           postID: postData.postid
-        });
+        } as PostResponseObject);
       console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
     } catch(err) {
@@ -581,18 +581,27 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
     return false;
   };
 
+  let successThisRound = 0;
   // Attempt to make the post
-  if (await postSegment(content) === false) {
-    return null;
+  if (!content.posted) {
+    if (await postSegment(content) === false)
+      return null;
+    else
+      successThisRound = 1;
   }
+
+  let successes = 1;
+  let expected = 1;
 
   // If this is a post thread root
   if (content.isThreadRoot) {
     const childPosts = await getChildPostsOfThread(env, content.postid) || [];
+    expected += childPosts.length;
     for (const child of childPosts) {
       // If this post is already posted, we might be trying to restore from a failed state
       if (child.posted) {
         postMap.set(child.postid, {postID: null, uri: child.uri!, cid: child.cid!});
+        successes += 1;
         continue;
       }
       // This is the first child post we haven't handled yet, oof.
@@ -601,14 +610,20 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         console.error(`We encountered errors attempting to post child ${child.postid}, returning what did get posted`);
         break;
       }
+      successes += 1;
+      successThisRound += 1;
     }
   }
 
   // Return a nice array for the folks at home
-  const returnArray = Array.from(postMap.values()).filter((post) => { return post.postID !== null;});
-  console.log(`posted ${returnArray.length}/${postMap.size}`);
+  const returnObj: PostStatus = {
+    records: Array.from(postMap.values()).filter((post) => { return post.postID !== null;}),
+    expected: expected,
+    got: successes
+  }
+  console.log(`posted ${successes}/${expected}, did ${successThisRound} work units`);
 
-  return returnArray;
+  return returnObj;
 }
 
 export const getPostRecords = async (records:string[]) => {
