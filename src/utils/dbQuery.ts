@@ -348,7 +348,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await getPostByCID(c.env, cid);
+  const existingPost = await getPostByCID(c, cid);
   if (existingPost !== null) {
     postUUID = existingPost.postid;
     const existingPostDate = existingPost.scheduledDate!;
