@@ -16,9 +16,9 @@ const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
   return get(env, queueName, null);
 };
 
-export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled;
+export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && !isEmpty(env.QUEUE_SETTINGS.post_queues);
 export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.repostsEnabled && !isEmpty(env.QUEUE_SETTINGS.repost_queues);
-export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled || false;
+export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && !isEmpty(env.QUEUE_SETTINGS.post_queues);
 export const shouldPostThreadQueue = (env: Bindings) => env.QUEUE_SETTINGS.threadEnabled;
 
 export async function enqueuePost(env: Bindings, post: Post) {
