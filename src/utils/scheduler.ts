@@ -5,7 +5,7 @@ import { makeAgentForUser, makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
 import { deleteAllRepostsBeforeCurrentTime, deletePosts, getAllPostsForCurrentTime, getAllRepostsForCurrentTime, purgePostedPosts } from './db/data';
 import { getAllAbandonedMedia } from './db/file';
-import { enqueuePost, enqueueRepost, isQueueEnabled, shouldPostThreadQueue } from './queuePublisher';
+import { enqueuePost, enqueueRepost, isQueueEnabled, isRepostQueueEnabled, shouldPostThreadQueue } from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: ScheduledContext, postData: Post, agent: AtpAgent|null, isQueued: boolean = false) => {
@@ -31,6 +31,7 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(env);
   const queueEnabled: boolean = isQueueEnabled(env);
+  const repostQueueEnabled: boolean = isRepostQueueEnabled(env);
   const threadQueueEnabled: boolean = shouldPostThreadQueue(env);
 
   const runtimeWrapper: ScheduledContext = {
@@ -71,7 +72,7 @@ export const schedulePostTask = async (env: Bindings, ctx: ExecutionContext) => 
   if (!isEmpty(scheduledReposts)) {
     console.log(`handling ${scheduledReposts.length} reposts`);
     scheduledReposts.forEach(async (repost) => {
-      if (!queueEnabled) {
+      if (!repostQueueEnabled) {
         let agent = (usesAgentMap) ? AgentList.get(repost.userId) || null : null;
         if (agent === null) {
           agent = await makeAgentForUser(env, repost.userId);

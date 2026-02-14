@@ -26,6 +26,7 @@ type R2ConfigSettings = {
 
 type QueueConfigSettings = {
   enabled: boolean;
+  repostsEnabled: boolean;
   threadEnabled: boolean;
   postNowEnabled?: boolean;
   delay_val: number;
@@ -45,7 +46,6 @@ export interface Bindings {
   KV: KVNamespace;
   IMAGES: ImagesBinding;
   POST_QUEUE1: Queue;
-  REPOST_QUEUE: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
