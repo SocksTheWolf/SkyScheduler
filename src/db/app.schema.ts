@@ -46,13 +46,14 @@ export const posts = sqliteTable('posts', {
     .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
-  // TODO: Check these two indexes because they're probably wrong
-  // for checking for post chains.
-  index("childPost_set_idx")
-    .on(table.rootPost, table.parentPost)
+  // Querying children
+  index("generalThread_idx")
+    .on(table.parentPost, table.rootPost)
     .where(sql`parentPost is not NULL`),
-  // Updating parent posts
-  index("parentPostUUID_idx").on(table.parentPost),
+  // Updating thread orders
+  index("threadOrder_idx")
+    .on(table.rootPost, table.threadOrder)
+    .where(sql`threadOrder >= 0`),
   // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)

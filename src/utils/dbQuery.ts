@@ -117,7 +117,7 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
     if (parentPost !== null) {
       // set anyone who had this as their parent to this post chain
       queriesToExecute.push(db.update(posts).set({parentPost: parentPost, threadOrder: postObj.threadOrder})
-        .where(and(eq(posts.rootPost, postObj.rootPost!), eq(posts.parentPost, postObj.postid))));
+        .where(and(eq(posts.parentPost, postObj.postid), eq(posts.rootPost, postObj.rootPost!))));
 
       // Update the post order past here
       queriesToExecute.push(db.update(posts).set({threadOrder: sql`threadOrder - 1`})
@@ -169,7 +169,11 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, new Date()) && !makePostNow) {
+  //
+  // Do not do this check if you are doing a threaded post
+  // or you have marked that you are posting right now.
+  if (!isAfter(scheduleDate, new Date()) &&
+    (!makePostNow || (!isEmpty(rootPost) && !isEmpty(parentPost)))) {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 
@@ -245,7 +249,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   if (isThreadedPost) {
     // Update the parent to our new post
     dbOperations.push(db.update(posts).set({parentPost: postUUID })
-      .where(and(eq(posts.rootPost, rootPostID!), eq(posts.parentPost, parentPostID!))));
+      .where(and(eq(posts.parentPost, parentPostID!), eq(posts.rootPost, rootPostID!))));
 
     // update all posts past this one to also update their order (we will take their id)
     dbOperations.push(db.update(posts).set({threadOrder: sql`threadOrder + 1`})
