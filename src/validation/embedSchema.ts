@@ -29,7 +29,7 @@ export const VideoEmbedSchema = z.object({
 
 export const LinkEmbedSchema = z.object({
   /* content is the thumbnail */
-  content: z.string().trim().prefault("").refine((value) => { 
+  content: z.string().trim().prefault("").refine((value) => {
     if (isEmpty(value))
       return true;
     // So the idea here is to try to encode the string into an URL object, and if that fails
@@ -46,10 +46,10 @@ export const LinkEmbedSchema = z.object({
   }),
   type: z.literal(EmbedDataType.WebLink),
   title: z.string().trim().default(""),
-  /* NOTE: uri is the link to the website here, 
+  /* NOTE: uri is the link to the website here,
     content is used as the thumbnail */
   uri: z.url({
-    normalize: true, 
+    normalize: true,
     protocol: /^https?$/,
     hostname: z.regexes.domain,
     error: "provided link is not an URL, please check URL and try again"

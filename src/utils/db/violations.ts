@@ -58,7 +58,7 @@ function createObjForValuesChange (violationType: AccountStatus[], value: boolea
 }
 
 export const createViolationForUser = async(env: Bindings, userId: string, violationType: AccountStatus): Promise<boolean> => {
-  const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage, 
+  const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage,
     AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
@@ -83,7 +83,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
 };
 
 export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: string) => {
-  return db.delete(violations).where(and(eq(violations.userId, userId), 
+  return db.delete(violations).where(and(eq(violations.userId, userId),
     and(ne(violations.tosViolation, true), ne(violations.accountGone, true))
   ));
 };
@@ -103,7 +103,7 @@ export const removeViolations = async(env: Bindings, userId: string, violationTy
   const valuesUpdate:LooseObj = createObjForValuesChange(violationType, false);
   await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId));
   // Delete the record if the user has no other violations
-  await db.delete(violations).where(and(eq(violations.userId, userId), 
+  await db.delete(violations).where(and(eq(violations.userId, userId),
     and(
       and(
         and(ne(violations.accountSuspended, true), ne(violations.accountGone, true),

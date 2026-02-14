@@ -10,8 +10,8 @@ import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
 function createPasswordResetMessage(url: string) {
-  return `Your SkyScheduler password reset url is: 
-${url} 
+  return `Your SkyScheduler password reset url is:
+${url}
 
 This URL will expire in about an hour.
 
@@ -134,7 +134,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         enabled: false
       },
     },
-    telemetry: { 
+    telemetry: {
       enabled: false
     },
     logger: {

@@ -89,7 +89,7 @@ repostForm.addEventListener('submit', async (e) => {
     body: payload
   });
   const data = await response.json();
-  
+
   if (response.ok) {
     pushToast(data.message, true);
     document.dispatchEvent(new Event("resetRepost"));

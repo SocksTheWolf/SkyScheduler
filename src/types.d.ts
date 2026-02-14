@@ -249,7 +249,7 @@ export type BskyAPILoginCreds = {
 
 // Used for the pruning and database operations
 export type GetAllPostedBatch = {
-  id: string; 
+  id: string;
   uri: string|null;
 };
 

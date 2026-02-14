@@ -53,11 +53,11 @@ export const TO_MS: number = TO_SEC*1000;
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L63
 export const MAX_LENGTH: number = 300;
 
-// Alt text limit via 
+// Alt text limit via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L69
 export const MAX_ALT_TEXT: number = 2000;
 
-// Image limit values via 
+// Image limit values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L97
 export const BSKY_IMG_MAX_WIDTH: number = 2000;
 export const BSKY_IMG_MAX_HEIGHT: number = 2000;

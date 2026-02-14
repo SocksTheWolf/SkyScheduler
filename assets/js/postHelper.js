@@ -593,7 +593,7 @@ function detachTribute(el) {
 function openPostAltEditor(file) {
   const editorLocation = document.querySelector(`div[alteditfor="${file}"]`);
   const editorDataLocation = editorLocation.querySelector("input[data-alt]");
-  openAltText(file, editorLocation.querySelector("a"), () => editorDataLocation.getAttribute("value"), 
+  openAltText(file, editorLocation.querySelector("a"), () => editorDataLocation.getAttribute("value"),
     (newAltValue) => {
       editorDataLocation.setAttribute("value", newAltValue);
   });

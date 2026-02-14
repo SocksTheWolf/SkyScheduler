@@ -24,7 +24,7 @@ preview.get("/file/:id", authMiddleware, async (c: Context) => {
   if (fetchedFile === null) {
     return c.redirect("/thumbs/missing.png");
   }
-  
+
   const contentType = fetchedFile.httpMetadata?.contentType || fetchedFile.customMetadata["type"];
   if (BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
     return c.redirect("/thumbs/missing.png");
@@ -34,7 +34,7 @@ preview.get("/file/:id", authMiddleware, async (c: Context) => {
   if (isEmpty(uploaderId) || c.get("userId") !== uploaderId) {
     return c.redirect("/thumbs/image.png");
   }
-  
+
   return c.body(await fetchedFile.blob(), 200, {
     "Content-Type": contentType
   })

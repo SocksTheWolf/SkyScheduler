@@ -8,11 +8,11 @@ export default function ResetPassword() {
   return (
     <BaseLayout title="SkyScheduler - Reset Password">
       <NavTags />
-      <AccountHandler title="Reset Password" 
-        loadingText="Resetting Password..." 
-        endpoint="/account/reset" 
-        successText="Success! Redirecting to login..." 
-        redirect="/login" 
+      <AccountHandler title="Reset Password"
+        loadingText="Resetting Password..."
+        endpoint="/account/reset"
+        successText="Success! Redirecting to login..."
+        redirect="/login"
         footerLinks={links}>
 
         <input type="hidden" name="resetToken" id="resetToken" hx-history="false" />

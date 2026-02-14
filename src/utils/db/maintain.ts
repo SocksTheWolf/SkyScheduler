@@ -56,7 +56,7 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
     console.error(`Adding file listings got error ${err}`);
   }
 
-  let batchedQueries:BatchItem<"sqlite">[] = []; 
+  let batchedQueries:BatchItem<"sqlite">[] = [];
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {
@@ -68,7 +68,7 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
   const allPosts = await db.select({id: posts.uuid}).from(posts);
   for (const post of allPosts) {
     const count = db.$count(reposts, eq(reposts.uuid, post.id));
-    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id, 
+    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id,
       count: count}).onConflictDoNothing());
   }
   await db.batch(batchedQueries as BatchQuery);

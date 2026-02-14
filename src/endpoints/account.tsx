@@ -30,7 +30,7 @@ const serverParseValidationErr = (c: Context, errorJson: string) => {
   try {
     const errorMsgs = JSON.parse(errorJson);
     return c.html(<div class="validation-error btn-error">
-      <b>Failed Validation</b>: 
+      <b>Failed Validation</b>:
         <ul>
           {errorMsgs.map((el: { message: string; }) => {
             return <li>{el.message}</li>;
@@ -169,13 +169,13 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
 
   // Grab the user's pds as well
   const userPDS: string = await lookupBskyPDS(profileDID);
-  
+
   // grab our auth object
   const auth = c.get("auth");
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
   }
-  
+
   console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
   // create the user
   const createUser = await auth.api.signUpEmail({
@@ -261,7 +261,7 @@ account.post("/reset", pullAuthData, async (c: Context) => {
   if (!auth) {
     return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
   }
-  
+
   const { data, error } = await auth.api.resetPassword({body: {
     newPassword: password,
     token: resetToken,
@@ -275,7 +275,7 @@ account.post("/reset", pullAuthData, async (c: Context) => {
 account.post("/delete", authMiddleware, async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountDeleteSchema.safeParse(body);
-  
+
   if (!validation.success) {
     return serverParseValidationErr(c, validation.error.message);
   }
@@ -308,7 +308,7 @@ account.post("/delete", authMiddleware, async (c) => {
         .then((media) => deleteFromR2(c, media))
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
-      
+
       c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {

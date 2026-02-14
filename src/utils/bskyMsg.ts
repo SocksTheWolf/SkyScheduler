@@ -50,7 +50,7 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
         } catch (delerr) {
           console.error(`failed to delete reset message for self, got error ${delerr}`);
         }
-        // Message has been sent.      
+        // Message has been sent.
         return true;
       } else {
         console.error(`Unable to send the message to ${user}, could not sendMessage call`);

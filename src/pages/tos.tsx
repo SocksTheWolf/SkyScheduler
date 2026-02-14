@@ -32,11 +32,11 @@ export default function TermsOfService() {
             Deletions may take up to 30 days to fully cycle out of backups.
           </p>
           <h4>Disclaimer/Limitations</h4>
-          <p>SkyScheduler IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-            IN NO EVENT SHALL THE AUTHORS, HOSTS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+          <p>SkyScheduler IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+            IN NO EVENT SHALL THE AUTHORS, HOSTS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
             TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
           <h4>Ammendum</h4>
-          <p>The terms of service may be revised at any time without prior notification. 
+          <p>The terms of service may be revised at any time without prior notification.
             Continued use of the website means that you agree to be bound by the current version of this document.</p>
           <footer>
             <FooterCopyright />
