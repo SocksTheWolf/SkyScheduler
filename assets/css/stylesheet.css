@@ -3,7 +3,7 @@
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .sidebar-block {
@@ -69,6 +69,13 @@
 }
 .btn-delete .thread-cancel {
   display: inline-block;
+}
+
+.addThreadPost {
+  svg, img {
+    margin-top: -8px;
+    margin-left: 0.8px;
+  }
 }
 
 .w-full {

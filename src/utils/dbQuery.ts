@@ -35,8 +35,6 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
         })
         .from(posts).where(eq(posts.userId, userId))
         .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
-        /* this might not be necessary but we'll throw it in here anyways */
-        .groupBy(posts.rootPost)
         .orderBy(desc(posts.scheduledDate), asc(posts.threadOrder), desc(posts.createdAt)).all();
 
       if (isEmpty(results))
@@ -114,7 +112,7 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
 
     // If the parent post is not null, then attempt to find and update the post chain
     const parentPost = postObj.parentPost;
-    if (parentPost !== null) {
+    if (parentPost !== undefined) {
       // set anyone who had this as their parent to this post chain
       queriesToExecute.push(db.update(posts).set({parentPost: parentPost, threadOrder: postObj.threadOrder})
         .where(and(eq(posts.parentPost, postObj.postid), eq(posts.rootPost, postObj.rootPost!))));
@@ -173,7 +171,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   // Do not do this check if you are doing a threaded post
   // or you have marked that you are posting right now.
   if (!isAfter(scheduleDate, new Date()) &&
-    (!makePostNow || (!isEmpty(rootPost) && !isEmpty(parentPost)))) {
+    (!makePostNow && (isEmpty(rootPost) && isEmpty(parentPost)))) {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 

@@ -42,7 +42,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </button>`);
   const threadItemElement = raw(`<button class="addThreadPost btn-sm primary outline" data-tooltip="Create a post in thread"
-      data-placement="top" listen="false">
+      data-placement="right" listen="false">
         <img src="/icons/reply.svg" alt="threaded post icon" width="20px" height="20px" />
       </button>`);
 
@@ -68,7 +68,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
   const postHTML = html`
   <article
     id="postBase${content.postid}" ${oobSwapStr}>
-    <header class="postItemHeader" data-root="${content.rootPost || content.postid}" ${parentMetaAttr}
+    <header class="postItemHeader" data-root="${content.rootPost || content.postid}" ${raw(parentMetaAttr)}
       ${hasBeenPosted && !content.isRepost ? raw('hidden>') : raw(`>`)}
         ${!hasBeenPosted ? editPostElement : null}
         ${!hasBeenPosted ? threadItemElement : null}

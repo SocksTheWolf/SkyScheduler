@@ -326,11 +326,11 @@ postForm.addEventListener('submit', async (e) => {
   const contentVal = content.value;
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
-  const nowTime = new Date().toISOString();
+  const isThreadPost = threadField.hasAttribute("rootpost") && threadField.hasAttribute("parentpost");
   // Handle conversion of date time to make sure that it is correct.
   let dateTime;
   try {
-    dateTime = postNow ? nowTime : new Date(scheduledDateVal).toISOString();
+    dateTime = isThreadPost || postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
   } catch(dateErr) {
     pushToast("Invalid date", false);
     showPostProgress(false);
@@ -358,13 +358,11 @@ postForm.addEventListener('submit', async (e) => {
     }
 
     // Add thread data if it exists
-    if (threadField.hasAttribute("rootpost") && threadField.hasAttribute("parentpost")) {
+    if (isThreadPost) {
       postObject.parentPost = threadField.getAttribute("parentpost");
       postObject.rootPost = threadField.getAttribute("rootpost");
       postObject.makePostNow = false;
       postObject.repostData = undefined;
-      // set the date to right now.
-      postObject.scheduledDate = nowTime;
     }
 
     const hasFiles = fileData.size > 0;
