@@ -22,8 +22,7 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
   altTextField.selectionStart = altTextField.value.length;
   recountCounter("altTextCount");
   tributeToElement(altTextField);
-  const handleSave = (ev) => {
-    ev.preventDefault();
+  const handleSave = () => {
     const newAltTextData = altTextField.value;
     saveCallback(newAltTextData);
     if (newAltTextData === "") {
