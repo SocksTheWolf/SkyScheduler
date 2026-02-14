@@ -28,6 +28,7 @@ type QueueConfigSettings = {
   enabled: boolean;
   threadEnabled: boolean;
   postNowEnabled?: boolean;
+  delay_val: number;
   post_queues: string[];
   repost_queues: string[];
 }
