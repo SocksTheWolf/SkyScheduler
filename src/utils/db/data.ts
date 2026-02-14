@@ -77,10 +77,10 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   const currentTime = floorCurrentTime();
   const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
     .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
-  
+
   // This is really stupid and I hate it, but someone has to update repost counts once posted
   if (deletedPosts.length > 0) {
-    let batchedQueries:BatchItem<"sqlite">[] = []; 
+    let batchedQueries:BatchItem<"sqlite">[] = [];
     for (const deleted of deletedPosts) {
       // Update counts
       const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
@@ -94,7 +94,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
         // if there are none, this schedule should get removed from the repostInfo array
         const stillHasSchedule = await db.select().from(reposts)
           .where(and(
-            eq(reposts.scheduleGuid, deleted.scheduleGuid!), 
+            eq(reposts.scheduleGuid, deleted.scheduleGuid!),
             eq(reposts.uuid, deleted.id)))
           .limit(1).all();
 
