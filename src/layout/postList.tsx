@@ -65,7 +65,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
     (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
       <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>Reposts Left: {content.repostCount}</span></>) : "";
 
-  const parentMetaAttr = (!content.isThreadRoot) ? `data-parent="${content.postid}"` : "";
+  const parentMetaAttr = (content.isChildPost) ? `data-parent="${content.parentPost}"` : "";
 
   const postHTML = html`
   <article

@@ -51,8 +51,8 @@ document.addEventListener("resetPost", () => {
   setElementVisible(cancelThreadBtn.parentElement, false);
   postFormTitle.innerText = "Schedule New Post";
   // remove thread info data
-  if (threadField.hasAttribute("postid")) {
-    const postHighlight = getPostListElement(threadField.getAttribute("postid"));
+  if (threadField.hasAttribute("parentpost")) {
+    const postHighlight = getPostListElement(threadField.getAttribute("parentpost"));
     if (postHighlight) {
       postHighlight.classList.remove("highlight");
     }
@@ -498,8 +498,10 @@ document.addEventListener("editPost", function(event) {
 document.addEventListener("replyThreadCreate", function(ev) {
   const postDOM = ev.detail.target;
   // check attributes
-  if (!postDOM.hasAttribute("data-root"))
+  if (!postDOM.hasAttribute("data-root")) {
+    pushToast("Invalid operation occurred", false);
     return;
+  }
 
   const rootID = postDOM.getAttribute("data-root");
   if (threadField.hasAttribute("rootpost")) {
@@ -510,11 +512,9 @@ document.addEventListener("replyThreadCreate", function(ev) {
   }
   
   threadField.setAttribute("rootpost", rootID);
-  const parentID = postDOM.hasAttribute("data-parent") ? postDOM.getAttribute("data-parent") : rootID;
+  const parentID = postDOM.hasAttribute("data-item") ? postDOM.getAttribute("data-item") : rootID;
   threadField.setAttribute("parentpost", parentID);
-  const itemID = postDOM.getAttribute("data-item");
-  threadField.setAttribute("postid", itemID);
-  const postHighlight = getPostListElement(threadField.getAttribute("postid"));
+  const postHighlight = getPostListElement(parentID);
   if (postHighlight) {
     postHighlight.classList.add("highlight");
   }

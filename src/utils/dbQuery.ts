@@ -206,7 +206,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       if (rootPostData.isRepost) {
         return {ok: false, msg: "Threads cannot be made of repost actions"};
       }
-      rootPostID = rootPostData.rootPost!;
+      rootPostID = rootPostData.rootPost || rootPostData.postid;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
         if (uuidValid(parentPost)) {
