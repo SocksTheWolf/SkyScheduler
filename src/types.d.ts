@@ -182,6 +182,11 @@ export type PostStatus = {
   got: number;
 };
 
+export type DeleteResponse = {
+  success: boolean;
+  needsRefresh?: boolean;
+}
+
 export interface LooseObj {
   [key: string]: any;
 };

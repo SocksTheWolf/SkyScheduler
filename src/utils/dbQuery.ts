@@ -13,6 +13,7 @@ import {
   AccountStatus,
   BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
+  DeleteResponse,
   EmbedDataType,
   Post, PostLabel,
   RepostInfo
@@ -90,10 +91,11 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
   return false;
 };
 
-export const deletePost = async (c: Context, id: string): Promise<boolean> => {
+export const deletePost = async (c: Context, id: string): Promise<DeleteResponse> => {
   const userId = c.get("userId");
+  const returnObj: DeleteResponse = {success: false};
   if (!userId) {
-    return false;
+    return returnObj;
   }
 
   const db: DrizzleD1Database = drizzle(c.env.DB);
@@ -146,9 +148,10 @@ export const deletePost = async (c: Context, id: string): Promise<boolean> => {
     // delete post
     queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, id)));
     await c.executionCtx.waitUntil(db.batch(queriesToExecute as BatchQuery));
-    return true;
+    returnObj.success = true;
+    returnObj.needsRefresh = postObj.isThreadRoot;
   }
-  return false;
+  return returnObj;
 };
 
 export const createPost = async (c: Context, body: any): Promise<CreatePostQueryResponse> => {

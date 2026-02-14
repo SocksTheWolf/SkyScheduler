@@ -9,6 +9,7 @@ import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
+  DeleteResponse,
   EmbedDataType, LooseObj, Post
 } from "../types.d";
 import { makePost } from "../utils/bskyApi";
@@ -216,8 +217,14 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
 post.delete("/delete/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
-    if (await deletePost(c, id) === true) {
-      c.header("HX-Trigger-After-Swap", "postDeleted, accountViolations");
+    const response: DeleteResponse = await deletePost(c, id);
+    if (response.success === true) {
+      let postRefreshEvent = "";
+      if (response.needsRefresh) {
+        postRefreshEvent = ", refreshPosts, timeSidebar, scrollTop";
+      }
+      const triggerEvents = `postDeleted, accountViolations${postRefreshEvent}`;
+      c.header("HX-Trigger-After-Swap", triggerEvents);
       return c.html(<></>);
     }
   }
