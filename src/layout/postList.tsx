@@ -29,11 +29,12 @@ export function ScheduledPost(props: ScheduledPostOptions) {
 
   const postType = content.isRepost ? "repost" : "post";
   const postOnText = content.isRepost ? "Repost on" : "Posted on";
+  const deleteReplace = `hx-target="${content.isChildPost ? 'blockquote:has(' : ''}#postBase${content.postid}${content.isChildPost ? ')' :''}"`;
   const editAttributes = hasBeenPosted ? '' : raw(`title="Click to edit post content" hx-get="/post/edit/${content.postid}"
         hx-trigger="click once" hx-target="#post${content.postid}" hx-swap="innerHTML show:#editPost${content.postid}:top"`);
   const deletePostElement = raw(`<button type="submit" hx-delete="/post/delete/${content.postid}"
         hx-confirm="Are you sure you want to delete this ${postType}?" title="Click to delete this ${postType}"
-        data-placement="left" data-tooltip="Delete this ${postType}" hx-target="#postBase${content.postid}"
+        data-placement="left" data-tooltip="Delete this ${postType}" ${raw(deleteReplace)}
         hx-swap="outerHTML" hx-trigger="click" class="btn-sm btn-error outline btn-delete">
           <img src="/icons/trash.svg" alt="trash icon" width="20px" height="20px" />
       </button>`);
@@ -90,7 +91,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
     </footer>
   </article>`;
   // if this is a thread, chain it nicely
-  if (content.parentPost !== undefined)
+  if (content.isChildPost)
     return html`<blockquote>${postHTML}</blockquote>`;
 
   return postHTML;
