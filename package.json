@@ -45,7 +45,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^24.10.12",
+    "@types/node": "^24.10.13",
     "drizzle-kit": "^0.31.8",
     "minify": "^14.1.0",
     "npm-run-all": "^4.1.5",
