@@ -32,6 +32,10 @@
   text-overflow: ellipsis;
 }
 
+.postText {
+  white-space: pre-wrap;
+}
+
 .btn-error, .pico .btn-error {
   border: var(--pico-border-width) solid red;
   color: red;

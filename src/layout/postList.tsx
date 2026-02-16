@@ -10,7 +10,7 @@ type PostContentObjectProps = {
 };
 
 export function PostContentObject({text}: PostContentObjectProps) {
-  return (<p class="truncate">{text}</p>);
+  return (<p class="postText">{text}</p>);
 }
 
 type ScheduledPostOptions = {
