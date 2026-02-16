@@ -24,15 +24,18 @@ export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowE
 export const shouldPostThreadQueue = (env: Bindings) => env.QUEUE_SETTINGS.threadEnabled && (hasPostQueue(env) || isQueueEnabled(env));
 
 export async function enqueuePost(env: Bindings, post: Post) {
-  if (post.isThreadRoot && !shouldPostThreadQueue(env))
-    return;
-  else if (!isQueueEnabled(env))
+  if (post.isThreadRoot) {
+    if (!shouldPostThreadQueue(env))
+      return;
+  } else if (!isQueueEnabled(env))
     return;
 
   // Pick a random consumer to handle this post
   const queueConsumer: Queue|null = getRandomQueue(env, "post_queues");
-  if (queueConsumer !== null)
+
+  if (queueConsumer !== null) {
     await queueConsumer.send({type: QueueTaskType.Post, post: post} as QueueTaskData, { contentType: queueContentType });
+  }
 }
 
 export async function enqueueRepost(env: Bindings, post: Repost) {
