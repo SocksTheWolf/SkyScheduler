@@ -43,7 +43,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         data-tooltip="Edit this post" data-placement="right" ${editAttributes}>
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </button>`);
-  const threadItemElement = raw(`<button class="addThreadPost btn-sm primary outline" data-tooltip="Create a post in thread"
+  const threadItemElement = raw(`<button class="addThreadPost btn-sm primary outline" data-tooltip="Add a post to thread"
       data-placement="right" listen="false">
         <img src="/icons/reply.svg" alt="threaded post icon" width="20px" height="20px" />
       </button>`);
