@@ -337,6 +337,7 @@ postForm.addEventListener('submit', async (e) => {
     if (isThreadPost) {
       postObject.parentPost = threadField.getAttribute("parentpost");
       postObject.rootPost = threadField.getAttribute("rootpost");
+      // make sure to remove any invalid combinations
       postObject.makePostNow = false;
       postObject.repostData = undefined;
     }
@@ -514,7 +515,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
       pushToast("You are already threading a post, please cancel/submit it before continuing", false);
     return;
   }
-  
+
   threadField.setAttribute("rootpost", rootID);
   const parentID = postDOM.hasAttribute("data-item") ? postDOM.getAttribute("data-item") : rootID;
   threadField.setAttribute("parentpost", parentID);
@@ -522,7 +523,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
   if (postHighlight) {
     postHighlight.classList.add("highlight");
   }
-  
+
   setElementVisible(cancelThreadBtn.parentElement, true);
   setElementVisible(sectionRetweet, false);
   setElementVisible(sectionSchedule, false);

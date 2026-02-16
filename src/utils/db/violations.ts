@@ -1,7 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
-import { bannedUsers, violations } from "../../db/app.schema";
+import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { Bindings, LooseObj, AccountStatus, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";

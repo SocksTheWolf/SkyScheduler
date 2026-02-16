@@ -92,34 +92,6 @@ export const repostCounts = sqliteTable('repostCounts', {
   count: integer('count').default(0).notNull()
 });
 
-// violations of users of this service
-export const violations = sqliteTable('violations', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  userId: text("user")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }).unique(),
-  tosViolation: integer('tosViolation', { mode: 'boolean' }).default(false),
-  userPassInvalid: integer('userPassInvalid', { mode: 'boolean' }).default(false),
-  accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),
-  accountGone: integer('accountGone', { mode: 'boolean' }).default(false),
-  mediaTooBig: integer('mediaTooBig', { mode: 'boolean' }).default(false),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-}, (table) => [
-  // joining and querying against the table's data
-  index("violations_user_idx").on(table.userId)
-]);
-
-// banned users from skyscheduler, prevents them from signing up
-export const bannedUsers = sqliteTable('bans', {
-  did: text('account_did').primaryKey().notNull(),
-  reason: text('banReason').notNull().default(""),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' })
-  .default(sql`CURRENT_TIMESTAMP`)
-  .notNull(),
-});
-
 // helper bookkeeping to make sure we don't have a ton of abandoned files in R2
 export const mediaFiles = sqliteTable('media', {
   fileName: text('file', {mode: 'text'}).primaryKey(),

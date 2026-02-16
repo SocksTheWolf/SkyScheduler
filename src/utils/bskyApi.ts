@@ -620,8 +620,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         continue;
       }
       // This is the first child post we haven't handled yet, oof.
-      const childSuccess = await postSegment(child);
-      if (childSuccess === false) {
+      if (await postSegment(child) === false) {
         console.error(`We encountered errors attempting to post child ${child.postid}, returning what did get posted`);
         break;
       }

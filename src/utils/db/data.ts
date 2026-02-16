@@ -3,7 +3,8 @@ import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from 'uuid';
-import { posts, repostCounts, reposts, violations } from "../../db/app.schema";
+import { posts, repostCounts, reposts } from "../../db/app.schema";
+import { violations } from "../../db/enforcement.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
 import {
   BatchQuery,
@@ -20,7 +21,9 @@ export const doesPostExist = async (env: Bindings, userId: string, postId: strin
     return false;
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select().from(posts).where(and(eq(posts.uuid, postId), eq(posts.userId, userId))).limit(1).all();
+  const result = await db.select().from(posts).where(
+    and(eq(posts.uuid, postId), eq(posts.userId, userId)))
+    .limit(1).all();
   return result.length >= 1;
 };
 
@@ -110,19 +113,9 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
         }
       }
     }
-    await db.batch(batchedQueries as BatchQuery);
+    if (batchedQueries.length > 0)
+      await db.batch(batchedQueries as BatchQuery);
   }
-};
-
-/* This function should only be used by anything that is an internal helper (such as a task)
-  Should not be used for standard post modification */
-export const updatePostData = async (env: Bindings, id: string, newData: Object): Promise<boolean> => {
-  if (!uuidValid(id))
-    return false;
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const {success} = await db.update(posts).set(newData).where(eq(posts.uuid, id));
-  return success;
 };
 
 export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordResponse[], allPosted: boolean) => {
@@ -137,7 +130,8 @@ export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordRes
 
     let wasPosted = (i == 0 && !allPosted) ? false : true;
     dbOperations.push(db.update(posts).set(
-      {content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})`, posted: wasPosted, uri: record.uri, cid: record.cid, embedContent: []})
+      {content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})`, posted: wasPosted,
+        uri: record.uri, cid: record.cid, embedContent: []})
     .where(eq(posts.uuid, record.postID)));
   }
 
@@ -146,8 +140,12 @@ export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordRes
 }
 
 export const setPostNowOffForPost = async (env: Bindings, id: string) => {
-  const didUpdate = await updatePostData(env, id, {postNow: false});
-  if (!didUpdate)
+  if (!uuidValid(id))
+    return false;
+
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const {success} = await db.update(posts).set({postNow: false}).where(eq(posts.uuid, id));
+  if (!success)
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
@@ -156,10 +154,10 @@ export const updatePostForGivenUser = async (env: Bindings, userId: string, id: 
     return false;
 
   const db: DrizzleD1Database = drizzle(env.DB);
-  const {success} = await db.update(posts).set(newData).where(and(eq(posts.uuid, id), eq(posts.userId, userId)));
+  const {success} = await db.update(posts).set(newData).where(
+    and(eq(posts.uuid, id), eq(posts.userId, userId)));
   return success;
 };
-
 
 export const getAllPostedPostsOfUser = async(env: Bindings, userId: string): Promise<GetAllPostedBatch[]> => {
   if (isEmpty(userId))
@@ -228,10 +226,14 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promi
   postsToDelete.forEach((itm) => {
     deleteQueries.push(db.delete(posts).where(and(eq(posts.uuid, itm), eq(posts.posted, true))));
   });
+
   // Batching this should improve db times
-  const batchResponse = await db.batch(deleteQueries as BatchQuery);
-  // Return the number of items that have been deleted
-  return batchResponse.reduce((val, item) => val + item.success, 0);
+  if (deleteQueries.length > 0) {
+    const batchResponse = await db.batch(deleteQueries as BatchQuery);
+    // Return the number of items that have been deleted
+    return batchResponse.reduce((val, item) => val + item.success, 0);
+  }
+  return 0;
 };
 
 export const purgePostedPosts = async (env: Bindings): Promise<number> => {

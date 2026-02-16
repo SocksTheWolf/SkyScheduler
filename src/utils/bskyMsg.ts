@@ -42,7 +42,8 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
     const rt = new RichText({text: msg});
     await rt.detectFacets(agent);
     try {
-      const sendMessage = await agent.chat.bsky.convo.sendMessage({convoId: convoId, message: {text: msg, facets: rt.facets}}, chatHeaders);
+      const sendMessage = await agent.chat.bsky.convo.sendMessage(
+        {convoId: convoId, message: {text: msg, facets: rt.facets}}, chatHeaders);
       if (sendMessage.success) {
         // delete the message for me
         try {

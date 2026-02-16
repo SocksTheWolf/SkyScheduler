@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
-import { DependencyTags, ScriptTags } from "../layout/depTags";
+import { IncludeDependencyTags, ScriptTags } from "../layout/depTags";
 import FooterCopyright from "../layout/footer";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
@@ -36,7 +36,7 @@ export default function Dashboard(props:any) {
   return (
     <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard"
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
-      <DependencyTags scripts={defaultDashboardPreloads} />
+      <IncludeDependencyTags scripts={defaultDashboardPreloads} />
       <div class="row-fluid">
         <section class="col-3">
           <article>

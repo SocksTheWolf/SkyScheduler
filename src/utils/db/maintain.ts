@@ -69,5 +69,6 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
     batchedQueries.push(db.insert(repostCounts).values({uuid: post.id,
       count: count}).onConflictDoNothing());
   }
-  await db.batch(batchedQueries as BatchQuery);
+  if (batchedQueries.length > 0)
+    await db.batch(batchedQueries as BatchQuery);
 };

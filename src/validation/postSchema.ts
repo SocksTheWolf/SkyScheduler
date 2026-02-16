@@ -43,7 +43,7 @@ export const PostSchema = z.object({
     if (makePostNow) {
       ctx.addIssue({
         code: "custom",
-        message: "You cannot post now while making threads",
+        message: "You cannot use the post now feature while making threads",
         path: ["makePostNow"]
       });
     }
@@ -51,7 +51,7 @@ export const PostSchema = z.object({
     if (repostData !== undefined) {
       ctx.addIssue({
         code: "custom",
-        message: "You cannot have repost data with threads",
+        message: "You cannot have reposts on child posts of threads",
         path: ["repostData"]
       });
     }

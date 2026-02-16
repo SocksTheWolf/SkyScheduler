@@ -82,7 +82,8 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
           .where(eq(users.id, userId)));
       }
 
-      await db.batch(queriesToExecute as BatchQuery);
+      if (queriesToExecute.length > 0)
+        await db.batch(queriesToExecute as BatchQuery);
       return true;
     }
   } catch(err) {

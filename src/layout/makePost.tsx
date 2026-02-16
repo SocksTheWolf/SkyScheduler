@@ -12,7 +12,7 @@ import {
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { ContentLabelOptions } from "./contentLabelOptions";
-import { DependencyTags } from "./depTags";
+import { IncludeDependencyTags } from "./depTags";
 import { RetweetOptions } from "./retweetOptions";
 import { ScheduleOptions } from "./scheduleOptions";
 
@@ -29,7 +29,7 @@ export function PostCreation() {
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
-    <DependencyTags scripts={PreloadPostCreation} />
+    <IncludeDependencyTags scripts={PreloadPostCreation} />
     <article>
       <form id="postForm" novalidate>
         <header>
