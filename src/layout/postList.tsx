@@ -4,13 +4,17 @@ import isEmpty from "just-is-empty";
 import { Post } from "../types.d";
 import { getUsernameForUser } from "../utils/db/userinfo";
 import { getPostsForUser } from "../utils/dbQuery";
+import { MAX_POSTED_LENGTH } from "../limits";
 
 type PostContentObjectProps = {
   text: string;
+  posted: boolean;
+  repost: boolean;
 };
 
-export function PostContentObject({text}: PostContentObjectProps) {
-  return (<p class="postText">{text}</p>);
+export function PostContentObject(props: PostContentObjectProps) {
+  const ellipses = props.posted && !props.repost && props.text.length >= MAX_POSTED_LENGTH ? "..." : "";
+  return (<p class="postText">{props.text}{ellipses}</p>);
 }
 
 type ScheduledPostOptions = {
@@ -79,7 +83,7 @@ export function ScheduledPost(props: ScheduledPostOptions) {
         ${canSeeHeader ? deletePostElement : null}
     </header>
     <div id="post${content.postid}">
-      ${<PostContentObject text={content.text}/>}
+      ${<PostContentObject text={content.text} posted={content.posted || false} repost={content.isRepost || false} />}
     </div>
     <footer>
       <small>

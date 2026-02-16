@@ -45,7 +45,7 @@ export function PostAltTextEdit({post}: EditedPostProps) {
 export function PostEdit({post}:EditedPostProps) {
   // If this post is posted, just show the same object again.
   if (post.posted) {
-    return (<PostContentObject text={post.text}/>);
+    return (<PostContentObject text={post.text} posted={true} repost={false} />);
   }
 
   const editSpinner:string = `editSpinner${post.postid}`;
