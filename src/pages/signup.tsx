@@ -1,10 +1,10 @@
 import { Context } from "hono";
 import AccountHandler from "../layout/account";
-import FooterCopyright from "../layout/footer";
+import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
-import NavTags from "../layout/navTags";
+import NavTags from "../layout/helpers/navTags";
 import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
-import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
+import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { UsernameField } from "../layout/usernameField";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { PWAutoCompleteSettings } from "../types.d";

@@ -13,9 +13,10 @@ import {
   EmbedDataType, LooseObj, Post
 } from "../types.d";
 import { makePost } from "../utils/bskyApi";
-import { getUsernameForUser } from "../utils/db/userinfo";
 import {
-  createPost, createRepost, deletePost, getPostById, getPostByIdWithReposts,
+  createPost, createRepost,
+  deletePost, getPostById,
+  getPostByIdWithReposts,
   updatePostForUser
 } from "../utils/dbQuery";
 import { enqueuePost, shouldPostNowQueue } from "../utils/queuePublisher";
@@ -50,7 +51,7 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
 
   const { content } = validation.data;
   // delete item from r2
-  deleteFromR2(c, content);
+  c.executionCtx.waitUntil(deleteFromR2(c, content, false));
   return c.json({"success": true}, 200);
 });
 
@@ -184,10 +185,9 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
 
   if (await updatePostForUser(c, id, payload)) {
     originalPost.text = content;
-    const username = await getUsernameForUser(c);
     c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
     c.header("HX-Trigger-After-Swap", "postUpdatedNotice, timeSidebar, scrollTop");
-    return c.html(<ScheduledPost post={originalPost} user={username} dynamic={true} />);
+    return c.html(<ScheduledPost post={originalPost} dynamic={true} />);
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
@@ -203,8 +203,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
   // Get the original post to replace with
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
-    const username = await getUsernameForUser(c);
-    return c.html(<ScheduledPost post={postInfo} user={username} dynamic={true} />);
+    return c.html(<ScheduledPost post={postInfo} dynamic={true} />);
   }
 
   // Refresh sidebar otherwise

@@ -2,6 +2,7 @@ import { startOfHour, subDays } from "date-fns";
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import { Bindings, BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types.d";
+import { Context } from "hono";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);
@@ -104,4 +105,8 @@ export function floorGivenTime(given: Date) {
 
 export function daysAgo(days: number) {
   return subDays(new Date(), days);
+}
+
+export function UseCFTurnstile(ctx: Context): boolean {
+  return ctx.env.SIGNUP_SETTINGS.use_captcha && ctx.env.IN_DEV === false;
 }

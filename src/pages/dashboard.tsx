@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
-import { IncludeDependencyTags, ScriptTags } from "../layout/depTags";
-import FooterCopyright from "../layout/footer";
+import { IncludeDependencyTags, ScriptTags } from "../layout/helpers/includesTags";
+import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";

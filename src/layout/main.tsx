@@ -1,10 +1,9 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
-import { HtmlEscapedString } from 'hono/utils/html';
 import { PreloadRules } from '../types.d';
 import { mainScriptStr } from '../utils/appScripts';
-import { PreloadDependencyTags } from './depTags';
-import MetaTags from './metaTags';
+import { PreloadDependencyTags } from './helpers/includesTags';
+import MetaTags from './helpers/metaTags';
 
 type BaseLayoutProps = {
   children: Child;
@@ -45,6 +44,7 @@ export const BaseLayout = ({
       </container>
     </body>
   </html>);
+  // inject the doctype so we're not in quirks mode
   return html`<!DOCTYPE html>
   ${layout}`;
 }

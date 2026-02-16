@@ -1,6 +1,6 @@
-import FooterCopyright from "../layout/footer";
+import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
-import NavTags from "../layout/navTags";
+import NavTags from "../layout/helpers/navTags";
 
 export default function TermsOfService() {
   return (

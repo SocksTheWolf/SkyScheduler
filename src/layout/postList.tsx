@@ -2,7 +2,6 @@ import { Context } from "hono";
 import { html, raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { Post } from "../types.d";
-import { getUsernameForUser } from "../utils/db/userinfo";
 import { getPostsForUser } from "../utils/dbQuery";
 import { MAX_POSTED_LENGTH } from "../limits";
 
@@ -19,7 +18,6 @@ export function PostContentObject(props: PostContentObjectProps) {
 
 type ScheduledPostOptions = {
   post: Post;
-  user: string|null;
   // if the object should be dynamically replaced.
   // usually in edit/cancel edit settings.
   dynamic?: boolean;
@@ -27,9 +25,8 @@ type ScheduledPostOptions = {
 
 export function ScheduledPost(props: ScheduledPostOptions) {
   const content: Post = props.post;
-  const username: string|null = props.user;
   const oobSwapStr = (props.dynamic) ? `hx-swap-oob="#postBase${content.postid}"` : "";
-  const hasBeenPosted: boolean = (username !== null && content.posted === true && content.uri !== undefined);
+  const hasBeenPosted: boolean = (content.posted === true && content.uri !== undefined);
   const postURIID: string|null = content.uri ? content.uri.replace("at://","").replace("app.bsky.feed.","") : null;
 
   const postType = content.isRepost ? "repost" : "post";
@@ -111,13 +108,12 @@ type ScheduledPostListProps = {
 export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
   if (ctx !== undefined) {
     const response: Post[]|null = await getPostsForUser(ctx);
-    const username = await getUsernameForUser(ctx);
     if (!isEmpty(response)) {
       return (
         <>
         <a hidden tabindex={-1} class="invalidateTab hidden"></a>
         {response!.map((data: Post) => {
-          return <ScheduledPost post={data} user={username} />;
+          return <ScheduledPost post={data} />;
         })}
         </>
       );

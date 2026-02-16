@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { UseCFTurnstile } from "../layout/turnstile";
+import { UseCFTurnstile } from "../utils/helpers";
 
 // Middleware that handles turnstile verification.
 export async function verifyTurnstile(c: Context, next: any) {

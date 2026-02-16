@@ -1,6 +1,7 @@
 import { raw } from "hono/html";
 
 export default function MetaTags() {
+  /* Modify these to change meta information on all pages. */
   const Title: string = "SkyScheduler";
   const URL: string = "https://skyscheduler.work";
   const Description: string = "Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!";

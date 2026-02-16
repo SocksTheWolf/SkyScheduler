@@ -2,7 +2,6 @@ import { eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
-import truncate from "just-truncate";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";

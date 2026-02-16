@@ -1,6 +1,6 @@
 import AccountHandler from "../layout/account";
 import { BaseLayout } from "../layout/main";
-import NavTags from "../layout/navTags";
+import NavTags from "../layout/helpers/navTags";
 import { DashboardPasswordField } from "../layout/passwordFields";
 import { UsernameField } from "../layout/usernameField";
 import { PWAutoCompleteSettings } from "../types.d";

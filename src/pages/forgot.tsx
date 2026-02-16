@@ -1,9 +1,9 @@
 import { Context } from "hono";
 import AccountHandler from "../layout/account";
-import FooterCopyright from "../layout/footer";
+import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
-import NavTags from "../layout/navTags";
-import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/turnstile";
+import NavTags from "../layout/helpers/navTags";
+import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { UsernameField } from "../layout/usernameField";
 
 export default function ForgotPassword(props:any) {

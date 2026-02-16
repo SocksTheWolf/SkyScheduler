@@ -48,8 +48,8 @@ export function PostEdit({post}:EditedPostProps) {
     return (<PostContentObject text={post.text} posted={true} repost={false} />);
   }
 
-  const editSpinner:string = `editSpinner${post.postid}`;
-  const editResponse:string = `editResponse${post.postid}`;
+  const editSpinner: string = `editSpinner${post.postid}`;
+  const editResponse: string = `editResponse${post.postid}`;
   return (
     <form id={`editPost${post.postid}`} hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
         hx-swap="innerHTML swap:0.2s" hx-indicator={`#${editSpinner}`}>

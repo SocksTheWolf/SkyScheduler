@@ -430,7 +430,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   return { ok: success, msg: success ? "success" : "fail", postId: postUUID };
 };
 
-export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
+export const updatePostForUser = async (c: Context, id: string, newData: Object): Promise<boolean> => {
   const userId = c.get("userId");
   return await updatePostForGivenUser(c.env, userId, id, newData);
 };

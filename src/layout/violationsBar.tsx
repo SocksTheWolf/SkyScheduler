@@ -1,6 +1,4 @@
 import { Context } from "hono";
-import isEmpty from "just-is-empty";
-import { Violation } from "../types.d";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
 export async function ViolationNoticeBar(props: any) {

@@ -233,7 +233,8 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
   // There has to be a better method for this tbh.
   const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
   if (canMessageUser === false) {
-    return c.json({ok: false, message: `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
+    return c.json({ok: false, message:
+      `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
   }
 
   const { data, error } = await auth.api.requestPasswordReset({

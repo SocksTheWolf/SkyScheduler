@@ -102,7 +102,7 @@ Most of the application can be modified either through the `wrangler.toml` vars 
 
 ### Minimization
 
-The application by default is configured to use the minified versions of the scripts in `assets/js`. You can either turn off this behavior in `src/limits.ts` or run `npm run minify` whenever those files change.
+The application by default is configured to use the minified versions of the scripts in `assets/js`. By default these rebuild whenever any typescript file is changed or the application is deployed/ran.
 
 ## Project Structure
 
@@ -132,11 +132,11 @@ skyscheduler/
 
 #### Server
 
-- Zod - data validation
-- BetterAuth - login/authentication
-- BetterAuthCloudflare - helper adaption
+- BetterAuth - site login/authentication
+- BetterAuthCloudflare - helper for BetterAuth on CF
 - hono - request routing/processing
 - uuid - id generation
+- zod - data validation
 - image-dimensions - image data validation
 - date-fns - date processing helpers
 - drizzle - database orm/schemas
@@ -148,7 +148,7 @@ skyscheduler/
 - tribute - client autocomplete library
 - toastify - client notifications
 - dropzone - file upload negotiation
-- pico - styling
+- pico - styling, tabs, modals
 - countable - dynamic input counter
 
 ## Contributing

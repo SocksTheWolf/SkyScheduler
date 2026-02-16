@@ -11,10 +11,10 @@ import {
 } from "../limits";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
-import { ContentLabelOptions } from "./contentLabelOptions";
-import { IncludeDependencyTags } from "./depTags";
-import { RetweetOptions } from "./retweetOptions";
-import { ScheduleOptions } from "./scheduleOptions";
+import { ContentLabelOptions } from "./options/contentLabelOptions";
+import { IncludeDependencyTags } from "./helpers/includesTags";
+import { RetweetOptions } from "./options/retweetOptions";
+import { ScheduleOptions } from "./options/scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,

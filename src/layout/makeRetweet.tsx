@@ -1,5 +1,5 @@
-import { RetweetOptions } from "./retweetOptions";
-import { ScheduleOptions } from "./scheduleOptions";
+import { RetweetOptions } from "./options/retweetOptions";
+import { ScheduleOptions } from "./options/scheduleOptions";
 
 export function MakeRetweet() {
   return (
@@ -11,7 +11,9 @@ export function MakeRetweet() {
       <article>
         <header>Post To Retweet</header>
         <input type="text" id="repostRecordURL" placeholder="https://" />
-        <small>This must be a post, it cannot be anything else. It must also exist, and be reachable (i.e. a post that's not deleted, nor are you forbidden from seeing it)</small>
+        <small>This must be a post, it cannot be anything else.
+          It must also exist, and be reachable
+          (i.e. a post that's not deleted, nor are you forbidden from seeing it)</small>
       </article>
       <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" header="Retweet At" />
       <article>
