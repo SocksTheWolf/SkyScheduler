@@ -13,7 +13,7 @@ type PostContentObjectProps = {
 };
 
 export function PostContentObject(props: PostContentObjectProps) {
-  const ellipses = props.posted && !props.repost && props.text.length >= MAX_POSTED_LENGTH ? "..." : "";
+  const ellipses = props.posted && !props.repost && props.text.length >= (MAX_POSTED_LENGTH-1) ? "..." : "";
   return (<p class="postText">{props.text}{ellipses}</p>);
 }
 
