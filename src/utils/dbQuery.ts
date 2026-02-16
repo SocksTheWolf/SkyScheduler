@@ -20,7 +20,7 @@ import {
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { getChildPostsOfThread, getPostThreadCount, updatePostForGivenUser } from "./db/data";
+import { getChildPostsOfThread, getPostByCID, getPostThreadCount, updatePostForGivenUser } from "./db/data";
 import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -140,7 +140,7 @@ export const deletePost = async (c: Context, id: string): Promise<DeleteResponse
       }
     } else if (postObj.isChildPost) {
       // this is not a thread root, so we should figure out how many children are left.
-      const childPostCount = (await getPostThreadCount(c.env, postObj.user, postObj.rootPost!)) - 1;
+      const childPostCount = (await getPostThreadCount(db, postObj.user, postObj.rootPost!)) - 1;
       if (childPostCount <= 0) {
         queriesToExecute.push(db.update(posts).set({threadOrder: -1}).where(eq(posts.uuid, postObj.rootPost!)));
       }
@@ -232,7 +232,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
 
   const isThreadedPost: boolean = (rootPostID !== undefined && parentPostID !== undefined);
   if (isThreadedPost) {
-    const threadCount: number = await getPostThreadCount(c.env, userId, rootPostID!);
+    const threadCount: number = await getPostThreadCount(db, userId, rootPostID!);
     if (threadCount >= MAX_POSTS_PER_THREAD) {
       return { ok: false, msg: `this thread has hit the limit of ${MAX_POSTS_PER_THREAD} posts per thread`};
     }
@@ -349,7 +349,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await getPostByCID(c, cid);
+  const existingPost = await getPostByCID(db, userId, cid);
   if (existingPost !== null) {
     postUUID = existingPost.postid;
     const existingPostDate = existingPost.scheduledDate!;
@@ -450,22 +450,6 @@ export const getPostById = async(c: Context, id: string): Promise<Post|null> => 
     return createPostObject(result[0]);
   return null;
 };
-
-export const getPostByCID = async(c: Context, cid: string): Promise<Post|null> => {
-  const userId = c.get("userId");
-  if (!userId)
-    return null;
-
-  const env = c.env;
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select().from(posts)
-    .where(and(eq(posts.userId, userId), eq(posts.cid, cid)))
-    .limit(1).all();
-
-  if (!isEmpty(result))
-    return createPostObject(result[0]);
-  return null;
-}
 
 // used for post editing, acts very similar to getPostsForUser
 export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Post|null> => {

@@ -6,11 +6,10 @@ import { Bindings, LooseObj, AccountStatus, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
-const createBanForUser = async (env: Bindings, userName: string, reason: string) => {
+const createBanForUser = async (db: DrizzleD1Database, userName: string, reason: string) => {
   if (userName !== null) {
     const didHandle = await lookupBskyHandle(userName);
     if (didHandle !== null) {
-      const db: DrizzleD1Database = drizzle(env.DB);
       await db.insert(bannedUsers).values({did: didHandle, reason: reason}).onConflictDoNothing();
       console.log(`ban inserted for user ${userName}`);
     } else {
@@ -71,7 +70,7 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
   if (violationType === AccountStatus.TOSViolation) {
     const bskyUsername = await getUsernameForUserId(env, userId);
     if (bskyUsername !== null) {
-      await createBanForUser(env, bskyUsername, "tos violation");
+      await createBanForUser(db, bskyUsername, "tos violation");
     } else {
       console.warn(`unable to get bsky username for id ${userId}`);
     }

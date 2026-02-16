@@ -16,17 +16,6 @@ import {
 } from "../../types.d";
 import { createPostObject, createRepostObject, floorCurrentTime } from "../helpers";
 
-export const doesPostExist = async (env: Bindings, userId: string, postId: string): Promise<boolean> => {
-  if (isEmpty(userId) || !uuidValid(postId))
-    return false;
-
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select().from(posts).where(
-    and(eq(posts.uuid, postId), eq(posts.userId, userId)))
-    .limit(1).all();
-  return result.length >= 1;
-};
-
 export const getAllPostsForCurrentTime = async (env: Bindings, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time
   const db: DrizzleD1Database = drizzle(env.DB);
@@ -205,11 +194,10 @@ export const getChildPostsOfThread = async (env: Bindings, rootId: string): Prom
   return null;
 };
 
-export const getPostThreadCount = async (env: Bindings, userId: string, rootId: string): Promise<number> => {
+export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, rootId: string): Promise<number> => {
   if (!uuidValid(rootId))
     return 0;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
   return await db.$count(posts, and(
     eq(posts.rootPost, rootId),
     eq(posts.userId, userId)));
@@ -255,4 +243,14 @@ export const purgePostedPosts = async (env: Bindings): Promise<number> => {
     return 0;
 
   return await deletePosts(env, postsToDelete);
-}
+};
+
+export const getPostByCID = async(db: DrizzleD1Database, userId: string, cid: string): Promise<Post|null> => {
+  const result = await db.select().from(posts)
+    .where(and(eq(posts.userId, userId), eq(posts.cid, cid)))
+    .limit(1).all();
+
+  if (!isEmpty(result))
+    return createPostObject(result[0]);
+  return null;
+};
