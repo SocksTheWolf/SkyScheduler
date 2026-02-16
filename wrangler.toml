@@ -29,7 +29,7 @@ bucket_name = "skyembeds"
 
 # temporary storage to get CF Images working, this bucket should be WAF'd so no one but the worker can access it.
 [[r2_buckets]]
-binding = "R2RESIZE" 
+binding = "R2RESIZE"
 bucket_name = "skyscheduler-resize"
 
 [triggers]
@@ -51,15 +51,11 @@ persist = true
 [[queues.producers]]
 queue = "skyscheduler-post-queue"
 binding = "POST_QUEUE1"
-[[queues.producers]]
-queue = "skyscheduler-repost-queue"
-binding = "REPOST_QUEUE"
 
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
-max_batch_size = 2
-[[queues.consumers]]
-queue = "skyscheduler-repost-queue"
+max_batch_size = 5
+max_batch_timeout = 10
 
 [images]
 binding = "IMAGES"
@@ -78,7 +74,7 @@ IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.sky
 SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
 
 # queue handling, pushing information. This is experimental.
-QUEUE_SETTINGS = {enabled=false, postNowEnabled=false, post_queues=["POST_QUEUE1"], repost_queues=["REPOST_QUEUE"]}
+QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
 
 # redirect links
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}

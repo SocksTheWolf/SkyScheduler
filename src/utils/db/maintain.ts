@@ -35,12 +35,10 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
   // Post truncation
   if (postTruncation.length > 0) {
     console.log(`Attempting to clean up post truncation for ${postTruncation.length} posts`);
-    // it would be nicer to do bulking of this, but the method to do so in drizzle leaves me uneasy (and totally not about to sql inject myself)
-    // so we do each query uniquely instead.
-    postTruncation.forEach(async item => {
+    for (const item of postTruncation) {
       console.log(`Updating post ${item.id}`);
-      await db.update(posts).set({ content: truncate(item.content, MAX_POSTED_LENGTH) }).where(eq(posts.uuid, item.id));
-    });
+      await db.update(posts).set({ content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH})`}).where(eq(posts.uuid, item.id));
+    }
   }
 
   // push timestamps
@@ -56,7 +54,7 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
     console.error(`Adding file listings got error ${err}`);
   }
 
-  let batchedQueries:BatchItem<"sqlite">[] = []; 
+  let batchedQueries:BatchItem<"sqlite">[] = [];
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {
@@ -68,7 +66,7 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
   const allPosts = await db.select({id: posts.uuid}).from(posts);
   for (const post of allPosts) {
     const count = db.$count(reposts, eq(reposts.uuid, post.id));
-    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id, 
+    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id,
       count: count}).onConflictDoNothing());
   }
   await db.batch(batchedQueries as BatchQuery);

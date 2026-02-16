@@ -20,7 +20,7 @@ export function PostAltTextEdit({post}: EditedPostProps) {
           <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
           <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
           {/* Accessible handlers will be added in via the htmx header */}
-          <a tabindex={0} role="button" data-file={embedData.content} 
+          <a tabindex={0} role="button" data-file={embedData.content}
             class="editPostAlt secondary outline">Edit Alt</a>
         </center>
       </div>
@@ -65,7 +65,7 @@ export function PostEdit({post}:EditedPostProps) {
       <center class="postControls">
         <div id={editResponse}>
         </div>
-        <button tabindex={0}>Update Post</button> 
+        <button tabindex={0}>Update Post</button>
         <a tabindex={0} role="button" class="secondary cancelEditButton" hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
         hx-confirm="Are you sure you want to cancel editing?">Cancel</a>
       </center>

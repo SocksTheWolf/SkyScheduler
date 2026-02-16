@@ -14,6 +14,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - **Multiple user/account handling**: Manage multiple users/bsky accounts easily
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
 - **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
+- **Post Threading**: Schedule entire post threads with full media support per post!
 - **Simple Setup**: Fairly minimal setup and easy to use
 - **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images
 - **Handles Link Embeds**: Post your content with a link embed easily!
@@ -27,7 +28,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - Node.js (v24.x or later)
 - Package Manager
-- Cloudflare Pro Workers account (for CPU and Queues [can be disabled with `QUEUE_SETTINGS.enabled` set to false])
+- Cloudflare Pro Workers account (for CPU)
 
 ### Installation
 
@@ -53,7 +54,7 @@ cp .dev.vars.example .dev.vars
    - `TURNSTILE_PUBLIC_KEY` - the turnstile public key for captcha
    - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
    - `RESIZE_SECRET_HEADER` - a header value that will be included on requests while trying to resize images. Protects the resize bucket while still making it accessible to CF Images.
-   
+
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
 4. Update your `wrangler.toml` with changes that reflect your account.

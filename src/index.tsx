@@ -153,17 +153,18 @@ export default {
       break;
     }
   },
-  async queue(batch: MessageBatch<QueueTaskData>, environment: Env, ctx: ExecutionContext) {
+  async queue(batch: MessageBatch<QueueTaskData>, environment: Bindings, ctx: ExecutionContext) {
     const runtimeWrapper: ScheduledContext = {
       executionCtx: ctx,
-      env: environment as Bindings
+      env: environment
     };
 
-    let wasSuccess = false;
+    const delay: number = environment.QUEUE_SETTINGS.delay_val;
+    let wasSuccess: boolean = false;
     for (const message of batch.messages) {
       switch (message.body.type) {
         case QueueTaskType.Post:
-          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, null, true);
+          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, null);
         break;
         case QueueTaskType.Repost:
           wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost!, null);
@@ -176,7 +177,7 @@ export default {
       }
       // Handle queue acknowledgement on success/failure
       if (!wasSuccess) {
-        message.retry({delaySeconds: 3*(message.attempts+1)});
+        message.retry({delaySeconds: delay*(message.attempts+1)});
       } else {
         message.ack();
       }

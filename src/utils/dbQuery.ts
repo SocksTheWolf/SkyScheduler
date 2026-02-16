@@ -1,5 +1,5 @@
 import { addHours, isAfter, isEqual } from "date-fns";
-import { and, desc, eq, getTableColumns } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, gt, gte, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { Context } from "hono";
@@ -8,18 +8,19 @@ import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
+import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import {
+  AccountStatus,
   BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
+  DeleteResponse,
   EmbedDataType,
-  AccountStatus,
   Post, PostLabel,
   RepostInfo
 } from "../types.d";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { doesPostExist, updatePostForGivenUser } from "./db/data";
+import { getChildPostsOfThread, getPostThreadCount, updatePostForGivenUser } from "./db/data";
 import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -29,18 +30,21 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
     const userId = c.get("userId");
     if (userId) {
       const db: DrizzleD1Database = drizzle(c.env.DB);
-      const results = await db.select({...getTableColumns(posts), repostCount: repostCounts.count})
+      const results = await db.select({
+          ...getTableColumns(posts),
+          repostCount: repostCounts.count
+        })
         .from(posts).where(eq(posts.userId, userId))
         .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
-        .orderBy(desc(posts.scheduledDate), desc(posts.createdAt)).all();
-      
+        .orderBy(desc(posts.scheduledDate), asc(posts.threadOrder), desc(posts.createdAt)).all();
+
       if (isEmpty(results))
         return null;
 
       return results.map((itm) => createPostObject(itm));
     }
   } catch(err) {
-    console.error(`Failed to get posts for user, session could not be fetched ${err}`);  
+    console.error(`Failed to get posts for user, session could not be fetched ${err}`);
   }
   return null;
 };
@@ -87,29 +91,67 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
   return false;
 };
 
-export const deletePost = async (c: Context, id: string): Promise<boolean> => {
+export const deletePost = async (c: Context, id: string): Promise<DeleteResponse> => {
   const userId = c.get("userId");
+  const returnObj: DeleteResponse = {success: false};
   if (!userId) {
-    return false;
+    return returnObj;
   }
 
   const db: DrizzleD1Database = drizzle(c.env.DB);
-  const postQuery = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).all();
-  if (postQuery.length !== 0) {
+  const postObj = await getPostById(c, id);
+  if (postObj !== null) {
+    let queriesToExecute:BatchItem<"sqlite">[] = [];
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
-    if (!postQuery[0].posted) {
-      await deleteEmbedsFromR2(c, createPostObject(postQuery[0]).embeds);
+    if (!postObj.posted) {
+      await deleteEmbedsFromR2(c, postObj.embeds);
       if (await userHasViolations(db, userId)) {
         // Remove the media too big violation if it's been given
         await removeViolation(c.env, userId, AccountStatus.MediaTooBig);
       }
     }
 
-    c.executionCtx.waitUntil(db.delete(posts).where(eq(posts.uuid, id)));
-    return true;
+    // If the parent post is not null, then attempt to find and update the post chain
+    const parentPost = postObj.parentPost;
+    if (parentPost !== undefined) {
+      // set anyone who had this as their parent to this post chain
+      queriesToExecute.push(db.update(posts).set({parentPost: parentPost, threadOrder: postObj.threadOrder})
+        .where(and(eq(posts.parentPost, postObj.postid), eq(posts.rootPost, postObj.rootPost!))));
+
+      // Update the post order past here
+      queriesToExecute.push(db.update(posts).set({threadOrder: sql`threadOrder - 1`})
+      .where(
+        and(eq(posts.rootPost, postObj.rootPost!), gt(posts.threadOrder, postObj.threadOrder)
+      )));
+    }
+
+    // We'll need to delete all of the child embeds then, a costly, annoying experience.
+    if (postObj.isThreadRoot) {
+      const childPosts = await getChildPostsOfThread(c.env, postObj.postid);
+      if (childPosts !== null) {
+        for (const childPost of childPosts) {
+          c.executionCtx.waitUntil(deleteEmbedsFromR2(c, childPost.embeds));
+          queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, childPost.postid)));
+        }
+      } else {
+        console.warn(`could not get child posts of thread ${postObj.postid} during delete`);
+      }
+    } else if (postObj.isChildPost) {
+      // this is not a thread root, so we should figure out how many children are left.
+      const childPostCount = (await getPostThreadCount(c.env, postObj.user, postObj.rootPost!)) - 1;
+      if (childPostCount <= 0) {
+        queriesToExecute.push(db.update(posts).set({threadOrder: -1}).where(eq(posts.uuid, postObj.rootPost!)));
+      }
+    }
+
+    // delete post
+    queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, id)));
+    await c.executionCtx.waitUntil(db.batch(queriesToExecute as BatchQuery));
+    returnObj.success = true;
+    returnObj.needsRefresh = postObj.isThreadRoot;
   }
-  return false;
+  return returnObj;
 };
 
 export const createPost = async (c: Context, body: any): Promise<CreatePostQueryResponse> => {
@@ -128,7 +170,11 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, new Date()) && !makePostNow) {
+  //
+  // Do not do this check if you are doing a threaded post
+  // or you have marked that you are posting right now.
+  if (!isAfter(scheduleDate, new Date()) &&
+    (!makePostNow && (isEmpty(rootPost) && isEmpty(parentPost)))) {
     return { ok: false, msg: "Scheduled date must be in the future" };
   }
 
@@ -146,6 +192,7 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   let rootPostID:string|undefined = undefined;
   let parentPostID:string|undefined = undefined;
   let rootPostData: Post|null = null;
+  let parentPostOrder: number = 0;
   if (uuidValid(rootPost)) {
     // returns null if the post doesn't appear on this account
     rootPostData = await getPostById(c, rootPost!);
@@ -153,46 +200,87 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
       if (rootPostData.posted) {
         return { ok: false, msg: "You cannot make threads off already posted posts"};
       }
-      rootPostID = rootPostData.rootPost!;
+      if (rootPostData.isChildPost) {
+        return { ok: false, msg: "Subthreads of threads are not allowed." };
+      }
+      if (rootPostData.isRepost) {
+        return {ok: false, msg: "Threads cannot be made of repost actions"};
+      }
+      rootPostID = rootPostData.rootPost || rootPostData.postid;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
         if (uuidValid(parentPost)) {
-          if (await doesPostExist(c.env, userId, parentPost!)) {
+          const parentPostData = await getPostById(c, parentPost!);
+          if (parentPostData !== null) {
             parentPostID = parentPost!;
+            parentPostOrder = parentPostData.threadOrder + 1;
           } else {
             return { ok: false, msg: "The given parent post cannot be found on your account"};
           }
+        } else {
+          return { ok: false, msg: "The given parent post is invalid"};
         }
       } else {
-        parentPostID = rootPost!;
+        parentPostID = rootPostData.postid;
+        parentPostOrder = 1; // Root will always be 0, so if this is root, go 1 up.
       }
     } else {
       return { ok: false, msg: "The given root post cannot be found on your account"};
     }
   }
-  const isThreadedPost:boolean = (rootPostID !== undefined && parentPostID !== undefined);
+
+  const isThreadedPost: boolean = (rootPostID !== undefined && parentPostID !== undefined);
+  if (isThreadedPost) {
+    const threadCount: number = await getPostThreadCount(c.env, userId, rootPostID!);
+    if (threadCount >= MAX_POSTS_PER_THREAD) {
+      return { ok: false, msg: `this thread has hit the limit of ${MAX_POSTS_PER_THREAD} posts per thread`};
+    }
+  }
 
   // Create repost metadata
   const scheduleGUID = (!isThreadedPost) ? uuidv4() : undefined;
-  const repostInfo = (!isThreadedPost) ? createRepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
-  
+  const repostInfo = (!isThreadedPost) ?
+    createRepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
+
   // Create the posts
   const postUUID = uuidv4();
-  let dbOperations: BatchItem<"sqlite">[] = [
-    db.insert(posts).values({
+  let dbOperations: BatchItem<"sqlite">[] = [];
+
+  // if we're threaded, insert our post before the given parent
+  if (isThreadedPost) {
+    // Update the parent to our new post
+    dbOperations.push(db.update(posts).set({parentPost: postUUID })
+      .where(and(eq(posts.parentPost, parentPostID!), eq(posts.rootPost, rootPostID!))));
+
+    // update all posts past this one to also update their order (we will take their id)
+    dbOperations.push(db.update(posts).set({threadOrder: sql`threadOrder + 1`})
+      .where(
+        and(eq(posts.rootPost, rootPostID!), gte(posts.threadOrder, parentPostOrder)
+    )));
+
+    // Update the root post so that it has the correct flags set on it as well.
+    if (rootPostData!.isThreadRoot == false) {
+      dbOperations.push(db.update(posts).set({threadOrder: 0, rootPost: rootPostData!.postid})
+        .where(eq(posts.uuid, rootPostData!.postid)));
+    }
+  } else {
+    rootPostID = postUUID;
+  }
+
+  // Add the post to the DB
+  dbOperations.push(db.insert(posts).values({
       content,
       uuid: postUUID,
       postNow: makePostNow,
-      scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData?.scheduledDate!),
-      /*isThread: isThreadedPost,
+      scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData!.scheduledDate!),
       rootPost: rootPostID,
-      parentPost: parentPostID,*/
+      parentPost: parentPostID,
       repostInfo: (!isThreadedPost) ? [repostInfo!] : [],
+      threadOrder: (!isThreadedPost) ? undefined : parentPostOrder,
       embedContent: embeds,
       contentLabel: label || PostLabel.None,
       userId: userId
-    })
-  ];
+    }));
 
   if (!isEmpty(embeds)) {
     // Loop through all data within an embed blob so we can mark it as posted
@@ -238,7 +326,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   const { url, uri, cid, scheduledDate, repostData } = validation.data;
   const scheduleDate = floorGivenTime(new Date(scheduledDate));
   const timeNow = new Date();
-  
+
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, timeNow)) {
     return { ok: false, msg: "Scheduled date must be in the future" };
@@ -260,21 +348,22 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await db.select({id: posts.uuid, date: posts.scheduledDate, curRepostInfo: posts.repostInfo})
-    .from(posts).where(and(
-      eq(posts.userId, userId), eq(posts.cid, cid)))
-    .limit(1).all();
-
-  const hasExistingPost:boolean = existingPost.length >= 1;
-  if (hasExistingPost) {
-    postUUID = existingPost[0].id;
-    const existingPostDate = existingPost[0].date;
+  const existingPost = await getPostByCID(c, cid);
+  if (existingPost !== null) {
+    postUUID = existingPost.postid;
+    const existingPostDate = existingPost.scheduledDate!;
     // Ensure the date asked for is after what the post's schedule date is
     if (!isAfter(scheduleDate, existingPostDate) && !isEqual(scheduledDate, existingPostDate)) {
       return { ok: false, msg: "Scheduled date must be after the initial post's date" };
     }
+    // Make sure this isn't a thread post.
+    // We could probably work around this but I don't think it's worth the effort.
+    if (existingPost.isChildPost) {
+      return {ok: false, msg: "Repost posts cannot be created from child thread posts"};
+    }
+
     // Add repost info object to existing array
-    let newRepostInfo:RepostInfo[] = isEmpty(existingPost[0].curRepostInfo) ? [] : existingPost[0].curRepostInfo!;
+    let newRepostInfo:RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
     if (newRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
       return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
     }
@@ -287,7 +376,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
     if (MAX_REPOST_POSTS > 0 && accountCurrentReposts >= MAX_REPOST_POSTS) {
-      return {ok: false, msg: 
+      return {ok: false, msg:
         `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS}) repost posts`};
     }
 
@@ -313,7 +402,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
       scheduleGuid: scheduleGUID,
       scheduledDate: scheduleDate
     }).onConflictDoNothing());
-  
+
   // Push other repost times if we have them
   if (repostData) {
     for (var i = 1; i <= repostData.times; ++i) {
@@ -326,7 +415,7 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
     totalRepostCount += repostData.times;
   }
   // Update repost counts
-  if (hasExistingPost) {
+  if (existingPost !== null) {
     const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
     dbOperations.push(db.update(repostCounts)
     .set({count: newCount})
@@ -337,12 +426,12 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
 
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
-  return { ok: success, msg: success ? "success" : "fail" };
+  return { ok: success, msg: success ? "success" : "fail", postId: postUUID };
 };
 
 export const updatePostForUser = async (c: Context, id: string, newData: Object) => {
   const userId = c.get("userId");
-  return await updatePostForGivenUser(c, userId, id, newData);
+  return await updatePostForGivenUser(c.env, userId, id, newData);
 };
 
 export const getPostById = async(c: Context, id: string): Promise<Post|null> => {
@@ -352,11 +441,30 @@ export const getPostById = async(c: Context, id: string): Promise<Post|null> => 
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select().from(posts).where(and(eq(posts.uuid, id), eq(posts.userId, userId))).limit(1).all();
+  const result = await db.select().from(posts)
+    .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
+    .limit(1).all();
+
   if (!isEmpty(result))
     return createPostObject(result[0]);
   return null;
 };
+
+export const getPostByCID = async(c: Context, cid: string): Promise<Post|null> => {
+  const userId = c.get("userId");
+  if (!userId)
+    return null;
+
+  const env = c.env;
+  const db: DrizzleD1Database = drizzle(env.DB);
+  const result = await db.select().from(posts)
+    .where(and(eq(posts.userId, userId), eq(posts.cid, cid)))
+    .limit(1).all();
+
+  if (!isEmpty(result))
+    return createPostObject(result[0]);
+  return null;
+}
 
 // used for post editing, acts very similar to getPostsForUser
 export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Post|null> => {
@@ -366,12 +474,15 @@ export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Pos
 
   const env = c.env;
   const db: DrizzleD1Database = drizzle(env.DB);
-  const result = await db.select({...getTableColumns(posts), repostCount: repostCounts.count}).from(posts)
-    .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
-    .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
-    .limit(1).all();
+  const result = await db.select({
+    ...getTableColumns(posts),
+    repostCount: repostCounts.count,
+    }).from(posts)
+      .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
+      .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
+      .limit(1).all();
 
   if (!isEmpty(result))
     return createPostObject(result[0]);
-  return null;   
+  return null;
 };

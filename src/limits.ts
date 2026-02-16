@@ -2,7 +2,7 @@ import remove from "just-remove";
 
 /** APPLICATION CONFIGURATIONS **/
 // minimum length of a post
-export const MIN_LENGTH: number = 1; 
+export const MIN_LENGTH: number = 1;
 // max amount of times something can be reposted
 export const MAX_REPOST_INTERVAL: number = 15;
 // max amount of time something can be reposted over
@@ -13,6 +13,8 @@ export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
 export const GIF_UPLOAD_ALLOWED: boolean = false;
+// max posts per thread
+export const MAX_POSTS_PER_THREAD: number = 10;
 
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;
@@ -51,11 +53,11 @@ export const TO_MS: number = TO_SEC*1000;
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L63
 export const MAX_LENGTH: number = 300;
 
-// Alt text limit via 
+// Alt text limit via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L69
 export const MAX_ALT_TEXT: number = 2000;
 
-// Image limit values via 
+// Image limit values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L97
 export const BSKY_IMG_MAX_WIDTH: number = 2000;
 export const BSKY_IMG_MAX_HEIGHT: number = 2000;

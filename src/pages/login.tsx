@@ -10,11 +10,11 @@ export default function Login() {
   return (
     <BaseLayout title="SkyScheduler - Login">
       <NavTags />
-      <AccountHandler title="Login" 
-        loadingText="Logging in..." 
+      <AccountHandler title="Login"
+        loadingText="Logging in..."
         footerLinks={links}
-        endpoint="/account/login" 
-        successText="Success! Redirecting to dashboard..." 
+        endpoint="/account/login"
+        successText="Success! Redirecting to dashboard..."
         redirect="/dashboard">
 
         <UsernameField />

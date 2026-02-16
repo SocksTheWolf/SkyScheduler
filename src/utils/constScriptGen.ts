@@ -22,7 +22,7 @@ const makeFileTypeStr = (typeMap: string[]) => {
 };
 
 export const ConstScriptPreload: PreloadRules[] = [
-  {type: "script", href: `/js/consts.js?v=${CONST_SCRIPT_VERSION}`}, 
+  {type: "script", href: `/js/consts.js?v=${CONST_SCRIPT_VERSION}`},
 ];
 
 export function makeConstScript() {

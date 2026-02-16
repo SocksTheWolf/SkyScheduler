@@ -18,8 +18,9 @@ export const posts = sqliteTable('posts', {
   cid: text('cid'),
   // if this post is a pseudo post (i.e. a repost of anything)
   isRepost: integer('isRepost', { mode: 'boolean' }).default(false),
-  // if this post has a post chain to it, this should only ever apply to the root post
-  //isThread: integer('isThread', {mode: 'boolean'}).default(false),
+  rootPost: text('rootPost'),
+  parentPost: text('parentPost'),
+  threadOrder: integer('threadOrder').default(-1),
   // bsky content labels
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
   // metadata timestamps
@@ -45,10 +46,14 @@ export const posts = sqliteTable('posts', {
     .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
-  // for checking for post chains
-  /*index("threadUUID_idx")
-    .on(table.uuid, table.isThread, table.rootPost)
-    .where(sql`isThread = 1`),*/
+  // Querying children
+  index("generalThread_idx")
+    .on(table.parentPost, table.rootPost)
+    .where(sql`parentPost is not NULL`),
+  // Updating thread orders
+  index("threadOrder_idx")
+    .on(table.rootPost, table.threadOrder)
+    .where(sql`threadOrder >= 0`),
   // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)
@@ -115,6 +120,7 @@ export const bannedUsers = sqliteTable('bans', {
   .notNull(),
 });
 
+// helper bookkeeping to make sure we don't have a ton of abandoned files in R2
 export const mediaFiles = sqliteTable('media', {
   fileName: text('file', {mode: 'text'}).primaryKey(),
   hasPost: integer('hasPost', { mode: 'boolean' }).default(false),

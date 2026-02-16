@@ -9,6 +9,7 @@ import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
+  DeleteResponse,
   EmbedDataType, LooseObj, Post
 } from "../types.d";
 import { makePost } from "../utils/bskyApi";
@@ -17,7 +18,7 @@ import {
   createPost, createRepost, deletePost, getPostById, getPostByIdWithReposts,
   updatePostForUser
 } from "../utils/dbQuery";
-import { enqueuePost, isQueueEnabled, shouldPostNowQueue } from "../utils/queuePublisher";
+import { enqueuePost, shouldPostNowQueue } from "../utils/queuePublisher";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
@@ -64,7 +65,7 @@ post.post("/create", authMiddleware, async (c: Context) => {
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
       const env: Bindings = c.env;
-      if (isQueueEnabled(env) && shouldPostNowQueue(env)) {
+      if (shouldPostNowQueue(env)) {
         try
         {
           await enqueuePost(env, postInfo!);
@@ -74,14 +75,15 @@ post.post("/create", authMiddleware, async (c: Context) => {
         }
       } else {
         if (!await makePost(c, postInfo))
-          return c.json({message: `Failed to post content, will try again soon.\n\nIf it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
+          return c.json({message: `Failed to post content, will try again soon.\n\n
+            If it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
       }
-      return c.json({message: "Created Post!" });
+      return c.json({message: "Created Post!", id: response.postId});
     } else {
       return c.json({message: "Unable to get post content, post may have been lost"}, 401);
     }
   }
-  return c.json({ message: "Post scheduled successfully!" });
+  return c.json({ message: "Post scheduled successfully!", id: response.postId});
 });
 
 // Create repost
@@ -91,7 +93,7 @@ post.post("/create/repost", authMiddleware, async (c: Context) => {
   if (!response.ok) {
     return c.json({message: response.msg}, 400);
   }
-  return c.json({ message: "Repost scheduled successfully!"});
+  return c.json({ message: "Repost scheduled successfully!", id: response.postId});
 });
 
 // Get all posts
@@ -119,7 +121,6 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
 post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
-  const swapSuccessEvents: string = "postUpdatedNotice, timeSidebar, scrollTop, scrollListTop";
   if (!isValid(id)) {
     c.header("HX-Trigger-After-Swap", swapErrEvents);
     return c.html(<b class="btn-error">Post was invalid</b>, 400);
@@ -180,11 +181,12 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   // push embedContent as editable yes.
   if (hasEmbedEdits)
     payload.embedContent = originalPost.embeds;
-  
+
   if (await updatePostForUser(c, id, payload)) {
     originalPost.text = content;
     const username = await getUsernameForUser(c);
-    c.header("HX-Trigger-After-Swap", swapSuccessEvents);
+    c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
+    c.header("HX-Trigger-After-Swap", "postUpdatedNotice, timeSidebar, scrollTop");
     return c.html(<ScheduledPost post={originalPost} user={username} dynamic={true} />);
   }
 
@@ -197,11 +199,10 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
   if (!isValid(id))
     return c.html(<></>, 400);
 
-  c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
-  
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
   if (postInfo !== null) {
+    c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
     const username = await getUsernameForUser(c);
     return c.html(<ScheduledPost post={postInfo} user={username} dynamic={true} />);
   }
@@ -215,8 +216,14 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
 post.delete("/delete/:id", authMiddleware, async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
-    if (await deletePost(c, id) === true) {
-      c.header("HX-Trigger-After-Swap", "postDeleted, accountViolations");
+    const response: DeleteResponse = await deletePost(c, id);
+    if (response.success === true) {
+      let postRefreshEvent = "";
+      if (response.needsRefresh) {
+        postRefreshEvent = ", refreshPosts, timeSidebar, scrollTop";
+      }
+      const triggerEvents = `postDeleted, accountViolations${postRefreshEvent}`;
+      c.header("HX-Trigger-After-Swap", triggerEvents);
       return c.html(<></>);
     }
   }

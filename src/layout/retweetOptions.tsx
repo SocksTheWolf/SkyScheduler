@@ -18,14 +18,14 @@ export function RetweetOptions(props: RetweetOptionsProps) {
       <input class="autoRepostBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
       <label hidden={props.hidden} class="noselect" for={props.id}>{checkboxLabel}</label>
       <center class="repostScheduleSimple">
-          Automatically repost this {props.contentType || "content"} every 
+          Automatically repost this {props.contentType || "content"} every
           <select disabled>
             {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
               if (i == 0) return;
               const dayStr = i % 24 === 0 ? ` (${i/24} day)` : '';
               return (<option value={i}>{i}{dayStr}</option>);
             })}
-          </select> hours 
+          </select> hours
           <select disabled>
             {[...Array(MAX_REPOST_INTERVAL_LIMIT)].map((x, i) => {
               if (i == 0) return;

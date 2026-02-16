@@ -1,3 +1,4 @@
+/* Functions that can be used anywhere on the website. */
 function pushToast(msg, isSuccess) {
   Toastify({
     text: msg,
@@ -12,74 +13,34 @@ function scrollTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function formatDate(date) {
-  return new Date(date).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-  });
-}
-
-function updateAllTimes() {
-  document.querySelectorAll(".timestamp").forEach(el => {
-    if (el.hasAttribute("corrected"))
-      return;
-    
-    el.textContent = formatDate(el.innerText);
-    el.setAttribute("corrected", true);
-  });
-  document.querySelectorAll(".repostTimesLeft").forEach(el => {
-    if (el.hasAttribute("data-tooltip"))
-      return;
-
-    if (el.firstElementChild.className == "repostInfoData") {
-      const repostInformation = el.firstElementChild.innerText;
-      if (repostInformation.length > 0)
-        el.setAttribute("data-tooltip", repostInformation);
+function scrollToObject(el) {
+  if (el) {
+    el.scroll({top:0, behavior:'smooth'});
+    const tabInvalidate = el.querySelector(".invalidateTab");
+    if (tabInvalidate) {
+      tabInvalidate.focus();
+      tabInvalidate.blur();
     }
-  });
+  }
 }
 
-function refreshPosts() {
-  htmx.trigger("body", "refreshPosts");
-}
-
-function addKeyboardListener(el, callback) {
+function addKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
   el.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter" || ev.key === " ") {
-      ev.preventDefault();
+    if (keys.includes(ev.key)) {
+      if (preventDefault)
+        ev.preventDefault();
       callback(ev);
     }
   });
 }
-
-document.addEventListener("postDeleted", function() {
-  pushToast("Post deleted", true);
-});
-
-document.addEventListener("postFailedDelete", function() {
-  pushToast("Post failed to delete, try again", false);
-  refreshPosts();
-});
-
-document.addEventListener("timeSidebar", function() {
-  updateAllTimes();
-});
-
-document.addEventListener("scrollTop", function() {
-  scrollTop();
-});
-
-document.addEventListener("postUpdatedNotice", function() {
-  pushToast("Post updated successfully!", true);
-})
-
-document.addEventListener("accountUpdated", function(ev) {
-  closeModal(document.getElementById("changeInfo"));
-  document.getElementById("settingsData").reset();
-  pushToast("Settings Updated!", true);
-});
+function addClickKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
+  el.addEventListener("click", (ev) => {
+    if (preventDefault)
+      ev.preventDefault();
+    callback();
+  });
+  addKeyboardListener(el, callback, keys, preventDefault);
+}
 
 function pushDeletedAccountToast() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -129,45 +90,6 @@ function addUsernameFieldWatchers() {
       userEl.value = updateUsername(ev.clipboardData.getData("text"));
     });
   }
-}
-function addCounter(textField, counter, maxLength) {
-  const textEl = document.getElementById(textField);
-  const counterEl = document.getElementById(counter);
-  if (counterEl) {
-    // escape out of adding a counter more than once
-    if (counterEl.hasAttribute("counting"))
-      return;
-
-    const handleCount = (counter) => {
-      counterEl.innerHTML = `${counter.all}/${maxLength}`;
-      // Show red color if the text field is too long, this will not be super accurate on items containing links, but w/e
-      if (counter.all > maxLength) {
-        counterEl.classList.add('tooLong');
-      } else {
-        counterEl.classList.remove('tooLong');
-      }
-    };
-
-    Countable.on(textEl, handleCount);
-    counterEl.setAttribute("counting", true);
-    counterEl.addEventListener("reset", () => {
-      counterEl.innerHTML = `0/${maxLength}`;
-      counterEl.classList.remove('tooLong');
-    });
-    counterEl.addEventListener("recount", () => {
-      Countable.count(textEl, handleCount);
-    });
-  }
-}
-
-function recountCounter(counter) {
-  const counterEl = document.getElementById(counter);
-  counterEl.dispatchEvent(new Event("recount"));
-}
-
-function resetCounter(counter) {
-  const counterEl = document.getElementById(counter);
-  counterEl.dispatchEvent(new Event("reset"));
 }
 
 function redirectAfterDelay(url, customDelay=0) {
@@ -244,17 +166,5 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
     pushToast(successMessage, true);
     if (successLocation !== "")
       redirectAfterDelay(successLocation, customDelay);
-  });
-}
-
-function addEasyModalOpen(buttonID, modalEl, closeButtonID) {
-  document.getElementById(buttonID).addEventListener("click", (ev) => {
-    ev.preventDefault();
-    clearSettingsData();
-    openModal(modalEl);
-  });
-  document.getElementById(closeButtonID).addEventListener("click", (ev) => {
-    ev.preventDefault();
-    closeModal(modalEl);
   });
 }

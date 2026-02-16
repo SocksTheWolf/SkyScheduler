@@ -1,15 +1,21 @@
 const repostCheckbox = document.getElementById('makeReposts');
 const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
-const urlCardBox = document.getElementById('urlCard');
+
 const recordUrlBox = document.getElementById('recordBox');
 const content = document.getElementById('content');
 const postForm = document.getElementById('postForm');
+const threadField = document.getElementById('threadInfo');
+const cancelThreadBtn = document.getElementById('cancelThreadPost');
+const postFormTitle = document.getElementById('postFormTitle')
 let hasFileLimit = false;
 let fileData = new Map();
 
-const imageAttachmentSection = document.getElementById("imageAttachmentSection");
-const linkAttachmentSection = document.getElementById("webLinkAttachmentSection");
+/* Sections for handling UI changes and modifications */
+const sectionRetweet = document.getElementById('section-retweet');
+const sectionSchedule = document.getElementById('section-postSchedule');
+const sectionImageAttach = document.getElementById("section-imageAttachment");
+const sectionLinkAttach = document.getElementById("section-weblink");
 
 function addOnUnloadBlocker() {
   window.onbeforeunload = function() {
@@ -20,40 +26,9 @@ function addOnUnloadBlocker() {
 function clearOnUnloadBlocker() {
   window.onbeforeunload = null;
 }
-function setElementRequired(el, required) {
-  if (required)
-    el.setAttribute("required", true);
-  else
-    el.removeAttribute("required");
-}
 
-function setElementVisible(el, shouldShow) {
-  if (shouldShow)
-    el.classList.remove("hidden");
-  else
-    el.classList.add("hidden");
-}
-
-function setElementDisabled(el, disabled) {
-  if (disabled)
-    el.setAttribute("disabled", true);
-  else
-    el.removeAttribute("disabled");
-}
-
-urlCardBox.addEventListener("paste", () => {
-  showContentLabeler(true);
-  setElementVisible(imageAttachmentSection, false);
-});
-
-urlCardBox.addEventListener("input", () => {
-  const isNotEmpty = urlCardBox.value.length > 0;
-  showContentLabeler(isNotEmpty);
-  setElementVisible(imageAttachmentSection, !isNotEmpty);
-});
-
-let fileDropzone = new Dropzone("#fileUploads", { 
-  url: "/post/upload", 
+let fileDropzone = new Dropzone("#fileUploads", {
+  url: "/post/upload",
   autoProcessQueue: true,
   /* We process this ourselves */
   addRemoveLinks: false,
@@ -68,8 +43,23 @@ let fileDropzone = new Dropzone("#fileUploads", {
 document.addEventListener("resetPost", () => {
   postForm.reset();
   postForm.removeAttribute("disabled");
-  setElementVisible(imageAttachmentSection, true);
-  setElementVisible(linkAttachmentSection, true);
+  // reset sections
+  setElementVisible(sectionImageAttach, true);
+  setElementVisible(sectionLinkAttach, true);
+  setElementVisible(sectionRetweet, true);
+  setElementVisible(sectionSchedule, true);
+  setElementVisible(cancelThreadBtn.parentElement, false);
+  postFormTitle.innerText = "Schedule New Post";
+  // remove thread info data
+  if (threadField.hasAttribute("parentpost")) {
+    const postHighlight = getPostListElement(threadField.getAttribute("parentpost"));
+    if (postHighlight) {
+      postHighlight.classList.remove("highlight");
+    }
+  }
+  threadField.removeAttribute("rootpost");
+  threadField.removeAttribute("parentpost");
+  threadField.removeAttribute("postid");
   showContentLabeler(false);
   setSelectDisable(repostCheckbox.parentElement, true);
   setElementRequired(scheduledDate, true);
@@ -78,7 +68,7 @@ document.addEventListener("resetPost", () => {
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
   hasFileLimit = false;
-  urlCardBox.value = "";
+  document.getElementById('urlCard').value = "";
   recordUrlBox.value = "";
   resetCounter("count");
   setTimeout(scrollTop, 400);
@@ -93,7 +83,7 @@ fileDropzone.on("reset", () => {
   hasFileLimit = false;
   clearOnUnloadBlocker();
   showContentLabeler(false);
-  setElementVisible(linkAttachmentSection, true);
+  setElementVisible(sectionLinkAttach, true);
 });
 
 fileDropzone.on("addedfile", file => {
@@ -102,11 +92,11 @@ fileDropzone.on("addedfile", file => {
     pushToast("Maximum number of files reached", false);
     return;
   }
-  setElementVisible(linkAttachmentSection, false);
+  setElementVisible(sectionLinkAttach, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
-  
+
   addAltText.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -128,7 +118,7 @@ fileDropzone.on("addedfile", file => {
     // Remove the file
     fetch('/post/upload', {
         method: 'DELETE',
-        keepalive: true, 
+        keepalive: true,
         body: JSON.stringify({"content": fileData.get(file.name).content })
     }).then(async response => {
       const data = await response.json();
@@ -142,7 +132,7 @@ fileDropzone.on("addedfile", file => {
           pushToast(`Deleted file ${file.name}`, true);
       }
       if (fileData.length == 0) {
-        setElementVisible(linkAttachmentSection, true);
+        setElementVisible(sectionLinkAttach, true);
       }
     });
   });
@@ -181,7 +171,7 @@ fileDropzone.on("success", function(file, response) {
         pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
         deleteFileOnError();
       } else {
-        fileData.set(file.name, {content: response.data, type: 3, 
+        fileData.set(file.name, {content: response.data, type: 3,
           height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
         hasFileLimit = true;
       }
@@ -206,7 +196,7 @@ fileDropzone.on("success", function(file, response) {
           if (uint8[i] == 0x21
             && uint8[i + 1] == 0xF9
             && uint8[i + 2] == 0x04
-            && uint8[i + 7] == 0x00) 
+            && uint8[i + 7] == 0x00)
           {
             const delay = (uint8[i + 5] << 8) | (uint8[i + 4] & 0xFF)
             duration += delay < 2 ? 10 : delay
@@ -247,7 +237,7 @@ fileDropzone.on("success", function(file, response) {
   } else {
     fileData.set(file.name, {content: response.data, type: 1});
   }
-  
+
   // Make the buttons pressable
   file.previewElement.querySelectorAll("button").forEach(el => setElementDisabled(el, false));
 
@@ -286,10 +276,10 @@ fileDropzone.on("error", function(file, msg) {
     console.error(`file error was ${msg}`);
     pushToast(`Error: ${file.name} had an unexpected error`, false);
   }
-  
+
   fileDropzone.removeFile(file);
   if (fileData.length == 0) {
-    setElementVisible(linkAttachmentSection, true);
+    setElementVisible(sectionLinkAttach, true);
   }
 });
 
@@ -312,10 +302,11 @@ postForm.addEventListener('submit', async (e) => {
   const contentVal = content.value;
   const postNow = postNowCheckbox.checked;
   const scheduledDateVal = scheduledDate.value;
+  const isThreadPost = threadField.hasAttribute("rootpost") && threadField.hasAttribute("parentpost");
   // Handle conversion of date time to make sure that it is correct.
   let dateTime;
   try {
-    dateTime = postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
+    dateTime = isThreadPost || postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
   } catch(dateErr) {
     pushToast("Invalid date", false);
     showPostProgress(false);
@@ -328,7 +319,9 @@ postForm.addEventListener('submit', async (e) => {
         content: contentVal,
         scheduledDate: dateTime,
         makePostNow: postNow,
-        repostData: undefined
+        repostData: undefined,
+        rootPost: undefined,
+        parentPost: undefined,
     };
 
     // Add repost data if we should be making reposts
@@ -340,8 +333,16 @@ postForm.addEventListener('submit', async (e) => {
       };
     }
 
+    // Add thread data if it exists
+    if (isThreadPost) {
+      postObject.parentPost = threadField.getAttribute("parentpost");
+      postObject.rootPost = threadField.getAttribute("rootpost");
+      postObject.makePostNow = false;
+      postObject.repostData = undefined;
+    }
+
     const hasFiles = fileData.size > 0;
-    const linkCardURL = urlCardBox.value;
+    const linkCardURL = document.getElementById('urlCard').value;
     const recordURL = recordUrlBox.value;
     const hasWebEmbed = linkCardURL.length > 0;
     const hasRecord = recordURL.length > 0;
@@ -398,11 +399,15 @@ postForm.addEventListener('submit', async (e) => {
       body: payload
     });
     const data = await response.json();
-    
+
     if (response.ok) {
       pushToast(data.message, true);
       document.dispatchEvent(new Event("resetPost"));
       refreshPosts();
+      if (data.id) {
+        // TODO: this really should wait for refreshPosts to end
+        setTimeout(function(){scrollToPost(data.id)}, 1600);
+      }
     } else {
       // For postnow, we try again, immediate failures still add to the DB
       if (response.status === 406 && postNow) {
@@ -433,8 +438,9 @@ function setSelectDisable(nodeBase, disable) {
 function showContentLabeler(shouldShow) {
   const contentLabelSelector = document.getElementById("content-label-selector");
   const contentLabelSelect = document.getElementById("contentLabels");
+  const urlEmbedBox = document.getElementById('urlCard');
 
-  if (!shouldShow && (fileData.length > 0 || urlCardBox.value.length > 0))
+  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
     return;
 
   setElementVisible(contentLabelSelector, shouldShow);
@@ -448,129 +454,12 @@ function showPostProgress(shouldShow) {
   el.setAttribute("aria-busy", shouldShow);
   setElementDisabled(el, shouldShow);
   setElementDisabled(postForm, shouldShow);
+  setElementDisabled(cancelThreadBtn, shouldShow);
   if (shouldShow) {
     el.textContent = "Making Post...";
   } else {
     el.textContent = "Schedule Post";
   }
-}
-
-function openAltText(file, altTextButton, loadCallback, saveCallback) {
-  // A bunch of DOM elements
-  const altTextModal = document.getElementById("altTextDialog");
-  const altTextField = document.getElementById("altTextField");
-  const altTextImgPreview = document.getElementById("altThumbImg");
-  const saveButton = document.getElementById("altTextSaveButton");
-  const cancelButton = document.getElementById("altTextCancelButton");
-  const isFileInstance = file instanceof File;
-  const altTextPreviewImgURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
-
-  // Handle page reset
-  if (altTextModal.hasAttribute("hasReset") === false) {
-    document.addEventListener("resetPost", () => {
-      altTextField.value = "";
-      altTextImgPreview.src = "";
-      resetCounter("altTextCount");
-    });
-    altTextModal.setAttribute("hasReset", true);
-  }
-
-  altTextField.value = loadCallback() || "";
-  altTextField.selectionStart = altTextField.value.length;
-  recountCounter("altTextCount");
-  tributeToElement(altTextField);
-  const handleSave = (ev) => {
-    ev.preventDefault();
-    const newAltTextData = altTextField.value;
-    saveCallback(newAltTextData);
-    if (newAltTextData === "") {
-      altTextButton.classList.remove("btn-success");
-    } else {
-      altTextButton.classList.add("btn-success");
-    }
-    closeAltModal();
-  };
-
-  const unbindAltModal = () => {
-    saveButton.removeEventListener("click", handleSave);
-    cancelButton.removeEventListener("click", closeAltModal);
-    altTextModal.removeEventListener("close", unbindAltModal);
-    altTextImgPreview.src = "";
-    if (isFileInstance)
-      URL.revokeObjectURL(altTextPreviewImgURL);
-    detachTribute(altTextField);
-  }
-
-  const closeAltModal = () => {
-    unbindAltModal();
-    closeModal(altTextModal);
-  };
-
-  altTextImgPreview.src = altTextPreviewImgURL;
-  saveButton.addEventListener("click", handleSave);
-  cancelButton.addEventListener("click", closeAltModal);
-  altTextModal.addEventListener("close", unbindAltModal);
-  openModal(altTextModal);
-  altTextField.focus();
-}
-
-function searchBSkyMentions(query, callback) {
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", `https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${query}&limit=${MAX_AUTO_COMPLETE_NAMES}`);
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      // Request good
-      if (xhr.status === 200) {
-        try {
-          const returnData = JSON.parse(xhr.responseText);
-          callback(returnData.actors);
-          return;
-        } catch(err) {
-          console.error(`failed to parse bsky mention list ${err}`)
-        }
-      }
-      console.error(`fetching bluesky mentionlist returned ${xhr.status}`);
-      callback([]);
-    }
-  }
-  xhr.send();
-}
-
-function tributeToElement(el) {
-  const mentionTribute = new Tribute({
-    menuItemTemplate: function(item) {
-      const avatarStr = item.original.avatar !== undefined ? `<img src="${item.original.avatar}">` : "";
-      return `${avatarStr}<span><code>${item.original.displayName}</code><br /> <small>@${item.original.handle}</small></span>`;
-    },
-    values: function(text, cb) {
-      searchBSkyMentions(text, item => cb(item));
-    },
-    noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
-    lookup: 'handle',
-    fillAttr: 'handle',
-    spaceSelectsMatch: true,
-    menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
-    menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES,
-    menuContainer: el.parentNode
-  });
-
-  el.addEventListener("detach", () => {
-    mentionTribute.detach(el);
-  });
-  mentionTribute.attach(el);
-}
-
-function detachTribute(el) {
-  el.dispatchEvent(new Event("detach"));
-}
-
-function openPostAltEditor(file) {
-  const editorLocation = document.querySelector(`div[alteditfor="${file}"]`);
-  const editorDataLocation = editorLocation.querySelector("input[data-alt]");
-  openAltText(file, editorLocation.querySelector("a"), () => editorDataLocation.getAttribute("value"), 
-    (newAltValue) => {
-      editorDataLocation.setAttribute("value", newAltValue);
-  });
 }
 
 // HTMX will call this
@@ -579,7 +468,7 @@ document.addEventListener("editPost", function(event) {
   const editField = document.getElementById(`edit${postid}`);
   const editForm = document.getElementById(`editPost${postid}`);
   const cancelButton = editForm.querySelector(".cancelEditButton");
-  
+
   addCounter(`edit${postid}`, `editCount${postid}`, MAX_LENGTH);
   tributeToElement(editField);
 
@@ -596,37 +485,49 @@ document.addEventListener("editPost", function(event) {
   editField.addEventListener("tribute-active-false", () => {
     editField.addEventListener("keydown", cancelEditField);
   });
-  
-  const addEventListeners = (el, callback) => {
-    el.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      callback();
-    });
-    addKeyboardListener(el, (ev) => callback());
-  }
+
   editField.addEventListener("keydown", cancelEditField);
   editForm.querySelectorAll(".editPostAlt").forEach((altEl) => {
-    addEventListeners(altEl, () => {
+    addClickKeyboardListener(altEl, () => {
       openPostAltEditor(encodeURIComponent(altEl.getAttribute("data-file")) || "");
     });
   });
 
-  addKeyboardListener(cancelButton, (ev) => cancelButton.click());
+  addKeyboardListener(cancelButton, () => cancelButton.click());
 
   editField.selectionStart = editField.value.length;
   editField.focus();
 });
 
-document.addEventListener("scrollListTop", function() {
-  const postsList = document.getElementById("posts");
-  if (postsList) {
-    postsList.scroll({top:0, behavior:'smooth'});
-    const tabInvalidate = postsList.querySelector(".invalidateTab");
-    if (tabInvalidate) {
-      tabInvalidate.focus();
-      tabInvalidate.blur();
-    }
+document.addEventListener("replyThreadCreate", function(ev) {
+  const postDOM = ev.detail.target;
+  // check attributes
+  if (!postDOM.hasAttribute("data-root")) {
+    pushToast("Invalid operation occurred", false);
+    return;
   }
+
+  const rootID = postDOM.getAttribute("data-root");
+  if (threadField.hasAttribute("rootpost")) {
+    const currentEdit = threadField.getAttribute("rootpost");
+    if (rootID != currentEdit)
+      pushToast("You are already threading a post, please cancel/submit it before continuing", false);
+    return;
+  }
+  
+  threadField.setAttribute("rootpost", rootID);
+  const parentID = postDOM.hasAttribute("data-item") ? postDOM.getAttribute("data-item") : rootID;
+  threadField.setAttribute("parentpost", parentID);
+  const postHighlight = getPostListElement(parentID);
+  if (postHighlight) {
+    postHighlight.classList.add("highlight");
+  }
+  
+  setElementVisible(cancelThreadBtn.parentElement, true);
+  setElementVisible(sectionRetweet, false);
+  setElementVisible(sectionSchedule, false);
+
+  postFormTitle.innerText = "Schedule New Thread Reply";
 });
 
 function runPageReactors() {
@@ -659,16 +560,33 @@ function runPageReactors() {
     }
   });
 
+  const urlCardBox = document.getElementById('urlCard');
+  urlCardBox.addEventListener("paste", () => {
+    showContentLabeler(true);
+    setElementVisible(sectionImageAttach, false);
+  });
+
+  urlCardBox.addEventListener("input", (ev) => {
+    const isNotEmpty = ev.target.value.length > 0;
+    showContentLabeler(isNotEmpty);
+    setElementVisible(sectionImageAttach, !isNotEmpty);
+  });
+
   // Handle character counting
   addCounter("content", "count", MAX_LENGTH);
   addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
   // Add mentions
   tributeToElement(content);
+  // add event for the cancel button
+  if (cancelThreadBtn) {
+    addClickKeyboardListener(cancelThreadBtn, () =>
+      {document.dispatchEvent(new Event("resetPost")) });
+  }
   document.dispatchEvent(new Event("timeSidebar"));
   document.dispatchEvent(new Event("resetPost"));
 }
 
-document.addEventListener("DOMContentLoaded", () => { 
+document.addEventListener("DOMContentLoaded", () => {
   runPageReactors();
   new PicoTabs('[role="tablist"]');
 });

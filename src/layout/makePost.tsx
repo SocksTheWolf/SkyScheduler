@@ -18,8 +18,8 @@ import { ScheduleOptions } from "./scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
   ...ConstScriptPreload,
-  {type: "script", href: "/dep/dropzone.min.js"}, 
-  {type: "style", href: "/dep/dropzone.min.css"}, 
+  {type: "script", href: "/dep/dropzone.min.js"},
+  {type: "style", href: "/dep/dropzone.min.css"},
   {type: "style", href: "/css/dropzoneMods.css"},
   {type: "style", href: "/dep/tribute.css"},
   {type: "script", href: "/dep/tribute.min.js"}
@@ -33,7 +33,10 @@ export function PostCreation() {
     <article>
       <form id="postForm" novalidate>
         <header>
-          <h4>Schedule New Post</h4>
+          <h4 id="postFormTitle"></h4>
+          <small class="btn-delete thread-cancel" data-tooltip="Cancel making post in thread">
+            <a id="cancelThreadPost" tabindex={0} class="ghost secondary" role="button">Cancel Thread Post</a>
+          </small>
         </header>
         <div>
           <article>
@@ -46,7 +49,7 @@ export function PostCreation() {
 
           <details>
             <summary role="button" title="click to toggle section" class="secondary outline">Attach Media/Link</summary>
-            <section id="imageAttachmentSection">
+            <section id="section-imageAttachment">
               <article>
                 <header>Files</header>
                 <div>
@@ -56,14 +59,14 @@ export function PostCreation() {
                 </div>
                 <footer>
                 <div class="uploadGuidelines"><small><b>Note</b>: <ul>
-                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>: 
+                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
                   <ul>
                     <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
                     <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB (SkyScheduler will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
                     <li>don't upload and fail, it's recommended to use a lower resolution file instead</li>
                   </ul></li>
-                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>: 
+                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>:
                   <ul>
                     <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
@@ -73,7 +76,7 @@ export function PostCreation() {
                 </footer>
               </article>
             </section>
-            <section id="webLinkAttachmentSection">
+            <section id="section-weblink">
               <article>
                 <header>Link Embed</header>
                 <input type="text" id="urlCard" placeholder="https://" value="" />
@@ -96,15 +99,16 @@ export function PostCreation() {
               </article>
             </section>
           </details>
-          <details open>
+          <details id="section-postSchedule" open>
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
             <ScheduleOptions allowNow={true} timeID="scheduledDate" checkboxID="postNow" type="post" />
           </details>
 
-          <details>
+          <details id="section-retweet">
             <summary role="button" title="click to toggle section" class="secondary outline">Auto-Retweet</summary>
             <RetweetOptions id="makeReposts" />
           </details>
+          <input type="hidden" id="threadInfo" />
         </div>
         <footer>
           <button id="makingPostRequest" type="submit" class="w-full primary">

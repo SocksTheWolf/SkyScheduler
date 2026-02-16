@@ -70,8 +70,8 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
   });
   if (R2UploadRes) {
     await addFileListing(env, fileName, metaData.user);
-    return {"success": true, "data": R2UploadRes.key, 
-      "originalName": metaData.name, "fileSize": metaData.size, 
+    return {"success": true, "data": R2UploadRes.key,
+      "originalName": metaData.name, "fileSize": metaData.size,
       "qualityLevel": metaData.qualityLevel};
   } else {
     return {"success": false, "error": "unable to push to file storage"};
@@ -140,11 +140,11 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
           const returnType = response.headers.get("Content-Type") || "";
           const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
           const resizeHadError = resizedHeader === null || resizedHeader.indexOf("err=") !== -1;
-          
+
           if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
             console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
-            
-            // If we make the file size less than the actual limit 
+
+            // If we make the file size less than the actual limit
             if (transformFileSize < BSKY_IMG_SIZE_LIMIT && transformFileSize !== 0) {
               console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
               failedToResize = false;
@@ -196,7 +196,7 @@ const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
   // Technically this will never hit because it is greater than our own internal limits
   if (file.size > BSKY_VIDEO_SIZE_LIMIT) {
     return {"success": false, "error": `max video size is ${BSKY_VIDEO_SIZE_LIMIT}MB`};
-  }  
+  }
 
   const fileMetaData: FileMetaData = {
     name: file.name,

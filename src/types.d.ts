@@ -26,7 +26,10 @@ type R2ConfigSettings = {
 
 type QueueConfigSettings = {
   enabled: boolean;
+  repostsEnabled: boolean;
+  threadEnabled: boolean;
   postNowEnabled?: boolean;
+  delay_val: number;
   post_queues: string[];
   repost_queues: string[];
 }
@@ -43,7 +46,6 @@ export interface Bindings {
   KV: KVNamespace;
   IMAGES: ImagesBinding;
   POST_QUEUE1: Queue;
-  REPOST_QUEUE: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
@@ -124,7 +126,9 @@ export type Post = {
   cid?: string;
   uri?: string;
   // thread data
-  isThread: boolean;
+  isThreadRoot: boolean;
+  isChildPost: boolean;
+  threadOrder: number;
   rootPost?: string;
   parentPost?: string;
 };
@@ -165,10 +169,23 @@ export type PostResponseObject = {
 };
 
 export type PostRecordResponse = PostResponseObject & {
-  postID: string;
+  postID: string|null;
   content: string;
-  embeds?: EmbedData[]; 
+  embeds?: EmbedData[];
 };
+
+export type PostStatus = {
+  records: PostRecordResponse[];
+  // number of expected successes
+  expected: number;
+  // number of successes we got
+  got: number;
+};
+
+export type DeleteResponse = {
+  success: boolean;
+  needsRefresh?: boolean;
+}
 
 export interface LooseObj {
   [key: string]: any;
@@ -216,11 +233,11 @@ export type BskyRecordWrapper = {
 export type CreateObjectResponse = {
   ok: boolean;
   msg: string;
+  postId?: string;
 };
 
 export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
-  postId?: string;
 };
 
 export type BskyAPILoginCreds = {
@@ -232,7 +249,7 @@ export type BskyAPILoginCreds = {
 
 // Used for the pruning and database operations
 export type GetAllPostedBatch = {
-  id: string; 
+  id: string;
   uri: string|null;
 };
 

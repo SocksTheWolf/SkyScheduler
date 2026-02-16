@@ -15,9 +15,9 @@ type DashboardPasswordFieldSettings = {
 export function BSkyAppPasswordField(props: PasswordFieldSettings) {
   const requiredAttr:string = props.required ? "required" : "";
   return html`<input type="password" name="bskyAppPassword" title="Bluesky account's App Password"
-            maxlength=${BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" ${requiredAttr} 
+            maxlength=${BSKY_MAX_APP_PASSWORD_LENGTH} placeholder="" ${requiredAttr}
             data-1p-ignore data-bwignore data-lpignore="true"
-            data-protonpass-ignore="true" 
+            data-protonpass-ignore="true"
             autocomplete="off"></input>`;
 }
 
@@ -36,6 +36,6 @@ export function DashboardPasswordField(props: DashboardPasswordFieldSettings) {
       autocompleteSetting = "new-password";
     break;
   }
-  return html`<input id="password" type="password" name="password" minlength=${MIN_DASHBOARD_PASS} 
+  return html`<input id="password" type="password" name="password" minlength=${MIN_DASHBOARD_PASS}
     maxlength=${MAX_DASHBOARD_PASS} ${requiredAttr} autocomplete=${autocompleteSetting} />`;
 }

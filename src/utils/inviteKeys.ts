@@ -48,7 +48,7 @@ export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) =
     }
     // check the amount we have
     const amount: number = parseInt(value);
-    
+
     // handle NaN
     if (isNaN(amount)) {
       console.warn(`${inviteKey} has the value of ${value} which triggers NaN.`);

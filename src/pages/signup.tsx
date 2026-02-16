@@ -12,19 +12,19 @@ import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props:any) {
   const ctx: Context = props.c;
-  const linkToInvites = isUsingInviteKeys(ctx) ? 
-    (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) : 
+  const linkToInvites = isUsingInviteKeys(ctx) ?
+    (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
     "You can ask for the maintainer for it";
 
   return (
-    <BaseLayout title="SkyScheduler - Signup" 
+    <BaseLayout title="SkyScheduler - Signup"
       preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
-      <AccountHandler title="Create an Account" 
+      <AccountHandler title="Create an Account"
         submitText="Sign Up!"
-        loadingText="Signing up..." 
-        endpoint="/account/signup" 
-        successText="Success! Redirecting to login..." 
+        loadingText="Signing up..."
+        endpoint="/account/signup"
+        successText="Success! Redirecting to login..."
         redirect="/login"
         footerHTML={<FooterCopyright />}>
 

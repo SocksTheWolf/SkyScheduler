@@ -32,7 +32,7 @@ export async function pullAuthData(c: Context, next: any) {
   }
   await next();
 }
-export async function requireAuth(c: Context, next: any) { 
+export async function requireAuth(c: Context, next: any) {
   if (c.get("session") === null || c.get("userId") === null) {
     return c.json({ error: "Unauthorized" }, 401);
   }

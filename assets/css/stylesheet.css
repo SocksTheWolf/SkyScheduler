@@ -3,7 +3,7 @@
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .sidebar-block {
@@ -33,13 +33,13 @@
 }
 
 .btn-error, .pico .btn-error {
-  border: var(--pico-border-width) solid red; 
+  border: var(--pico-border-width) solid red;
   color: red;
 }
 
 .btn-error:hover, .pico .btn-error:hover {
   --error-color-hover: rgb(252, 60, 60);
-  border: var(--pico-border-width) solid var(--error-color-hover); 
+  border: var(--pico-border-width) solid var(--error-color-hover);
   color: var(--error-color-hover);
 }
 
@@ -49,7 +49,7 @@
 }
 
 .btn-success, .pico .btn-success {
-  border: var(--pico-border-width) solid green; 
+  border: var(--pico-border-width) solid green;
   color: green;
 }
 
@@ -65,6 +65,17 @@
   float: right;
   svg, img {
     margin-top: -7px;
+  }
+}
+.btn-delete .thread-cancel {
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.addThreadPost {
+  svg, img {
+    margin-top: -7px;
+    margin-left: 1.3px;
   }
 }
 
@@ -236,6 +247,15 @@ textarea, .pico textarea {
 
 .capitialize {
   text-transform: capitalize;
+}
+
+.serverFunds {
+  position: relative;
+  top: -10px;
+}
+
+.highlight, .highlight div, .highlight header, .highlight footer {
+  background-color: rgba(210, 166, 8, 0.891) !important;
 }
 
 [data-tooltip]:before, .pico [data-tooltip]:before {

@@ -4,6 +4,10 @@ type DepTagsType = {
   scripts?: PreloadRules[]
 };
 
+type ScriptTagsType = {
+  scripts: string[];
+}
+
 export function DependencyTags({scripts}: DepTagsType) {
   if (scripts === undefined) {
     return (<></>);
@@ -16,6 +20,13 @@ export function DependencyTags({scripts}: DepTagsType) {
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" />);
     }
+  });
+  return (<>{html}</>);
+}
+
+export function ScriptTags({scripts}: ScriptTagsType) {
+  const html = scripts.map((itm) => {
+    return (<script type="text/javascript" src={itm}></script>);
   });
   return (<>{html}</>);
 }

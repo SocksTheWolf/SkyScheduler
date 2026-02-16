@@ -34,7 +34,7 @@ export const getAllAbandonedMedia = async(env: Bindings) => {
     .where(
       and(eq(mediaFiles.hasPost, false), lte(mediaFiles.createdAt, numDaysAgo))
     ).all();
-  
+
   return results.map((item) => item.fileName);
 };
 
@@ -42,7 +42,7 @@ export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<
   const db: DrizzleD1Database = drizzle(env.DB);
   const mediaList = await db.select({embeds: posts.embedContent}).from(posts)
     .where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
-  
+
   let messyArray: string[][] = [];
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;

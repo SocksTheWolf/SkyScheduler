@@ -16,11 +16,17 @@ const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
   return get(env, queueName, null);
 };
 
-export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled;
-export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled || false;
+const hasPostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && env.IN_DEV == false;
+const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && env.IN_DEV == false;
+export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
+export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.repostsEnabled && hasRepostQueue(env);
+export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
+export const shouldPostThreadQueue = (env: Bindings) => env.QUEUE_SETTINGS.threadEnabled && (hasPostQueue(env) || isQueueEnabled(env));
 
 export async function enqueuePost(env: Bindings, post: Post) {
-  if (!isQueueEnabled(env))
+  if (post.isThreadRoot && !shouldPostThreadQueue(env))
+    return;
+  else if (!isQueueEnabled(env))
     return;
 
   // Pick a random consumer to handle this post
@@ -30,9 +36,9 @@ export async function enqueuePost(env: Bindings, post: Post) {
 }
 
 export async function enqueueRepost(env: Bindings, post: Repost) {
-  if (!isQueueEnabled(env))
+  if (!isRepostQueueEnabled(env))
     return;
-  
+
   // Pick a random consumer to handle this repost
   const queueConsumer: Queue|null = getRandomQueue(env, "repost_queues");
   if (queueConsumer !== null)

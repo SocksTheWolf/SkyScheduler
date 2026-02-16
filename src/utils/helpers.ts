@@ -11,33 +11,47 @@ export function createPostObject(data: any) {
   postData.label = data.contentLabel;
   postData.text = data.content;
   postData.postNow = data.postNow;
-  if (data.repostCount)
+  postData.threadOrder = data.threadOrder;
+
+  if (has(data, "repostCount"))
     postData.repostCount = data.repostCount;
 
-  if (data.posted)
-    postData.posted = data.posted;
   if (data.scheduledDate)
     postData.scheduledDate = data.scheduledDate;
-
-  if (data.isRepost)
-    postData.isRepost = data.isRepost;
 
   if (data.repostInfo)
     postData.repostInfo = data.repostInfo;
 
-  if (data.rootPost && data.parentPost) {
-    postData.parentPost = data.parentPost;
+  if (data.rootPost)
     postData.rootPost = data.rootPost;
-    postData.isThread = true;
+
+  if (data.parentPost) {
+    postData.parentPost = data.parentPost;
+    postData.isChildPost = true;
   } else {
-    postData.isThread = false;
-  } 
+    postData.isChildPost = false;
+  }
+
+  if (data.threadOrder == 0)
+    postData.isThreadRoot = true;
+  else
+    postData.isThreadRoot = false;
 
   // ATProto data
   if (data.uri)
     postData.uri = data.uri;
   if (data.cid)
     postData.cid = data.cid;
+
+  if (has(data, "isRepost"))
+    postData.isRepost = data.isRepost;
+
+  if (has(data, "posted"))
+    postData.posted = data.posted;
+
+  // if a cid flag appears for the object and it's a thread root, then the post (if marked not posted) is posted.
+  if (postData.posted == false && !isEmpty(data.cid) && postData.isThreadRoot)
+    postData.posted = true;
 
   return postData;
 }

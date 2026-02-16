@@ -12,7 +12,7 @@ export function ScheduleOptions(props: ScheduleOptionsProps) {
   const hasHeader = !isEmpty(props.header);
   const headerText = hasHeader ? props.header : "";
 
-  const postNowHTML = (props.allowNow) ?  
+  const postNowHTML = (props.allowNow) ?
   (<>
     <input class="postNow" type="checkbox" id={props.checkboxID} />
     <label class="noselect capitialize" for={props.checkboxID}>Make {props.type} Now?</label>
