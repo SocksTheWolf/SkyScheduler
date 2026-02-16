@@ -25,18 +25,19 @@ export default function PrivacyPolicy() {
               <li>Cloudflare
                 <ul>
                   <li>Images are sent to Cloudflare Images compressor to optimize the file size in order to upload onto BlueSky</li>
+                  <li>CF's Turnstile captcha service is used during signup and password recovery to prevent botted behaviors</li>
                   <li>Data is stored in Cloudflare's D1/R2/KV storage containers</li>
-                  <li>Media may be scanned by Cloudflare's <a rel="noopener nofollow noindex" href="https://developers.cloudflare.com/cache/reference/csam-scanning/" class="secondary">illicit material detection service</a>.
+                  <li>Media may be scanned by Cloudflare's <a rel="noopener nofollow noindex" href="https://developers.cloudflare.com/cache/reference/csam-scanning/" class="secondary">illicit material detection service</a>.<br />
                   &nbsp;Said media is not allowed on this service and violators will be banned.</li>
                 </ul>
               </li>
               <li>Bluesky/Custom PDS
                 <ul>
-                  <li>To transfer your content to their service at the time you choose</li>
+                  <li>To determine what PDS your account is located on (via <a href="https://plc.directory" rel="nofollow" class="secondary">plc.directory</a>)</li>
+                  <li>To transfer your content to the PDS your account is located on at the time you choose</li>
                 </ul>
               </li>
             </ol>
-
           </p>
           <h4>How Data is Used</h4>
           <p>We use the data that you provide to transmit your content to the BlueSky PDS (or a PDS of your own choosing) on your behalf.<br />
@@ -50,6 +51,13 @@ export default function PrivacyPolicy() {
               </ul>
             </div>
           </p>
+          <h4>Links to other policies</h4>
+          <p>Here are the privacy policies for the services that we do use, these links are not kept up to date and may change due to the nature of being from third parties.</p>
+          <ul>
+            <li><a class="secondary" href="https://www.cloudflare.com/privacypolicy/" rel="noopener nofollow">Cloudflare</a></li>
+            <li><a class="secondary" href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener nofollow">Cloudflare Turnstile</a></li>
+            <li><a class="secondary" href="https://bsky.social/about/support/privacy-policy" rel="noopener nofollow">BlueSky</a></li>
+          </ul>
           <footer>
             <FooterCopyright />
           </footer>
