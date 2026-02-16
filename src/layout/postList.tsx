@@ -67,15 +67,16 @@ export function ScheduledPost(props: ScheduledPostOptions) {
 
   // This is only really good for debugging, this attribute isn't used anywhere else.
   const parentMetaAttr = (content.isChildPost) ? `data-parent="${content.parentPost}"` : "";
+  const canSeeHeader = !hasBeenPosted || (content.isRepost && content.repostCount! > 0);
 
   const postHTML = html`
   <article
     id="postBase${content.postid}" ${oobSwapStr}>
     <header class="postItemHeader" data-item="${content.postid}" data-root="${content.rootPost || content.postid}" ${raw(parentMetaAttr)}
-      ${hasBeenPosted && !content.isRepost ? raw('hidden>') : raw(`>`)}
+      ${canSeeHeader ? raw('>') : raw(`hidden>`)}
         ${!hasBeenPosted ? editPostElement : null}
         ${!hasBeenPosted ? threadItemElement : null}
-        ${!hasBeenPosted || (content.isRepost && content.repostCount! > 0) ? deletePostElement : null}
+        ${canSeeHeader ? deletePostElement : null}
     </header>
     <div id="post${content.postid}">
       ${<PostContentObject text={content.text}/>}
