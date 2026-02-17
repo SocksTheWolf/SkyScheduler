@@ -1,8 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
-import { Context } from "hono";
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
-import { Bindings, LooseObj, AccountStatus, Violation } from "../../types.d";
+import { AccountStatus, AllContext, LooseObj, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
@@ -18,16 +17,21 @@ const createBanForUser = async (db: DrizzleD1Database, userName: string, reason:
   }
 }
 
-export const userHasBan = async (env: Bindings, userDid: string): Promise<boolean> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  return (await db.select().from(bannedUsers).where(eq(bannedUsers.did, userDid)).limit(1).all()).length > 0;
+export const userHasBan = async (c: AllContext, userDid: string): Promise<boolean> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to check if user has ban, db was null");
+    return false;
+  }
+  const usersBanned = await db.$count(bannedUsers, eq(bannedUsers.did, userDid));
+  return (usersBanned > 0);
 };
 
-export const userHandleHasBan = async (env: Bindings, userName: string) => {
+export const userHandleHasBan = async (c: AllContext, userName: string) => {
   if (userName !== null) {
     const didHandle = await lookupBskyHandle(userName);
     if (didHandle !== null)
-      return await userHasBan(env, didHandle);
+      return await userHasBan(c, didHandle);
   }
   return false;
 };
@@ -56,7 +60,7 @@ function createObjForValuesChange (violationType: AccountStatus[], value: boolea
   return valuesUpdate;
 }
 
-export const createViolationForUser = async(env: Bindings, userId: string, violationType: AccountStatus): Promise<boolean> => {
+export const createViolationForUser = async(c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
   const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage,
     AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
@@ -65,10 +69,14 @@ export const createViolationForUser = async(env: Bindings, userId: string, viola
     return false;
   }
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to get database to create violations for");
+    return false;
+  }
   const valuesUpdate:LooseObj = createObjForValuesChange([violationType], true);
   if (violationType === AccountStatus.TOSViolation) {
-    const bskyUsername = await getUsernameForUserId(env, userId);
+    const bskyUsername = await getUsernameForUserId(c, userId);
     if (bskyUsername !== null) {
       await createBanForUser(db, bskyUsername, "tos violation");
     } else {
@@ -87,12 +95,16 @@ export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: st
   ));
 };
 
-export const removeViolation = async(env: Bindings, userId: string, violationType: AccountStatus) => {
-  await removeViolations(env, userId, [violationType]);
+export const removeViolation = async(c: AllContext, userId: string, violationType: AccountStatus) => {
+  await removeViolations(c, userId, [violationType]);
 };
 
-export const removeViolations = async(env: Bindings, userId: string, violationType: AccountStatus[]) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const removeViolations = async(c: AllContext, userId: string, violationType: AccountStatus[]) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.warn(`unable to remove violations for user ${userId}, db was null`);
+    return;
+  }
   // Check if they have a violation first
   if ((await userHasViolations(db, userId)) == false) {
     return;
@@ -113,16 +125,17 @@ export const removeViolations = async(env: Bindings, userId: string, violationTy
 }
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
-  const {results} = await db.select().from(violations).where(eq(violations.userId, userId)).limit(1).run();
+  const {results} = await db.select().from(violations)
+    .where(eq(violations.userId, userId)).limit(1).run();
   if (results.length > 0)
     return (results[0] as Violation);
   return null;
 };
 
-export const getViolationsForCurrentUser = async(c: Context): Promise<Violation|null> => {
+export const getViolationsForCurrentUser = async(c: AllContext): Promise<Violation|null> => {
   const userId = c.get("userId");
-  if (userId) {
-    const db: DrizzleD1Database = drizzle(c.env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (userId && db) {
     return await getViolationsForUser(db, userId);
   }
   return null;

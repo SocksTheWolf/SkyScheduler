@@ -1,7 +1,11 @@
 import { Context } from "hono";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
-export async function ViolationNoticeBar(props: any) {
+type ViolationNoticeProps = {
+  ctx: Context;
+}
+
+export async function ViolationNoticeBar(props: ViolationNoticeProps) {
   const ctx: Context = props.ctx;
   const violationData = await getViolationsForCurrentUser(ctx);
   if (violationData !== null) {

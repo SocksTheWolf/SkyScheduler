@@ -4,8 +4,8 @@ import { ExecutionContext } from "hono";
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
   enabled: boolean;
-  steps: number[];
-  bucket_url: string;
+  steps?: number[];
+  bucket_url?: string;
 };
 
 type SignupConfigSettings = {
@@ -47,7 +47,7 @@ export interface Bindings {
   IMAGES: ImagesBinding;
   POST_QUEUE1: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;
-  INVITE_POOL: KVNamespace;
+  INVITE_POOL?: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
   SIGNUP_SETTINGS: SignupConfigSettings;
   SITE_SETTINGS: SiteConfigSettings;
@@ -215,10 +215,27 @@ export type PreloadRules = {
   href: string;
 };
 
-export type ScheduledContext = {
+export class ScheduledContext {
   executionCtx: ExecutionContext;
   env: Bindings;
+  #map: Map<string, any>;
+  constructor(env: Bindings, executionCtx: ExecutionContext) {
+    this.#map = new Map<string, any>();
+    this.env = env;
+    this.executionCtx = executionCtx;
+    this.set("db", drizzle(env.DB));
+  }
+  get(name: string) {
+    if (this.#map.has(name))
+      return this.#map.get(name);
+    return null;
+  }
+  set(name: string, value: any) {
+    this.#map.set(name, value);
+  }
 };
+
+export type AllContext = Context|ScheduledContext;
 
 export type BskyEmbedWrapper = {
   type: EmbedDataType;

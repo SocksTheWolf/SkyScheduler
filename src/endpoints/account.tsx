@@ -163,7 +163,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   }
 
   // Check if the user has violated TOS.
-  if (await userHasBan(c.env, profileDID)) {
+  if (await userHasBan(c, profileDID)) {
     return c.json({ok: false, message: "your account has been forbidden from using this service"}, 400);
   }
 
@@ -214,7 +214,7 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
     return c.json({ok: false, message: "user doesn't exist"}, 401);
   }
 
-  const userEmail = await getUserEmailForHandle(c.env, username);
+  const userEmail = await getUserEmailForHandle(c, username);
   if (isEmpty(userEmail)) {
     return c.json({ok: false, message: "user data is missing"}, 401);
   }
@@ -305,7 +305,7 @@ account.post("/delete", authMiddleware, async (c) => {
       password: password
     });
     if (verify) {
-      c.executionCtx.waitUntil(getAllMediaOfUser(c.env, userId)
+      c.executionCtx.waitUntil(getAllMediaOfUser(c, userId)
         .then((media) => deleteFromR2(c, media))
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));

@@ -15,7 +15,7 @@ export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|unde
     if (inviteKey === undefined)
       return false;
 
-    const value = await c.env.INVITE_POOL.get(inviteKey);
+    const value = await c.env.INVITE_POOL!.get(inviteKey);
     // Key does not exist
     if (value === null)
       return false;
@@ -41,7 +41,7 @@ export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) =
     if (inviteKey === undefined)
       return;
 
-    const value = await c.env.INVITE_POOL.get(inviteKey);
+    const value = await c.env.INVITE_POOL!.get(inviteKey);
     if (value === null) {
       console.error(`attempted to use invite key ${inviteKey} but is invalid`);
       return;
@@ -62,12 +62,12 @@ export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) =
     let newValue: number = amount - 1;
     // Delete any keys that fall to 0, they should be removed from the db
     if (newValue <= 0) {
-      await c.env.INVITE_POOL.delete(inviteKey);
+      await c.env.INVITE_POOL!.delete(inviteKey);
       return;
     }
 
     // put the new value on the stack
-    await c.env.INVITE_POOL.put(inviteKey, newValue.toString());
+    await c.env.INVITE_POOL!.put(inviteKey, newValue.toString());
   }
 }
 
@@ -80,6 +80,6 @@ export const makeInviteKey = (c: Context) => {
     separator: '-',
     capitalize: false,
   });
-  c.executionCtx.waitUntil(c.env.INVITE_POOL.put(newKey, "10"));
+  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, "10"));
   return newKey;
 }

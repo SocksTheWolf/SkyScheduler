@@ -1,3 +1,4 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
 name = "skyscheduler"
 main = "src/index.tsx"
 compatibility_date = "2024-12-13"
@@ -10,15 +11,27 @@ preview_urls = false
 assets = { run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
 routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
-kv_namespaces = [
-  { binding = "KV", id = "0ecd892014ac47eea38c72be94586e7b" }, # Redis for sessions
-  { binding = "INVITE_POOL", id = "45e1cff45cad45c28b22c4fbcd30db00" } # Invite key pool
-]
+# Redis for sessions
+[[kv_namespaces]]
+binding = "KV"
+id = "0ecd892014ac47eea38c72be94586e7b"
+
+# Invite key pool
+[[kv_namespaces]]
+binding = "INVITE_POOL"
+id = "45e1cff45cad45c28b22c4fbcd30db00"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
 database_id = "5553e724-4dfb-4771-9c08-3584da5855d1"
+migrations_table = "migrations"
+migrations_dir = "migrations"
+
+[[d1_databases]]
+binding = "DBStaging"
+database_name = "skyposts-dev"
+database_id = "9e9e3275-c12e-4209-9b8c-a1ee57f7bb8d"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
@@ -71,7 +84,7 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # Signup options and if keys should be used
-SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="https://bsky.app/profile/skyscheduler.work/post/3ltsfnzdmkk2l"}
+SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread=""}
 
 # queue handling, pushing information. This is experimental.
 QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
@@ -87,3 +100,34 @@ SITE_SETTINGS={use_agent_map=false}
 
 # set this to true in your .dev.vars to turn off turnstile
 IN_DEV=false
+
+[env.staging]
+workers_dev = true
+
+[env.staging.vars]
+BETTER_AUTH_URL="*"
+IMAGE_SETTINGS={enabled=false}
+SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread=""}
+QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
+REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
+R2_SETTINGS={auto_prune=false, prune_days=3}
+SITE_SETTINGS={use_agent_map=false}
+IN_DEV=true
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "skyposts-dev"
+database_id = "9e9e3275-c12e-4209-9b8c-a1ee57f7bb8d"
+migrations_table = "migrations"
+migrations_dir = "migrations"
+
+[[env.staging.kv_namespaces]]
+binding = "KV"
+id = "9b9c6cdfd40e405aa3df63544a553b08"
+
+[env.staging.images]
+binding = "IMAGES"
+
+[[env.staging.r2_buckets]]
+binding = "R2"
+bucket_name = "skyembeds-dev"

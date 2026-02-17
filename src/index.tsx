@@ -1,3 +1,4 @@
+import { drizzle } from "drizzle-orm/d1";
 import { Env, Hono } from "hono";
 import { ContextVariables, createAuth } from "./auth";
 import { account } from "./endpoints/account";
@@ -36,6 +37,7 @@ app.use("/api/auth/**", corsHelperMiddleware);
 app.use("*", async (c, next) => {
   const auth = createAuth(c.env, (c.req.raw as any).cf || {});
   c.set("auth", auth);
+  c.set("db", drizzle(c.env.DB));
   await next();
 });
 
@@ -103,30 +105,30 @@ app.get("/invite", authAdminOnlyMiddleware, (c) => {
 
 // Admin Maintenance Cleanup
 app.get("/cron", authAdminOnlyMiddleware, async (c) => {
-  await schedulePostTask(c.env, c.executionCtx);
+  await schedulePostTask(c);
   return c.text("ran");
 });
 
 app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
-  c.executionCtx.waitUntil(cleanUpPostsTask(c.env, c.executionCtx));
+  c.executionCtx.waitUntil(cleanUpPostsTask(c));
   return c.text("ran");
 });
 
 app.get("/db-update", authAdminOnlyMiddleware, (c) => {
-  c.executionCtx.waitUntil(runMaintenanceUpdates(c.env));
+  c.executionCtx.waitUntil(runMaintenanceUpdates(c));
   return c.text("ran");
 });
 
 app.get("/abandoned", authAdminOnlyMiddleware, async (c) => {
   let returnHTML = "";
-  const abandonedFiles: string[] = await getAllAbandonedMedia(c.env);
+  const abandonedFiles: string[] = await getAllAbandonedMedia(c);
   // print out all abandoned files
   for (const file of abandonedFiles) {
     returnHTML += `${file}\n`;
   }
   if (c.env.R2_SETTINGS.auto_prune == true) {
     console.log("pruning abandoned files...");
-    await cleanupAbandonedFiles(c.env, c.executionCtx);
+    await cleanupAbandonedFiles(c);
   }
 
   if (returnHTML.length == 0) {
@@ -143,23 +145,20 @@ app.get("/setup", async (c) => await setupAccounts(c));
 
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
+    const runtimeWrapper = new ScheduledContext(env, ctx);
     switch (event.cron) {
       case "30 17 * * sun":
-        ctx.waitUntil(cleanUpPostsTask(env, ctx));
+        ctx.waitUntil(cleanUpPostsTask(runtimeWrapper));
       break;
       default:
       case "0 * * * *":
-        ctx.waitUntil(schedulePostTask(env, ctx));
+        ctx.waitUntil(schedulePostTask(runtimeWrapper));
       break;
     }
   },
-  async queue(batch: MessageBatch<QueueTaskData>, environment: Bindings, ctx: ExecutionContext) {
-    const runtimeWrapper: ScheduledContext = {
-      executionCtx: ctx,
-      env: environment
-    };
-
-    const delay: number = environment.QUEUE_SETTINGS.delay_val;
+  async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
+    const runtimeWrapper = new ScheduledContext(env, ctx);
+    const delay: number = env.QUEUE_SETTINGS.delay_val;
     let wasSuccess: boolean = false;
     for (const message of batch.messages) {
       switch (message.body.type) {

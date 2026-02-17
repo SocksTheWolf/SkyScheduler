@@ -9,7 +9,8 @@ import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../limit
 import {
   Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, Post, PostLabel, AccountStatus,
-  PostRecordResponse, PostStatus, Repost, ScheduledContext
+  PostRecordResponse, PostStatus, Repost, ScheduledContext,
+  AllContext
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
@@ -104,8 +105,8 @@ export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) =
   return AccountStatus.UnhandledError;
 }
 
-export const makeAgentForUser = async (env: Bindings, userId: string) => {
-  const loginCreds = await getBskyUserPassForId(env, userId);
+export const makeAgentForUser = async (c: AllContext, userId: string) => {
+  const loginCreds = await getBskyUserPassForId(c, userId);
   if (loginCreds.valid === false) {
     console.error(`credentials for user ${userId} were invalid`);
     return null;
@@ -116,7 +117,7 @@ export const makeAgentForUser = async (env: Bindings, userId: string) => {
 
   const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
   if (loginResponse != AccountStatus.Ok) {
-    const addViolation: boolean = await createViolationForUser(env, userId, loginResponse);
+    const addViolation: boolean = await createViolationForUser(c, userId, loginResponse);
     if (addViolation)
       console.error(`Unable to login to ${userId} with violation ${loginResponse}`);
     return null;
@@ -124,29 +125,28 @@ export const makeAgentForUser = async (env: Bindings, userId: string) => {
   return agent;
 }
 
-export const makePost = async (c: Context|ScheduledContext, content: Post|null, usingAgent: AtpAgent|null=null) => {
+export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtpAgent|null=null) => {
   if (content === null) {
     console.warn("Dropping invocation of makePost, content was null");
     return false;
   }
 
-  const env = c.env;
   // make a check to see if the post has already been posted onto bsky
   // skip over this check if we are a threaded post, as we could have had a child post that didn't make it.
-  if (!content.isThreadRoot && await isPostAlreadyPosted(env, content.postid)) {
+  if (!content.isThreadRoot && await isPostAlreadyPosted(c, content.postid)) {
     console.log(`Dropped handling make post for post ${content.postid}, already posted.`);
     return true;
   }
 
-  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(env, content.user) : usingAgent;
+  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(c, content.user) : usingAgent;
   if (agent === null) {
     console.warn(`could not make agent for post ${content.postid}`);
     return false;
   }
 
-  const newPostRecords: PostStatus|null = await makePostRaw(env, content, agent);
+  const newPostRecords: PostStatus|null = await makePostRaw(c, content, agent);
   if (newPostRecords !== null) {
-    await bulkUpdatePostedData(env, newPostRecords.records, newPostRecords.expected == newPostRecords.got);
+    await bulkUpdatePostedData(c, newPostRecords.records, newPostRecords.expected == newPostRecords.got);
 
     // Delete any embeds if they exist.
     for (const record of newPostRecords.records) {
@@ -164,15 +164,14 @@ export const makePost = async (c: Context|ScheduledContext, content: Post|null, 
 
   // Turn off the post now flag if we failed.
   if (content.postNow) {
-    c.executionCtx.waitUntil(setPostNowOffForPost(env, content.postid));
+    c.executionCtx.waitUntil(setPostNowOffForPost(c, content.postid));
   }
   return false;
 }
 
-export const makeRepost = async (c: Context|ScheduledContext, content: Repost, usingAgent: AtpAgent|null=null) => {
-  const env = c.env;
+export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtpAgent|null=null) => {
   let bWasSuccess = true;
-  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(env, content.userId) : usingAgent;
+  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(c, content.userId) : usingAgent;
   if (agent === null) {
     console.warn(`could not make agent for repost ${content.postid}`);
     return false;
@@ -196,8 +195,8 @@ export const makeRepost = async (c: Context|ScheduledContext, content: Repost, u
   return bWasSuccess;
 };
 
-export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
-  const username = await getUsernameForUserId(env, content.user);
+export const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
+  const username = await getUsernameForUserId(c, content.user);
   // incredibly unlikely but we'll handle it
   if (username === null) {
     console.warn(`username for post ${content.postid} was invalid`);
@@ -294,7 +293,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
                   // embed thumbnails of any size
                   // it will fail when you try to make the post record, saying the
                   // post record is invalid.
-                  const imgTransform = (await env.IMAGES.input(imageBlob.stream())
+                  const imgTransform = (await c.env.IMAGES.input(imageBlob.stream())
                     .transform({width: 1280, height: 720, fit: "scale-down"})
                     .output({ format: "image/jpeg", quality: 85 })).response();
                   if (imgTransform.ok) {
@@ -429,7 +428,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
         }
 
         // Otherwise pull files from storage
-        const file = await env.R2.get(currentEmbed.content);
+        const file = await c.env.R2.get(currentEmbed.content);
         if (!file) {
           console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
           return false;
@@ -447,7 +446,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
             }
           }
           // Give violation mediaTooBig if the file is too large.
-          await createViolationForUser(env, postData.user, AccountStatus.MediaTooBig);
+          await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
           console.warn(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
           return false;
         }
@@ -609,7 +608,7 @@ export const makePostRaw = async (env: Bindings, content: Post, agent: AtpAgent)
 
   // If this is a post thread root
   if (content.isThreadRoot) {
-    const childPosts = await getChildPostsOfThread(env, content.postid) || [];
+    const childPosts = await getChildPostsOfThread(c, content.postid) || [];
     expected += childPosts.length;
     // get the thread children.
     for (const child of childPosts) {

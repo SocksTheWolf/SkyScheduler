@@ -1,8 +1,7 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
-import { Context } from "hono";
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
@@ -11,6 +10,7 @@ import { accounts, users } from "../db/auth.schema";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import {
   AccountStatus,
+  AllContext,
   BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse,
@@ -25,11 +25,11 @@ import { getViolationsForUser, removeViolation, removeViolations, userHasViolati
 import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
-export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
+export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
   try {
     const userId = c.get("userId");
-    if (userId) {
-      const db: DrizzleD1Database = drizzle(c.env.DB);
+    const db: DrizzleD1Database = c.get("db");
+    if (userId && db) {
       const results = await db.select({
           ...getTableColumns(posts),
           repostCount: repostCounts.count
@@ -49,11 +49,15 @@ export const getPostsForUser = async (c: Context): Promise<Post[]|null> => {
   return null;
 };
 
-export const updateUserData = async (c: Context, newData: any): Promise<boolean> => {
+export const updateUserData = async (c: AllContext, newData: any): Promise<boolean> => {
   const userId = c.get("userId");
+  const db: DrizzleD1Database = c.get("db");
   try {
+    if (!db) {
+      console.error("Unable to update user data, no database object");
+      return false;
+    }
     if (userId) {
-      const db: DrizzleD1Database = drizzle(c.env.DB);
       let queriesToExecute:BatchItem<"sqlite">[] = [];
 
       if (has(newData, "password")) {
@@ -73,7 +77,7 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
         // check if the user has violations
         if (await userHasViolations(db, userId)) {
           // they do, so clear them out
-          await removeViolations(c.env, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
+          await removeViolations(c, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
         }
       }
 
@@ -92,14 +96,19 @@ export const updateUserData = async (c: Context, newData: any): Promise<boolean>
   return false;
 };
 
-export const deletePost = async (c: Context, id: string): Promise<DeleteResponse> => {
+export const deletePost = async (c: AllContext, id: string): Promise<DeleteResponse> => {
   const userId = c.get("userId");
   const returnObj: DeleteResponse = {success: false};
   if (!userId) {
     return returnObj;
   }
 
-  const db: DrizzleD1Database = drizzle(c.env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to delete post ${id}, db was null`);
+    return returnObj;
+  }
+
   const postObj = await getPostById(c, id);
   if (postObj !== null) {
     let queriesToExecute:BatchItem<"sqlite">[] = [];
@@ -109,7 +118,7 @@ export const deletePost = async (c: Context, id: string): Promise<DeleteResponse
       await deleteEmbedsFromR2(c, postObj.embeds);
       if (await userHasViolations(db, userId)) {
         // Remove the media too big violation if it's been given
-        await removeViolation(c.env, userId, AccountStatus.MediaTooBig);
+        await removeViolation(c, userId, AccountStatus.MediaTooBig);
       }
     }
 
@@ -129,7 +138,7 @@ export const deletePost = async (c: Context, id: string): Promise<DeleteResponse
 
     // We'll need to delete all of the child embeds then, a costly, annoying experience.
     if (postObj.isThreadRoot) {
-      const childPosts = await getChildPostsOfThread(c.env, postObj.postid);
+      const childPosts = await getChildPostsOfThread(c, postObj.postid);
       if (childPosts !== null) {
         for (const childPost of childPosts) {
           c.executionCtx.waitUntil(deleteEmbedsFromR2(c, childPost.embeds));
@@ -155,12 +164,16 @@ export const deletePost = async (c: Context, id: string): Promise<DeleteResponse
   return returnObj;
 };
 
-export const createPost = async (c: Context, body: any): Promise<CreatePostQueryResponse> => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
-
+export const createPost = async (c: AllContext, body: any): Promise<CreatePostQueryResponse> => {
+  const db: DrizzleD1Database = c.get("db");
   const userId = c.get("userId");
   if (!userId)
     return { ok: false, msg: "Your user session has expired, please login again"};
+
+  if (!db) {
+    console.error("unable to create post, db became null");
+    return { ok: false, msg: "An application error has occurred please refresh" };
+  }
 
   const validation = PostSchema.safeParse(body);
   if (!validation.success) {
@@ -313,12 +326,17 @@ export const createPost = async (c: Context, body: any): Promise<CreatePostQuery
   return { ok: success, postNow: makePostNow, postId: postUUID, msg: success ? "success" : "fail" };
 };
 
-export const createRepost = async (c: Context, body: any): Promise<CreateObjectResponse> => {
-  const db: DrizzleD1Database = drizzle(c.env.DB);
+export const createRepost = async (c: AllContext, body: any): Promise<CreateObjectResponse> => {
+  const db: DrizzleD1Database = c.get("db");
 
   const userId = c.get("userId");
   if (!userId)
     return { ok: false, msg: "Your user session has expired, please login again"};
+
+  if (!db) {
+    console.error("unable to create repost db became null");
+    return {ok: false, msg: "Invalid server operation occurred, please refresh"};
+  }
 
   const validation = RepostSchema.safeParse(body);
   if (!validation.success) {
@@ -430,18 +448,22 @@ export const createRepost = async (c: Context, body: any): Promise<CreateObjectR
   return { ok: success, msg: success ? "success" : "fail", postId: postUUID };
 };
 
-export const updatePostForUser = async (c: Context, id: string, newData: Object): Promise<boolean> => {
+export const updatePostForUser = async (c: AllContext, id: string, newData: Object): Promise<boolean> => {
   const userId = c.get("userId");
-  return await updatePostForGivenUser(c.env, userId, id, newData);
+  return await updatePostForGivenUser(c, userId, id, newData);
 };
 
-export const getPostById = async(c: Context, id: string): Promise<Post|null> => {
+export const getPostById = async(c: AllContext, id: string): Promise<Post|null> => {
   const userId = c.get("userId");
   if (!userId || !uuidValid(id))
     return null;
 
-  const env = c.env;
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to get post ${id}, db was null`);
+    return null;
+  }
+
   const result = await db.select().from(posts)
     .where(and(eq(posts.uuid, id), eq(posts.userId, userId)))
     .limit(1).all();
@@ -452,13 +474,17 @@ export const getPostById = async(c: Context, id: string): Promise<Post|null> => 
 };
 
 // used for post editing, acts very similar to getPostsForUser
-export const getPostByIdWithReposts = async(c: Context, id: string): Promise<Post|null> => {
+export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<Post|null> => {
   const userId = c.get("userId");
   if (!userId || !uuidValid(id))
     return null;
 
-  const env = c.env;
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to get post ${id} with reposts, db was null`);
+    return null;
+  }
+
   const result = await db.select({
     ...getTableColumns(posts),
     repostCount: repostCounts.count,

@@ -1,12 +1,16 @@
 import { and, eq, inArray, lte } from "drizzle-orm";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
-import { Bindings, EmbedDataType, LooseObj } from "../../types.d";
+import { AllContext, EmbedDataType, LooseObj } from "../../types.d";
 import { daysAgo } from "../helpers";
 
-export const addFileListing = async (env: Bindings, file: string, user: string|null, createDate: Date|null=null) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const addFileListing = async (c: AllContext, file: string, user: string|null, createDate: Date|null=null) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to create file listing for file ${file}, db was null`);
+    return;
+  }
   let insertData:LooseObj = {};
   if (createDate !== null) {
     insertData.createdAt = createDate;
@@ -18,17 +22,25 @@ export const addFileListing = async (env: Bindings, file: string, user: string|n
       .onConflictDoNothing({target: mediaFiles.fileName});
 };
 
-export const deleteFileListings = async (env: Bindings, files: string|string[]) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const deleteFileListings = async (c: AllContext, files: string|string[]) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to delete file listings ${files}, db was null`);
+    return;
+  }
   let filesToDelete = [];
   filesToDelete.push(files);
   const filesToWorkOn = flatten(filesToDelete);
   await db.delete(mediaFiles).where(inArray(mediaFiles.fileName, filesToWorkOn));
 };
 
-export const getAllAbandonedMedia = async(env: Bindings) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
-  const numDaysAgo = daysAgo(env.R2_SETTINGS.prune_days);
+export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("could not get all abandoned media, db was null");
+    return [];
+  }
+  const numDaysAgo = daysAgo(c.env.R2_SETTINGS.prune_days);
 
   const results = await db.select().from(mediaFiles)
     .where(
@@ -38,8 +50,12 @@ export const getAllAbandonedMedia = async(env: Bindings) => {
   return results.map((item) => item.fileName);
 };
 
-export const getAllMediaOfUser = async (env: Bindings, userId: string): Promise<string[]> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const getAllMediaOfUser = async (c: AllContext, userId: string): Promise<string[]> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.warn(`could not get all media of user ${userId}, db was null`);
+    return [];
+  }
   const mediaList = await db.select({embeds: posts.embedContent}).from(posts)
     .where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
 

@@ -1,16 +1,19 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
-import { IncludeDependencyTags, ScriptTags } from "../layout/helpers/includesTags";
 import FooterCopyright from "../layout/helpers/footer";
+import { IncludeDependencyTags, ScriptTags } from "../layout/helpers/includesTags";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { PreloadRules } from "../types.d";
-import { altTextScriptStr, appScriptStr, appScriptStrs, postHelperScriptStr, repostHelperScriptStr, tributeScriptStr } from "../utils/appScripts";
 import { SHOW_PROGRESS_BAR } from "../progress";
+import { PreloadRules } from "../types.d";
+import {
+  altTextScriptStr, appScriptStr, appScriptStrs,
+  postHelperScriptStr, repostHelperScriptStr, tributeScriptStr
+} from "../utils/appScripts";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;

@@ -1,17 +1,21 @@
 import { eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
-import { BatchQuery, Bindings, R2BucketObject } from "../../types.d";
+import { AllContext, BatchQuery, Bindings, R2BucketObject } from "../../types.d";
 import { getAllFilesList } from "../r2Query";
 import { addFileListing, getAllMediaOfUser } from "./file";
 
 /** Maintenance operations **/
-export const runMaintenanceUpdates = async (env: Bindings) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const runMaintenanceUpdates = async (c: AllContext) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to get database to run maintenance");
+    return;
+  }
   // Create a posted query that also checks for valid json and content length
   const postedQuery = db.select({
     ...getTableColumns(posts),
@@ -44,10 +48,10 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
   await db.update(posts).set({updatedAt: sql`CURRENT_TIMESTAMP`}).where(isNull(posts.updatedAt));
 
   // populate existing media table with post data
-  const allBucketFiles:R2BucketObject[] = await getAllFilesList(env);
+  const allBucketFiles:R2BucketObject[] = await getAllFilesList(c);
   try {
     for (const bucketFile of allBucketFiles) {
-      await addFileListing(env, bucketFile.name, bucketFile.user, bucketFile.date);
+      await addFileListing(c, bucketFile.name, bucketFile.user, bucketFile.date);
     }
   } catch(err) {
     console.error(`Adding file listings got error ${err}`);
@@ -57,7 +61,7 @@ export const runMaintenanceUpdates = async (env: Bindings) => {
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {
-    const userMedia = await getAllMediaOfUser(env, user.id);
+    const userMedia = await getAllMediaOfUser(c, user.id);
     batchedQueries.push(db.update(mediaFiles).set({hasPost: true})
       .where(inArray(mediaFiles.fileName, flatten(userMedia))));
   }

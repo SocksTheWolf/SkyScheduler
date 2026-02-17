@@ -1,6 +1,6 @@
 import isEmpty from 'just-is-empty';
 import split from 'just-split';
-import { Bindings } from '../types.d';
+import { AllContext } from '../types.d';
 import { getPostRecords } from './bskyApi';
 import { getAllPostedPosts, getAllPostedPostsOfUser } from './db/data';
 
@@ -8,8 +8,8 @@ import { getAllPostedPosts, getAllPostedPostsOfUser } from './db/data';
 // are still on the network or not. If they are not, then this prunes the posts from
 // the database. This call is quite expensive and should only be ran on a weekly
 // cron job.
-export const pruneBskyPosts = async (env: Bindings, userId?: string) => {
-  const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(env, userId) : await getAllPostedPosts(env);
+export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
+  const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(c, userId) : await getAllPostedPosts(c);
   let removePostIds: string[] = [];
   let postedGroups = split(allPostedPosts, 25);
   while (!isEmpty(postedGroups)) {

@@ -15,7 +15,7 @@ import {
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
-import { Bindings, EmbedData, EmbedDataType, R2BucketObject, ScheduledContext } from '../types.d';
+import { AllContext, EmbedData, EmbedDataType, R2BucketObject } from '../types.d';
 import { addFileListing, deleteFileListings } from './db/file';
 
 type FileMetaData = {
@@ -26,7 +26,7 @@ type FileMetaData = {
   qualityLevel?: number;
 };
 
-export const deleteEmbedsFromR2 = async (c: Context|ScheduledContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
+export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
   let itemsToDelete:string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
@@ -42,13 +42,13 @@ export const deleteEmbedsFromR2 = async (c: Context|ScheduledContext, embeds: Em
   return itemsToDelete;
 };
 
-export const deleteFromR2 = async (c: Context|ScheduledContext, embeds: string[]|string, isQueued: boolean=false) => {
+export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQueued: boolean=false) => {
   if (embeds.length <= 0)
     return;
 
   console.log(`Deleting ${embeds}`);
   const killFilesPromise = c.env.R2.delete(embeds);
-  const deleteFileListingPromise = deleteFileListings(c.env, embeds);
+  const deleteFileListingPromise = deleteFileListings(c, embeds);
   if (isQueued) {
     await killFilesPromise;
     await deleteFileListingPromise;
@@ -58,18 +58,18 @@ export const deleteFromR2 = async (c: Context|ScheduledContext, embeds: string[]
   }
 };
 
-const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
+const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
   const fileExt:string|undefined = metaData.name.split(".").pop();
   if (fileExt === undefined) {
     return {"success": false, "error": "unable to upload, file name is invalid"};
   }
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
-  const R2UploadRes = await env.R2.put(fileName, buffer, {
+  const R2UploadRes = await c.env.R2.put(fileName, buffer, {
     customMetadata: {"user": metaData.user, "type": metaData.type }
   });
   if (R2UploadRes) {
-    await addFileListing(env, fileName, metaData.user);
+    await addFileListing(c, fileName, metaData.user);
     return {"success": true, "data": R2UploadRes.key,
       "originalName": metaData.name, "fileSize": metaData.size,
       "qualityLevel": metaData.qualityLevel};
@@ -80,7 +80,6 @@ const rawUploadToR2 = async (env: Bindings, buffer: ArrayBuffer|ReadableStream, 
 
 const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   const originalName = file.name;
-  const env: Bindings = c.env;
   // The maximum size of CF Image transforms.
   if (file.size > CF_IMAGES_FILE_SIZE_LIMIT) {
     return {"success": false, "error": `An image has a maximum file size of ${CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB`};
@@ -108,9 +107,9 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   if (file.size > BSKY_IMG_SIZE_LIMIT) {
     let failedToResize = true;
 
-    if (env.IMAGE_SETTINGS.enabled) {
+    if (c.env.IMAGE_SETTINGS.enabled) {
       const resizeFilename = uuidv4();
-      const resizeBucketPush = await env.R2RESIZE.put(resizeFilename, await file.bytes(), {
+      const resizeBucketPush = await c.env.R2RESIZE.put(resizeFilename, await file.bytes(), {
         customMetadata: {"user": userId },
         httpMetadata: { contentType: file.type }
       });
@@ -121,11 +120,11 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
       }
 
       // TODO: use the image wrangler binding
-      for (var i = 0; i < env.IMAGE_SETTINGS.steps.length; ++i) {
-        const qualityLevel = env.IMAGE_SETTINGS.steps[i];
-        const response = await fetch(new URL(resizeFilename, env.IMAGE_SETTINGS.bucket_url), {
+      for (var i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {
+        const qualityLevel = c.env.IMAGE_SETTINGS.steps[i];
+        const response = await fetch(new URL(resizeFilename, c.env.IMAGE_SETTINGS.bucket_url!), {
           headers: {
-            "x-skyscheduler-helper": env.RESIZE_SECRET_HEADER
+            "x-skyscheduler-helper": c.env.RESIZE_SECRET_HEADER
           },
           cf: {
             image: {
@@ -170,7 +169,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
         }
       }
       // Delete the file from the resize bucket.
-      c.executionCtx.waitUntil(env.R2RESIZE.delete(resizeFilename));
+      c.executionCtx.waitUntil(c.env.R2RESIZE.delete(resizeFilename));
     }
 
     if (failedToResize) {
@@ -189,10 +188,10 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
 
   if (fileToProcess === null)
     fileToProcess = await file.arrayBuffer();
-  return await rawUploadToR2(env, fileToProcess, fileMetaData);
+  return await rawUploadToR2(c, fileToProcess, fileMetaData);
 };
 
-const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
+const uploadVideoToR2 = async (c: Context, file: File, userId: string) => {
   // Technically this will never hit because it is greater than our own internal limits
   if (file.size > BSKY_VIDEO_SIZE_LIMIT) {
     return {"success": false, "error": `max video size is ${BSKY_VIDEO_SIZE_LIMIT}MB`};
@@ -204,7 +203,7 @@ const uploadVideoToR2 = async (env: Bindings, file: File, userId: string) => {
     type: file.type,
     user: userId
   };
-  return await rawUploadToR2(env, await file.stream(), fileMetaData);
+  return await rawUploadToR2(c, await file.stream(), fileMetaData);
 };
 
 export const uploadFileR2 = async (c: Context, file: File|string, userId: string) => {
@@ -227,16 +226,16 @@ export const uploadFileR2 = async (c: Context, file: File|string, userId: string
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
     return await uploadImageToR2(c, file, userId);
   } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
-    return await uploadVideoToR2(c.env, file, userId);
+    return await uploadVideoToR2(c, file, userId);
   } else if (GIF_UPLOAD_ALLOWED && BSKY_GIF_MIME_TYPES.includes(fileType)) {
     // TODO: modify this in the future to transform the image to a webm
     // then push to uploadVideo
-    return await uploadVideoToR2(c.env, file, userId);
+    return await uploadVideoToR2(c, file, userId);
   }
   return {"success": false, "error": "unable to push to R2"};
 };
 
-export const getAllFilesList = async (env: Bindings) => {
+export const getAllFilesList = async (c: AllContext) => {
   let options: R2ListOptions = {
     limit: 1000,
     include: ["customMetadata"]
@@ -244,7 +243,7 @@ export const getAllFilesList = async (env: Bindings) => {
   let values:R2BucketObject[] = [];
 
   while (true) {
-    const response = await env.R2.list(options);
+    const response = await c.env.R2.list(options);
     for (const file of response.objects) {
       values.push({
         name: file.key,

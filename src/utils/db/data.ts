@@ -1,14 +1,14 @@
 import { and, asc, desc, eq, inArray, isNotNull, lte, ne, notInArray, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
+import { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from 'uuid';
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
 import {
+  AllContext,
   BatchQuery,
-  Bindings,
   GetAllPostedBatch,
   Post,
   PostRecordResponse,
@@ -16,9 +16,13 @@ import {
 } from "../../types.d";
 import { createPostObject, createRepostObject, floorCurrentTime } from "../helpers";
 
-export const getAllPostsForCurrentTime = async (env: Bindings, removeThreads: boolean = false): Promise<Post[]> => {
+export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("Could not get all posts for current time, db was null");
+    return [];
+  }
   const currentTime: Date = floorCurrentTime();
 
   const violationUsers = db.select({violators: violations.userId}).from(violations);
@@ -41,9 +45,13 @@ export const getAllPostsForCurrentTime = async (env: Bindings, removeThreads: bo
   return results.map((item) => createPostObject(item));
 };
 
-export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date): Promise<Repost[]> => {
+export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date): Promise<Repost[]> => {
   // Get all scheduled posts for the given time
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("could not get all reposts for given timeframe, db was null");
+    return [];
+  }
   const query = db.select({uuid: reposts.uuid}).from(reposts)
     .where(lte(reposts.scheduledDate, givenDate));
   const violationsQuery = db.select({data: violations.userId}).from(violations);
@@ -55,12 +63,16 @@ export const getAllRepostsForGivenTime = async (env: Bindings, givenDate: Date):
   return results.map((item) => createRepostObject(item));
 };
 
-export const getAllRepostsForCurrentTime = async (env: Bindings): Promise<Repost[]> => {
-  return await getAllRepostsForGivenTime(env, floorCurrentTime());
+export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost[]> => {
+  return await getAllRepostsForGivenTime(c, floorCurrentTime());
 };
 
-export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to delete all reposts before current time, db was null");
+    return;
+  }
   const currentTime = floorCurrentTime();
   const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
     .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
@@ -107,8 +119,12 @@ export const deleteAllRepostsBeforeCurrentTime = async (env: Bindings) => {
   }
 };
 
-export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordResponse[], allPosted: boolean) => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordResponse[], allPosted: boolean) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to bulk update posted data, db was null");
+    return;
+  }
   let dbOperations: BatchItem<"sqlite">[] = [];
 
   for (let i = 0; i < records.length; ++i) {
@@ -128,50 +144,74 @@ export const bulkUpdatePostedData = async (env: Bindings, records: PostRecordRes
     await db.batch(dbOperations as BatchQuery);
 }
 
-export const setPostNowOffForPost = async (env: Bindings, id: string) => {
+export const setPostNowOffForPost = async (c: AllContext, id: string) => {
+  const db: DrizzleD1Database = c.get("db");
   if (!uuidValid(id))
     return false;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  if (!db) {
+    console.warn(`cannot set off post now for post ${id}`);
+    return false;
+  }
+
   const {success} = await db.update(posts).set({postNow: false}).where(eq(posts.uuid, id));
   if (!success)
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
-export const updatePostForGivenUser = async (env: Bindings, userId: string, id: string, newData: Object) => {
+export const updatePostForGivenUser = async (c: AllContext, userId: string, id: string, newData: Object) => {
+  const db: DrizzleD1Database = c.get("db");
   if (isEmpty(userId) || !uuidValid(id))
     return false;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  if (!db) {
+    console.error(`unable to update post ${id} for user ${userId}, db was null`);
+    return false;
+  }
+
   const {success} = await db.update(posts).set(newData).where(
     and(eq(posts.uuid, id), eq(posts.userId, userId)));
   return success;
 };
 
-export const getAllPostedPostsOfUser = async(env: Bindings, userId: string): Promise<GetAllPostedBatch[]> => {
+export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Promise<GetAllPostedBatch[]> => {
+  const db: DrizzleD1Database = c.get("db");
   if (isEmpty(userId))
     return [];
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  if (!db) {
+    console.error(`unable to get all posted posts of user ${userId}, db was null`);
+    return [];
+  }
+
   return await db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
     .where(and(eq(posts.userId, userId), eq(posts.posted, true)))
     .all();
 };
 
-export const getAllPostedPosts = async (env: Bindings): Promise<GetAllPostedBatch[]> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatch[]> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("unable to get all posted posts, db was null");
+    return [];
+  }
   return await db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
     .where(eq(posts.posted, true))
     .all();
 };
 
-export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promise<boolean> => {
+export const isPostAlreadyPosted = async (c: AllContext, postId: string): Promise<boolean> => {
+  const db: DrizzleD1Database = c.get("db");
   if (!uuidValid(postId))
     return true;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  if (!db) {
+    console.error(`unable to get database to tell if ${postId} has been posted`);
+    return true;
+  }
+
   const query = await db.select({posted: posts.posted}).from(posts).where(eq(posts.uuid, postId)).all();
   if (isEmpty(query) || query[0].posted === null) {
     // if the post does not exist, return true anyways
@@ -180,11 +220,16 @@ export const isPostAlreadyPosted = async (env: Bindings, postId: string): Promis
   return query[0].posted;
 };
 
-export const getChildPostsOfThread = async (env: Bindings, rootId: string): Promise<Post[]|null> => {
+export const getChildPostsOfThread = async (c: AllContext, rootId: string): Promise<Post[]|null> => {
+  const db: DrizzleD1Database = c.get("db");
   if (!uuidValid(rootId))
     return null;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  if (!db) {
+    console.error(`unable to get child posts of root ${rootId}, db was null`);
+    return null;
+  }
+
   const query = await db.select().from(posts)
     .where(and(isNotNull(posts.parentPost), eq(posts.rootPost, rootId)))
     .orderBy(asc(posts.threadOrder), desc(posts.createdAt)).all();
@@ -204,12 +249,16 @@ export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, 
 }
 
 // deletes multiple posted posts from a database.
-export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promise<number> => {
+export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promise<number> => {
   // Don't do anything on empty arrays.
   if (isEmpty(postsToDelete))
     return 0;
 
-  const db: DrizzleD1Database = drizzle(env.DB);
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`could not delete posts ${postsToDelete}, db was null`);
+    return 0;
+  }
   let deleteQueries: BatchItem<"sqlite">[] = [];
   postsToDelete.forEach((itm) => {
     deleteQueries.push(db.delete(posts).where(and(eq(posts.uuid, itm), eq(posts.posted, true))));
@@ -224,8 +273,12 @@ export const deletePosts = async (env: Bindings, postsToDelete: string[]): Promi
   return 0;
 };
 
-export const purgePostedPosts = async (env: Bindings): Promise<number> => {
-  const db: DrizzleD1Database = drizzle(env.DB);
+export const purgePostedPosts = async (c: AllContext): Promise<number> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error("could not purge posted posts, got error");
+    return 0;
+  }
   const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
   const dbQuery = await db.select({ data: posts.uuid }).from(posts)
   .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
@@ -242,7 +295,7 @@ export const purgePostedPosts = async (env: Bindings): Promise<number> => {
   if (isEmpty(postsToDelete))
     return 0;
 
-  return await deletePosts(env, postsToDelete);
+  return await deletePosts(c, postsToDelete);
 };
 
 export const getPostByCID = async(db: DrizzleD1Database, userId: string, cid: string): Promise<Post|null> => {
