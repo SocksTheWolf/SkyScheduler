@@ -12,7 +12,8 @@ const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
     return null;
 
   const queueName: string = random(queueListNames) || "";
-  console.log(`Picked ${queueName} from ${listName}`);
+  if (queueListNames.length > 1)
+    console.log(`Picked ${queueName} from ${listName}`);
   return get(env, queueName, null);
 };
 
