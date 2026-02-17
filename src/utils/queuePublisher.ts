@@ -1,7 +1,7 @@
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
-import { Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
+import { AllContext, Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
 
 const queueContentType = 'v8';
 
@@ -23,27 +23,27 @@ export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.repost
 export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
 export const shouldPostThreadQueue = (env: Bindings) => env.QUEUE_SETTINGS.threadEnabled && (hasPostQueue(env) || isQueueEnabled(env));
 
-export async function enqueuePost(env: Bindings, post: Post) {
+export async function enqueuePost(c: AllContext, post: Post) {
   if (post.isThreadRoot) {
-    if (!shouldPostThreadQueue(env))
+    if (!shouldPostThreadQueue(c.env))
       return;
-  } else if (!isQueueEnabled(env))
+  } else if (!isQueueEnabled(c.env))
     return;
 
   // Pick a random consumer to handle this post
-  const queueConsumer: Queue|null = getRandomQueue(env, "post_queues");
+  const queueConsumer: Queue|null = getRandomQueue(c.env, "post_queues");
 
   if (queueConsumer !== null) {
     await queueConsumer.send({type: QueueTaskType.Post, post: post} as QueueTaskData, { contentType: queueContentType });
   }
 }
 
-export async function enqueueRepost(env: Bindings, post: Repost) {
-  if (!isRepostQueueEnabled(env))
+export async function enqueueRepost(c: AllContext, post: Repost) {
+  if (!isRepostQueueEnabled(c.env))
     return;
 
   // Pick a random consumer to handle this repost
-  const queueConsumer: Queue|null = getRandomQueue(env, "repost_queues");
+  const queueConsumer: Queue|null = getRandomQueue(c.env, "repost_queues");
   if (queueConsumer !== null)
     await queueConsumer.send({type: QueueTaskType.Repost, repost: post} as QueueTaskData, { contentType: queueContentType });
 }

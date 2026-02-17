@@ -43,7 +43,7 @@ export const schedulePostTask = async (c: AllContext) => {
   // TODO: bunching as a part of queues, literally just throw an agent at a queue with instructions and go.
   // this requires queueing to be working properly.
   const AgentList = new Map();
-  const usesAgentMap: boolean = (c.env.SITE_SETTINGS.use_agent_map) || false;
+  const usesAgentMap: boolean = c.env.SITE_SETTINGS.use_agent_map;
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
@@ -58,7 +58,7 @@ export const schedulePostTask = async (c: AllContext) => {
           if (usesAgentMap)
             AgentList.set(post.user, agent);
         }
-        c.ctx.waitUntil(handlePostTask(c, post, agent));
+        c.executionCtx.waitUntil(handlePostTask(c, post, agent));
       }
     }
   } else {
@@ -76,12 +76,12 @@ export const schedulePostTask = async (c: AllContext) => {
           if (usesAgentMap)
             AgentList.set(repost.userId, agent);
         }
-        c.ctx.waitUntil(handleRepostTask(c, repost, agent));
+        c.executionCtx.waitUntil(handleRepostTask(c, repost, agent));
       } else {
         await enqueueRepost(c, repost);
       }
     };
-    c.ctx.waitUntil(deleteAllRepostsBeforeCurrentTime(c));
+    c.executionCtx.waitUntil(deleteAllRepostsBeforeCurrentTime(c));
   } else {
     console.log("no reposts scheduled for this time");
   }
