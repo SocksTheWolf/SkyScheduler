@@ -63,12 +63,19 @@ persist = true
 
 [[queues.producers]]
 queue = "skyscheduler-post-queue"
-binding = "POST_QUEUE1"
+binding = "POST_QUEUE"
+
+[[queues.producers]]
+queue = "skyscheduler-repost-queue"
+binding = "REPOST_QUEUE"
 
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
 max_batch_size = 5
 max_batch_timeout = 10
+
+[[queues.consumers]]
+queue = "skyscheduler-repost-queue"
 
 [images]
 binding = "IMAGES"
@@ -87,7 +94,7 @@ IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.sky
 SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread=""}
 
 # queue handling, pushing information.
-QUEUE_SETTINGS = {enabled=true, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
+QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE"], repost_queues=["REPOST_QUEUE"]}
 
 # redirect links
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
@@ -108,7 +115,7 @@ workers_dev = true
 BETTER_AUTH_URL="*"
 IMAGE_SETTINGS={enabled=false}
 SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread=""}
-QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
+QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE"], repost_queues=[]}
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
 R2_SETTINGS={auto_prune=false, prune_days=3}
 SITE_SETTINGS={use_agent_map=false}
