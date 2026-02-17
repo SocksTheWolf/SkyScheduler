@@ -86,7 +86,7 @@ npm run deploy
 npm run migrate:all
 ```
 
-9. Modify the site specific information located in `limits.ts`, `metaTags.tsx`, `robots.txt`, `sitemap.xml` (these are currently set up for the website attached to this project)
+9. Modify the site specific information/configurations located in `limits.ts`, `metaTags.tsx`, `robots.txt`, `sitemap.xml` (these are currently set up for the website attached to this project)
 
 10. Run your application and go to `/setup`. This will create the admin account.
 

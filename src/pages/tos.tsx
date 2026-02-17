@@ -5,7 +5,7 @@ import { APP_NAME } from "../limits";
 
 export default function TermsOfService() {
   return (
-    <BaseLayout title="TOS" mainClass="homepage">
+    <BaseLayout title="Terms of Service" mainClass="homepage">
       <NavTags />
       <section class="container">
         <article>
