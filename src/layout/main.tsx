@@ -1,5 +1,6 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
+import { APP_NAME } from '../limits';
 import { PreloadRules } from '../types.d';
 import { mainScriptStr } from '../utils/appScripts';
 import { PreloadDependencyTags } from './helpers/includesTags';
@@ -7,14 +8,14 @@ import MetaTags from './helpers/metaTags';
 
 type BaseLayoutProps = {
   children: Child;
-  title?: string;
+  title: string;
   mainClass?: string;
   preloads?: PreloadRules[]
 };
 
 export const BaseLayout = ({
   children,
-  title = "SkyScheduler",
+  title,
   mainClass = "",
   preloads = []
 }: BaseLayoutProps) => {
@@ -22,7 +23,7 @@ export const BaseLayout = ({
   <html data-theme="dark" lang="en">
     <head>
       <meta charset="UTF-8" />
-      <title>{title}</title>
+      <title>{APP_NAME} - {title}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="preload" href="/dep/htmx.min.js" as="script" />
       <link rel="preload" href="/dep/toastify.js" as="script" />

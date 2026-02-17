@@ -2,19 +2,20 @@ import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
 import {
+  APP_NAME,
   MAX_POSTS_PER_THREAD, MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS,
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 
 export default function Home() {
   return (
-    <BaseLayout title="SkyScheduler - Home" mainClass="homepage">
+    <BaseLayout title="Home" mainClass="homepage">
       <NavTags />
       <section class="container">
         <article>
           <noscript><header>Javascript is required to use this website</header></noscript>
           <p>
-            <strong>SkyScheduler</strong> is a
+            <strong>{APP_NAME}</strong> is a
             free, <a href="https://github.com/socksthewolf/skyscheduler" rel="nofollow" target="_blank">open source</a> service
             that lets you schedule and automatically repost your content on Bluesky!<br />
             Boost engagement and reach more people no matter what time of day!<br />
@@ -23,12 +24,12 @@ export default function Home() {
                 <img
                   src="/dashboard.png"
                   fetchpriority="high"
-                  alt="Picture of SkyScheduler Dashboard"
+                  alt={`Picture of ${APP_NAME} Dashboard`}
                   height="618px"
                   width="1200px"
                 />
                 <figcaption>
-                  An amazing picture of SkyScheduler's Dashboard, wow!
+                  An amazing picture of {APP_NAME}'s Dashboard, wow!
                 </figcaption>
               </figure>
             </center>

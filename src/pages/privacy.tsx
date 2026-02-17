@@ -4,7 +4,7 @@ import NavTags from "../layout/helpers/navTags";
 
 export default function PrivacyPolicy() {
   return (
-    <BaseLayout title="SkyScheduler - Privacy Policy" mainClass="homepage">
+    <BaseLayout title="Privacy Policy" mainClass="homepage">
       <NavTags />
       <section class="container">
         <article>

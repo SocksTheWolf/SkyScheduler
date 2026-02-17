@@ -1,3 +1,4 @@
+import { APP_NAME } from "../../limits";
 import { PROGRESS_MADE, PROGRESS_TOTAL } from "../../progress";
 
 // Helper footer for various pages
@@ -10,8 +11,8 @@ type FooterCopyrightProps = {
 export default function FooterCopyright(props: FooterCopyrightProps) {
   const newWinAttr = props.inNewWindow ? {"target": '_blank'} : {};
   const projectURL = (<a class="secondary" target="_blank" title="Project source on GitHub"
-    href="https://github.com/SocksTheWolf/SkyScheduler">SkyScheduler</a>);
-  const homepageURL = (<a class="secondary" title="Homepage" href="/">SkyScheduler</a>);
+    href="https://github.com/SocksTheWolf/SkyScheduler">{APP_NAME}</a>);
+  const homepageURL = (<a class="secondary" title="Homepage" href="/">{APP_NAME}</a>);
   const progressBarTooltip = `$${PROGRESS_MADE}/$${PROGRESS_TOTAL} for this month`;
   return (
     <center><small>

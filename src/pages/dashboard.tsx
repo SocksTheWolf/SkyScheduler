@@ -8,6 +8,7 @@ import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
+import { APP_NAME } from "../limits";
 import { SHOW_PROGRESS_BAR } from "../progress";
 import { PreloadRules } from "../types.d";
 import {
@@ -37,14 +38,14 @@ export default function Dashboard(props:any) {
     return {href: itm, type: "script"};
   });
   return (
-    <BaseLayout title="SkyScheduler - Dashboard" mainClass="dashboard"
+    <BaseLayout title="Dashboard" mainClass="dashboard"
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
       <IncludeDependencyTags scripts={defaultDashboardPreloads} />
       <div class="row-fluid">
         <section class="col-3">
           <article>
             <header>
-              <h4>SkyScheduler Dashboard</h4>
+              <h4>{APP_NAME} Dashboard</h4>
               <div class="sidebar-block">
                 <small><i>Schedule Bluesky posts effortlessly</i>.</small><br />
                 <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username"

@@ -1,4 +1,4 @@
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
+import { APP_NAME, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { PWAutoCompleteSettings } from "../types.d";
 import { settingsScriptStr } from "../utils/appScripts";
 import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
@@ -32,7 +32,7 @@ export function Settings(props: SettingsTypeProps) {
             <label>
               Dashboard Pass:
               <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} />
-              <small>The password to access the SkyScheduler Dashboard</small>
+              <small>The password to access the {APP_NAME} Dashboard</small>
             </label>
             <label>
               BSky App Password:
@@ -60,7 +60,7 @@ export function Settings(props: SettingsTypeProps) {
     <dialog id="deleteAccount">
       <article>
         <header>Delete Account</header>
-        <p>To delete your SkyScheduler account, please type your password below.<br />
+        <p>To delete your {APP_NAME} account, please type your password below.<br />
             All pending, scheduled posts + all unposted media will be deleted from this service.
 
           <center><strong>NOTE</strong>: THIS ACTION IS <u>PERMANENT</u>.</center>
@@ -71,7 +71,7 @@ export function Settings(props: SettingsTypeProps) {
           <label>
             Dashboard Pass: <input id="deleteAccountPass" type="password" name="password"
               minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />
-            <small>The password to access the SkyScheduler Dashboard</small>
+            <small>The password to access the {APP_NAME} Dashboard</small>
           </label>
         </form>
         <progress id="delSpinner" class="htmx-indicator" />

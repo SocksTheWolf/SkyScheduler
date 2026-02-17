@@ -1,6 +1,7 @@
 import remove from "just-remove";
 
 /** APPLICATION CONFIGURATIONS **/
+export const APP_NAME: string = "SkyScheduler";
 // minimum length of a post
 export const MIN_LENGTH: number = 1;
 // max amount of times something can be reposted

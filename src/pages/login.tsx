@@ -8,7 +8,7 @@ import { PWAutoCompleteSettings } from "../types.d";
 export default function Login() {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];
   return (
-    <BaseLayout title="SkyScheduler - Login">
+    <BaseLayout title="Login">
       <NavTags />
       <AccountHandler title="Login"
         loadingText="Logging in..."

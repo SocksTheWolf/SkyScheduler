@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import { APP_NAME } from "../limits";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
 type ViolationNoticeProps = {
@@ -11,7 +12,7 @@ export async function ViolationNoticeBar(props: ViolationNoticeProps) {
   if (violationData !== null) {
     let errorStr = "";
     if (violationData.tosViolation) {
-      errorStr = "Your account is in violation of SkyScheduler usage.";
+      errorStr = `Your account is in violation of ${APP_NAME} usage.`;
     } else if(violationData.userPassInvalid) {
       errorStr = "Your Bluesky handle or application password is invalid. Please update these in the settings.";
     } else if (violationData.accountSuspended) {

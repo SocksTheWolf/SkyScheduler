@@ -17,7 +17,7 @@ export default function Signup(props:any) {
     "You can ask for the maintainer for it";
 
   return (
-    <BaseLayout title="SkyScheduler - Signup"
+    <BaseLayout title="Signup"
       preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Create an Account"

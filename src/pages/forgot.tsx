@@ -1,16 +1,17 @@
 import { Context } from "hono";
 import AccountHandler from "../layout/account";
 import FooterCopyright from "../layout/helpers/footer";
-import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
+import { BaseLayout } from "../layout/main";
 import { UsernameField } from "../layout/usernameField";
+import { APP_NAME } from "../limits";
 
 export default function ForgotPassword(props:any) {
   const ctx: Context = props.c;
-  const botAccountURL:string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
+  const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (
-    <BaseLayout title="SkyScheduler - Forgot Password"
+    <BaseLayout title="Forgot Password"
       preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Forgot Password Reset"
@@ -26,7 +27,7 @@ export default function ForgotPassword(props:any) {
             If you encounter errors, your <a href="https://bsky.app/messages/settings" class="secondary" rel="nofollow" target="_blank">Direct Communication settings</a> might be set to forbid
             Direct Messages from accounts you don't follow.<br /><br />
             It is <u>heavily recommended</u> to <a href={botAccountURL} target="_blank">follow the service account</a>.<br /><br />
-            <small><b>NOTE</b>: SkyScheduler sends DMs via an one-way delivery method. No one (other than you) can see the account password reset URL.</small></p>
+            <small><b>NOTE</b>: {APP_NAME} sends DMs via an one-way delivery method. No one (other than you) can see the account password reset URL.</small></p>
         </center>
 
         <UsernameField />

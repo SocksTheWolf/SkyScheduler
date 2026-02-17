@@ -6,7 +6,7 @@ import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 export default function ResetPassword() {
   const links = [{title: "Forgot Password", url: "/forgot"}];
   return (
-    <BaseLayout title="SkyScheduler - Reset Password">
+    <BaseLayout title="Reset Password">
       <NavTags />
       <AccountHandler title="Reset Password"
         loadingText="Resetting Password..."

@@ -6,8 +6,15 @@ export const setupAccounts = async(c: Context) => {
   if (await doesAdminExist(c))
     return c.html("already created", 501);
 
-  if (!has(c.env, "DEFAULT_ADMIN_USER") || !has(c.env, "DEFAULT_ADMIN_PASS") || !has(c.env, "DEFAULT_ADMIN_BSKY_PASS"))
-    return c.html("invalid configuration, missing configs");
+  const settingsToCheck:string[] =
+    ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "DEFAULT_ADMIN_BSKY_PASS"];
+
+  // Loop through and check all of the settings that are easy to miss
+  for (const setting of settingsToCheck) {
+    if (!has(c.env, setting)) {
+      return c.text(`missing ${setting} setting!`);
+    }
+  }
 
   const data = await c.get("auth").api.signUpEmail({
     body: {

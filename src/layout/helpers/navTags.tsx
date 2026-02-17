@@ -1,9 +1,11 @@
+import { APP_NAME } from "../../limits";
+
 export default function NavTags() {
   return (
     <div class="container">
       <nav>
         <ul>
-          <li><h2><a class="contrast" href="/">SkyScheduler</a></h2></li>
+          <li><h2><a class="contrast" href="/">{APP_NAME}</a></h2></li>
         </ul>
         <ul>
           <li><a href="/signup">Sign Up</a></li>

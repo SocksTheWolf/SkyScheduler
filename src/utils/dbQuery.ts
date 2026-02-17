@@ -7,7 +7,7 @@ import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
+import { APP_NAME, MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import {
   AccountStatus,
   AllContext,
@@ -196,7 +196,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
   const violationData = await getViolationsForUser(db, userId);
   if (violationData != null) {
     if (violationData.tosViolation) {
-      return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+      return {ok: false, msg: `This account is unable to use ${APP_NAME} services at this time`};
     } else if (violationData.userPassInvalid) {
       return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
     }
@@ -355,7 +355,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   const violationData = await getViolationsForUser(db, userId);
   if (violationData != null) {
     if (violationData.tosViolation) {
-      return {ok: false, msg: "This account is unable to use SkyScheduler services at this time"};
+      return {ok: false, msg: `This account is unable to use ${APP_NAME} services at this time`};
     } else if (violationData.userPassInvalid) {
       return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
     }

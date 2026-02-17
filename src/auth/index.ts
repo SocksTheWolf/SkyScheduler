@@ -4,13 +4,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { schema } from "../db";
-import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
+import { APP_NAME, BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import { Bindings } from "../types.d";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
 function createPasswordResetMessage(url: string) {
-  return `Your SkyScheduler password reset url is:
+  return `Your ${APP_NAME} password reset url is:
 ${url}
 
 This URL will expire in about an hour.
@@ -107,7 +107,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         },
       }
     ),
-    appName: "SkyScheduler",
+    appName: APP_NAME,
     secret: env?.BETTER_AUTH_SECRET,
     baseURL: (env?.BETTER_AUTH_URL === "*") ? undefined : env?.BETTER_AUTH_URL,
     user: {
