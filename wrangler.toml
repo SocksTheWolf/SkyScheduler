@@ -72,10 +72,12 @@ binding = "REPOST_QUEUE"
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
 max_batch_size = 5
-max_batch_timeout = 10
+max_batch_timeout = 5
+max_retries = 3
 
 [[queues.consumers]]
 queue = "skyscheduler-repost-queue"
+max_retries = 3
 
 [images]
 binding = "IMAGES"
