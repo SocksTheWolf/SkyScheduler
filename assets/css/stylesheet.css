@@ -16,6 +16,8 @@
 }
 
 .repostScheduleSimple {
+  display: inherit !important;
+  text-align: center;
   select {
     width: 10%;
     height: 50px;
@@ -23,6 +25,11 @@
     margin-right: 15px;
     padding-top: 10px;
   }
+}
+
+.pico #posts blockquote {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .dz-filename, .truncate {
@@ -34,6 +41,10 @@
 
 .postText {
   white-space: pre-wrap;
+}
+
+.checkboxLine {
+  width: unset !important;
 }
 
 .btn-error, .pico .btn-error {

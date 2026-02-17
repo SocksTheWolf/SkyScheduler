@@ -13,10 +13,10 @@ export function ScheduleOptions(props: ScheduleOptionsProps) {
   const headerText = hasHeader ? props.header : "";
 
   const postNowHTML = (props.allowNow) ?
-  (<>
+  (<div>
     <input class="postNow" type="checkbox" id={props.checkboxID} />
-    <label class="noselect capitialize" for={props.checkboxID}>Make {props.type} Now?</label>
-  </>) : null;
+    <label class="noselect capitialize checkboxLine" for={props.checkboxID}>Make {props.type} Now?</label>
+  </div>) : null;
 
   return (
     <section class="scheduledDateBlock">

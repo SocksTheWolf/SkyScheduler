@@ -16,8 +16,8 @@ export function RetweetOptions(props: RetweetOptionsProps) {
   return (
     <section>
       <input class="autoRepostBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
-      <label hidden={props.hidden} class="noselect" for={props.id}>{checkboxLabel}</label>
-      <center class="repostScheduleSimple">
+      <label hidden={props.hidden} class="noselect checkboxLine" for={props.id}>{checkboxLabel}</label>
+      <fieldset class="repostScheduleSimple">
           Automatically repost this {props.contentType || "content"} every
           <select disabled>
             {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
@@ -32,7 +32,7 @@ export function RetweetOptions(props: RetweetOptionsProps) {
               return (<option value={i}>{i}</option>);
             })}
           </select> times from {repostedFrom}.
-      </center>
+      </fieldset>
     </section>
   );
 }
