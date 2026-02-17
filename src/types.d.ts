@@ -12,7 +12,7 @@ type ImageConfigSettings = {
 type SignupConfigSettings = {
   use_captcha: boolean;
   invite_only: boolean;
-  invite_thread: string;
+  invite_thread?: string;
 }
 
 type RedirectConfigSettings = {
@@ -22,7 +22,7 @@ type RedirectConfigSettings = {
 
 type R2ConfigSettings = {
   auto_prune: boolean;
-  prune_days: number;
+  prune_days?: number;
 }
 
 type QueueConfigSettings = {

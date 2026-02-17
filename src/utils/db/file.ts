@@ -40,6 +40,9 @@ export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
     console.error("could not get all abandoned media, db was null");
     return [];
   }
+  if (c.env.R2_SETTINGS.prune_days === undefined) {
+    return [];
+  }
   const numDaysAgo = daysAgo(c.env.R2_SETTINGS.prune_days);
 
   const results = await db.select().from(mediaFiles)

@@ -2,15 +2,15 @@ import { Context } from "hono";
 import humanId from "human-id";
 import has from "just-has";
 
-export const isUsingInviteKeys = (c: Context) => {
+export const isUsingInviteKeys = (c: Context): boolean => {
   return has(c.env, "INVITE_POOL") && c.env.SIGNUP_SETTINGS.invite_only;
 }
 
-export const getInviteThread = (c: Context) => {
-  return c.env.SIGNUP_SETTINGS.invite_thread;
+export const getInviteThread = (c: Context): string => {
+  return c.env.SIGNUP_SETTINGS.invite_thread || "";
 }
 
-export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|undefined) => {
+export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|undefined): Promise<boolean> => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return false;
@@ -71,7 +71,7 @@ export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) =
   }
 }
 
-export const makeInviteKey = (c: Context) => {
+export const makeInviteKey = (c: Context): string|null => {
   if (!isUsingInviteKeys(c)) {
     return null;
   }
