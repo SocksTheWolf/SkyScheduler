@@ -86,8 +86,8 @@ IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.sky
 # Signup options and if keys should be used
 SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread=""}
 
-# queue handling, pushing information. This is experimental.
-QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
+# queue handling, pushing information.
+QUEUE_SETTINGS = {enabled=true, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE1"], repost_queues=[]}
 
 # redirect links
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
