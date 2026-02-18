@@ -63,6 +63,8 @@ document.addEventListener("resetPost", () => {
   showContentLabeler(false);
   setSelectDisable(repostCheckbox.parentElement, true);
   setElementRequired(scheduledDate, true);
+  setElementVisible(scheduledDate, true);
+  setElementVisible(scheduledDate.nextElementSibling, true);
   showPostProgress(false);
   clearOnUnloadBlocker();
   repostCheckbox.checked = false;
@@ -532,10 +534,14 @@ document.addEventListener("replyThreadCreate", function(ev) {
 });
 
 function runPageReactors() {
+  const keys = ["Enter", " "];
   document.querySelectorAll(".autoRepostBox").forEach(el => {
-    el.addEventListener('click', (e) => {
+    addClickKeyboardListener(el, (e) => {
       setSelectDisable(e.target.parentElement, !e.target.checked);
-    });
+    }, keys, false);
+    /*el.addEventListener("click", (e) => {
+      setSelectDisable(e.target.parentElement, !e.target.checked);
+    });*/
     if (el.getAttribute("startchecked") == "true") {
       setSelectDisable(el.parentElement, false);
     }
@@ -555,9 +561,12 @@ function runPageReactors() {
     dateScheduler.setAttribute("min", convertTimeValueLocally(Date.now()));
 
     if (scheduledPostNowBox) {
-      scheduledPostNowBox.addEventListener('click', (e) => {
-        setElementRequired(dateScheduler, !e.target.checked);
-      });
+      addClickKeyboardListener(scheduledPostNowBox, () => {
+        const isChecked = scheduledPostNowBox.checked;
+        setElementRequired(dateScheduler, !isChecked);
+        setElementVisible(dateScheduler, !isChecked);
+        setElementVisible(dateScheduler.nextElementSibling, !isChecked);
+      }, keys, false);
     }
   });
 

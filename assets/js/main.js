@@ -37,7 +37,7 @@ function addClickKeyboardListener(el, callback, keys=["Enter", " "], preventDefa
   el.addEventListener("click", (ev) => {
     if (preventDefault)
       ev.preventDefault();
-    callback();
+    callback(ev);
   });
   addKeyboardListener(el, callback, keys, preventDefault);
 }
