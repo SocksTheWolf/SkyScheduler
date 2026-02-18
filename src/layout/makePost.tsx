@@ -12,8 +12,8 @@ import {
 } from "../limits";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
-import { ContentLabelOptions } from "./options/contentLabelOptions";
 import { IncludeDependencyTags } from "./helpers/includesTags";
+import { ContentLabelOptions } from "./options/contentLabelOptions";
 import { RetweetOptions } from "./options/retweetOptions";
 import { ScheduleOptions } from "./options/scheduleOptions";
 

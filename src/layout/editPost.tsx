@@ -1,6 +1,6 @@
 import { MAX_LENGTH } from "../limits";
 import { EmbedDataType, Post } from "../types.d";
-import { PostContentObject } from "./postList";
+import { PostContent } from "./post";
 
 type EditedPostProps = {
   post: Post;
@@ -45,7 +45,7 @@ export function PostAltTextEdit({post}: EditedPostProps) {
 export function PostEdit({post}:EditedPostProps) {
   // If this post is posted, just show the same object again.
   if (post.posted) {
-    return (<PostContentObject text={post.text} posted={true} repost={false} />);
+    return (<PostContent text={post.text} posted={true} repost={false} />);
   }
 
   const editSpinner: string = `editSpinner${post.postid}`;

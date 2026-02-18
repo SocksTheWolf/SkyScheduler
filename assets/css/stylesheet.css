@@ -13,6 +13,9 @@
 
 .postItemHeader {
   min-height: 50px;
+  button:has(+ button) {
+    margin-right: 10px;
+  }
 }
 
 .repostScheduleSimple {
@@ -144,7 +147,7 @@
   display: inline-block;
 }
 
-#refresh-posts > span, #settingsButton > span {
+#refresh-posts > span, #settingsButton > span, .repostIcon {
   margin-right: 5px;
 }
 

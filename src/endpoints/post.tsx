@@ -4,7 +4,8 @@ import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
 import { ContextVariables } from "../auth";
 import { PostEdit } from "../layout/editPost";
-import { ScheduledPost, ScheduledPostList } from "../layout/postList";
+import { PostHTML } from "../layout/post";
+import { ScheduledPostList } from "../layout/postList";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import {
@@ -174,7 +175,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     originalPost.text = content;
     c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
     c.header("HX-Trigger-After-Swap", "postUpdatedNotice, timeSidebar, scrollTop");
-    return c.html(<ScheduledPost post={originalPost} dynamic={true} />);
+    return c.html(<PostHTML post={originalPost} dynamic={true} />);
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
@@ -190,7 +191,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
   // Get the original post to replace with
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
-    return c.html(<ScheduledPost post={postInfo} dynamic={true} />);
+    return c.html(<PostHTML post={postInfo} dynamic={true} />);
   }
 
   // Refresh sidebar otherwise
