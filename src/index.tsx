@@ -2,9 +2,9 @@ import { drizzle } from "drizzle-orm/d1";
 import { Env, Hono } from "hono";
 import { ContextVariables, createAuth } from "./auth";
 import { account } from "./endpoints/account";
+import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
-import { authAdminOnlyMiddleware } from "./middleware/adminOnly";
 import { authMiddleware } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
@@ -19,16 +19,35 @@ import TermsOfService from "./pages/tos";
 import { Bindings, QueueTaskData, ScheduledContext, TaskType } from "./types.d";
 import { AgentMap } from "./utils/bskyAgents";
 import { makeConstScript } from "./utils/constScriptGen";
-import { getAllAbandonedMedia } from "./utils/db/file";
-import { runMaintenanceUpdates } from "./utils/db/maintain";
-import { makeInviteKey } from "./utils/inviteKeys";
 import {
-  cleanupAbandonedFiles, cleanUpPostsTask, handlePostTask,
+  cleanUpPostsTask, handlePostTask,
   handleRepostTask, schedulePostTask
 } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
+
+///// Static Pages /////
+
+// Root route
+app.all("/", (c) => c.html(<Home />));
+
+// JS injection of const variables
+app.get("/js/consts.js", (c) => {
+  const constScript = makeConstScript();
+  return c.body(constScript, 200, {
+    'Content-Type': 'text/javascript',
+    'Cache-Control': 'max-age=604800'
+  });
+});
+
+// Add redirects
+app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
+app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
+
+// Legal linkies
+app.get("/tos", (c) => c.html(<TermsOfService />));
+app.get("/privacy", (c) => c.html(<PrivacyPolicy />));
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes
@@ -56,29 +75,13 @@ app.route("/account", account);
 app.use("/post/**", corsHelperMiddleware);
 app.route("/post", post);
 
+// Admin endpoints
+app.use("/admin/**", corsHelperMiddleware);
+app.route("/admin", admin);
+
 // Image preview endpoint
 app.use("/preview/**", corsHelperMiddleware);
 app.route("/preview", preview);
-
-// Root route
-app.all("/", (c) => c.html(<Home />));
-
-// JS injection of const variables
-app.get("/js/consts.js", (c) => {
-  const constScript = makeConstScript();
-  return c.body(constScript, 200, {
-    'Content-Type': 'text/javascript',
-    'Cache-Control': 'max-age=604800'
-  });
-});
-
-// Add redirects
-app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
-app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
-
-// Legal linkies
-app.get("/tos", (c) => c.html(<TermsOfService />));
-app.get("/privacy", (c) => c.html(<PrivacyPolicy />));
 
 // Dashboard route
 app.get("/dashboard", authMiddleware, (c) => c.html(<Dashboard c={c} />));
@@ -94,50 +97,6 @@ app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword c={c} />
 
 // Reset Password route
 app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword />));
-
-// Generate invites route
-app.get("/invite", authAdminOnlyMiddleware, (c) => {
-  const newKey = makeInviteKey(c);
-  if (newKey !== null)
-    return c.text(`${newKey} is good for 10 uses`);
-  else
-    return c.text("Invite keys are disabled.");
-});
-
-// Admin Maintenance Cleanup
-app.get("/cron", authAdminOnlyMiddleware, async (c) => {
-  await schedulePostTask(c);
-  return c.text("ran");
-});
-
-app.get("/cron-clean", authAdminOnlyMiddleware, (c) => {
-  c.executionCtx.waitUntil(cleanUpPostsTask(c));
-  return c.text("ran");
-});
-
-app.get("/db-update", authAdminOnlyMiddleware, (c) => {
-  c.executionCtx.waitUntil(runMaintenanceUpdates(c));
-  return c.text("ran");
-});
-
-app.get("/abandoned", authAdminOnlyMiddleware, async (c) => {
-  let returnHTML = "";
-  const abandonedFiles: string[] = await getAllAbandonedMedia(c);
-  // print out all abandoned files
-  for (const file of abandonedFiles) {
-    returnHTML += `${file}\n`;
-  }
-  if (c.env.R2_SETTINGS.auto_prune == true) {
-    console.log("pruning abandoned files...");
-    await cleanupAbandonedFiles(c);
-  }
-
-  if (returnHTML.length == 0) {
-    returnHTML = "no files abandoned";
-  }
-
-  return c.text(returnHTML);
-});
 
 // Startup Application
 app.get("/start", (c) => c.redirect('/setup'));

@@ -76,10 +76,14 @@ export const makeInviteKey = (c: Context): string|null => {
     return null;
   }
 
+  const usages: number = c.env.SIGNUP_SETTINGS.invite_uses;
+  if (usages === undefined)
+    return null;
+
   const newKey: string = humanId({
     separator: '-',
     capitalize: false,
   });
-  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, "10"));
+  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, usages));
   return newKey;
 }

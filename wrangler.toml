@@ -71,7 +71,7 @@ binding = "REPOST_QUEUE"
 
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
-max_batch_size = 5
+max_batch_size = 3
 max_batch_timeout = 5
 max_retries = 3
 
@@ -93,7 +93,7 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # Signup options and if keys should be used
-SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread=""}
+SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="", invite_uses=10}
 
 # queue handling, pushing information.
 QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE"], repost_queues=["REPOST_QUEUE"]}
@@ -116,7 +116,7 @@ workers_dev = true
 [env.staging.vars]
 BETTER_AUTH_URL="*"
 IMAGE_SETTINGS={enabled=false}
-SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread=""}
+SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread="", invite_uses=10}
 QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE"], repost_queues=[]}
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
 R2_SETTINGS={auto_prune=false, prune_days=3}
