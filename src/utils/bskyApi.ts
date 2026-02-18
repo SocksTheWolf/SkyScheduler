@@ -16,8 +16,8 @@ import { atpRecordURI } from '../validation/regexCases';
 import { makeAgentForUser } from './bskyAgents';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
 import { getUsernameForUserId } from './db/userinfo';
-import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';
+import { createViolationForUser } from './db/violations';
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -375,10 +375,12 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
               || err.status === ResponseType.UpstreamTimeout) {
               console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
               return false;
+            } else if (err.status === ResponseType.PayloadTooLarge || err.status === ResponseType.UnsupportedMediaType) {
+              // give the MediaTooBig if we get one of these errors
+              await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
+              return false;
             }
           }
-          // Give violation mediaTooBig if the file is too large.
-          //await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
           console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
           return false;
         }
