@@ -84,6 +84,6 @@ export const makeInviteKey = (c: Context): string|null => {
     separator: '-',
     capitalize: false,
   });
-  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, usages));
+  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, usages.toString()));
   return newKey;
 }
