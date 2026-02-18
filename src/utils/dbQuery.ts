@@ -1,5 +1,5 @@
 import { addHours, isAfter, isEqual } from "date-fns";
-import { and, asc, desc, eq, getTableColumns, gt, gte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import has from "just-has";
@@ -132,7 +132,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
       // Update the post order past here
       queriesToExecute.push(db.update(posts).set({threadOrder: sql`threadOrder - 1`})
       .where(
-        and(eq(posts.rootPost, postObj.rootPost!), gt(posts.threadOrder, postObj.threadOrder)
+        and(and(eq(posts.rootPost, postObj.rootPost!), ne(posts.threadOrder, -1)), gt(posts.threadOrder, postObj.threadOrder)
       )));
     }
 
@@ -269,7 +269,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
     // update all posts past this one to also update their order (we will take their id)
     dbOperations.push(db.update(posts).set({threadOrder: sql`threadOrder + 1`})
       .where(
-        and(eq(posts.rootPost, rootPostID!), gte(posts.threadOrder, parentPostOrder)
+        and(and(eq(posts.rootPost, rootPostID!), ne(posts.threadOrder, -1)), gte(posts.threadOrder, parentPostOrder)
     )));
 
     // Update the root post so that it has the correct flags set on it as well.

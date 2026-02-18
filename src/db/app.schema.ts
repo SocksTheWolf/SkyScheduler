@@ -53,7 +53,7 @@ export const posts = sqliteTable('posts', {
   // Updating thread orders
   index("threadOrder_idx")
     .on(table.rootPost, table.threadOrder)
-    .where(sql`threadOrder >= 0`),
+    .where(sql`threadOrder <> -1`),
   // cron job
   index("postNowScheduledDatePosted_idx")
     .on(table.posted, table.scheduledDate, table.postNow)

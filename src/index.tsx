@@ -179,7 +179,9 @@ export default {
       }
       // Handle queue acknowledgement on success/failure
       if (!wasSuccess) {
-        message.retry({delaySeconds: delay*(message.attempts+1)});
+        const delaySeconds = delay*(message.attempts+1);
+        console.log(`attempting to retry message in ${delaySeconds}`);
+        message.retry({delaySeconds: delaySeconds});
       } else {
         message.ack();
       }
