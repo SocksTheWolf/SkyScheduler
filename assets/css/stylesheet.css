@@ -82,9 +82,8 @@
     margin-top: -7px;
   }
 }
-.btn-delete .thread-cancel {
-  display: inline-block;
-  margin-top: 3px;
+.thread-cancel {
+  margin-top: -2rem;
 }
 
 .addThreadPost {
