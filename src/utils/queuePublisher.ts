@@ -1,7 +1,7 @@
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
-import { AllContext, Bindings, Post, QueueTaskData, QueueTaskType, Repost } from "../types.d";
+import { AllContext, Bindings, Post, QueueTaskData, Repost, TaskType } from "../types.d";
 
 const queueContentType = 'v8';
 
@@ -35,7 +35,7 @@ export async function enqueuePost(c: AllContext, post: Post) {
   const queueConsumer: Queue|null = getRandomQueue(c.env, "post_queues");
 
   if (queueConsumer !== null) {
-    await queueConsumer.send({type: QueueTaskType.Post, post: post} as QueueTaskData, { contentType: queueContentType });
+    await queueConsumer.send({type: TaskType.Post, post: post} as QueueTaskData, { contentType: queueContentType });
   }
 }
 
@@ -46,5 +46,5 @@ export async function enqueueRepost(c: AllContext, post: Repost) {
   // Pick a random consumer to handle this repost
   const queueConsumer: Queue|null = getRandomQueue(c.env, "repost_queues");
   if (queueConsumer !== null)
-    await queueConsumer.send({type: QueueTaskType.Repost, repost: post} as QueueTaskData, { contentType: queueContentType });
+    await queueConsumer.send({type: TaskType.Repost, repost: post} as QueueTaskData, { contentType: queueContentType });
 }

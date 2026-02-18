@@ -1,20 +1,21 @@
 import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
 import { ResponseType, XRPCError } from '@atproto/xrpc';
-import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../limits';
 import {
-  Bindings, BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj, Post, PostLabel, AccountStatus,
-  PostRecordResponse, PostStatus, Repost, ScheduledContext,
-  AllContext
+  AccountStatus,
+  AllContext,
+  BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
+  LooseObj, Post, PostLabel,
+  PostRecordResponse, PostStatus, Repost
 } from '../types.d';
 import { atpRecordURI } from '../validation/regexCases';
+import { makeAgentForUser } from './bskyAgents';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
-import { getBskyUserPassForId, getUsernameForUserId } from './db/userinfo';
+import { getUsernameForUserId } from './db/userinfo';
 import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';
 
@@ -61,71 +62,7 @@ export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
   return "https://bsky.social";
 };
 
-export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
-  try {
-    const loginResponse = await agent.login({
-      identifier: user,
-      password: pass,
-      allowTakendown: true
-    });
-    if (!loginResponse.success) {
-      if (loginResponse.data.active == false) {
-        switch (loginResponse.data.status) {
-          case "deactivated":
-            return AccountStatus.Deactivated;
-          case "suspended":
-            return AccountStatus.Suspended;
-          case "takendown":
-            return AccountStatus.TakenDown;
-        }
-        return AccountStatus.InvalidAccount;
-      }
-      return AccountStatus.PlatformOutage;
-    }
-    return AccountStatus.Ok;
-  } catch (err) {
-    // Apparently login can rethrow as an XRPCError and completely eat the original throw.
-    // so errors don't get handled gracefully.
-    const errWrap: LooseObj = err as LooseObj;
-    const errorName = errWrap.constructor.name;
-    if (errorName === "XRPCError") {
-      const errCode = errWrap.status;
-      if (errCode == 401) {
-        // app password is bad
-        return AccountStatus.InvalidAccount;
-      } else if (errCode >= 500) {
-        return AccountStatus.PlatformOutage;
-      }
-    } else if (errorName === "XRPCNotSupported") {
-      // handle is bad
-      return AccountStatus.InvalidAccount;
-    }
-    console.error(`encountered exception on login for user ${user}, err ${err}`);
-  }
-  return AccountStatus.UnhandledError;
-}
-
-export const makeAgentForUser = async (c: AllContext, userId: string) => {
-  const loginCreds = await getBskyUserPassForId(c, userId);
-  if (loginCreds.valid === false) {
-    console.error(`credentials for user ${userId} were invalid`);
-    return null;
-  }
-  const {username, password, pds} = loginCreds;
-  // Login to bsky
-  const agent = new AtpAgent({ service: new URL(pds) });
-
-  const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
-  if (loginResponse != AccountStatus.Ok) {
-    const addViolation: boolean = await createViolationForUser(c, userId, loginResponse);
-    if (addViolation)
-      console.error(`Unable to login to ${userId} with violation ${loginResponse}`);
-    return null;
-  }
-  return agent;
-}
-
-export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtpAgent|null=null) => {
+export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtpAgent) => {
   if (content === null) {
     console.warn("Dropping invocation of makePost, content was null");
     return false;
@@ -138,13 +75,7 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
     return true;
   }
 
-  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(c, content.user) : usingAgent;
-  if (agent === null) {
-    console.warn(`could not make agent for post ${content.postid}`);
-    return false;
-  }
-
-  const newPostRecords: PostStatus|null = await makePostRaw(c, content, agent);
+  const newPostRecords: PostStatus|null = await makePostRaw(c, content, usingAgent);
   if (newPostRecords !== null) {
     await bulkUpdatePostedData(c, newPostRecords.records, newPostRecords.expected == newPostRecords.got);
 
@@ -169,7 +100,7 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
   return false;
 }
 
-export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtpAgent|null=null) => {
+export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtpAgent) => {
   let bWasSuccess = true;
   const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(c, content.userId) : usingAgent;
   if (agent === null) {
@@ -195,7 +126,7 @@ export const makeRepost = async (c: AllContext, content: Repost, usingAgent: Atp
   return bWasSuccess;
 };
 
-export const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
+const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
   const username = await getUsernameForUserId(c, content.user);
   // incredibly unlikely but we'll handle it
   if (username === null) {

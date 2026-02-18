@@ -1,6 +1,6 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { Bindings, AccountStatus } from '../types.d';
-import { loginToBsky } from './bskyApi';
+import { loginToBsky } from './bskyAgents';
 
 const chatHeaders = {headers: {
   "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"

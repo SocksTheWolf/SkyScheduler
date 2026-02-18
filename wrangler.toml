@@ -104,8 +104,8 @@ REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://
 # if we should be removing abandoned files from R2 storage
 R2_SETTINGS={auto_prune=true, prune_days=3}
 
-# various site settings
-SITE_SETTINGS={use_agent_map=false}
+# settings about tasks
+TASK_SETTINGS={use_posts=true, use_reposts=true}
 
 # set this to true in your .dev.vars to turn off turnstile
 IN_DEV=false
@@ -120,7 +120,7 @@ SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread=""}
 QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=100, post_queues=["POST_QUEUE"], repost_queues=[]}
 REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
 R2_SETTINGS={auto_prune=false, prune_days=3}
-SITE_SETTINGS={use_agent_map=false}
+TASK_SETTINGS={use_posts=true, use_reposts=true}
 IN_DEV=true
 
 [[env.staging.d1_databases]]

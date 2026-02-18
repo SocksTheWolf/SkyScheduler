@@ -539,9 +539,6 @@ function runPageReactors() {
     addClickKeyboardListener(el, (e) => {
       setSelectDisable(e.target.parentElement, !e.target.checked);
     }, keys, false);
-    /*el.addEventListener("click", (e) => {
-      setSelectDisable(e.target.parentElement, !e.target.checked);
-    });*/
     if (el.getAttribute("startchecked") == "true") {
       setSelectDisable(el.parentElement, false);
     }

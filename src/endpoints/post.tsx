@@ -12,15 +12,14 @@ import {
   DeleteResponse,
   EmbedDataType, LooseObj, Post
 } from "../types.d";
-import { makePost } from "../utils/bskyApi";
 import {
   createPost, createRepost,
   deletePost, getPostById,
   getPostByIdWithReposts,
   updatePostForUser
 } from "../utils/dbQuery";
-import { enqueuePost, shouldPostNowQueue } from "../utils/queuePublisher";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
+import { handlePostNowTask } from "../utils/scheduler";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
@@ -65,18 +64,8 @@ post.post("/create", authMiddleware, async (c: Context) => {
     // Handling posting right now.
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
-      if (shouldPostNowQueue(c.env)) {
-        try {
-          await enqueuePost(c, postInfo!);
-        } catch(err) {
-          console.error(err);
-          return c.json({message: 'Failed to post content, will retry again soon'}, 406);
-        }
-      } else {
-        if (!await makePost(c, postInfo))
-          return c.json({message: `Failed to post content, will try again soon.\n\n
-            If it doesn't post, send a message with this code:\n${postInfo!.postid}`}, 406);
-      }
+      if (await handlePostNowTask(c, postInfo!) === false)
+        return c.json({message: "Unable to post now, will try again during next nearest hour"}, 406);
       return c.json({message: "Created Post!", id: response.postId});
     } else {
       return c.json({message: "Unable to get post content, post may have been lost"}, 401);

@@ -1,17 +1,23 @@
 import AtpAgent from '@atproto/api';
 import isEmpty from 'just-is-empty';
-import { AllContext, Post, Repost } from '../types.d';
-import { makeAgentForUser, makePost, makeRepost } from './bskyApi';
+import { AllContext, Post, Repost, TaskType } from '../types.d';
+import { AgentMap } from './bskyAgents';
+import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
 import {
   deleteAllRepostsBeforeCurrentTime, deletePosts, getAllPostsForCurrentTime,
-  getAllRepostsForCurrentTime, purgePostedPosts
+  getAllRepostsForCurrentTime, purgePostedPosts,
+  setPostNowOffForPost
 } from './db/data';
 import { getAllAbandonedMedia } from './db/file';
-import { enqueuePost, enqueueRepost, isQueueEnabled, isRepostQueueEnabled, shouldPostThreadQueue } from './queuePublisher';
+import { enqueuePost, enqueueRepost, isQueueEnabled, isRepostQueueEnabled, shouldPostNowQueue, shouldPostThreadQueue } from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtpAgent|null) => {
+  if (agent === null) {
+    console.error(`Unable to make agent to post ${postData.postid}`);
+    return false;
+  }
   const madePost = await makePost(runtime, postData, agent);
   if (madePost) {
     console.log(`Made post ${postData.postid} successfully`);
@@ -20,7 +26,37 @@ export const handlePostTask = async(runtime: AllContext, postData: Post, agent: 
   }
   return madePost;
 }
+
+export const handlePostNowTask = async(c: AllContext, postData: Post) => {
+  let postStatus = false;
+  if (shouldPostNowQueue(c.env)) {
+    try {
+      await enqueuePost(c, postData);
+      postStatus = true;
+    } catch(err) {
+      console.error(`Post now queue for ${postData.postid} got error: ${err}`);
+      postStatus = false;
+    }
+  } else {
+    const agent = await AgentMap.getAgentDirect(c, postData.user);
+    if (agent === null) {
+      console.error(`unable to get agent for user ${postData.user} to post now`);
+      postStatus = false;
+    } else {
+      postStatus = await makePost(c, postData, agent);
+    }
+  }
+  if (postStatus === false)
+    c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.postid));
+
+  return postStatus;
+};
+
 export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtpAgent|null) => {
+  if (agent === null) {
+    console.error(`Unable to make agent to post ${postData.postid}`);
+    return false;
+  }
   const madeRepost = await makeRepost(c, postData, agent);
   if (madeRepost) {
     console.log(`Reposted ${postData.uri} successfully!`);
@@ -36,14 +72,7 @@ export const schedulePostTask = async (c: AllContext) => {
   const queueEnabled: boolean = isQueueEnabled(c.env);
   const repostQueueEnabled: boolean = isRepostQueueEnabled(c.env);
   const threadQueueEnabled: boolean = shouldPostThreadQueue(c.env);
-  // Temporary cache of agents to make handling actions much better and easier.
-  // The only potential downside is if we run hot on RAM with a lot of users. Before, the agents would
-  // get freed up as a part of exiting their cycle, but this would make that worse...
-  //
-  // TODO: bunching as a part of queues, literally just throw an agent at a queue with instructions and go.
-  // this requires queueing to be working properly.
-  const AgentList = new Map();
-  const usesAgentMap: boolean = c.env.SITE_SETTINGS.use_agent_map;
+  const agency = new AgentMap(c.env.TASK_SETTINGS);
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
@@ -52,12 +81,7 @@ export const schedulePostTask = async (c: AllContext) => {
       if (queueEnabled || (post.isThreadRoot && threadQueueEnabled)) {
         await enqueuePost(c, post);
       } else {
-        let agent = (usesAgentMap) ? AgentList.get(post.user) || null : null;
-        if (agent === null) {
-          agent = await makeAgentForUser(c, post.user);
-          if (usesAgentMap)
-            AgentList.set(post.user, agent);
-        }
+        let agent = await agency.getOrAddAgent(c, post.user, TaskType.Post);
         c.executionCtx.waitUntil(handlePostTask(c, post, agent));
       }
     }
@@ -70,12 +94,7 @@ export const schedulePostTask = async (c: AllContext) => {
     console.log(`handling ${scheduledReposts.length} reposts`);
     for (const repost of scheduledReposts) {
       if (!repostQueueEnabled) {
-        let agent = (usesAgentMap) ? AgentList.get(repost.userId) || null : null;
-        if (agent === null) {
-          agent = await makeAgentForUser(c, repost.userId);
-          if (usesAgentMap)
-            AgentList.set(repost.userId, agent);
-        }
+        let agent = await agency.getOrAddAgent(c, repost.userId, TaskType.Repost);
         c.executionCtx.waitUntil(handleRepostTask(c, repost, agent));
       } else {
         await enqueueRepost(c, repost);

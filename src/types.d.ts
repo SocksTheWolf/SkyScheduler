@@ -35,8 +35,9 @@ type QueueConfigSettings = {
   repost_queues: string[];
 }
 
-type SiteConfigSettings = {
-  use_agent_map: boolean;
+type AgentConfigSettings = {
+  use_posts: boolean;
+  use_reposts: boolean;
 }
 
 /** Types, types, types **/
@@ -52,7 +53,7 @@ export interface Bindings {
   INVITE_POOL?: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
   SIGNUP_SETTINGS: SignupConfigSettings;
-  SITE_SETTINGS: SiteConfigSettings;
+  TASK_SETTINGS: AgentConfigSettings;
   R2_SETTINGS: R2ConfigSettings;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
@@ -143,14 +144,14 @@ export type Repost = {
   scheduleGuid?: string;
 };
 
-export enum QueueTaskType {
+export enum TaskType {
   None,
   Post,
   Repost,
 };
 
 export type QueueTaskData = {
-  type: QueueTaskType;
+  type: TaskType;
   post?: Post;
   repost?: Repost;
 };
