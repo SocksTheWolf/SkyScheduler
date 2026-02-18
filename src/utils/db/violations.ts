@@ -1,5 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
+import flatten from "just-flatten-it";
+import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus, AllContext, LooseObj, Violation } from "../../types.d";
 import { lookupBskyHandle } from "../bskyApi";
@@ -74,7 +76,9 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     console.error("unable to get database to create violations for");
     return false;
   }
-  const valuesUpdate:LooseObj = createObjForValuesChange([violationType], true);
+  let violationsArray = [];
+  violationsArray.push(violationType);
+  const valuesUpdate: LooseObj = createObjForValuesChange(flatten(violationsArray), true);
   if (violationType === AccountStatus.TOSViolation) {
     const bskyUsername = await getUsernameForUserId(c, userId);
     if (bskyUsername !== null) {
@@ -82,6 +86,11 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     } else {
       console.warn(`unable to get bsky username for id ${userId}`);
     }
+  }
+
+  if (isEmpty(valuesUpdate)) {
+    console.warn(`Unable to give violations to ${userId}`);
+    return false;
   }
 
   const {success} = await db.insert(violations).values({userId: userId, ...valuesUpdate})

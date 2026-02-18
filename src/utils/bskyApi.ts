@@ -371,14 +371,15 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
           uploadFile = await agent.uploadBlob(fileBlob, {encoding: file.httpMetadata?.contentType });
         } catch (err) {
           if (err instanceof XRPCError) {
-            if (err.status === ResponseType.InternalServerError) {
+            if (err.status === ResponseType.InternalServerError || err.status === ResponseType.UpstreamFailure
+              || err.status === ResponseType.UpstreamTimeout) {
               console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
               return false;
             }
           }
           // Give violation mediaTooBig if the file is too large.
-          await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
-          console.warn(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
+          //await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
+          console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
           return false;
         }
 
