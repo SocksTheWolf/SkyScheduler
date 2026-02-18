@@ -208,7 +208,7 @@ post.delete("/delete/:id", authMiddleware, async (c: Context) => {
       if (response.needsRefresh) {
         postRefreshEvent = ", refreshPosts, timeSidebar, scrollTop";
       }
-      const triggerEvents = `postDeleted, accountViolations${postRefreshEvent}`;
+      const triggerEvents = `resetIfThreading, postDeleted, accountViolations${postRefreshEvent}`;
       c.header("HX-Trigger-After-Swap", triggerEvents);
       return c.html(<></>);
     }

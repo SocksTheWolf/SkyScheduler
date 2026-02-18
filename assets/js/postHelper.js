@@ -533,6 +533,11 @@ document.addEventListener("replyThreadCreate", function(ev) {
   postFormTitle.innerText = "Schedule New Thread Reply";
 });
 
+document.addEventListener("resetIfThreading", () => {
+  if (!cancelThreadBtn.classList.contains("hidden"))
+    document.dispatchEvent(new Event("resetPost"));
+});
+
 function runPageReactors() {
   const keys = ["Enter", " "];
   document.querySelectorAll(".autoRepostBox").forEach(el => {
