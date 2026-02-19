@@ -103,11 +103,13 @@ function translateErrorObject(obj, defaultString) {
   // If we have a json object in the error message field
   var hasJsonErr = false;
   try {
-    errData = JSON.parse(obj.message);
+    errData = JSON.parse(obj.message || obj.msg);
     hasJsonErr = true;
   } catch {
     if (obj.message !== null)
       errData = obj.message;
+    else if (obj.msg !== null)
+      errData = obj.msg;
   }
   // Check to see if we even have anything.
   if (hasJsonErr) {

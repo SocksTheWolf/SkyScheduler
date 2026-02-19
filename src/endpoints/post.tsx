@@ -60,19 +60,19 @@ post.post("/create", authMiddleware, async (c: Context) => {
   const body = await c.req.json();
   const response: CreatePostQueryResponse = await createPost(c, body);
   if (!response.ok) {
-    return c.json({message: response.msg}, 400);
+    return c.json({ok: false, msg: response.msg}, 400);
   } else if (response.postNow && response.postId) {
     // Handling posting right now.
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
       if (await handlePostNowTask(c, postInfo!) === false)
-        return c.json({message: "Unable to post now, will try again during next nearest hour"}, 406);
-      return c.json({message: "Created Post!", id: response.postId});
+        return c.json({ok: false, msg: "Unable to post now, will try again during next nearest hour"}, 406);
+      return c.json({ok: true, msg: "Created Post!", id: response.postId});
     } else {
-      return c.json({message: "Unable to get post content, post may have been lost"}, 401);
+      return c.json({ok: false, msg: "Unable to get post content, post may have been lost"}, 401);
     }
   }
-  return c.json({ message: "Post scheduled successfully!", id: response.postId});
+  return c.json({ ok: true, msg: "Post scheduled successfully!", id: response.postId});
 });
 
 // Create repost
@@ -80,9 +80,9 @@ post.post("/create/repost", authMiddleware, async (c: Context) => {
   const body = await c.req.json();
   const response: CreateObjectResponse = await createRepost(c, body);
   if (!response.ok) {
-    return c.json({message: response.msg}, 400);
+    return c.json({ok: false, msg: response.msg}, 400);
   }
-  return c.json({ message: "Repost scheduled successfully!", id: response.postId});
+  return c.json({ ok: true, msg: "Repost scheduled successfully!", id: response.postId});
 });
 
 // Get all posts
@@ -118,7 +118,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   const body = await c.req.json();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
-    return c.html(<b class="btn-error">New post had invalid data</b>);
+    return c.html(<b class="btn-error">New post had invalid data</b>, 400);
   }
 
   const { content, altEdits } = validation.data;
@@ -126,13 +126,13 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
     c.header("HX-Trigger-After-Settle", swapErrEvents);
-    return c.html(<b class="btn-error">Could not find post to edit</b>);
+    return c.html(<b class="btn-error">Could not find post to edit</b>, 400);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
     c.header("HX-Trigger-After-Settle", "scrollTop");
-    return c.html(<b class="btn-error">This post has already been posted</b>);
+    return c.html(<b class="btn-error">This post has already been posted</b>, 400);
   }
 
   // Handle alt text and stuffs
@@ -140,7 +140,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
     // Check to see if this post had editable data
     if (originalPost.embeds === undefined) {
       c.header("HX-Trigger-After-Settle", swapErrEvents);
-      return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
+      return c.html(<b class="btn-error">Post did not have media content that was editable</b>, 400);
     }
 
     // Create an easy map to match content with quickly
@@ -155,7 +155,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
       // if we have anything other than an image, this is an error
       if (embedData.type !== EmbedDataType.Image) {
         c.header("HX-Trigger-After-Settle", swapErrEvents);
-        return c.html(<b class="btn-error">Invalid operation performed</b>);
+        return c.html(<b class="btn-error">Invalid operation performed</b>, 400);
       }
       // Check to see if this text was edited
       const newAltText = editsMap.get(embedData.content);
@@ -179,7 +179,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
-  return c.html(<b class="btn-error">Failed to process edit</b>);
+  return c.html(<b class="btn-error">Failed to process edit</b>, 400);
 });
 
 post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
@@ -196,7 +196,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
 
   // Refresh sidebar otherwise
   c.header("HX-Trigger-After-Swap", "refreshPosts, timeSidebar, scrollListTop, scrollTop");
-  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
+  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>, 400);
 });
 
 // delete a post
@@ -215,5 +215,5 @@ post.delete("/delete/:id", authMiddleware, async (c: Context) => {
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
-  return c.html(<></>);
+  return c.html(<></>, 400);
 });

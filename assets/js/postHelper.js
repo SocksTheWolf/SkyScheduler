@@ -405,7 +405,7 @@ postForm.addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (response.ok) {
-      pushToast(data.message, true);
+      pushToast(data.msg, true);
       document.dispatchEvent(new Event("resetPost"));
       refreshPosts();
       if (data.id) {
@@ -419,7 +419,7 @@ postForm.addEventListener('submit', async (e) => {
         htmx.trigger("body", "accountViolations");
         refreshPosts();
       }
-      pushToast(translateErrorObject(data, data.error?.message || data.error || "An Error Occurred"), false);
+      pushToast(translateErrorObject(data, data.error?.message || data.error || data.msg || "An Error Occurred"), false);
     }
   } catch (err) {
     console.log(err);

@@ -3,7 +3,7 @@ import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { authMiddleware, pullAuthData } from "../middleware/auth";
+import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
 import { Bindings, LooseObj } from "../types.d";
@@ -36,9 +36,9 @@ const serverParseValidationErr = (c: Context, errorJson: string) => {
             return <li>{el.message}</li>;
           })}
         </ul>
-      </div>);
+      </div>, 400);
   } catch {
-    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>);
+    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>, 400);
   }
 }
 
@@ -48,7 +48,7 @@ account.post("/login", async (c) => {
   const auth = c.get("auth");
   const validation = LoginSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ ok: false, message: validation.error.toString() }, 400);
+    return c.json({ ok: false, msg: validation.error.toString() }, 400);
   }
   const { username, password } = validation.data;
   try {
@@ -62,11 +62,11 @@ account.post("/login", async (c) => {
     });
     if (response) {
       c.res.headers.set("set-cookie", headers.get("set-cookie")!);
-      return c.json({ok: true, message: "logged in!"});
+      return c.json({ok: true, msg: "logged in!"});
     }
-    return c.json({ok: false, message: "could not login user"}, 401);
+    return c.json({ok: false, msg: "could not login user"}, 401);
   } catch (err: any) {
-    return c.json({ok: false, message: err.message || err.msg || "Unknown Error"}, 404);
+    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 404);
   }
 });
 
@@ -97,16 +97,16 @@ account.post("/update", authMiddleware, async (c) => {
 
   // Check to see if we made any changes at all
   if (isEmpty(newObject)) {
-    return c.html(<b class="btn-error">No Changes Made</b>);
+    return c.html(<b class="btn-error">No Changes Made</b>, 201);
   }
 
   const userUpdated = await updateUserData(c, newObject);
   if (userUpdated) {
     c.header("HX-Trigger", "accountUpdated");
     c.header("HX-Trigger-After-Swap", "accountViolations");
-    return c.html(<></>);
+    return c.html(<></>, 200);
   }
-  return c.html(<b class="btn-error">Unknown error occurred</b>);
+  return c.html(<b class="btn-error">Unknown error occurred</b>, 400);
 });
 
 // endpoint that just returns current username
@@ -138,33 +138,33 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   const body = await c.req.json();
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ ok: false, message: validation.error.toString() }, 400);
+    return c.json({ ok: false, msg: validation.error.toString() }, 400);
   }
 
   const { signupToken, username, password, bskyAppPassword } = validation.data;
   if (await doesUserExist(c, username)) {
-    return c.json({ok: false, message: "user already exists"}, 401);
+    return c.json({ok: false, msg: "user already exists"}, 401);
   }
 
   // Prevent sign ups with these accounts, they are setup using a different method.
   if (username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) {
-    return c.json({ok: false, message: "forbidden account"});
+    return c.json({ok: false, msg: "forbidden account"});
   }
 
   // Check to see if we're using invite keys, and if so, check em.
   if (await doesInviteKeyHaveValues(c, signupToken) === false) {
-    return c.json({ok: false, message: "invalid signup token value"}, 400);
+    return c.json({ok: false, msg: "invalid signup token value"}, 400);
   }
 
   // Check bsky handle existing
   const profileDID: string|null = await lookupBskyHandle(username);
   if (profileDID === null) {
-    return c.json({ok: false, message: "bsky handle returned invalid, please check input"}, 400);
+    return c.json({ok: false, msg: "bsky handle returned invalid, please check input"}, 400);
   }
 
   // Check if the user has violated TOS.
   if (await userHasBan(c, profileDID)) {
-    return c.json({ok: false, message: "your account has been forbidden from using this service"}, 400);
+    return c.json({ok: false, msg: "your account has been forbidden from using this service"}, 400);
   }
 
   // Grab the user's pds as well
@@ -173,7 +173,7 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
   // grab our auth object
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
   }
 
   console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
@@ -195,10 +195,10 @@ account.post("/signup", verifyTurnstile, async (c: Context) => {
     c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
 
     console.log(`user ${username} created! with code ${signupToken||'none'}`);
-    return c.json({ok: true, message: "signup success"});
+    return c.json({ok: true, msg: "signup success"});
   }
   console.error(`could not sign up user ${username}, no token was returned`);
-  return c.json({ok: false, message: "unknown error occurred"}, 501);
+  return c.json({ok: false, msg: "unknown error occurred"}, 501);
 });
 
 account.post("/forgot", verifyTurnstile, async (c: Context) => {
@@ -206,34 +206,34 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
 
   const validation = AccountForgotSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ ok: false, message: validation.error.toString() }, 400);
+    return c.json({ ok: false, msg: validation.error.toString() }, 400);
   }
 
   const { username } = validation.data;
   if (await doesUserExist(c, username) === false) {
-    return c.json({ok: false, message: "user doesn't exist"}, 401);
+    return c.json({ok: false, msg: "user doesn't exist"}, 401);
   }
 
   const userEmail = await getUserEmailForHandle(c, username);
   if (isEmpty(userEmail)) {
-    return c.json({ok: false, message: "user data is missing"}, 401);
+    return c.json({ok: false, msg: "user data is missing"}, 401);
   }
 
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
   }
 
   // Look up handle
   const bskyUserId = await lookupBskyHandle(username);
   if (bskyUserId === null) {
-    return c.json({ok: false, message: "invalid user id"}, 401);
+    return c.json({ok: false, msg: "invalid user id"}, 401);
   }
 
   // There has to be a better method for this tbh.
   const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
   if (canMessageUser === false) {
-    return c.json({ok: false, message:
+    return c.json({ok: false, msg:
       `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
   }
 
@@ -245,22 +245,22 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
   });
   if (error) {
     console.error(`Password reset encountered an error: ${error}`);
-    return c.json({ok: false, message: "encountered reset error, try again later"}, 401);
+    return c.json({ok: false, msg: "encountered reset error, try again later"}, 401);
   }
-  return c.json({ok: true, message: "request processed"});
+  return c.json({ok: true, msg: "request processed"});
 });
 
-account.post("/reset", pullAuthData, async (c: Context) => {
+account.post("/reset", async (c: Context) => {
   const body = await c.req.json();
 
   const validation = AccountResetSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({ ok: false, message: validation.error.toString() }, 400);
+    return c.json({ ok: false, msg: validation.error.toString() }, 400);
   }
   const { resetToken, password } = validation.data;
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, message: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
   }
 
   const { data, error } = await auth.api.resetPassword({body: {
@@ -268,9 +268,9 @@ account.post("/reset", pullAuthData, async (c: Context) => {
     token: resetToken,
   }});
   if (error) {
-    return c.json({ok: false, message: "invalid token/password"}, 401);
+    return c.json({ok: false, msg: "invalid token/password"}, 401);
   }
-  return c.json({ ok: true, message: "successfully updated password" });
+  return c.json({ ok: true, msg: "successfully updated password" });
 });
 
 account.post("/delete", authMiddleware, async (c) => {
@@ -296,7 +296,7 @@ account.post("/delete", authMiddleware, async (c) => {
 
     // Make sure we still have data
     if (!usrAccount || !usrAccount.password) {
-      return c.html(<b class="btn-error">Failed: User Data Missing...</b>);
+      return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 400);
     }
 
     // Do a hash verification on the user's input to see if the passwords match
@@ -313,10 +313,10 @@ account.post("/delete", authMiddleware, async (c) => {
       c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {
-      return c.html(<b class="btn-error">Failed: Invalid Password</b>);
+      return c.html(<b class="btn-error">Failed: Invalid Password</b>, 400);
     }
   } catch (err: any) {
     console.error(`failed to delete user ${userId} had error ${err.message || err.msg || 'no code'}`);
-    return c.html(<b class="btn-error">Failed: Server Error</b>);
+    return c.html(<b class="btn-error">Failed: Server Error</b>, 501);
   }
 });

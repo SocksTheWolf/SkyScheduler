@@ -21,13 +21,13 @@ export async function verifyTurnstile(c: Context, next: any) {
 
     // Check if we could contact siteverify
     if (!turnstileFetch.ok) {
-      return c.json({ok: false, message: "timed out verifying captcha"}, 400);
+      return c.json({ok: false, msg: "timed out verifying captcha"}, 400);
     }
 
     // Check if the output was okay
     const turnstileOutcome:any = await turnstileFetch.json();
     if (!turnstileOutcome.success) {
-      return c.json({ok: false, message: "captcha timed out"}, 401);
+      return c.json({ok: false, msg: "captcha timed out"}, 401);
     }
   }
   await next();
