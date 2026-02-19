@@ -36,3 +36,4 @@ misc/generated.css
 src/css.ts
 *.db
 assets/js/*.min.js
+assets/css/*.min.css

@@ -67,6 +67,7 @@ document.addEventListener("resetPost", () => {
   setElementVisible(scheduledDate.nextElementSibling, true);
   showPostProgress(false);
   clearOnUnloadBlocker();
+  content.removeEventListener("keydown", cancelThreadingKeyboard);
   repostCheckbox.checked = false;
   postNowCheckbox.checked = false;
   hasFileLimit = false;
@@ -465,7 +466,7 @@ function showPostProgress(shouldShow) {
   }
 }
 
-// HTMX will call this
+// HTMX will call these
 document.addEventListener("editPost", function(event) {
   const postid = event.detail.value;
   const editField = document.getElementById(`edit${postid}`);
@@ -518,6 +519,8 @@ document.addEventListener("replyThreadCreate", function(ev) {
     return;
   }
 
+  content.addEventListener("keydown", cancelThreadingKeyboard);
+
   threadField.setAttribute("rootpost", rootID);
   const parentID = postDOM.hasAttribute("data-item") ? postDOM.getAttribute("data-item") : rootID;
   threadField.setAttribute("parentpost", parentID);
@@ -537,6 +540,13 @@ document.addEventListener("resetIfThreading", () => {
   if (!cancelThreadBtn.classList.contains("hidden"))
     document.dispatchEvent(new Event("resetPost"));
 });
+
+function cancelThreadingKeyboard(ev) {
+  if (ev.key === "Escape") {
+    ev.preventDefault();
+    document.dispatchEvent(new Event("resetPost"));
+  }
+}
 
 function runPageReactors() {
   const keys = ["Enter", " "];

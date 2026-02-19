@@ -28,6 +28,7 @@
     "minify:tribute": "minify assets/js/tributeHelper.js > assets/js/tributeHelper.min.js",
     "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
     "minify:settings": "minify assets/js/settings.js > assets/js/settings.min.js",
+    "minify:style": "minify assets/css/stylesheet.css > assets/css/stylesheet.min.css",
     "minify": "run-p minify:*",
     "types": "wrangler types src/wrangler.d.ts"
   },

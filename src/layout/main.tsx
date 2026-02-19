@@ -33,7 +33,7 @@ export const BaseLayout = ({
       <script type="text/javascript" src="/dep/htmx.min.js"></script>
       <script type="text/javascript" src="/dep/toastify.js"></script>
       <link rel="stylesheet" href="/dep/pico.min.css" />
-      <link rel="stylesheet" href="/css/stylesheet.css" />
+      <link rel="stylesheet" href="/css/stylesheet.min.css" />
       <script type="text/javascript" src={mainScriptStr}></script>
       <MetaTags />
     </head>
