@@ -106,9 +106,9 @@ function translateErrorObject(obj, defaultString) {
     errData = JSON.parse(obj.message || obj.msg);
     hasJsonErr = true;
   } catch {
-    if (obj.message !== null)
+    if (obj.message !== null && obj.message !== undefined)
       errData = obj.message;
-    else if (obj.msg !== null)
+    else if (obj.msg !== null && obj.msg !== undefined)
       errData = obj.msg;
   }
   // Check to see if we even have anything.
