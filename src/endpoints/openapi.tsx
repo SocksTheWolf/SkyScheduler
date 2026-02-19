@@ -4,7 +4,7 @@ import { Context, Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { ContextVariables } from "../auth";
 import { Bindings } from "../types";
-import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
+import { AccountDeleteSchema, AccountForgotSchema, CheckCallbackParam, PasswordResetPart } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { LoginSchema } from "../validation/loginSchema";
@@ -409,3 +409,7 @@ openapiRoutes.post("/account/delete", describeRoute({
 openapiRoutes.get("/preview/file/:id", describeRoute({
   description: "preview a file",
 }), validator("param", CheckGUIDSchema));
+
+openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
+  description: "resets a password"
+}), validator("param", PasswordResetPart), validator("query", CheckCallbackParam));

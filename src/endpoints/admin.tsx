@@ -70,6 +70,7 @@ admin.get('/openapi.json',
         version: '1.0.0',
         description: 'API Routes',
       },
+      openapi: "3.0",
       servers: [
         { url: 'https://skyscheduler.work', description: 'Production Server'}
       ],
