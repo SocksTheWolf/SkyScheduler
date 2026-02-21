@@ -1,7 +1,7 @@
 import FooterCopyright from "../layout/helpers/footer";
 import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
-import { APP_NAME } from "../limits";
+import { APP_NAME } from "../siteinfo";
 
 export default function TermsOfService() {
   return (

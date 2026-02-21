@@ -7,7 +7,8 @@ import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { APP_NAME, MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
+import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
+import { APP_NAME } from "../siteinfo";
 import {
   AccountStatus,
   AllContext,

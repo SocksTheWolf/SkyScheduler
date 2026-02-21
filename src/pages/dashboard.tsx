@@ -1,19 +1,19 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
 import FooterCopyright from "../layout/helpers/footer";
-import { IncludeDependencyTags, ScriptTags } from "../layout/helpers/includesTags";
+import { IncludeDependencyTags } from "../layout/helpers/includesTags";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { APP_NAME } from "../limits";
-import { SHOW_PROGRESS_BAR } from "../progress";
+import { APP_NAME } from "../siteinfo";
+import { SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import { PreloadRules } from "../types.d";
 import {
-  altTextScriptStr, appScriptStr, appScriptStrs,
-  postHelperScriptStr, repostHelperScriptStr, tributeScriptStr
+  dashboardScriptStr,
+  settingsScriptStr
 } from "../utils/appScripts";
 
 export default function Dashboard(props:any) {
@@ -25,16 +25,9 @@ export default function Dashboard(props:any) {
     {href: "/dep/modal.js", type: "script"},
     {href: "/dep/tabs.js", type: "script"}
   ];
-  const bottomScripts:string[] = [
-    appScriptStr,
-    altTextScriptStr,
-    tributeScriptStr,
-    postHelperScriptStr,
-    repostHelperScriptStr
-  ];
 
   // Our own homebrew js files
-  const dashboardScripts: PreloadRules[] = appScriptStrs.map((itm) => {
+  const dashboardScripts: PreloadRules[] = [dashboardScriptStr, settingsScriptStr].map((itm) => {
     return {href: itm, type: "script"};
   });
   return (
@@ -75,7 +68,7 @@ export default function Dashboard(props:any) {
                 </button>
               </div>
               <hr />
-              <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_PROGRESS_BAR} />
+              <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR} />
             </footer>
           </article>
         </section>
@@ -94,7 +87,7 @@ export default function Dashboard(props:any) {
         </div>
       </div>
       <AltTextDialog />
-      <ScriptTags scripts={bottomScripts} />
+      <script type="text/javascript" src={dashboardScriptStr}></script>
       <Settings pds={ctx.get("pds")} />
     </BaseLayout>
   );

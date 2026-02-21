@@ -5,7 +5,7 @@ import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
 import { UsernameField } from "../layout/usernameField";
-import { APP_NAME } from "../limits";
+import { APP_NAME } from "../siteinfo";
 
 export default function ForgotPassword(props:any) {
   const ctx: Context = props.c;

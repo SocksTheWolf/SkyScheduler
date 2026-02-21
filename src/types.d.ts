@@ -48,6 +48,7 @@ export interface Bindings {
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
   IMAGES: ImagesBinding;
+  ASSETS?: Fetcher;
   POST_QUEUE: Queue;
   REPOST_QUEUE: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;

@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { APP_NAME } from "../limits";
+import { APP_NAME } from "../siteinfo";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
 type ViolationNoticeProps = {

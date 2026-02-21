@@ -16,6 +16,7 @@ import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
+import { SITE_URL } from "./siteinfo";
 import { Bindings, QueueTaskData, ScheduledContext, TaskType } from "./types.d";
 import { AgentMap } from "./utils/bskyAgents";
 import { makeConstScript } from "./utils/constScriptGen";
@@ -37,6 +38,17 @@ app.get("/js/consts.js", (c) => {
   const constScript = makeConstScript();
   return c.body(constScript, 200, {
     'Content-Type': 'text/javascript',
+    'Cache-Control': 'max-age=604800'
+  });
+});
+
+// Write the robots.txt file dynamically
+app.get("/robots.txt", async (c) => {
+  const origin = new URL(c.req.url).origin;
+  const robotsFile = await c.env.ASSETS!.fetch(`${origin}/robots.txt`)
+    .then(async (resp) => await resp.text());
+  return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200, {
+    'Content-Type': 'text/plain',
     'Cache-Control': 'max-age=604800'
   });
 });
@@ -99,8 +111,6 @@ app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword c={c} />
 app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword />));
 
 // Startup Application
-app.get("/start", (c) => c.redirect('/setup'));
-app.get("/startup", (c) => c.redirect('/setup'));
 app.get("/setup", async (c) => await setupAccounts(c));
 
 export default {

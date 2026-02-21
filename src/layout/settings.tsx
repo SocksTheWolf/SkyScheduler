@@ -1,4 +1,5 @@
-import { APP_NAME, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
+import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types.d";
 import { settingsScriptStr } from "../utils/appScripts";
 import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";

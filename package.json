@@ -1,13 +1,15 @@
 {
   "name": "skyscheduler",
+  "license": "MIT",
+  "homepage": "https://skyscheduler.work",
   "scripts": {
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify --env=''",
     "staging": "wrangler deploy --env staging --minify",
-    "auth": "npm run auth:generate && npm run auth:format",
     "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
     "auth:format": "prettier --write src/db/auth.schema.ts",
+    "auth": "run-s auth:*",
     "generate": "drizzle-kit generate",
     "migrate:local:db": "wrangler d1 migrations apply skyposts --local",
     "migrate:local:pragma": "wrangler d1 execute skyposts --command \"PRAGMA optimize\" --local -y",
@@ -19,17 +21,16 @@
     "migrate:staging:pragma": "wrangler d1 execute skyposts-dev --command \"PRAGMA optimize\" --remote -y",
     "migrate:staging": "run-s migrate:staging:*",
     "migrate:remote": "npm run migrate:prod && npm run migrate:staging",
-    "migrate:optimize": "npm run migrate:prod:pragma && npm run migrate:staging:pragma && npm run migrate:local:pragma",
+    "migrate:optimize": "run-s migrate:*:pragma",
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
-    "minify:repost": "minify assets/js/repostHelper.js > assets/js/repostHelper.min.js",
-    "minify:post": "minify assets/js/postHelper.js > assets/js/postHelper.min.js",
-    "minify:app": "minify assets/js/app.js > assets/js/app.min.js",
-    "minify:alt": "minify assets/js/altTextHelper.js > assets/js/altTextHelper.min.js",
-    "minify:tribute": "minify assets/js/tributeHelper.js > assets/js/tributeHelper.min.js",
     "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
+    "minify:app": "cat assets/js/*Helper.js | minify --js > assets/js/app.min.js",
     "minify:settings": "minify assets/js/settings.js > assets/js/settings.min.js",
     "minify:style": "minify assets/css/stylesheet.css > assets/css/stylesheet.min.css",
     "minify": "run-p minify:*",
+    "sitemap:make": "sscli > assets/sitemap.xml",
+    "sitemap:clean": "replace-in-file \"/homepage|\\.tsx/g\" \"\" assets/sitemap.xml",
+    "sitemap": "run-s sitemap:*",
     "types": "wrangler types src/wrangler.d.ts"
   },
   "dependencies": {
@@ -58,9 +59,11 @@
     "@types/node": "^24.10.13",
     "drizzle-kit": "^0.31.9",
     "minify": "^14.1.0",
+    "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.1",
-    "wrangler": "^4.66.0",
-    "npm-run-all2": "^8.0.4"
+    "replace-in-file": "^8.4.0",
+    "static-sitemap-cli": "^2.2.7",
+    "wrangler": "^4.66.0"
   },
   "engines": {
     "node": ">=24.11.1"

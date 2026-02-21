@@ -2,5 +2,3 @@ User-Agent: *
 Disallow: *.js$
 Disallow: *.css$
 Disallow: /admin
-
-Sitemap: https://skyscheduler.work/sitemap.xml

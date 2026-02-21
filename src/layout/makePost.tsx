@@ -1,5 +1,4 @@
 import {
-  APP_NAME,
   BSKY_IMG_FILE_EXTS,
   BSKY_IMG_SIZE_LIMIT_IN_MB,
   BSKY_VIDEO_FILE_EXTS,
@@ -10,6 +9,7 @@ import {
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
+import { APP_NAME } from "../siteinfo";
 import { PreloadRules } from "../types.d";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { IncludeDependencyTags } from "./helpers/includesTags";

@@ -86,7 +86,11 @@ npm run deploy
 npm run migrate:all
 ```
 
-9. Modify the site specific information/configurations located in `limits.ts`, `metaTags.tsx`, `robots.txt`, `sitemap.xml` (these are currently set up for the website attached to this project)
+9. Customize/Modify any information/configurations located in:
+
+* `limits.ts` - site configuration and application limits
+* `siteinfo.ts` - site information such as name, description, domain, etc
+* `.ssclirc` - sitemap domain
 
 10. Run your application and go to `/setup`. This will create the admin account.
 
@@ -166,3 +170,6 @@ We welcome contributions!
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+_Source hosted on [Github](https://github.com/SocksTheWolf/SkyScheduler), mirrored on [tangled](https://tangled.org/socksthewolf.com/skyscheduler)_

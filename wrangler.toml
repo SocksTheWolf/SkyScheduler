@@ -8,7 +8,7 @@ minify = true
 upload_source_maps = true
 preview_urls = false
 
-assets = { run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
+assets = { binding = "ASSETS", run_worker_first = ["/robots.txt"], directory = "./assets/", not_found_handling = "single-page-application" }
 routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
 # Redis for sessions

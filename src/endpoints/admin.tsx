@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { generateSpecs } from "hono-openapi";
 import { secureHeaders } from "hono/secure-headers";
 import { ContextVariables } from "../auth";
-import { APP_NAME } from "../limits";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
+import { APP_NAME, SITE_URL } from "../siteinfo";
 import { Bindings } from "../types.d";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates } from "../utils/db/maintain";
@@ -64,22 +64,20 @@ admin.get("/abandoned", async (c) => {
 
 ////// OpenAPI Spec for WAF /////
 admin.get('/openapi.json', async (c) => {
-  const websiteURL: URL = new URL(c.req.url);
-  const originStr: string = websiteURL.origin;
   const specs = await generateSpecs(openapiRoutes, {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
         version: '1.0.0',
         description: 'API Routes',
-        termsOfService: `${originStr}/tos`,
+        termsOfService: `${SITE_URL}/tos`,
         license: {
           name: "MIT",
         }
       },
       openapi: "3.0",
       servers: [
-        { url: originStr, description: 'Production Server'}
+        { url: SITE_URL, description: 'Production Server'}
       ],
     },
   }, c);

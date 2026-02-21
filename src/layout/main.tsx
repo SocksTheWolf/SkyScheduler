@@ -1,6 +1,6 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
-import { APP_NAME } from '../limits';
+import { APP_NAME } from "../siteinfo";
 import { PreloadRules } from '../types.d';
 import { mainScriptStr } from '../utils/appScripts';
 import { PreloadDependencyTags } from './helpers/includesTags';

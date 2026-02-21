@@ -1,4 +1,4 @@
-import { APP_NAME } from "../../limits";
+import { APP_NAME } from "../../siteinfo";
 
 export default function NavTags() {
   return (
