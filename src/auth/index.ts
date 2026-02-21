@@ -6,6 +6,7 @@ import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import { APP_NAME } from "../siteinfo";
+import { Bindings } from "../types";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
