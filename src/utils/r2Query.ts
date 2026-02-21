@@ -15,7 +15,7 @@ import {
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
-import { AllContext, EmbedData, EmbedDataType, R2BucketObject } from '../types.d';
+import { AllContext, EmbedData, EmbedDataType, R2BucketObject } from '../types';
 import { addFileListing, deleteFileListings } from './db/file';
 
 type FileMetaData = {

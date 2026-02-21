@@ -1,6 +1,6 @@
 import FooterCopyright from "../layout/helpers/footer";
-import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
+import { BaseLayout } from "../layout/main";
 
 export default function PrivacyPolicy() {
   return (

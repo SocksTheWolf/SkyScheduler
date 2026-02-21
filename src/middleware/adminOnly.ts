@@ -1,6 +1,6 @@
 import { Context } from "hono";
-import { authMiddleware } from "./auth";
 import { every } from "hono/combine";
+import { authMiddleware } from "./auth";
 
 // This requires that the user is an admin, it must pipe through
 // the auth middleware first.

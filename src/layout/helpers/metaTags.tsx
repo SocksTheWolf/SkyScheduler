@@ -1,6 +1,5 @@
 import { raw } from "hono/html";
-import { APP_NAME } from "../../siteinfo";
-import { SITE_DESCRIPTION, SITE_URL } from "../../siteinfo";
+import { APP_NAME, SITE_DESCRIPTION, SITE_URL } from "../../siteinfo";
 
 export default function MetaTags() {
   const SocialImage: string = `${SITE_URL}/dashboard.png`;

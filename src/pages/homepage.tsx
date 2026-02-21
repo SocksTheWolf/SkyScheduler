@@ -1,6 +1,6 @@
 import FooterCopyright from "../layout/helpers/footer";
-import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
+import { BaseLayout } from "../layout/main";
 import {
   MAX_POSTS_PER_THREAD, MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS,
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB

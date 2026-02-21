@@ -12,7 +12,7 @@ import {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse,
   EmbedDataType, LooseObj, Post
-} from "../types.d";
+} from "../types";
 import {
   createPost, createRepost,
   deletePost, getPostById,

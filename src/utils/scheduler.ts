@@ -1,6 +1,6 @@
 import AtpAgent from '@atproto/api';
 import isEmpty from 'just-is-empty';
-import { AllContext, Post, Repost, TaskType } from '../types.d';
+import { AllContext, Post, Repost, TaskType } from '../types';
 import { AgentMap } from './bskyAgents';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';

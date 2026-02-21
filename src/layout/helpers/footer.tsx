@@ -1,6 +1,4 @@
-import { APP_NAME } from "../../siteinfo";
-import { PROGRESS_MADE } from "../../siteinfo";
-import { PROGRESS_TOTAL } from "../../siteinfo";
+import { APP_NAME, PROGRESS_MADE, PROGRESS_TOTAL } from "../../siteinfo";
 
 // Helper footer for various pages
 type FooterCopyrightProps = {

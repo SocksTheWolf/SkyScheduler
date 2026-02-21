@@ -5,7 +5,7 @@ import flatten from "just-flatten-it";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
-import { AllContext, BatchQuery, Bindings, R2BucketObject } from "../../types.d";
+import { AllContext, BatchQuery, R2BucketObject } from "../../types";
 import { getAllFilesList } from "../r2Query";
 import { addFileListing, getAllMediaOfUser } from "./file";
 

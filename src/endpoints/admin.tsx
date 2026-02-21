@@ -5,7 +5,7 @@ import { ContextVariables } from "../auth";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { APP_NAME, SITE_URL } from "../siteinfo";
-import { Bindings } from "../types.d";
+import { Bindings } from "../types";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates } from "../utils/db/maintain";
 import { makeInviteKey } from "../utils/inviteKeys";

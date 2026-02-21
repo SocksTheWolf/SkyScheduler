@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 import { MAX_LENGTH, MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, MIN_LENGTH } from "../limits";
-import { EmbedDataType, PostLabel } from "../types.d";
+import { EmbedDataType, PostLabel } from "../types";
 import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { AltTextSchema } from "./sharedValidations";

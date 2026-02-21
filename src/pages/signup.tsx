@@ -1,13 +1,13 @@
 import { Context } from "hono";
 import AccountHandler from "../layout/account";
 import FooterCopyright from "../layout/helpers/footer";
-import { BaseLayout } from "../layout/main";
 import NavTags from "../layout/helpers/navTags";
-import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
+import { BaseLayout } from "../layout/main";
+import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
 import { UsernameField } from "../layout/usernameField";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { PWAutoCompleteSettings } from "../types.d";
+import { PWAutoCompleteSettings } from "../types";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props:any) {

@@ -4,7 +4,10 @@
 //
 // Also just handles general login.
 import AtpAgent from "@atproto/api";
-import { AccountStatus, AllContext, LooseObj, Post, Repost, AgentConfigSettings, TaskType } from "../types.d";
+import {
+  AccountStatus, AgentConfigSettings,
+  AllContext, LooseObj, Post, Repost, TaskType
+} from "../types";
 import { getBskyUserPassForId } from "./db/userinfo";
 import { createViolationForUser } from "./db/violations";
 

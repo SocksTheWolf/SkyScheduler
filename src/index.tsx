@@ -17,7 +17,7 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { SITE_URL } from "./siteinfo";
-import { Bindings, QueueTaskData, ScheduledContext, TaskType } from "./types.d";
+import { Bindings, QueueTaskData, ScheduledContext, TaskType } from "./types";
 import { AgentMap } from "./utils/bskyAgents";
 import { makeConstScript } from "./utils/constScriptGen";
 import {

@@ -2,7 +2,7 @@ import { startOfHour, subDays } from "date-fns";
 import { Context } from "hono";
 import has from "just-has";
 import isEmpty from "just-is-empty";
-import { BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types.d";
+import { BskyAPILoginCreds, Post, Repost, RepostInfo } from "../types";
 
 export function createPostObject(data: any) {
   const postData: Post = (new Object() as Post);

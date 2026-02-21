@@ -1,6 +1,6 @@
 import { Context } from "hono";
-import { doesAdminExist } from "./db/userinfo";
 import has from "just-has";
+import { doesAdminExist } from "./db/userinfo";
 
 export const setupAccounts = async(c: Context) => {
   if (await doesAdminExist(c))

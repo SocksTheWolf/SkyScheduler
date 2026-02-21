@@ -4,15 +4,15 @@ import {
   BSKY_NAME_LOOKUP_LIMIT, BSKY_NAME_TYPE_AHEAD_CHARS,
   BSKY_VIDEO_LENGTH_LIMIT,
   BSKY_VIDEO_MIME_TYPES,
+  GIF_UPLOAD_ALLOWED,
   MAX_ALT_TEXT,
   MAX_EMBEDS_PER_POST,
   MAX_GIF_LENGTH_LIMIT,
   MAX_LENGTH,
   MAX_THUMBNAIL_SIZE,
-  R2_FILE_SIZE_LIMIT,
-  GIF_UPLOAD_ALLOWED
+  R2_FILE_SIZE_LIMIT
 } from "../limits";
-import { PreloadRules } from "../types.d";
+import { PreloadRules } from "../types";
 import { postRecordURI } from "../validation/regexCases";
 
 const CONST_SCRIPT_VERSION: number = 8;

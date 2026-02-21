@@ -6,7 +6,7 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { verifyTurnstile } from "../middleware/turnstile";
-import { Bindings, LooseObj } from "../types.d";
+import { Bindings, LooseObj } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bskyApi";
 import { checkIfCanDMUser } from "../utils/bskyMsg";
 import { getAllMediaOfUser } from "../utils/db/file";

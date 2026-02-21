@@ -1,6 +1,6 @@
 import { BatchItem } from "drizzle-orm/batch";
 import { drizzle } from "drizzle-orm/d1";
-import { ExecutionContext } from "hono";
+import { Context, ExecutionContext } from "hono";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -36,7 +36,7 @@ type QueueConfigSettings = {
   repost_queues: string[];
 }
 
-type AgentConfigSettings = {
+export type AgentConfigSettings = {
   use_posts: boolean;
   use_reposts: boolean;
 }

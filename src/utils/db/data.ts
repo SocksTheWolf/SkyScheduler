@@ -13,7 +13,7 @@ import {
   Post,
   PostRecordResponse,
   Repost
-} from "../../types.d";
+} from "../../types";
 import { createPostObject, createRepostObject, floorCurrentTime } from "../helpers";
 
 export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {

@@ -8,9 +8,8 @@ import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { APP_NAME } from "../siteinfo";
-import { SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
-import { PreloadRules } from "../types.d";
+import { APP_NAME, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
+import { PreloadRules } from "../types";
 import {
   dashboardScriptStr,
   settingsScriptStr

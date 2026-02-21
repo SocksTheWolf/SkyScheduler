@@ -11,13 +11,13 @@ import {
   BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, Post, PostLabel,
   PostRecordResponse, PostStatus, Repost
-} from '../types.d';
+} from '../types';
 import { atpRecordURI } from '../validation/regexCases';
 import { makeAgentForUser } from './bskyAgents';
 import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
 import { getUsernameForUserId } from './db/userinfo';
-import { deleteEmbedsFromR2 } from './r2Query';
 import { createViolationForUser } from './db/violations';
+import { deleteEmbedsFromR2 } from './r2Query';
 
 export const doesHandleExist = async (user: string) => {
   try {

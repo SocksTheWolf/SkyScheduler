@@ -18,7 +18,7 @@ import {
   EmbedDataType,
   Post, PostLabel,
   RepostInfo
-} from "../types.d";
+} from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { getChildPostsOfThread, getPostByCID, getPostThreadCount, updatePostForGivenUser } from "./db/data";
