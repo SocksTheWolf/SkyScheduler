@@ -14,3 +14,16 @@ export const AccountResetSchema = z.object({
     .nonempty("confirm password cannot be empty")
     .nonoptional(),
 }).refine((schema) => schema.confirmPassword === schema.password, "Passwords do not match");
+
+// encoded strings
+const uriComponent = z.codec(z.string(), z.string(), {
+  decode: (encodedString) => decodeURIComponent(encodedString),
+  encode: (decodedString) => encodeURIComponent(decodedString),
+});
+export const PasswordResetCheckCallbackParam = z.object({
+  callbackURL: z.literal(z.encode(uriComponent, "/reset"))
+});
+
+export const PasswordResetTokenParam = z.object({
+  id: z.string().min(20).max(64)
+});

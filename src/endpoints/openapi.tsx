@@ -1,17 +1,23 @@
-// Shitty file to help with automatically generating endpoint bindings so that we can dump them to the
+// Mediocre file to help with automatically generating endpoint bindings so that we can dump them to the
 // Cloudflare WAF to protect/log against abuse
 import { Context, Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { ContextVariables } from "../auth";
 import { Bindings } from "../types";
-import { AccountDeleteSchema, AccountForgotSchema, CheckCallbackParam, PasswordResetPart } from "../validation/accountForgotDeleteSchema";
-import { AccountResetSchema } from "../validation/accountResetSchema";
+import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
+import {
+  AccountResetSchema, PasswordResetCheckCallbackParam,
+  PasswordResetTokenParam
+} from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema, PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { CheckGUIDSchema, CreateResponseSchema, FileOperationResponseSchema, GenericResponseSchema } from "../validation/responseSchema";
+import {
+  CheckFileSchema, CheckGUIDSchema, CreateResponseSchema,
+  FileOperationResponseSchema, GenericResponseSchema
+} from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 export const openapiRoutes = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -408,8 +414,8 @@ openapiRoutes.post("/account/delete", describeRoute({
 
 openapiRoutes.get("/preview/file/:id", describeRoute({
   description: "preview a file",
-}), validator("param", CheckGUIDSchema));
+}), validator("param", CheckFileSchema));
 
 openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
   description: "resets a password"
-}), validator("param", PasswordResetPart), validator("query", CheckCallbackParam));
+}), validator("param", PasswordResetTokenParam), validator("query", PasswordResetCheckCallbackParam));

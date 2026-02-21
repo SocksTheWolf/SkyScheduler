@@ -1,3 +1,7 @@
+// Everything in this file is used for OpenAPI route generation.
+//
+// This can be the generally expected results for most endpoints
+// but not all.
 import * as z from "zod/v4";
 import { fileKeyRegex } from "./regexCases";
 

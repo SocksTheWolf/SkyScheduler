@@ -1,15 +1,16 @@
 import { Hono } from "hono";
+import { generateSpecs } from "hono-openapi";
 import { secureHeaders } from "hono/secure-headers";
 import { ContextVariables } from "../auth";
+import { APP_NAME } from "../limits";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
+import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings } from "../types.d";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates } from "../utils/db/maintain";
 import { makeInviteKey } from "../utils/inviteKeys";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 import { openapiRoutes } from "./openapi";
-import { openAPIRouteHandler } from "hono-openapi";
 
 export const admin = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
@@ -62,18 +63,25 @@ admin.get("/abandoned", async (c) => {
 });
 
 ////// OpenAPI Spec for WAF /////
-admin.get('/openapi.json',
-  openAPIRouteHandler(openapiRoutes, {
+admin.get('/openapi.json', async (c) => {
+  const websiteURL: URL = new URL(c.req.url);
+  const originStr: string = websiteURL.origin;
+  const specs = await generateSpecs(openapiRoutes, {
     documentation: {
       info: {
-        title: 'SkyScheduler API Routes',
+        title: `${APP_NAME} API Routes`,
         version: '1.0.0',
         description: 'API Routes',
+        termsOfService: `${originStr}/tos`,
+        license: {
+          name: "MIT",
+        }
       },
       openapi: "3.0",
       servers: [
-        { url: 'https://skyscheduler.work', description: 'Production Server'}
+        { url: originStr, description: 'Production Server'}
       ],
     },
-  })
-);
+  }, c);
+  return c.json(specs);
+});
