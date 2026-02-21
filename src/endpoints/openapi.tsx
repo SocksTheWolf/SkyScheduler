@@ -414,8 +414,24 @@ openapiRoutes.post("/account/delete", describeRoute({
 
 openapiRoutes.get("/preview/file/:id", describeRoute({
   description: "preview a file",
+  responses: {
+    200: {
+      description: "displays file"
+    },
+    401: {
+      description: "not logged in"
+    }
+  }
 }), validator("param", CheckFileSchema));
 
 openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
-  description: "resets a password"
+  description: "resets a password",
+  responses: {
+    200: {
+      description: "valid token, redirect to reset"
+    },
+    404: {
+      description: "reset token is invalid"
+    }
+  }
 }), validator("param", PasswordResetTokenParam), validator("query", PasswordResetCheckCallbackParam));
