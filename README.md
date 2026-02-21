@@ -26,7 +26,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 ### Prerequisites
 
-- Node.js (v24.x or later)
+- Node.js (v24.11 or later)
 - Package Manager
 - Cloudflare Pro Workers account (you will hit CPU limits otherwise)
 
@@ -60,7 +60,7 @@ cp .dev.vars.example .dev.vars
 4. Update your `wrangler.toml` with changes that reflect your account.
    - You'll need to update the values for the kv, r2, queues, d1 to reflect the bindings on your account.
    - Also make sure you update the `BETTER_AUTH_URL` to your working url as well.
-   - Do remember to remove the domain bindings!
+   - Do remember to update/remove the domain bindings!
 
 5. Install dependencies
 
@@ -80,13 +80,15 @@ npm run dev
 npm run deploy
 ```
 
-8. Create your D1 tables using the following command, this will set up your tables both locally and remotely. If you encounter issues running remotely, you can run the command again.
+8. Create your D1 tables using the following command, this will set up your tables both locally and remotely.
+
+*NOTE*: If you encounter issues running remotely, you can run the command again.
 
 ```bash
 npm run migrate:all
 ```
 
-9. Customize/Modify any information/configurations located in:
+9. Modify any site information located in:
 
 * `limits.ts` - site configuration and application limits
 * `siteinfo.ts` - site information such as name, description, domain, etc
@@ -146,6 +148,7 @@ skyscheduler/
 - date-fns - date processing helpers
 - drizzle - database orm/schemas
 - just - js helper library
+- human-id - passphrase generation for invite keys
 
 #### Client
 
