@@ -26,9 +26,9 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
     const newAltTextData = altTextField.value;
     saveCallback(newAltTextData);
     if (newAltTextData === "") {
-      altTextButton.classList.remove("btn-success");
+      altTextButton.classList.remove("has-alt-text");
     } else {
-      altTextButton.classList.add("btn-success");
+      altTextButton.classList.add("has-alt-text");
     }
     closeAltModal();
   };

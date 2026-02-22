@@ -96,7 +96,7 @@ fileDropzone.on("addedfile", file => {
     return;
   }
   setElementVisible(sectionLinkAttach, false);
-  const buttonHolder = Dropzone.createElement("<fieldset role='group' class='imgbtn'></fieldset>");
+  const buttonHolder = Dropzone.createElement("<fieldset role='group' class='file-item-group'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline' disabled><small>Add Alt Text</small></button><br />");
 

@@ -24,6 +24,9 @@
 .dz-filename {
   width: 65%;
   float: right;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 html {
@@ -34,4 +37,22 @@ html {
   font-size: 0.5em;
   font-weight: bold;
   color: black;
+}
+
+.file-item-group {
+  height: 15%;
+  display: block !important;
+  button {
+    margin-top: 10px;
+    margin-bottom: 10px !important;
+    margin-left: 10px !important;
+    text-wrap: nowrap;
+    vertical-align: center !important;
+    padding-top: 0px;
+  }
+}
+
+.has-alt-text {
+  border: var(--pico-border-width) solid green !important;
+  color: green !important;
 }

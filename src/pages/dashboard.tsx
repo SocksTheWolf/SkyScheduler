@@ -20,6 +20,7 @@ export default function Dashboard(props:any) {
   const ctx: Context = props.c;
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
+    {href: "/css/dashboard.min.css", type: "style"},
     {href: "/dep/countable.min.js", type: "script"},
     {href: "/dep/form-json.min.js", type: "script"},
     {href: "/dep/modal.js", type: "script"},

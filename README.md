@@ -108,7 +108,7 @@ Most of the application can be modified either through the `wrangler.toml` vars 
 
 ### Minimization
 
-The application by default is configured to use the minified versions of the scripts in `assets/js`. By default all client JS files will rebuild whenever any typescript file is changed or the application is deployed/ran.
+The application by default is configured to use the minified versions of the scripts in `assets/js` and `assets/css`. By default, all minimized files will rebuild whenever any typescript file is changed or the application is deployed/ran.
 
 ## Project Structure
 
