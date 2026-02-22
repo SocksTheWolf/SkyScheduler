@@ -1,6 +1,6 @@
 import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
-import { Post } from "../../types";
+import { Post } from "../../classes/post";
 import { AddPostToThreadButton, DeletePostButton, EditPostButton } from "./buttons";
 import { RepostCountElement, RepostIcon } from "./repostData";
 

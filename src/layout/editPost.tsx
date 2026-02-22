@@ -1,5 +1,6 @@
+import { Post } from "../classes/post";
 import { MAX_LENGTH } from "../limits";
-import { EmbedDataType, Post } from "../types";
+import { EmbedDataType } from "../types";
 import { PostContent } from "./post";
 
 type EditedPostProps = {

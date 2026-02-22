@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/d1";
 import { Env, Hono } from "hono";
 import { ContextVariables, createAuth } from "./auth";
+import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
@@ -17,9 +18,10 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { SITE_URL } from "./siteinfo";
-import { Bindings, QueueTaskData, ScheduledContext, TaskType } from "./types";
+import { Bindings, TaskType } from "./types";
 import { AgentMap } from "./utils/bskyAgents";
 import { makeConstScript } from "./utils/constScriptGen";
+import { QueueTaskData } from "./utils/queuePublisher";
 import {
   cleanUpPostsTask, handlePostTask,
   handleRepostTask, schedulePostTask

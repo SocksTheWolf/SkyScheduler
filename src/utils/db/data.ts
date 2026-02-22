@@ -3,6 +3,8 @@ import { BatchItem } from "drizzle-orm/batch";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from 'uuid';
+import { Post } from "../../classes/post";
+import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
@@ -10,11 +12,9 @@ import {
   AllContext,
   BatchQuery,
   GetAllPostedBatch,
-  Post,
-  PostRecordResponse,
-  Repost
+  PostRecordResponse
 } from "../../types";
-import { createPostObject, createRepostObject, floorCurrentTime } from "../helpers";
+import { floorCurrentTime } from "../helpers";
 
 export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time
@@ -42,7 +42,7 @@ export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: bo
   ));
   const results = await db.with(postsToMake).select().from(postsToMake)
     .where(notInArray(postsToMake.userId, violationUsers)).orderBy(asc(postsToMake.createdAt)).all();
-  return results.map((item) => createPostObject(item));
+  return results.map((item) => new Post(item));
 };
 
 export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date): Promise<Repost[]> => {
@@ -60,7 +60,7 @@ export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date):
     .where(and(inArray(posts.uuid, query), notInArray(posts.userId, violationsQuery)))
     .all();
 
-  return results.map((item) => createRepostObject(item));
+  return results.map((item) => new Repost(item));
 };
 
 export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost[]> => {
@@ -234,7 +234,7 @@ export const getChildPostsOfThread = async (c: AllContext, rootId: string): Prom
     .where(and(isNotNull(posts.parentPost), eq(posts.rootPost, rootId)))
     .orderBy(asc(posts.threadOrder), desc(posts.createdAt)).all();
   if (query.length > 0) {
-    return query.map((child) => createPostObject(child));
+    return query.map((child) => new Post(child));
   }
   return null;
 };
@@ -304,6 +304,6 @@ export const getPostByCID = async(db: DrizzleD1Database, userId: string, cid: st
     .limit(1).all();
 
   if (!isEmpty(result))
-    return createPostObject(result[0]);
+    return new Post(result[0]);
   return null;
 };

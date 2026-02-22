@@ -4,17 +4,22 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
+import { Post } from "../classes/post";
+import { Repost } from "../classes/repost";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../limits';
 import {
   AccountStatus,
   AllContext,
   BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj, Post, PostLabel,
-  PostRecordResponse, PostStatus, Repost
+  LooseObj, PostLabel,
+  PostRecordResponse, PostStatus
 } from '../types';
 import { atpRecordURI } from '../validation/regexCases';
 import { makeAgentForUser } from './bskyAgents';
-import { bulkUpdatePostedData, getChildPostsOfThread, isPostAlreadyPosted, setPostNowOffForPost } from './db/data';
+import {
+  bulkUpdatePostedData, getChildPostsOfThread,
+  isPostAlreadyPosted, setPostNowOffForPost
+} from './db/data';
 import { getUsernameForUserId } from './db/userinfo';
 import { createViolationForUser } from './db/violations';
 import { deleteEmbedsFromR2 } from './r2Query';

@@ -1,6 +1,6 @@
 import { BatchItem } from "drizzle-orm/batch";
-import { drizzle } from "drizzle-orm/d1";
-import { Context, ExecutionContext } from "hono";
+import { Context } from "hono";
+import { ScheduledContext } from "./classes/context";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -92,14 +92,6 @@ export type EmbedData = {
   duration?: number;
 };
 
-// Contains the repost info for a post
-export type RepostInfo = {
-  guid: string,
-  time: Date,
-  hours: number,
-  count: number
-};
-
 export enum PostLabel {
   None = "None",
   Suggestive = "Suggestive",
@@ -109,53 +101,10 @@ export enum PostLabel {
   GraphicAdult = "GraphicAdult"
 };
 
-// Basically a copy of the schema
-export type Post = {
-  // guid for post
-  postid: string;
-  // SkyScheduler User Id
-  user: string;
-  // post data
-  text: string;
-  embeds?: EmbedData[];
-  label: PostLabel;
-  // post flags
-  postNow: boolean;
-  posted?: boolean;
-  isRepost?: boolean;
-  // repost metadata
-  repostInfo?: RepostInfo[];
-  scheduledDate?: string;
-  repostCount?: number;
-  // atproto data
-  cid?: string;
-  uri?: string;
-  // thread data
-  isThreadRoot: boolean;
-  isChildPost: boolean;
-  threadOrder: number;
-  rootPost?: string;
-  parentPost?: string;
-};
-
-export type Repost = {
-  postid: string;
-  uri: string;
-  cid: string;
-  userId: string;
-  scheduleGuid?: string;
-};
-
 export enum TaskType {
   None,
   Post,
   Repost,
-};
-
-export type QueueTaskData = {
-  type: TaskType;
-  post?: Post;
-  repost?: Repost;
 };
 
 export type Violation = {
@@ -220,26 +169,6 @@ export type PreloadRules = {
   href: string;
 };
 
-export class ScheduledContext {
-  executionCtx: ExecutionContext;
-  env: Bindings;
-  #map: Map<string, any>;
-  constructor(env: Bindings, executionCtx: ExecutionContext) {
-    this.#map = new Map<string, any>();
-    this.env = env;
-    this.executionCtx = executionCtx;
-    this.set("db", drizzle(env.DB));
-  }
-  get(name: string) {
-    if (this.#map.has(name))
-      return this.#map.get(name);
-    return null;
-  }
-  set(name: string, value: any) {
-    this.#map.set(name, value);
-  }
-};
-
 export type AllContext = Context|ScheduledContext;
 
 export type BskyEmbedWrapper = {
@@ -260,13 +189,6 @@ export type CreateObjectResponse = {
 
 export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
-};
-
-export type BskyAPILoginCreds = {
-  pds: string;
-  username: string;
-  password: string;
-  valid: boolean;
 };
 
 // Used for the pruning and database operations

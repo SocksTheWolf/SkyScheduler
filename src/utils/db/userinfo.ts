@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
+import { BskyAPILoginCreds } from "../../classes/bskyLogin";
 import { users } from "../../db/auth.schema";
-import { AllContext, BskyAPILoginCreds } from "../../types";
-import { createLoginCredsObj } from "../helpers";
+import { AllContext } from "../../types";
 
 export const doesUserExist = async (c: AllContext, username: string): Promise<boolean> => {
   const db: DrizzleD1Database = c.get("db");
@@ -33,13 +33,13 @@ export const doesAdminExist = async (c: AllContext) => {
 export const getBskyUserPassForId = async (c: AllContext, userid: string): Promise<BskyAPILoginCreds> => {
   const db: DrizzleD1Database = c.get("db");
   if (!db)
-    return createLoginCredsObj(null);
+    return new BskyAPILoginCreds(null);
 
   const response = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
     .from(users)
     .where(eq(users.id, userid))
     .limit(1).all();
-  return createLoginCredsObj(response[0] || null);
+  return new BskyAPILoginCreds(response[0] || null);
 };
 
 export const getUsernameForUserId = async (c: AllContext, userId: string): Promise<string|null> => {
