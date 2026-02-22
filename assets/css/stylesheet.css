@@ -18,6 +18,30 @@
   }
 }
 
+.navHeader, .logoBox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  div a {
+    text-decoration: none;
+  }
+  h2, h4 {
+    display: flex;
+    margin-bottom: 0px;
+  }
+  img {
+    float: left;
+    margin-right: 20px;
+  }
+}
+
+@media (min-width: 510px) and (max-width:1200px) {
+  .logoBox h4 {
+    display: none;
+  }
+}
+
+
 .repostScheduleSimple {
   display: inherit !important;
   text-align: center;

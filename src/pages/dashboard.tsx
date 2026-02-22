@@ -14,6 +14,7 @@ import {
   dashboardScriptStr,
   settingsScriptStr
 } from "../utils/appScripts";
+import { LogoImage } from "../layout/helpers/logo";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;
@@ -37,10 +38,13 @@ export default function Dashboard(props:any) {
         <section class="col-3">
           <article>
             <header>
-              <h4>{APP_NAME} Dashboard</h4>
+              <div class="logoBox">
+                <LogoImage />
+                <h4>{APP_NAME} Dashboard</h4>
+              </div>
               <div class="sidebar-block">
                 <small><i>Schedule Bluesky posts effortlessly</i>.</small><br />
-                <small>Account: <b class="truncate" id="currentUser" hx-get="/account/username"
+                <small>Account: <b id="currentUser" hx-get="/account/username"
                   hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>
               <center class="postControls">
