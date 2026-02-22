@@ -71,8 +71,8 @@ binding = "REPOST_QUEUE"
 
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
-max_batch_size = 3
-max_batch_timeout = 5
+max_batch_size = 2
+max_batch_timeout = 3
 max_retries = 3
 
 [[queues.consumers]]

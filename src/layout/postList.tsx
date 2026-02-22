@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import isEmpty from "just-is-empty";
-import { Post } from "../types";
+import { Post } from "../classes/post";
 import { getPostsForUser } from "../utils/dbQuery";
 import { PostHTML } from "./post";
 

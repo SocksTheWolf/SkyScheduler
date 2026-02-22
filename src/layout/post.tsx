@@ -1,6 +1,6 @@
 import { html } from "hono/html";
+import { Post } from "../classes/post";
 import { MAX_POSTED_LENGTH } from "../limits";
-import { Post } from "../types";
 import { PostDataFooter, PostDataHeader } from "./posts/wrappers";
 
 type PostContentProps = {

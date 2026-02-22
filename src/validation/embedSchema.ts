@@ -1,7 +1,7 @@
 import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
 import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits";
-import { EmbedDataType } from "../types";
+import { EmbedDataType } from "../types/posts";
 import { FileContentSchema } from "./mediaSchema";
 import { atpRecordURI } from "./regexCases";
 import { AltTextSchema } from "./sharedValidations";

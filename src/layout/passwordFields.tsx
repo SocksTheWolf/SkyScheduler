@@ -1,6 +1,6 @@
 import { html } from "hono/html";
 import { BSKY_MAX_APP_PASSWORD_LENGTH, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { PWAutoCompleteSettings } from "../types";
+import { PWAutoCompleteSettings } from "../types/site";
 
 type PasswordFieldSettings = {
   required?: boolean

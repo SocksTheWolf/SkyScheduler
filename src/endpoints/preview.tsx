@@ -5,7 +5,7 @@ import { ContextVariables } from "../auth";
 import { BSKY_IMG_MIME_TYPES } from "../limits";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
-import { Bindings } from "../types";
+import { Bindings } from "../types/settings";
 import { FileContentSchema } from "../validation/mediaSchema";
 
 export const preview = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();

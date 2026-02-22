@@ -7,7 +7,7 @@ import { BaseLayout } from "../layout/main";
 import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
 import { UsernameField } from "../layout/usernameField";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { PWAutoCompleteSettings } from "../types";
+import { PWAutoCompleteSettings } from "../types/site";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props:any) {

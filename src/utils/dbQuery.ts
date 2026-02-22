@@ -5,25 +5,20 @@ import { DrizzleD1Database } from "drizzle-orm/d1";
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
+import { Post } from "../classes/post";
+import { RepostInfo } from "../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import {
-  AccountStatus,
-  AllContext,
-  BatchQuery,
-  CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse,
-  EmbedDataType,
-  Post, PostLabel,
-  RepostInfo
-} from "../types";
+import { AccountStatus } from "../types/accounts";
+import { EmbedDataType, PostLabel } from "../types/posts";
+import { CreateObjectResponse, CreatePostQueryResponse, DeleteResponse } from "../types/responses";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { getChildPostsOfThread, getPostByCID, getPostThreadCount, updatePostForGivenUser } from "./db/data";
 import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
-import { createPostObject, createRepostInfo, floorGivenTime } from "./helpers";
+import { floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
 export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
@@ -42,7 +37,7 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
       if (isEmpty(results))
         return null;
 
-      return results.map((itm) => createPostObject(itm));
+      return results.map((itm) => new Post(itm));
     }
   } catch(err) {
     console.error(`Failed to get posts for user, session could not be fetched ${err}`);
@@ -255,7 +250,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
   // Create repost metadata
   const scheduleGUID = (!isThreadedPost) ? uuidv4() : undefined;
   const repostInfo = (!isThreadedPost) ?
-    createRepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
+    new RepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
 
   // Create the posts
   const postUUID = uuidv4();
@@ -358,13 +353,13 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     if (violationData.tosViolation) {
       return {ok: false, msg: `This account is unable to use ${APP_NAME} services at this time`};
     } else if (violationData.userPassInvalid) {
-      return {ok: false, msg: "The BSky account credentials is invalid, please update these in the settings"};
+      return {ok: false, msg: "The BSky account credentials is invalid, please update th/ese in the settings"};
     }
   }
   let postUUID;
   let dbOperations: BatchItem<"sqlite">[] = [];
   const scheduleGUID = uuidv4();
-  const repostInfo: RepostInfo = createRepostInfo(scheduleGUID, scheduleDate, true, repostData);
+  const repostInfo: RepostInfo = new RepostInfo(scheduleGUID, scheduleDate, true, repostData);
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
@@ -470,7 +465,7 @@ export const getPostById = async(c: AllContext, id: string): Promise<Post|null> 
     .limit(1).all();
 
   if (!isEmpty(result))
-    return createPostObject(result[0]);
+    return new Post(result[0]);
   return null;
 };
 
@@ -495,6 +490,6 @@ export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<
       .limit(1).all();
 
   if (!isEmpty(result))
-    return createPostObject(result[0]);
+    return new Post(result[0]);
   return null;
 };

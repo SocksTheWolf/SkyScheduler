@@ -1,7 +1,10 @@
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
-import { AllContext, Bindings, Post, QueueTaskData, Repost, TaskType } from "../types";
+import { Post } from "../classes/post";
+import { Repost } from "../classes/repost";
+import { QueueTaskData, TaskType } from "../types/queue";
+import { Bindings } from '../types/settings';
 
 const queueContentType = 'v8';
 

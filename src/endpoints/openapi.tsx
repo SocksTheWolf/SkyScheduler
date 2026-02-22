@@ -3,7 +3,7 @@
 import { Context, Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { ContextVariables } from "../auth";
-import { Bindings } from "../types";
+import { Bindings } from "../types/settings";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import {
   AccountResetSchema, PasswordResetCheckCallbackParam,

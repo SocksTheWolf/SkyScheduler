@@ -10,7 +10,7 @@ import {
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import { PreloadRules } from "../types";
+import { PreloadRules } from "../types/site";
 import { ConstScriptPreload } from "../utils/constScriptGen";
 import { IncludeDependencyTags } from "./helpers/includesTags";
 import { ContentLabelOptions } from "./options/contentLabelOptions";

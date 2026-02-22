@@ -2,7 +2,7 @@ import { and, eq, inArray, lte } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
-import { AllContext, EmbedDataType, LooseObj } from "../../types";
+import { EmbedDataType } from "../../types/posts";
 import { daysAgo } from "../helpers";
 
 export const addFileListing = async (c: AllContext, file: string, user: string|null, createDate: Date|null=null) => {

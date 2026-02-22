@@ -3,7 +3,7 @@ import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { DashboardPasswordField } from "../layout/passwordFields";
 import { UsernameField } from "../layout/usernameField";
-import { PWAutoCompleteSettings } from "../types";
+import { PWAutoCompleteSettings } from "../types/site";
 
 export default function Login() {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];

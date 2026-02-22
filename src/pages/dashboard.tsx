@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
 import FooterCopyright from "../layout/helpers/footer";
 import { IncludeDependencyTags } from "../layout/helpers/includesTags";
+import { LogoImage } from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
@@ -9,14 +10,13 @@ import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
-import { PreloadRules } from "../types";
+import { PreloadRules } from "../types/site";
 import {
   dashboardScriptStr,
   settingsScriptStr
 } from "../utils/appScripts";
-import { LogoImage } from "../layout/helpers/logo";
 
-export default function Dashboard(props:any) {
+export default function Dashboard(props: any) {
   const ctx: Context = props.c;
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [

@@ -1,4 +1,4 @@
-import { PreloadRules } from "../../types";
+import { PreloadRules } from "../../types/site";
 
 type DepTagsType = {
   scripts?: PreloadRules[]

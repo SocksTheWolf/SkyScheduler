@@ -115,16 +115,18 @@ The application by default is configured to use the minified versions of the scr
 ```text
 skyscheduler/
 ├── assets/
+├── migrations/
 ├── src/
 │   ├── auth/
+│   ├── classes/
 │   ├── db/
 │   ├── endpoints/
 │   ├── layout/
 │   ├── middleware/
 │   ├── pages/
+│   ├── types/
 │   ├── utils/
 │   └── validation/
-├── migrations/
 ├── .dev.vars
 ├── .node-version
 ├── .markdownlint.json

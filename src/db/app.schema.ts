@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
-import { EmbedData, PostLabel, RepostInfo } from '../types';
+import { EmbedData, PostLabel } from "../types/posts";
+import { RepostInfo } from "../classes/repost";
 import { users } from "./auth.schema";
 
 export const posts = sqliteTable('posts', {

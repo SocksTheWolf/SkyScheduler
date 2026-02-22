@@ -12,7 +12,7 @@ import {
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT
 } from "../limits";
-import { PreloadRules } from "../types";
+import { PreloadRules } from "../types/site";
 import { postRecordURI } from "../validation/regexCases";
 
 const CONST_SCRIPT_VERSION: number = 8;

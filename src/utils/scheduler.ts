@@ -1,6 +1,8 @@
 import AtpAgent from '@atproto/api';
 import isEmpty from 'just-is-empty';
-import { AllContext, Post, Repost, TaskType } from '../types';
+import { Post } from "../classes/post";
+import { Repost } from "../classes/repost";
+import { TaskType } from "../types/queue";
 import { AgentMap } from './bskyAgents';
 import { makePost, makeRepost } from './bskyApi';
 import { pruneBskyPosts } from './bskyPrune';
@@ -10,7 +12,10 @@ import {
   setPostNowOffForPost
 } from './db/data';
 import { getAllAbandonedMedia } from './db/file';
-import { enqueuePost, enqueueRepost, isQueueEnabled, isRepostQueueEnabled, shouldPostNowQueue, shouldPostThreadQueue } from './queuePublisher';
+import {
+  enqueuePost, enqueueRepost, isQueueEnabled, isRepostQueueEnabled,
+  shouldPostNowQueue, shouldPostThreadQueue
+} from './queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtpAgent|null) => {

@@ -1,7 +1,7 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
 import { APP_NAME } from "../siteinfo";
-import { PreloadRules } from '../types';
+import { PreloadRules } from "../types/site";
 import { mainScriptStr } from '../utils/appScripts';
 import { PreloadDependencyTags } from './helpers/includesTags';
 import MetaTags from './helpers/metaTags';

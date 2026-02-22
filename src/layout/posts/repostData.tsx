@@ -1,6 +1,6 @@
 import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
-import { RepostInfo } from "../../types";
+import { RepostInfo } from "../../classes/repost";
 
 type RepostIconProps = {
   isRepost?: boolean;

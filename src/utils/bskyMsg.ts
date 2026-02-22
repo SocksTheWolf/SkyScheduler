@@ -1,5 +1,6 @@
 import { AtpAgent, RichText } from '@atproto/api';
-import { AccountStatus, Bindings } from '../types';
+import { AccountStatus } from "../types/accounts";
+import { Bindings } from '../types/settings';
 import { loginToBsky } from './bskyAgents';
 
 const chatHeaders = {headers: {
