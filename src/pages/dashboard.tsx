@@ -54,7 +54,7 @@ export default function Dashboard(props:any) {
                     hx-on-htmx-before-request="this.classList.add('svgAnim');"
                     hx-on-htmx-after-request="setTimeout(() => {this.classList.remove('svgAnim')}, 3000)">
                   <span>Refresh Posts</span>
-                  <img src="/icons/refresh.svg" alt="refresh icon" />
+                  <img src="/icons/refresh.svg" height="20px" width="20px" alt="refresh icon" />
                 </button>
                 <SettingsButton />
               </center>
