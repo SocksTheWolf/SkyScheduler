@@ -29,10 +29,6 @@
   text-overflow: ellipsis !important;
 }
 
-html {
-  scrollbar-gutter: stable;
-}
-
 .dropzone .dz-preview .dz-progress .dz-upload {
   font-size: 0.5em;
   font-weight: bold;

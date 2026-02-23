@@ -99,6 +99,10 @@
   padding-top: 1px;
 }
 
+html:not(.modal-is-open) {
+  scrollbar-gutter: stable;
+}
+
 #count, .editImgThumb, .editAltBlock {
   display: inline-block;
 }
