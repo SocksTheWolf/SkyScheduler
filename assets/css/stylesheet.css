@@ -11,7 +11,9 @@
   }
   h2, h4 {
     display: flex;
+    margin-top: 2px;
     margin-bottom: 0px;
+    line-height: unset;
   }
   img {
     float: left;

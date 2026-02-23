@@ -1,11 +1,19 @@
 import { APP_NAME } from "../../siteinfo";
 
-export function LogoImage() {
-  if (true)
+type LogoImageProps = {
+  enabled?: boolean;
+  width: number;
+  height: number;
+};
+
+export function LogoImage(props: LogoImageProps) {
+  if (props.enabled == false)
     return null;
 
-  // we can put on some more flags later to do things with like svg shenanigans
+  let width: number = props.width || 32;
+  let height: number = props.height || 32;
+
   return (<>
-    <img src="/logo.png" alt={`${APP_NAME} logo`} width="64px" height="64px" />
+    <img src="/logo.svg" alt={`${APP_NAME} logo`} width={`${width}px`} height={`${height}px`} />
   </>);
 }

@@ -7,7 +7,7 @@ export default function NavTags() {
       <div class="container navHeader">
         <div>
           <a href="/" title={`${APP_NAME} homepage`}>
-            <LogoImage />
+            <LogoImage width={64} height={64} />
             <h2 class="secondary">{APP_NAME}</h2>
           </a>
         </div>

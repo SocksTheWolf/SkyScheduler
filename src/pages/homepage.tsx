@@ -29,10 +29,11 @@ export default function Home() {
                   width="1200px"
                 />
                 <figcaption>
-                  An amazing picture of {APP_NAME}'s Dashboard, wow!
+                  {APP_NAME} is full of features to help wrangle your social media.
                 </figcaption>
               </figure>
             </center>
+            <hr />
             <h6 class="inline-header">Features:</h6>
             <ul>
               <li>Handles multiple users/accounts easily, supports most PDS instances</li>

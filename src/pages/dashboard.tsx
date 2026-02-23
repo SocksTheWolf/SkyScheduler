@@ -40,7 +40,7 @@ export default function Dashboard(props:any) {
           <article>
             <header>
               <div class="logoBox">
-                <LogoImage />
+                <LogoImage width={64} height={64} />
                 <h4>{APP_NAME} Dashboard</h4>
               </div>
               <div class="sidebar-block">
