@@ -2,7 +2,7 @@ import { raw } from "hono/html";
 import { APP_NAME, SITE_DESCRIPTION, SITE_URL } from "../../siteinfo";
 
 export default function MetaTags() {
-  const SocialImage: string = `${SITE_URL}/dashboard.png`;
+  const SocialImage: string = `${SITE_URL}/social-card.png`;
 
   return (
     <>
