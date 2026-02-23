@@ -79,6 +79,7 @@ max_retries = 3
 queue = "skyscheduler-repost-queue"
 max_retries = 3
 
+# used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"
 
@@ -90,7 +91,7 @@ command = "npm run minify"
 BETTER_AUTH_URL="https://skyscheduler.work"
 
 # If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
-IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
+IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/", max_width=3000}
 
 # Signup options and if keys should be used
 SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="", invite_uses=10}

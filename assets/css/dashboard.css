@@ -1,5 +1,4 @@
 /** SIDEBAR **/
-
 .postItemHeader {
   min-height: 50px;
   button:has(+ button) {

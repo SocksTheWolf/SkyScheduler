@@ -108,6 +108,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
     let failedToResize = true;
 
     if (c.env.IMAGE_SETTINGS.enabled) {
+      // Randomly generated id to be used during the resize process
       const resizeFilename = uuidv4();
       const resizeBucketPush = await c.env.R2RESIZE.put(resizeFilename, await file.bytes(), {
         customMetadata: {"user": userId },
@@ -116,12 +117,24 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
 
       if (!resizeBucketPush) {
         console.error(`Failed to push ${file.name} to the resizing bucket`);
-        return {"success": false, "error": "unable to handle image for resize, please make it smaller"}
+        return {"success": false, "error": "resize process ran out of disk space, you'll need to resize the image or try again"};
       }
 
-      // TODO: use the image wrangler binding
+      // Default image rules for resizing an image
+      const imageRules: RequestInitCfPropertiesImage = {
+        fit: "scale-down",
+        metadata: "copyright",
+        format: "jpeg",
+      };
+
+      // if the application is to also resize the width automatically, do so here.
+      // this will preserve aspect ratio
+      if (c.env.IMAGE_SETTINGS.max_width) {
+        imageRules.width = c.env.IMAGE_SETTINGS.max_width;
+      }
+
       for (var i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {
-        const qualityLevel = c.env.IMAGE_SETTINGS.steps[i];
+        const qualityLevel: number = c.env.IMAGE_SETTINGS.steps[i];
         const response = await fetch(new URL(resizeFilename, c.env.IMAGE_SETTINGS.bucket_url!), {
           headers: {
             "x-skyscheduler-helper": c.env.RESIZE_SECRET_HEADER
@@ -129,8 +142,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
           cf: {
             image: {
               quality: qualityLevel,
-              metadata: "copyright",
-              format: "jpeg"
+              ...imageRules
             }
           }
         });
@@ -138,7 +150,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
           const resizedHeader = response.headers.get("Cf-Resized");
           const returnType = response.headers.get("Content-Type") || "";
           const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
-          const resizeHadError = resizedHeader === null || resizedHeader.indexOf("err=") !== -1;
+          const resizeHadError: boolean = (resizedHeader === null || resizedHeader.indexOf("err=") !== -1);
 
           if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
             console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
@@ -174,7 +186,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
 
     if (failedToResize) {
       const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
-      return {"success": false, "originalName": originalName, "error": `Image is too large for bsky, over by ${fileSizeOverAmount}MB`};
+      return {"success": false, "originalName": originalName, "error": `Image is too large for BSky, size is over by ${fileSizeOverAmount}MB`};
     }
   }
 

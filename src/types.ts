@@ -7,6 +7,7 @@ type ImageConfigSettings = {
   enabled: boolean;
   steps?: number[];
   bucket_url?: string;
+  max_width?: number;
 };
 
 type SignupConfigSettings = {
@@ -169,8 +170,6 @@ export type PreloadRules = {
   href: string;
 };
 
-export type AllContext = Context|ScheduledContext;
-
 export type BskyEmbedWrapper = {
   type: EmbedDataType;
   data?: any;
@@ -203,4 +202,5 @@ export type R2BucketObject = {
   date: Date
 }
 
+export type AllContext = Context|ScheduledContext;
 export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];

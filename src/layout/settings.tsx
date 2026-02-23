@@ -38,8 +38,8 @@ export function Settings(props: SettingsTypeProps) {
             <label>
               BSky App Password:
               <BSkyAppPasswordField />
-              <small>If you need to change your bsky application password, you can
-                <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
+              <small>If you need to change your bsky application password, you can&nbsp;
+              <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
             </label>
             <label>
               BSky PDS:

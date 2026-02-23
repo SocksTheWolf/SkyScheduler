@@ -1,12 +1,21 @@
 /* Functions that can be used anywhere on the website. */
 function pushToast(msg, isSuccess) {
-  Toastify({
+  var newToast = Toastify({
     text: msg,
+    stopOnFocus: false,
+    ariaLive: true,
+    avatar: !isSuccess ? "/icons/warning.svg" : "/icons/success.svg",
     duration: !isSuccess ? 10000 : Toastify.defaults.duration,
     style: {
+      "padding-left": "12px",
       background: isSuccess ? 'green' : 'red'
-    }
-  }).showToast();
+    },
+    close: false,
+    onClick: () => {
+      newToast.hideToast();
+    },
+  });
+  newToast.showToast();
 }
 
 function scrollTop() {

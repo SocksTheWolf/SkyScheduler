@@ -82,7 +82,7 @@ export default function Dashboard(props:any) {
             <button id="tabone" class="w-half" role="tab" aria-selected="true" aria-controls="postTab">New Post</button>
             <button id="tabtwo" class="w-half" role="tab" aria-controls="repostTab">New Retweet</button>
             <div id="postTab" role="tabpanel" aria-labelledby="tabone" >
-              <PostCreation />
+              <PostCreation ctx={ctx} />
             </div>
             <div id="repostTab" role="tabpanel" aria-labelledby="tabtwo" hidden>
               <MakeRetweet />

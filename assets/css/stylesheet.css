@@ -67,3 +67,7 @@
 [data-tooltip]:before, .pico [data-tooltip]:before {
   white-space: preserve-breaks !important;
 }
+
+.toastify-avatar {
+  margin-left: 0px;
+}

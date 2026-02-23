@@ -10,6 +10,7 @@ const cancelThreadBtn = document.getElementById('cancelThreadPost');
 const postFormTitle = document.getElementById('postFormTitle')
 let hasFileLimit = false;
 let fileData = new Map();
+let waitingFiles = 0;
 
 /* Sections for handling UI changes and modifications */
 const sectionRetweet = document.getElementById('section-retweet');
@@ -20,6 +21,7 @@ const sectionLinkAttach = document.getElementById("section-weblink");
 function addOnUnloadBlocker() {
   window.onbeforeunload = function() {
     document.querySelectorAll(".fileDel").forEach((el) => {el.click();});
+    // only way to get the alert box to not show up
     return undefined;
   }
 }
@@ -27,10 +29,15 @@ function clearOnUnloadBlocker() {
   window.onbeforeunload = null;
 }
 
+function setFileData(fileName, data) {
+  fileData.set(fileName, data);
+  --waitingFiles;
+}
+
 let fileDropzone = new Dropzone("#fileUploads", {
   url: "/post/upload",
   autoProcessQueue: true,
-  /* We process this ourselves */
+  /* We add remove links ourselves */
   addRemoveLinks: false,
   maxFiles: FILE_DROP_MAX_FILES,
   dictMaxFilesExceeded: "max files",
@@ -80,10 +87,12 @@ document.addEventListener("resetPost", () => {
   fileDropzone.removeAllFiles();
   // Clear the file data map
   fileData.clear();
+  waitingFiles = 0;
 });
 
 fileDropzone.on("reset", () => {
   hasFileLimit = false;
+  waitingFiles = 0;
   clearOnUnloadBlocker();
   showContentLabeler(false);
   setElementVisible(sectionLinkAttach, true);
@@ -95,6 +104,8 @@ fileDropzone.on("addedfile", file => {
     pushToast("Maximum number of files reached", false);
     return;
   }
+  // Increase the number of waiting to be processed files.
+  ++waitingFiles;
   setElementVisible(sectionLinkAttach, false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='file-item-group'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel outline btn-error' disabled><small>Remove file</small></button>");
@@ -148,9 +159,18 @@ fileDropzone.on("addedfile", file => {
 fileDropzone.on("success", function(file, response) {
   const deleteFileOnError = () => {
     const delButton = file.previewElement.querySelectorAll(".fileDel")[0];
+    --waitingFiles;
     delButton.setAttribute("bad", true);
     delButton.click();
   };
+  const deleteFileIfLengthOver = (length, max) => {
+    if (length > max) {
+      pushToast(`${file.name} is over the max duration by ${(length - max).toFixed(2)} seconds`, false);
+      deleteFileOnError();
+      return true;
+    }
+    return false;
+  }
   // show the labels
   showContentLabeler(true);
   const fileIsImage = imageTypes.includes(file.type);
@@ -170,11 +190,8 @@ fileDropzone.on("success", function(file, response) {
     videoTag.setAttribute("src", videoObjectURL);
     videoTag.addEventListener("loadeddata", () => {
       const videoDuration = videoTag.duration;
-      if (videoDuration > MAX_VIDEO_LENGTH) {
-        pushToast(`${file.name} is too long for bsky by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
-        deleteFileOnError();
-      } else {
-        fileData.set(file.name, {content: response.data, type: 3,
+      if (!deleteFileIfLengthOver(videoDuration, MAX_VIDEO_LENGTH)) {
+        setFileData(file.name, {content: response.data, type: 3,
           height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
         hasFileLimit = true;
       }
@@ -196,10 +213,8 @@ fileDropzone.on("success", function(file, response) {
       let duration = 0;
       try {
         for (let i = 0, len = uint8.length; i < len; i++) {
-          if (uint8[i] == 0x21
-            && uint8[i + 1] == 0xF9
-            && uint8[i + 2] == 0x04
-            && uint8[i + 7] == 0x00)
+          if (uint8[i] == 0x21 && uint8[i + 1] == 0xF9
+            && uint8[i + 2] == 0x04 && uint8[i + 7] == 0x00)
           {
             const delay = (uint8[i + 5] << 8) | (uint8[i + 4] & 0xFF)
             duration += delay < 2 ? 10 : delay
@@ -224,21 +239,17 @@ fileDropzone.on("success", function(file, response) {
       if (videoDuration === null) {
         pushToast(`${file.name} duration could not be processed`, false);
         deleteFileOnError();
-      } else if (videoDuration > MAX_VIDEO_LENGTH) {
-        pushToast(`${file.name} is over the maximum video duration by ${(videoDuration - MAX_VIDEO_LENGTH).toFixed(2)} seconds`, false);
-        deleteFileOnError();
-      } else if (videoDuration >= MAX_GIF_LENGTH) {
-        pushToast(`${file.name} is over the maximum length for a gif by ${(videoDuration - MAX_GIF_LENGTH).toFixed(2)} seconds`, false);
-        deleteFileOnError();
+      } else if (deleteFileIfLengthOver(videoDuration, MAX_GIF_LENGTH)) {
+        return;
       } else {
-        fileData.set(file.name, { content: response.data, type: 3, height: imageHeight, width: imageWidth, duration: videoDuration });
+        setFileData(file.name, { content: response.data, type: 3, height: imageHeight, width: imageWidth, duration: videoDuration });
         hasFileLimit = true;
       }
     };
     // Force the file to load.
     imgObj.src = gifImgURL;
   } else {
-    fileData.set(file.name, {content: response.data, type: 1});
+    setFileData(file.name, {content: response.data, type: 1});
   }
 
   // Make the buttons pressable
@@ -280,6 +291,8 @@ fileDropzone.on("error", function(file, msg) {
     pushToast(`Error: ${file.name} had an unexpected error`, false);
   }
 
+  // file failed to upload, so drop the value here too
+  --waitingFiles;
   fileDropzone.removeFile(file);
   if (fileData.length == 0) {
     setElementVisible(sectionLinkAttach, true);
@@ -288,7 +301,7 @@ fileDropzone.on("error", function(file, msg) {
 
 fileDropzone.on("uploadprogress", function(file, progress, bytesSent) {
   const progressObject = file.previewElement.querySelector(".dz-upload");
-  progressObject.innerHTML = `${progress}%`;
+  progressObject.innerHTML = `${progress.toFixed(2)}%`;
   if ((progress === 100 || bytesSent == file.size) && progressObject) {
     progressObject.innerHTML = "Processing...please wait. This may take a bit!";
   }
@@ -301,6 +314,11 @@ fileDropzone.on("maxfilesexceeded", () => {
 // Handle form submission
 postForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  // prevent submissions if we're currently uploading files.
+  if (waitingFiles > 0) {
+    pushToast("Files are currently pending upload, please wait...", false);
+    return;
+  }
   showPostProgress(true);
   const contentVal = content.value;
   const postNow = postNowCheckbox.checked;

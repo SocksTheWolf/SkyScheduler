@@ -26,7 +26,8 @@ export const PreloadPostCreation: PreloadRules[] = [
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
-export function PostCreation() {
+export function PostCreation({ctx}: any) {
+  const maxWidth: number|undefined = ctx.env.IMAGE_SETTINGS.max_width;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (
   <section>
@@ -63,15 +64,21 @@ export function PostCreation() {
                   <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
                   <ul>
                     <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
-                    <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)</li>
+                    <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
+                    {maxWidth ? 
+                      <ol>
+                        <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{maxWidth}px</b> will also <u data-tooltip="will preserve aspect ratio">be resized</u> in addition to being compressed</li>
+                      </ol> : null}
+                    </li>
+                    
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
-                    <li>don't upload and fail, it's recommended to use a lower resolution file instead</li>
+                    <li>if an image fails to upload, you'll need to manually adjust the file to fit it properly</li>
                   </ul></li>
                   <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>:
                   <ul>
                     <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
                     <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-                    <li>will be processed on BSky after they're posted. This may show a temporary "Video not Found"/black screen for a bit after posting.</li>
+                    <li>will be processed on your PDS after they're posted. This may show a temporary <i>"Video not Found"</i> message for a bit after posting.</li>
                   </ul></li>
                   </ul></small></div>
                 </footer>
@@ -95,7 +102,7 @@ export function PostCreation() {
             <section>
               <article>
                 <header>Insert Post/Feed/List Link</header>
-                <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto powered record" />
+                <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto based record" />
                 <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
