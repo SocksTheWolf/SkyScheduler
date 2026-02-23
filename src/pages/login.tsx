@@ -3,6 +3,7 @@ import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { DashboardPasswordField } from "../layout/passwordFields";
 import { UsernameField } from "../layout/usernameField";
+import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
 
 export default function Login() {
@@ -20,7 +21,7 @@ export default function Login() {
         <UsernameField />
 
         <label hx-history="false">
-          Dashboard Password
+          {APP_NAME} Dashboard Password
           <DashboardPasswordField autocomplete={PWAutoCompleteSettings.CurrentPass} required={true} />
           <small><b>NOTE</b>: This password is not related to your Bluesky account!</small>
         </label>

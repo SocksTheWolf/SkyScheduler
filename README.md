@@ -82,7 +82,7 @@ npm run deploy
 
 8. Create your D1 tables using the following command, this will set up your tables both locally and remotely.
 
-*NOTE*: If you encounter issues running remotely, you can run the command again.
+**NOTE**: If you encounter issues running remotely, you can run the command again.
 
 ```bash
 npm run migrate:all
@@ -90,9 +90,9 @@ npm run migrate:all
 
 9. Modify any site information located in:
 
-* `limits.ts` - site configuration and application limits
-* `siteinfo.ts` - site information such as name, description, domain, etc
-* `.ssclirc` - sitemap domain
+   - `limits.ts` - site configuration and application limits
+   - `siteinfo.ts` - site information such as name, description, domain, etc
+   - `.ssclirc` - sitemap domain
 
 10. Run your application and go to `/setup`. This will create the admin account.
 
@@ -115,6 +115,11 @@ The application by default is configured to use the minified versions of the scr
 ```text
 skyscheduler/
 ├── assets/
+│   ├── css/
+│   ├── dep/
+│   ├── icons/
+│   ├── js/
+│   └── thumbs/
 ├── src/
 │   ├── auth/
 │   ├── classes/
@@ -130,6 +135,7 @@ skyscheduler/
 ├── .node-version
 ├── .markdownlint.json
 ├── .minify.json
+├── .ssclirc
 ├── drizzle.config.ts
 ├── package.json
 ├── tsconfig.json

@@ -9,6 +9,7 @@ import MetaTags from './helpers/metaTags';
 type BaseLayoutProps = {
   children: Child;
   title: string;
+  noIndex?: boolean;
   mainClass?: string;
   preloads?: PreloadRules[]
 };
@@ -16,6 +17,7 @@ type BaseLayoutProps = {
 export const BaseLayout = ({
   children,
   title,
+  noIndex = false,
   mainClass = "",
   preloads = []
 }: BaseLayoutProps) => {
@@ -24,6 +26,7 @@ export const BaseLayout = ({
     <head>
       <meta charset="UTF-8" />
       <title>{APP_NAME} - {title}</title>
+      {noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="preload" href="/dep/htmx.min.js" as="script" />
       <link rel="preload" href="/dep/toastify.js" as="script" />

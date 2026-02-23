@@ -3,7 +3,7 @@
   "match": "**/*.tsx",
   "stdout": true,
   "no-robots": true,
-  "ignore": "**/(dashboard|reset)*",
+  "ignore": "**/(dashboard|reset|forgot)*",
   "root": "src/pages",
   "format": "xml"
 }

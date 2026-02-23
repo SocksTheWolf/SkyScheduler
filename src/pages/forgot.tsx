@@ -12,10 +12,10 @@ export default function ForgotPassword(props:any) {
   const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (
     <BaseLayout title="Forgot Password"
-      preloads={[...TurnstileCaptchaPreloads(ctx)]}>
+      preloads={[...TurnstileCaptchaPreloads(ctx)]} noIndex={true}>
       <NavTags />
       <AccountHandler title="Forgot Password Reset"
-        submitText="Request Password Reset"
+        submitText={`Request ${APP_NAME} Password Reset`}
         loadingText="Requesting Password Reset..." endpoint="/account/forgot"
         successText="Attempted to send DM. If you do not have it, please make sure you are following the account."
         redirect="/login"

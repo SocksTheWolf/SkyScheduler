@@ -554,7 +554,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
       // If this post is already posted, we might be trying to restore from a failed state
       if (child.posted) {
         postMap.set(child.postid, {postID: null, uri: child.uri!, cid: child.cid!});
-        successes += 1;
+        ++successes;
         continue;
       }
       // This is the first child post we haven't handled yet, oof.
@@ -562,8 +562,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
         console.error(`We encountered errors attempting to post child ${child.postid}, returning what did get posted`);
         break;
       }
-      successes += 1;
-      successThisRound += 1;
+      ++successes;
+      ++successThisRound;
     }
   }
 

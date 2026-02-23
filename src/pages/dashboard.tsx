@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
 import FooterCopyright from "../layout/helpers/footer";
 import { IncludeDependencyTags } from "../layout/helpers/includesTags";
+import { LogoImage } from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
@@ -14,7 +15,6 @@ import {
   dashboardScriptStr,
   settingsScriptStr
 } from "../utils/appScripts";
-import { LogoImage } from "../layout/helpers/logo";
 
 export default function Dashboard(props:any) {
   const ctx: Context = props.c;

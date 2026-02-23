@@ -58,6 +58,7 @@ app.get("/robots.txt", async (c) => {
 // Add redirects
 app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
 app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
+app.all("/terms", (c) => c.redirect("/tos"));
 
 // Legal linkies
 app.get("/tos", (c) => c.html(<TermsOfService />));

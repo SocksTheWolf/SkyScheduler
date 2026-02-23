@@ -18,5 +18,7 @@ function setupSettings() {
   }
 }
 
-addUsernameFieldWatchers();
-setupSettings();
+document.addEventListener("DOMContentLoaded", () => {
+  addUsernameFieldWatchers();
+  setupSettings();
+});

@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://skyscheduler.work/forgot</loc>
-        <lastmod>2026-02-21T02:47:31.792Z</lastmod>
-    </url>
-    <url>
         <loc>https://skyscheduler.work/</loc>
-        <lastmod>2026-02-21T02:47:31.792Z</lastmod>
+        <lastmod>2026-02-23T01:42:15.807Z</lastmod>
     </url>
     <url>
         <loc>https://skyscheduler.work/login</loc>
-        <lastmod>2026-02-17T05:42:21.894Z</lastmod>
+        <lastmod>2026-02-23T01:49:53.299Z</lastmod>
     </url>
     <url>
         <loc>https://skyscheduler.work/privacy</loc>
-        <lastmod>2026-02-19T06:40:25.683Z</lastmod>
+        <lastmod>2026-02-23T01:51:40.422Z</lastmod>
     </url>
     <url>
         <loc>https://skyscheduler.work/signup</loc>
-        <lastmod>2026-02-17T05:42:43.576Z</lastmod>
+        <lastmod>2026-02-23T01:53:39.083Z</lastmod>
     </url>
     <url>
         <loc>https://skyscheduler.work/tos</loc>
-        <lastmod>2026-02-21T02:47:31.805Z</lastmod>
+        <lastmod>2026-02-23T01:47:34.846Z</lastmod>
     </url>
 </urlset>

@@ -1,10 +1,18 @@
 function handleResetLoad() {
   if (resetToken = new URLSearchParams(window.location.search).get("token")) {
-    document.getElementById("resetToken").value = encodeURI(resetToken);
+    const resetTokenField = document.getElementById("resetToken");
     const submitButton = document.getElementById("submitButton");
-    submitButton.removeAttribute("disabled");
+    if (resetTokenField && submitButton) {
+      resetTokenField.value = encodeURI(resetToken);
+      submitButton.removeAttribute("disabled");
+    }
+    else
+      pushToast("Page is malformed, please clear cache and refresh", false);
   } else {
     pushToast("Reset token is invalid! Request a new reset token to continue", false);
   }
 }
-handleResetLoad();
+
+document.addEventListener("DOMContentLoaded", () => {
+  handleResetLoad();
+});
