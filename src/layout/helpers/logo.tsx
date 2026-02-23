@@ -14,6 +14,6 @@ export function LogoImage(props: LogoImageProps) {
   let height: number = props.height || 32;
 
   return (<>
-    <img src="/logo.svg" alt={`${APP_NAME} logo`} width={`${width}px`} height={`${height}px`} />
+    <img src="/logo.svg" fetchpriority="high" alt={`${APP_NAME} logo`} width={`${width}px`} height={`${height}px`} />
   </>);
 }
