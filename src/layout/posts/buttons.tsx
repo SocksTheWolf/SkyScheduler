@@ -1,4 +1,4 @@
-
+// Buttons for post header tags
 export function AddPostToThreadButton() {
   return (
     <button class="addThreadPost btn-sm primary outline" data-tooltip="Add a post to thread"
@@ -19,7 +19,7 @@ export function EditPostButton({id}: PostIDProps) {
       hx-trigger="click once"
       title="Click to edit post content"
       hx-get={`/post/edit/${id}`}
-      hx-target={`#post${id}`}
+      hx-target={`#content-${id}`}
       hx-swap={`innerHTML show:#editPost${id}:top"`}>
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
     </button>
@@ -32,7 +32,7 @@ type DeletePostProps = PostIDProps & {
 }
 
 export function DeletePostButton(props: DeletePostProps) {
-  const deleteTargetId = `#postBase${props.id}`;
+  const deleteTargetId = `#post-${props.id}`;
   const postType = props.isRepost ? "repost" : "post";
   const deleteTarget = props.child ? `blockquote:has(${deleteTargetId})` : deleteTargetId;
   return (

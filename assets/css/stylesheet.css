@@ -21,6 +21,18 @@
   }
 }
 
+/* Shrink the nav icon on small handhead screens */
+@media (max-width: 410px) {
+  .navHeader {
+    img {
+      width: 24px !important;
+      height: 24px !important;
+      margin-right: 10px;
+      margin-top: 0.7em;
+    }
+  }
+}
+
 .btn-error, .pico .btn-error {
   border: var(--pico-border-width) solid red;
   color: red;

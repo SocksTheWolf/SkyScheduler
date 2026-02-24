@@ -23,14 +23,14 @@ type ScheduledPostOptions = {
 
 export function PostHTML(props: ScheduledPostOptions) {
   const content: Post = props.post;
-  const oobSwapStr = (props.dynamic) ? `hx-swap-oob="#postBase${content.postid}"` : "";
+  const oobSwapStr = (props.dynamic) ? `hx-swap-oob="#post-${content.postid}"` : "";
   const hasBeenPosted: boolean = (content.posted === true && content.uri !== undefined);
 
   const postHTML = html`
   <article
-    id="postBase${content.postid}" ${oobSwapStr}>
+    id="post-${content.postid}" ${oobSwapStr}>
     ${<PostDataHeader content={content} posted={hasBeenPosted} />}
-    <div id="post${content.postid}">
+    <div id="content-${content.postid}">
       ${<PostContent text={content.text} posted={content.posted || false} repost={content.isRepost || false} />}
     </div>
     ${<PostDataFooter content={content} posted={hasBeenPosted} />}

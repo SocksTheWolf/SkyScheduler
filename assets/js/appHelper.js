@@ -1,6 +1,6 @@
 /* Functions that are mostly used on the application side of things */
 function getPostListElement(itemID) {
-  return document.getElementById(`postBase${itemID}`);
+  return document.getElementById(`post-${itemID}`);
 }
 
 function formatDate(date) {

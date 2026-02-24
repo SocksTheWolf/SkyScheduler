@@ -138,8 +138,15 @@ dialog button.btn-error {
 }
 
 /** MAKING/EDITING POSTS **/
-textarea, .pico textarea {
-  resize: none;
+textarea {
+  resize: none !important;
+}
+
+/* Fix floating label due to tab list shenanigans */
+@media (max-width: 45em) {
+  #post-content-label {
+    width: unset !important;
+  }
 }
 
 .uploadGuidelines, .editAltBlock {
