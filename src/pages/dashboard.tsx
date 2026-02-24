@@ -9,7 +9,7 @@ import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { Settings, SettingsButton } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { APP_NAME, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
+import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import { PreloadRules } from "../types";
 import {
   dashboardScriptStr,
@@ -44,7 +44,7 @@ export default function Dashboard(props:any) {
                 <h4>{APP_NAME} Dashboard</h4>
               </div>
               <div class="sidebar-block">
-                <small><i>Schedule Bluesky posts effortlessly</i>.</small><br />
+                <small><i>{DASHBOARD_TAG_LINE}</i>.</small><br />
                 <small>Account: <b id="currentUser" hx-get="/account/username"
                   hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
               </div>

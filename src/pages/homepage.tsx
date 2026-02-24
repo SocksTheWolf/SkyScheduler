@@ -5,7 +5,7 @@ import {
   MAX_POSTS_PER_THREAD, MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS,
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME, APP_REPO } from "../siteinfo";
 
 export default function Home() {
   return (
@@ -16,7 +16,7 @@ export default function Home() {
           <noscript><header>Javascript is required to use this website!</header></noscript>
           <p>
             <strong>{APP_NAME}</strong> is a
-            free, <a href="https://github.com/socksthewolf/skyscheduler" rel="nofollow" target="_blank">open source</a> service
+            free, <a href={APP_REPO} rel="nofollow" target="_blank">open source</a> service
             that allows you to schedule and automatically repost your content on Bluesky!<br />
             Boost engagement and reach more people no matter what time of day!<br />
             <center>

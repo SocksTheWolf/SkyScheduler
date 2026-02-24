@@ -55,7 +55,9 @@ cp .dev.vars.example .dev.vars
    - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
    - `RESIZE_SECRET_HEADER` - a header value that will be included on requests while trying to resize images. Protects the resize bucket while still making it accessible to CF Images.
 
-**Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`. _Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk FILENAME` to upload all the settings at once.
+**Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
+
+_Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk FILENAME` to upload all the settings at once.
 
 4. Update your `wrangler.toml` with changes that reflect your account.
    - You'll need to update the values for the kv, r2, queues, d1 to reflect the bindings on your account.
@@ -104,7 +106,11 @@ Ensure you have configured the `.dev.vars` file with the necessary credentials a
 
 ### Application Variables
 
-Most of the application can be modified either through the `wrangler.toml` vars section or via `src/limits.ts`. These are usually heavily commented to explain what the options control.
+Most of the application can be modified with `wrangler.toml`'s vars section or via `src/limits.ts`. Both files are heavily commented to explain what the options control.
+
+### Site Variables
+
+Modifying key values such as meta tag data, the application name and any descriptions is fully controlled via `src/siteinfo.ts`. Changing these fields will modify the rest of the application's web output.
 
 ### Minimization
 
@@ -166,20 +172,20 @@ skyscheduler/
 - pico - styling, tabs, modals
 - countable - dynamic input counter
 
-## Contributing
+## Contributions
 
-We welcome contributions!
-
-### Ways to Contribute
+We welcome contributions! Here's some ways to contribute:
 
 - Report bugs
 - Suggest enhancements
-- Submit pull requests
 - [Sponsor](https://ko-fi.com/socksthewolf/tip)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project's source code is licensed under the MIT License
+Name, Logos and Branding are copyright SocksTheWolf, all rights reserved.
+
+See the [LICENSE](LICENSE) file for details.
 
 ---
 _Source hosted on [Github](https://github.com/SocksTheWolf/SkyScheduler), mirrored on [tangled](https://tangled.org/socksthewolf.com/skyscheduler)_

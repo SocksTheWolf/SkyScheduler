@@ -1,7 +1,7 @@
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME, APP_REPO } from "../siteinfo";
 
 export default function PrivacyPolicy() {
   return (
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
                   <li>Images are sent to Cloudflare Images compressor to optimize the file size in order to upload onto BlueSky</li>
                   <li>CF's Turnstile captcha service is used during signup and password recovery to prevent botted behaviors</li>
                   <li>Data is stored in Cloudflare's D1/R2/KV storage containers</li>
-                  <li>Media may be scanned by Cloudflare's 
+                  <li>Media may be scanned by Cloudflare's
                   &nbsp;<a rel="noopener nofollow noindex" href="https://developers.cloudflare.com/cache/reference/csam-scanning/" class="secondary">illicit material detection service</a>.<br />
                   &nbsp;Said media is not allowed on this service and violators will be banned.</li>
                 </ul>
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
                 <li>Data is not accessible to the maintainers of {APP_NAME}</li>
                 <li>{APP_NAME} does not sell your data to any third party</li>
                 <li>No data is used for genAI purposes nor for training any models</li>
-                <li>You can verify this by just looking at <a href="https://github.com/socksthewolf/skyscheduler" class="secondary" ref="noopener nofollow">the source code</a></li>
+                <li>You can verify this by just looking at <a href={APP_REPO} class="secondary" ref="noopener nofollow">the source code</a></li>
               </ul>
             </div>
           </p>

@@ -1,4 +1,4 @@
-import { APP_NAME } from "../../siteinfo";
+import { APP_NAME, LOGO_ENABLED } from "../../siteinfo";
 
 type LogoImageProps = {
   enabled?: boolean;
@@ -7,7 +7,7 @@ type LogoImageProps = {
 };
 
 export function LogoImage(props: LogoImageProps) {
-  if (props.enabled == false)
+  if (LOGO_ENABLED == false)
     return null;
 
   let width: number = props.width || 32;

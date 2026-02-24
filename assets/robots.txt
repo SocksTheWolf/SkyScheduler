@@ -1,4 +1,4 @@
-User-Agent: *
+User-agent: *
 Disallow: *.js$
 Disallow: *.css$
 Disallow: /admin
