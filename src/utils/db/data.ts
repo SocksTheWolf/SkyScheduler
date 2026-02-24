@@ -142,7 +142,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
 
   if (dbOperations.length > 0)
     await db.batch(dbOperations as BatchQuery);
-}
+};
 
 export const setPostNowOffForPost = async (c: AllContext, id: string) => {
   const db: DrizzleD1Database = c.get("db");
@@ -246,7 +246,7 @@ export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, 
   return await db.$count(posts, and(
     eq(posts.rootPost, rootId),
     eq(posts.userId, userId)));
-}
+};
 
 // deletes multiple posted posts from a database.
 export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promise<number> => {
@@ -279,13 +279,12 @@ export const purgePostedPosts = async (c: AllContext): Promise<number> => {
     console.error("could not purge posted posts, got error");
     return 0;
   }
-  const dateString = `datetime('now', '-${MAX_HOLD_DAYS_BEFORE_PURGE} days')`;
   const dbQuery = await db.select({ data: posts.uuid }).from(posts)
   .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
   .where(
     and(
       and(
-        eq(posts.posted, true), lte(posts.updatedAt, sql`${dateString}`)
+        eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-${Math.abs(MAX_HOLD_DAYS_BEFORE_PURGE)} days')`)
       ),
       // skip child posts objects
       and(lte(posts.threadOrder, 0), lte(repostCounts.count, 0))
