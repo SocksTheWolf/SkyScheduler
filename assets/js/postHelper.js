@@ -69,6 +69,7 @@ document.addEventListener("resetPost", () => {
   threadField.removeAttribute("postid");
   showContentLabeler(false);
   setSelectDisable(repostCheckbox.parentElement, true);
+  scheduledDate.value = "";
   setElementRequired(scheduledDate, true);
   setElementVisible(scheduledDate, true);
   setElementVisible(scheduledDate.nextElementSibling, true);
@@ -446,12 +447,6 @@ postForm.addEventListener('submit', async (e) => {
   showPostProgress(false);
 });
 
-function convertTimeValueLocally(number) {
-  const date = new Date(number);
-  date.setMinutes(0 - date.getTimezoneOffset());
-  return date.toISOString().slice(0,16);
-}
-
 function setSelectDisable(nodeBase, disable) {
   nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
     (el) => setElementDisabled(el, disable));
@@ -588,7 +583,7 @@ function runPageReactors() {
     });
 
     // push a minimum date to make it easier (less chance of typing 2025 by accident)
-    dateScheduler.setAttribute("min", convertTimeValueLocally(Date.now()));
+    dateScheduler.setAttribute("min", getScheduleTimeForNextHour());
 
     if (scheduledPostNowBox) {
       addClickKeyboardListener(scheduledPostNowBox, () => {

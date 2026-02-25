@@ -115,10 +115,7 @@ document.addEventListener("addNewRepost", (ev) => {
     if (contentTabs !== null) {
       contentTabs.switchTab("dashtabs", 1);
       scrollToObject(repostRecordURL);
-      // set current time to value of now + 1 hour
-      const curDate = new Date();
-      curDate.setHours(curDate.getHours() + 1);
-      document.getElementById("repostTime").value = convertTimeValueLocally(curDate);
+      document.getElementById("repostTime").value = getScheduleTimeForNextHour();
       return;
     }
   }

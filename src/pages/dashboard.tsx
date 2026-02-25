@@ -72,7 +72,7 @@ export default function Dashboard(props:any) {
                 </button>
               </div>
               <hr />
-              <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR} />
+              <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR} showVersion={true} />
             </footer>
           </article>
         </section>

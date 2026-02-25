@@ -164,3 +164,16 @@ function setElementDisabled(el, disabled) {
   else
     el.removeAttribute("disabled");
 }
+
+function convertTimeValueLocally(number) {
+  const date = new Date(number);
+  date.setMinutes(0 - date.getTimezoneOffset());
+  return date.toISOString().slice(0,16);
+}
+
+function getScheduleTimeForNextHour() {
+  // set current time to value of now + 1 hour
+  const curDate = new Date();
+  curDate.setHours(curDate.getHours() + 1);
+  return convertTimeValueLocally(curDate);
+}
