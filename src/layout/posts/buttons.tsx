@@ -1,6 +1,7 @@
 // Buttons for post header tags
 export function AddPostToThreadButton() {
-  return (<button class="addThreadPost btn-sm primary outline" listen="false">
+  return (<button class="addThreadPost btn-sm primary outline" listen="false"
+    title="Add a post underneath this one">
     <span data-tooltip="Add a post to thread" data-placement="right">
       <img src="/icons/reply.svg" alt="threaded post icon" width="20px" height="20px" />
     </span>
@@ -8,7 +9,8 @@ export function AddPostToThreadButton() {
 }
 
 export function AddRepostsButton() {
-  return (<button class="addRepostsButton btn-sm primary outline" listen="false">
+  return (<button class="addRepostsButton btn-sm primary outline" listen="false"
+    title="Add additional reposts to this post">
     <span data-placement="right" data-tooltip="Add reposts">
       <img src="/icons/add-repost.svg" alt="add reposts icon" width="20px" height="20px" />
     </span>
