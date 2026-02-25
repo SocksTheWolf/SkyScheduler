@@ -18,14 +18,10 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { SITE_URL } from "./siteinfo";
-import { Bindings, TaskType } from "./types";
-import { AgentMap } from "./utils/bskyAgents";
+import { Bindings, QueueTaskData } from "./types";
 import { makeConstScript } from "./utils/constScriptGen";
-import { QueueTaskData } from "./utils/queuePublisher";
-import {
-  cleanUpPostsTask, handlePostTask,
-  handleRepostTask, schedulePostTask
-} from "./utils/scheduler";
+import { processQueue } from "./utils/queueHandler";
+import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -138,34 +134,7 @@ export default {
     }
   },
   async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
-    const runtimeWrapper = new ScheduledContext(env, ctx);
-    const delay: number = env.QUEUE_SETTINGS.delay_val;
-    const agency = new AgentMap(env.TASK_SETTINGS);
-    let wasSuccess: boolean = false;
-    for (const message of batch.messages) {
-      const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, message.body.post || message.body.repost, message.body.type);
-      switch (message.body.type) {
-        case TaskType.Post:
-          wasSuccess = await handlePostTask(runtimeWrapper, message.body.post!, agent);
-        break;
-        case TaskType.Repost:
-          wasSuccess = await handleRepostTask(runtimeWrapper, message.body.repost!, agent);
-        break;
-        default:
-        case TaskType.None:
-          console.error("Got a message queue task type that was invalid");
-          message.ack();
-          return;
-      }
-      // Handle queue acknowledgement on success/failure
-      if (!wasSuccess) {
-        const delaySeconds = delay*(message.attempts+1);
-        console.log(`attempting to retry message in ${delaySeconds}`);
-        message.retry({delaySeconds: delaySeconds});
-      } else {
-        message.ack();
-      }
-    }
+    await processQueue(batch, env, ctx);
   },
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     return app.fetch(request, env, ctx);

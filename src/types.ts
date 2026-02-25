@@ -1,6 +1,8 @@
 import { BatchItem } from "drizzle-orm/batch";
 import { Context } from "hono";
 import { ScheduledContext } from "./classes/context";
+import { Post } from "./classes/post";
+import { Repost } from "./classes/repost";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -32,6 +34,7 @@ type QueueConfigSettings = {
   repostsEnabled: boolean;
   threadEnabled: boolean;
   postNowEnabled?: boolean;
+  pressure_retries?: boolean;
   delay_val: number;
   post_queues: string[];
   repost_queues: string[];
@@ -104,6 +107,7 @@ export enum PostLabel {
 
 export enum TaskType {
   None,
+  Info,
   Post,
   Repost,
 };
@@ -188,6 +192,11 @@ export type CreateObjectResponse = {
 
 export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
+};
+
+export type QueueTaskData = {
+  type: TaskType;
+  data: Post|Repost|null;
 };
 
 // Used for the pruning and database operations
