@@ -5,10 +5,7 @@ import { describeRoute, resolver, validator } from "hono-openapi";
 import { ContextVariables } from "../auth";
 import { Bindings } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
-import {
-  AccountResetSchema, PasswordResetCheckCallbackParam,
-  PasswordResetTokenParam
-} from "../validation/accountResetSchema";
+import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
@@ -423,15 +420,3 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
     }
   }
 }), validator("param", CheckFileSchema));
-
-openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
-  description: "resets a password",
-  responses: {
-    200: {
-      description: "valid token, redirect to reset"
-    },
-    404: {
-      description: "reset token is invalid"
-    }
-  }
-}), validator("param", PasswordResetTokenParam), validator("query", PasswordResetCheckCallbackParam));

@@ -5,14 +5,14 @@ import { username } from "better-auth/plugins";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME, SITE_URL } from "../siteinfo";
 import { Bindings } from "../types";
 import { lookupBskyHandle } from "../utils/bskyApi";
 import { createDMWithUser } from "../utils/bskyMsg";
 
-function createPasswordResetMessage(url: string) {
+function createPasswordResetMessage(url: string, token: string) {
   return `Your ${APP_NAME} password reset url is:
-${url}
+${SITE_URL}/reset-password/${token}
 
 This URL will expire in about an hour.
 
@@ -71,7 +71,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
           const userName = (user as any).username;
           const bskyUserId = await lookupBskyHandle(userName);
           if (bskyUserId !== null) {
-            const response = await createDMWithUser(env!, bskyUserId, createPasswordResetMessage(url));
+            const response = await createDMWithUser(env!, bskyUserId, createPasswordResetMessage(url, token));
             if (!response)
               throw new Error("FAILED_MESSAGE");
             } else {
