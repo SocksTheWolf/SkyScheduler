@@ -23,8 +23,8 @@ export default function Dashboard(props:any) {
     {href: "/css/dashboard.min.css", type: "style"},
     {href: "/dep/countable.min.js", type: "script"},
     {href: "/dep/form-json.min.js", type: "script"},
-    {href: "/dep/modal.js", type: "script"},
-    {href: "/dep/tabs.js", type: "script"}
+    {href: "/dep/modal.min.js", type: "script"},
+    {href: "/dep/tabs.min.js", type: "script"}
   ];
 
   // Our own homebrew js files
