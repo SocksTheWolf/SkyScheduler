@@ -36,7 +36,7 @@ export function PostCreation({ctx}: any) {
       <form id="postForm" novalidate>
         <header>
           <h4 id="postFormTitle"></h4>
-          <small class="btn-delete thread-cancel hidden" data-placement="left" data-tooltip="Cancel adding post to highlighted thread">
+          <small class="thread-cancel hidden" data-placement="left" data-tooltip="Cancel adding post to highlighted thread">
             <a id="cancelThreadPost" tabindex={0} class="contrast" role="button">Cancel Thread Post</a>
           </small>
         </header>

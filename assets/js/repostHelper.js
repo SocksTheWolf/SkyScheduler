@@ -106,6 +106,24 @@ repostForm.addEventListener('submit', async (e) => {
   }
 });
 
+document.addEventListener("addNewRepost", (ev) => {
+  const postHeader = ev.detail.target;
+  const postURIHolder = postHeader.parentElement.querySelector("footer small a:not(hidden)");
+  if (postURIHolder) {
+    const postURI = postURIHolder.getAttribute("href");
+    repostRecordURL.value = postURI;
+    if (contentTabs !== null) {
+      contentTabs.switchTab("dashtabs", 1);
+      scrollToObject(repostRecordURL);
+      // set current time to value of now.
+      document.getElementById("repostTime").value = convertTimeValueLocally(Date.now());
+      return;
+    }
+  }
+  console.warn("could not find valid repost target");
+});
+
+
 function showRepostProgress(shouldShow) {
   const el = document.getElementById("makingRepostRequest");
   el.setAttribute("aria-busy", shouldShow);

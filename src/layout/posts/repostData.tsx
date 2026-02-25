@@ -2,15 +2,15 @@ import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { RepostInfo } from "../../classes/repost";
 
-type RepostIconProps = {
+type RepostStatusIconProps = {
   isRepost?: boolean;
 };
 
-export function RepostIcon(props: RepostIconProps) {
+export function RepostStatusIcon(props: RepostStatusIconProps) {
   if (props.isRepost === true) {
     return (
-      <span>
-        <img src="/icons/repost.svg" class="repostIcon" alt="reposted post icon" width="20px" height="20px" />
+      <span class="repostStatus">
+        <img src="/icons/is-repost.svg" class="repostIcon" alt="reposted post icon" width="20px" height="20px" />
         <small>&nbsp;Reposted Post</small>
       </span>
     );

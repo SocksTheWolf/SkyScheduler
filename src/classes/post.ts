@@ -2,6 +2,7 @@ import has from "just-has";
 import isEmpty from "just-is-empty";
 import { EmbedData, PostLabel } from "../types";
 import { RepostInfo } from "./repost";
+import { MAX_REPOST_RULES_PER_POST } from "../limits";
 
 // Basically a copy of the schema
 export class Post {
@@ -25,8 +26,6 @@ export class Post {
   cid?: string;
   uri?: string;
   // thread data
-  isThreadRoot: boolean;
-  isChildPost: boolean;
   threadOrder: number;
   rootPost?: string;
   parentPost?: string;
@@ -52,17 +51,8 @@ export class Post {
     if (data.rootPost)
       this.rootPost = data.rootPost;
 
-    if (data.parentPost) {
+    if (data.parentPost)
       this.parentPost = data.parentPost;
-      this.isChildPost = true;
-    } else {
-      this.isChildPost = false;
-    }
-
-    if (data.threadOrder == 0)
-      this.isThreadRoot = true;
-    else
-      this.isThreadRoot = false;
 
     // ATProto data
     if (data.uri)
@@ -80,4 +70,18 @@ export class Post {
     if (this.posted == false && !isEmpty(data.cid) && this.isThreadRoot)
       this.posted = true;
   }
+  getURI(): string|null {
+    return this.uri ? "https://bsky.app/profile/" + this.uri.replace("at://","").replace("app.bsky.feed.","") : null;
+  }
+  canAddMoreRepostRules(): boolean {
+    if (!this.posted)
+      return false;
+
+    return !this.isChildPost && (this.repostInfo === undefined || this.repostInfo.length < MAX_REPOST_RULES_PER_POST);
+  }
+  hasEmbeds(): boolean {
+    return this.embeds !== undefined && this.embeds.length > 0;
+  }
+  get isThreadRoot() { return this.threadOrder == 0; }
+  get isChildPost() { return this.parentPost !== undefined; }
 };

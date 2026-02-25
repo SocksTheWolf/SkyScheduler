@@ -1,4 +1,5 @@
-/* Functions that are mostly used on the application side of things */
+/* Functions & vars that are mostly used on the application side of things */
+var contentTabs = null;
 function getPostListElement(itemID) {
   return document.getElementById(`post-${itemID}`);
 }
@@ -64,18 +65,23 @@ document.addEventListener("postFailedDelete", function() {
   refreshPosts();
 });
 
-document.addEventListener("timeSidebar", function() {
-  updateAllTimes();
-  document.querySelectorAll(".addThreadPost[listen=false]").forEach(el => {
+function sidebarButtonListener(className, eventName) {
+  document.querySelectorAll(`${className}[listen=false]`).forEach(el => {
     addClickKeyboardListener(el, () => {
-      const threadEvent = new CustomEvent('replyThreadCreate', {
+      const buttonEvent = new CustomEvent(eventName, {
         detail: {
           target: el.parentElement
       }});
-      document.dispatchEvent(threadEvent);
+      document.dispatchEvent(buttonEvent);
     });
     el.setAttribute("listen", true);
   });
+}
+
+document.addEventListener("timeSidebar", function() {
+  updateAllTimes();
+  sidebarButtonListener(".addThreadPost", "replyThreadCreate");
+  sidebarButtonListener(".addRepostsButton", "addNewRepost");
 });
 
 document.addEventListener("postUpdatedNotice", function() {

@@ -628,5 +628,6 @@ function runPageReactors() {
 
 document.addEventListener("DOMContentLoaded", () => {
   runPageReactors();
-  new PicoTabs('[role="tablist"]');
+  // Var is defined in appHelper
+  contentTabs = new PicoTabs('[role="tablist"]');
 });

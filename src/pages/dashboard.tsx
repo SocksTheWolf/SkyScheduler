@@ -78,7 +78,7 @@ export default function Dashboard(props:any) {
         </section>
         <div class="col-9">
           <ViolationNoticeBar ctx={ctx} />
-          <div role="tablist">
+          <div role="tablist" name="dashtabs">
             <button id="tabone" class="w-half" role="tab" aria-selected="true" aria-controls="postTab">New Post</button>
             <button id="tabtwo" class="w-half" role="tab" aria-controls="repostTab">New Retweet</button>
             <div id="postTab" role="tabpanel" aria-labelledby="tabone" >
