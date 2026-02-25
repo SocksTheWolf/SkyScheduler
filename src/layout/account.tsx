@@ -17,6 +17,7 @@ type AccountFormProps = {
   endpoint: string;
   successText: string;
   redirect: string;
+  disabledByDefault?: boolean;
   customRedirectDelay?: number;
   footerLinks?: FooterLink[]
   footerHTML?: string | Promise<HtmlEscapedString>
@@ -35,7 +36,7 @@ export default function AccountHandler(props: AccountFormProps) {
         <form id="loginForm">
           {props.children}
           <center>
-            <button type="submit">
+            <button type="submit" disabled={props.disabledByDefault || false}>
               {props.submitText || props.title}
             </button>
           </center>

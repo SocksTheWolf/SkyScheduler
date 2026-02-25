@@ -14,6 +14,7 @@ export default function ResetPassword() {
         endpoint="/account/reset"
         successText="Success! Redirecting to login..."
         redirect="/login"
+        disabledByDefault={true}
         footerLinks={links}>
 
         <input type="hidden" name="resetToken" id="resetToken" hx-history="false" />
