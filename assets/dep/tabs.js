@@ -2,7 +2,7 @@
  * Tabs
  * Copyright 2019-2025 - Licensed under MIT
  * Yohn https://github.com/Yohn/PicoCSS
- * Modified by Socks 
+ * Modified by Socks https://github.com/SocksTheWolf/SkyScheduler/commit/1dd6ca5736a415971dfe8c9821bd4d0b67dcadc0
  */
 class PicoTabContainer {
 	constructor(inTabs, inPanels) {
