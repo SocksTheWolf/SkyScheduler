@@ -2,18 +2,26 @@
  * Tabs
  * Copyright 2019-2025 - Licensed under MIT
  * Yohn https://github.com/Yohn/PicoCSS
+ * Modified by Socks 
  */
+class PicoTabContainer {
+	constructor(inTabs, inPanels) {
+		this.tabs = inTabs;
+		this.panels = inPanels;
+	}
+}
 class PicoTabs {
 	constructor(tabListContainerSelector) {
-		this.tabLists = document.querySelectorAll(tabListContainerSelector);
+		this.tabMap = new Map();
+		let tabLists = document.querySelectorAll(tabListContainerSelector);
 
 		// Proceed only if tablists are found
-		if (this.tabLists.length === 0) {
+		if (tabLists.length === 0) {
 			console.warn(`No elements with ${tabListContainerSelector} found on the page.`);
 			return;
 		}
 
-		this.tabLists.forEach((tabList) => {
+		tabLists.forEach((tabList) => {
 			const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
 			const panels = Array.from(tabList.querySelectorAll('[role="tabpanel"]'));
 
@@ -32,6 +40,9 @@ class PicoTabs {
 	}
 
 	init(tabList, tabs, panels) {
+		if (tabList.hasAttribute("name"))
+			this.tabMap.set(tabList.getAttribute("name"), new PicoTabContainer(tabs, panels));
+
 		tabs.forEach((tab, index) => {
 			tab.addEventListener("click", () => this.activateTab(tabs, panels, index));
 			tab.addEventListener("keydown", (e) => this.handleKeyDown(e, tabs, panels, index));
@@ -54,6 +65,13 @@ class PicoTabs {
 
 		// Focus the activated tab
 		tabs[index].focus();
+	}
+
+	switchTab(tabName, index) {
+		if (this.tabMap.has(tabName)) {
+			const tabData = this.tabMap.get(tabName);
+			this.activateTab(tabData.tabs, tabData.panels, index);
+		}
 	}
 
 	// Handle keyboard navigation
