@@ -59,7 +59,7 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
 
 export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtpAgent|null) => {
   if (agent === null) {
-    console.error(`Unable to make agent to post ${postData.postid}`);
+    console.error(`Unable to make agent to repost ${postData.postid}`);
     return false;
   }
   const madeRepost = await makeRepost(c, postData, agent);

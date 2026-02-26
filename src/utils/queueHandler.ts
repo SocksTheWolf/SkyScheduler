@@ -33,7 +33,8 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
       case TaskType.Repost:
         wasSuccess = await handleRepostTask(runtimeWrapper, message.body.data as Repost, agent);
       break;
-      case TaskType.Info:
+      case TaskType.Blast:
+        console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
         wasSuccess = true;
       break;
       default:
@@ -45,7 +46,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     // Handle queue acknowledgement on success/failure
     if (!wasSuccess) {
       const delaySeconds = delay*(message.attempts+1);
-      console.log(`attempting to retry message in ${delaySeconds}`);
+      console.log(`attempting to retry message ${taskType} in ${delaySeconds}`);
       message.retry({delaySeconds: delaySeconds});
       // push a backblast so that this item will retry in the future.
       // it basically just writes null in the buffer, which is silly but w/e

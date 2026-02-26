@@ -48,7 +48,7 @@ export async function enqueuePost(c: AllContext, data: Post, delay: number = -1)
   // Pick a random consumer to handle this post
   const queueConsumer: Queue|null = getRandomQueue(c.env, "post_queues");
   await pushToQueue(queueConsumer, data, TaskType.Post, delay);
-}
+};
 
 export async function enqueueRepost(c: AllContext, data: Repost, delay: number = -1) {
   if (!isRepostQueueEnabled(c.env))
@@ -57,9 +57,9 @@ export async function enqueueRepost(c: AllContext, data: Repost, delay: number =
   // Pick a random consumer to handle this repost
   const queueConsumer: Queue|null = getRandomQueue(c.env, "repost_queues");
   await pushToQueue(queueConsumer, data, TaskType.Repost, delay);
-}
+};
 
 export async function enqueueEmptyWork(c: AllContext, queueType: TaskType, delay: number = -1) {
   const queueConsumer: Queue|null = getRandomQueue(c.env, (queueType === TaskType.Post) ? "post_queues" : "repost_queues");
-  await pushToQueue(queueConsumer, null, TaskType.None, delay);
-}
+  await pushToQueue(queueConsumer, null, TaskType.Blast, delay);
+};

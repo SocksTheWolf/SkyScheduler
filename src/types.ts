@@ -107,7 +107,7 @@ export enum PostLabel {
 
 export enum TaskType {
   None,
-  Info,
+  Blast,
   Post,
   Repost,
 };

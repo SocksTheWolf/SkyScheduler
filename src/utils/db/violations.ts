@@ -88,8 +88,8 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     }
   }
 
+  // if there are no violations, then give none.
   if (isEmpty(valuesUpdate)) {
-    console.warn(`Unable to give violations to ${userId}`);
     return false;
   }
 
