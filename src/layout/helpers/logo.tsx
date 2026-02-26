@@ -1,7 +1,6 @@
 import { APP_NAME, LOGO_ENABLED } from "../../siteinfo";
 
 type LogoImageProps = {
-  enabled?: boolean;
   width: number;
   height: number;
 };
