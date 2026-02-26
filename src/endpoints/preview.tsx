@@ -3,7 +3,7 @@ import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
 import { BSKY_IMG_MIME_TYPES } from "../limits";
-import { authMiddleware } from "../middleware/auth";
+import { hasAuth, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings } from "../types";
 import { FileContentSchema } from "../validation/mediaSchema";
@@ -13,7 +13,11 @@ export const preview = new Hono<{ Bindings: Bindings, Variables: ContextVariable
 preview.use(secureHeaders());
 preview.use(corsHelperMiddleware);
 
-preview.get("/file/:id", authMiddleware, async (c: Context) => {
+preview.get("/file/:id", pullAuthData, async (c: Context) => {
+  if (!hasAuth(c)) {
+    return c.redirect("/thumbs/missing.png");
+  }
+
   const { id } = c.req.param();
   const validation = FileContentSchema.safeParse({content: id});
   if (!validation.success) {

@@ -9,7 +9,7 @@ export async function adminOnlyMiddleware(c: Context, next: any) {
     await next();
     return;
   }
-  return c.json({ error: "Unauthorized" }, 401);
+  return c.json({ ok: false, msg: "Unauthorized" }, 401);
 }
 
 export const authAdminOnlyMiddleware = every(authMiddleware, adminOnlyMiddleware);

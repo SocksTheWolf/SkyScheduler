@@ -11,8 +11,7 @@ import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse,
-  EmbedDataType, LooseObj
+  DeleteResponse, EmbedDataType, LooseObj
 } from "../types";
 import {
   createPost, createRepost,
@@ -29,9 +28,10 @@ export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }
 
 post.use(secureHeaders());
 post.use(corsHelperMiddleware);
+post.use(authMiddleware);
 
 // Create media upload
-post.post("/upload", authMiddleware, async (c: Context) => {
+post.post("/upload", async (c: Context) => {
   const formData = await c.req.parseBody();
   const fileUploadResponse = await uploadFileR2(c, formData['file'], c.get("userId"));
   if (fileUploadResponse.success === false)
@@ -41,7 +41,7 @@ post.post("/upload", authMiddleware, async (c: Context) => {
 });
 
 // Delete an upload
-post.delete("/upload", authMiddleware, async (c: Context) => {
+post.delete("/upload", async (c: Context) => {
   const body = await c.req.json();
 
   // Validate that this is a legitimate key
@@ -57,7 +57,7 @@ post.delete("/upload", authMiddleware, async (c: Context) => {
 });
 
 // Create post
-post.post("/create", authMiddleware, async (c: Context) => {
+post.post("/create", async (c: Context) => {
   const body = await c.req.json();
   const response: CreatePostQueryResponse = await createPost(c, body);
   if (!response.ok) {
@@ -77,7 +77,7 @@ post.post("/create", authMiddleware, async (c: Context) => {
 });
 
 // Create repost
-post.post("/create/repost", authMiddleware, async (c: Context) => {
+post.post("/create/repost", async (c: Context) => {
   const body = await c.req.json();
   const response: CreateObjectResponse = await createRepost(c, body);
   if (!response.ok) {
@@ -87,7 +87,7 @@ post.post("/create/repost", authMiddleware, async (c: Context) => {
 });
 
 // Get all posts
-post.all("/all", authMiddleware, async (c: Context) => {
+post.all("/all", async (c: Context) => {
   c.header("HX-Trigger-After-Swap", "timeSidebar");
   return c.html(
     <ScheduledPostList ctx={c} />
@@ -95,7 +95,7 @@ post.all("/all", authMiddleware, async (c: Context) => {
 });
 
 // Edit posts
-post.get("/edit/:id", authMiddleware, async (c: Context) => {
+post.get("/edit/:id", async (c: Context) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>, 400);
@@ -108,7 +108,7 @@ post.get("/edit/:id", authMiddleware, async (c: Context) => {
   return c.html(<></>, 400);
 });
 
-post.post("/edit/:id", authMiddleware, async (c: Context) => {
+post.post("/edit/:id", async (c: Context) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   if (!isValid(id)) {
@@ -183,7 +183,7 @@ post.post("/edit/:id", authMiddleware, async (c: Context) => {
   return c.html(<b class="btn-error">Failed to process edit</b>, 400);
 });
 
-post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
+post.get("/edit/:id/cancel", async (c: Context) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>, 400);
@@ -201,7 +201,7 @@ post.get("/edit/:id/cancel", authMiddleware, async (c: Context) => {
 });
 
 // delete a post
-post.delete("/delete/:id", authMiddleware, async (c: Context) => {
+post.delete("/delete/:id", async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);

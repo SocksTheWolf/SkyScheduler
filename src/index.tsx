@@ -7,9 +7,9 @@ import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
-import { authMiddleware } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
+import { redirectHomeIfLogout } from "./middleware/redirectHome";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
 import Homepage from "./pages/homepage";
@@ -90,7 +90,7 @@ app.route("/admin", admin);
 app.route("/preview", preview);
 
 // Dashboard route
-app.get("/dashboard", authMiddleware, (c) => c.html(<Dashboard c={c} />));
+app.get("/dashboard", redirectHomeIfLogout, (c) => c.html(<Dashboard c={c} />));
 
 // Login route
 app.get("/login", redirectToDashIfLogin, (c) => c.html(<Login />));

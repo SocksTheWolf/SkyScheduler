@@ -133,7 +133,7 @@ account.post("/logout", authMiddleware, async (c) => {
 
   // Redirect to home
   c.header("HX-Redirect", "/");
-  return c.html("Success");
+  return c.text("");
 });
 
 account.post("/signup", verifyTurnstile, async (c: Context) => {

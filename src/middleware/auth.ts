@@ -31,12 +31,17 @@ export async function pullAuthData(c: Context, next: any) {
     c.set("session", null);
   }
   await next();
-}
+};
+
 export async function requireAuth(c: Context, next: any) {
-  if (c.get("session") === null || c.get("userId") === null) {
-    return c.json({ error: "Unauthorized" }, 401);
+  if (!hasAuth(c)) {
+    return c.json({ ok: false, msg: "Unauthorized" }, 401);
   }
   await next();
+};
+
+export function hasAuth(c: Context) {
+  return (c.get("session") !== null && c.get("userId") !== null);
 }
 
 export const authMiddleware = every(pullAuthData, requireAuth);
