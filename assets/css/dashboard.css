@@ -256,6 +256,12 @@ textarea {
   padding: 5px;
 }
 
+/** MISC **/
+.btn-sm span {
+  border-bottom: none !important;
+  cursor: pointer;
+}
+
 /** REFRESH ANIMATION **/
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */

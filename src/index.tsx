@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
-import { Env, Hono } from "hono";
+import { Hono } from "hono";
+import { cache } from "hono/cache";
 import { ContextVariables, createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
@@ -11,7 +12,7 @@ import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
-import Home from "./pages/homepage";
+import Homepage from "./pages/homepage";
 import Login from "./pages/login";
 import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
@@ -28,37 +29,35 @@ const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
 ///// Static Pages /////
 
+// caches
+const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=604800' });
+const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=259200' });
+
 // Root route
-app.all("/", (c) => c.html(<Home />));
+app.all("/", staticPagesCache, (c) => c.html(<Homepage />));
 
 // JS injection of const variables
-app.get("/js/consts.js", (c) => {
+app.get("/js/consts.js", staticFilesCache, (c) => {
   const constScript = makeConstScript();
-  return c.body(constScript, 200, {
-    'Content-Type': 'text/javascript',
-    'Cache-Control': 'max-age=604800'
-  });
+  return c.body(constScript, 200, {'Content-Type': 'text/javascript'});
 });
 
 // Write the robots.txt file dynamically
-app.get("/robots.txt", async (c) => {
+app.get("/robots.txt", staticFilesCache, async (c) => {
   const origin = new URL(c.req.url).origin;
   const robotsFile = await c.env.ASSETS!.fetch(`${origin}/robots.txt`)
     .then(async (resp) => await resp.text());
-  return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200, {
-    'Content-Type': 'text/plain',
-    'Cache-Control': 'max-age=604800'
-  });
+  return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200);
 });
+
+// Legal linkies
+app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
+app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
 
 // Add redirects
 app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
 app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
 app.all("/terms", (c) => c.redirect("/tos"));
-
-// Legal linkies
-app.get("/tos", (c) => c.html(<TermsOfService />));
-app.get("/privacy", (c) => c.html(<PrivacyPolicy />));
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes
@@ -79,19 +78,15 @@ app.all("/api/auth/*", async (c) => {
 });
 
 // Account endpoints
-app.use("/account/**", corsHelperMiddleware);
 app.route("/account", account);
 
 // Posts endpoints
-app.use("/post/**", corsHelperMiddleware);
 app.route("/post", post);
 
 // Admin endpoints
-app.use("/admin/**", corsHelperMiddleware);
 app.route("/admin", admin);
 
 // Image preview endpoint
-app.use("/preview/**", corsHelperMiddleware);
 app.route("/preview", preview);
 
 // Dashboard route
@@ -136,7 +131,7 @@ export default {
   async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
     await processQueue(batch, env, ctx);
   },
-  fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
     return app.fetch(request, env, ctx);
-  },
+  }
 };

@@ -1,36 +1,27 @@
 import {
-  BSKY_GIF_MIME_TYPES,
-  BSKY_IMG_MIME_TYPES,
+  BSKY_GIF_MIME_TYPES, BSKY_IMG_MIME_TYPES,
   BSKY_NAME_LOOKUP_LIMIT, BSKY_NAME_TYPE_AHEAD_CHARS,
-  BSKY_VIDEO_LENGTH_LIMIT,
-  BSKY_VIDEO_MIME_TYPES,
-  GIF_UPLOAD_ALLOWED,
-  MAX_ALT_TEXT,
-  MAX_EMBEDS_PER_POST,
-  MAX_GIF_LENGTH_LIMIT,
-  MAX_LENGTH,
-  MAX_THUMBNAIL_SIZE,
+  BSKY_VIDEO_LENGTH_LIMIT, BSKY_VIDEO_MIME_TYPES,
+  GIF_UPLOAD_ALLOWED, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
+  MAX_GIF_LENGTH_LIMIT, MAX_LENGTH, MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT
 } from "../limits";
-import { PreloadRules } from "../types";
 import { postRecordURI } from "../validation/regexCases";
 
 const CONST_SCRIPT_VERSION: number = 8;
 
-const makeFileTypeStr = (typeMap: string[]) => {
-  return typeMap.map((type) => `"${type}"`).join()
-};
-
-export const ConstScriptPreload: PreloadRules[] = [
-  {type: "script", href: `/js/consts.js?v=${CONST_SCRIPT_VERSION}`},
-];
-
+export const ConstScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {
+  const makeFileTypeStr = (typeMap: string[]) => {
+    return typeMap.map((type) => `"${type}"`).join()
+  };
+
   let fileTypeArray = [...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES];
   if (GIF_UPLOAD_ALLOWED) {
     fileTypeArray.push(...BSKY_GIF_MIME_TYPES);
   }
-    return `const fileTypesSupported = [${makeFileTypeStr(fileTypeArray)}];
+
+  return `const fileTypesSupported = [${makeFileTypeStr(fileTypeArray)}];
 const imageTypes = [${makeFileTypeStr(BSKY_IMG_MIME_TYPES)}];
 const videoTypes = [${makeFileTypeStr(BSKY_VIDEO_MIME_TYPES)}];
 const gifTypes = [${makeFileTypeStr(BSKY_GIF_MIME_TYPES)}];

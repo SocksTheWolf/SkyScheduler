@@ -30,7 +30,7 @@ export const handlePostTask = async(runtime: AllContext, postData: Post, agent: 
     console.error(`Failed to post id ${postData.postid}`);
   }
   return madePost;
-}
+};
 
 export const handlePostNowTask = async(c: AllContext, postData: Post) => {
   let postStatus = false;

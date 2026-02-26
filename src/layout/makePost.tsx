@@ -1,24 +1,20 @@
 import {
-  BSKY_IMG_FILE_EXTS,
-  BSKY_IMG_SIZE_LIMIT_IN_MB,
-  BSKY_VIDEO_FILE_EXTS,
-  BSKY_VIDEO_MAX_DURATION,
+  BSKY_IMG_FILE_EXTS, BSKY_IMG_SIZE_LIMIT_IN_MB,
+  BSKY_VIDEO_FILE_EXTS, BSKY_VIDEO_MAX_DURATION,
   CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
-  MAX_LENGTH,
-  MAX_THUMBNAIL_SIZE,
+  MAX_LENGTH, MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import { PreloadRules } from "../types";
-import { ConstScriptPreload } from "../utils/constScriptGen";
-import { IncludeDependencyTags } from "./helpers/includesTags";
+import { ConstScriptStr } from "../utils/constScriptGen";
+import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
 import { ContentLabelOptions } from "./options/contentLabelOptions";
 import { RetweetOptions } from "./options/retweetOptions";
 import { ScheduleOptions } from "./options/scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
-  ...ConstScriptPreload,
+  {type: "script", href: ConstScriptStr },
   {type: "script", href: "/dep/dropzone.min.js"},
   {type: "style", href: "/dep/dropzone.min.css"},
   {type: "style", href: "/css/dropzoneMods.css"},
@@ -65,12 +61,11 @@ export function PostCreation({ctx}: any) {
                   <ul>
                     <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
                     <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
-                    {maxWidth ? 
+                    {maxWidth ?
                       <ol>
                         <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{maxWidth}px</b> will also <u data-tooltip="will preserve aspect ratio">be resized</u> in addition to being compressed</li>
                       </ol> : null}
                     </li>
-                    
                     <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
                     <li>if an image fails to upload, you'll need to manually adjust the file to fit it properly</li>
                   </ul></li>
@@ -103,7 +98,7 @@ export function PostCreation({ctx}: any) {
               <article>
                 <header>Insert Post/Feed/List Link</header>
                 <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto based record" />
-                <small>Posts must be quotable and all record types must exist upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
+                <small>Posts must be quotable and all record types must be resolvable (exist) upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
           </details>

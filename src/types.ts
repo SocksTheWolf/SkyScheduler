@@ -169,11 +169,6 @@ export enum PWAutoCompleteSettings {
   CurrentPass
 };
 
-export type PreloadRules = {
-  type: string;
-  href: string;
-};
-
 export type BskyEmbedWrapper = {
   type: EmbedDataType;
   data?: any;

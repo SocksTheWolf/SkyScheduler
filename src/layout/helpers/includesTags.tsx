@@ -1,4 +1,9 @@
-import { PreloadRules } from "../../types";
+// handling preloading and injection of dependencies into the layout
+
+export type PreloadRules = {
+  type: string;
+  href: string;
+};
 
 type DepTagsType = {
   scripts?: PreloadRules[]

@@ -6,7 +6,7 @@ export const setupAccounts = async(c: Context) => {
   if (await doesAdminExist(c))
     return c.html("already created", 501);
 
-  const settingsToCheck:string[] =
+  const settingsToCheck: string[] =
     ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "DEFAULT_ADMIN_BSKY_PASS"];
 
   // Loop through and check all of the settings that are easy to miss
