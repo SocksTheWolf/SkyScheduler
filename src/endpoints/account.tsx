@@ -113,7 +113,7 @@ account.post("/update", authMiddleware, async (c) => {
 account.get("/username", authMiddleware, async (c) => {
   const username = await getUsernameForUser(c);
   return c.text(username || "", 200, {
-    "Cache-Control": "max-age=600, min-fresh=60, must-revalidate, private"
+    "Cache-Control": "max-age=600, must-revalidate, private"
   });
 });
 
