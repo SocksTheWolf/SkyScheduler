@@ -36,6 +36,7 @@ type QueueConfigSettings = {
   postNowEnabled?: boolean;
   pressure_retries?: boolean;
   delay_val: number;
+  max_retries: number;
   post_queues: string[];
   repost_queues: string[];
 }

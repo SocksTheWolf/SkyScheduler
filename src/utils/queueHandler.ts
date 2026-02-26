@@ -19,6 +19,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
 
   // Retry settings
   const delay: number = env.QUEUE_SETTINGS.delay_val;
+  const maxRetries: number = env.QUEUE_SETTINGS.max_retries;
   const bufferRetries: boolean = env.QUEUE_SETTINGS.pressure_retries || false;
   let bufferBlasts: BufferBlast[] = [];
 
@@ -45,9 +46,15 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     }
     // Handle queue acknowledgement on success/failure
     if (!wasSuccess) {
-      const delaySeconds = delay*(message.attempts+1);
+      const currentAttempts: number = message.attempts;
+      const delaySeconds = delay*(currentAttempts+1);
       console.log(`attempting to retry message ${taskType} in ${delaySeconds}`);
       message.retry({delaySeconds: delaySeconds});
+
+      // if the attempts are over the maximum amount of retries then do not backblast
+      if (currentAttempts > maxRetries)
+        continue;
+
       // push a backblast so that this item will retry in the future.
       // it basically just writes null in the buffer, which is silly but w/e
       bufferBlasts.push({type: taskType, time: delaySeconds});
