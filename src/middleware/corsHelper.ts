@@ -7,7 +7,7 @@ export const corsHelperMiddleware = async (c: Context, next: any) => {
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "DELETE"],
     exposeHeaders: ["Content-Length", "Content-Type", "HX-Trigger",
-      "HX-Push-Url", "HX-Replace-Url", "HX-Refresh",
+      "HX-Push-Url", "HX-Replace-Url", "HX-Refresh", "Cache-Control",
       "HX-Redirect", "HX-Trigger-After-Swap", "HX-Trigger-After-Settle"],
     maxAge: 600,
     credentials: true,

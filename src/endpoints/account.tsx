@@ -112,7 +112,9 @@ account.post("/update", authMiddleware, async (c) => {
 // endpoint that just returns current username
 account.get("/username", authMiddleware, async (c) => {
   const username = await getUsernameForUser(c);
-  return c.text(username || "");
+  return c.text(username || "", 200, {
+    "Cache-Control": "max-age=600, min-fresh=60, must-revalidate, private"
+  });
 });
 
 // endpoint that returns any violations
