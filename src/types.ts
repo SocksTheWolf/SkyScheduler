@@ -130,7 +130,6 @@ export type PostResponseObject = {
 
 export type PostRecordResponse = PostResponseObject & {
   postID: string|null;
-  content: string;
   embeds?: EmbedData[];
 };
 

@@ -2,10 +2,11 @@ import { drizzle } from "drizzle-orm/d1";
 import { ExecutionContext } from "hono";
 import { Bindings } from "../types";
 
-
 export class ScheduledContext {
   executionCtx: ExecutionContext;
   env: Bindings;
+  // used for parameters wrappings such as "isAdmin" or "session"
+  // as a proxy for Context
   #map: Map<string, any>;
   constructor(env: Bindings, executionCtx: ExecutionContext) {
     this.#map = new Map<string, any>();

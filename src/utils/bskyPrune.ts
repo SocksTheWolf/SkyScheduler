@@ -23,7 +23,7 @@ export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
     // Create a map and an array so we can do lookups for reconciliation later
     // to figure out what posts can be removed.
     let urisOnly: string[] = [];
-    const postMap = new Map<string, string>();
+    const postMap: Map<string, string> = new Map();
     currentGroup.forEach((itm) => {
       if (itm.uri === null) {
         console.log(`Skipping a "posted" post that does not have an uri: ${itm.id}`);

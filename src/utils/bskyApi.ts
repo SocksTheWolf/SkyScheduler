@@ -140,7 +140,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
   }
 
   // Easy lookup map for reply mapping for this post chain
-  const postMap = new Map();
+  const postMap: Map<string, PostRecordResponse> = new Map();
 
   // Lambda that handles making a post record and submitting it to bsky
   const postSegment = async (postData: Post) => {
@@ -483,17 +483,17 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
 
     // set up the thread chain
     if (postData.isChildPost) {
-      const rootPostRecord: PostRecordResponse = postMap.get(postData.rootPost!);
-      const parentPostRecord: PostRecordResponse = postMap.get(postData.parentPost!);
+      const rootPostRecord: PostRecordResponse|undefined = postMap.get(postData.rootPost!);
+      const parentPostRecord: PostRecordResponse|undefined = postMap.get(postData.parentPost!);
       if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {
         (postRecord as any).reply = {
           "root": {
-            "uri": rootPostRecord.uri,
-            "cid": rootPostRecord.cid
+            "uri": rootPostRecord!.uri,
+            "cid": rootPostRecord!.cid
           },
           "parent": {
-            "uri": parentPostRecord.uri,
-            "cid": parentPostRecord.cid
+            "uri": parentPostRecord!.uri,
+            "cid": parentPostRecord!.cid
           }
         }
       }

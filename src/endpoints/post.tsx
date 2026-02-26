@@ -145,7 +145,7 @@ post.post("/edit/:id", async (c: Context) => {
     }
 
     // Create an easy map to match content with quickly
-    let editsMap = new Map();
+    let editsMap: Map<string, string> = new Map();
     altEdits.forEach((item) => {
       editsMap.set(item.content, item.alt);
     });

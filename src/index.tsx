@@ -44,7 +44,7 @@ app.get("/js/consts.js", staticFilesCache, (c) => {
 
 // Write the robots.txt file dynamically
 app.get("/robots.txt", staticFilesCache, async (c) => {
-  const origin = new URL(c.req.url).origin;
+  const origin: string = new URL(c.req.url).origin;
   const robotsFile = await c.env.ASSETS!.fetch(`${origin}/robots.txt`)
     .then(async (resp) => await resp.text());
   return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200);
