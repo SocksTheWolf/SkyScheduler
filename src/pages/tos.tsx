@@ -19,13 +19,16 @@ export default function TermsOfService() {
           <h4>Usage</h4>
           <p>By using this software you agree to:
             <ol>
-              <li>Not use the service to scam, spam or to otherwise violate the terms of the 
-                <a class="secondary" href="https://bsky.social/about/support/tos" rel="nofollow noindex noopener" target="_blank">Bluesky Terms of Service</a></li>
+              <li>Not use the service to scam, spam or to otherwise violate the terms of the <a class="secondary"
+                href="https://bsky.social/about/support/tos" rel="nofollow noindex noopener" target="_blank">
+                Bluesky Terms of Service</a>
+              </li>
               <li>Not upload material that is illegal, illicit or stolen</li>
               <li>Not attempt to reverse engineer the software to cause damage or otherwise harm others</li>
               <li>Not hold the software nor its developers at fault for any damages, neither perceived nor tangible</li>
-              <li>Grant {APP_NAME} a temporary, non-exclusive, royalty-free license to the content that you schedule for the sole purpose of transmitting 
-                it on your behalf via the ATProtocol to the PDS of your choosing (default: Bluesky).</li>
+              <li>Grant {APP_NAME} a temporary, non-exclusive, royalty-free license to the content that you schedule
+                &nbsp;for the sole purpose of transmitting it on your behalf via the ATProtocol
+                to the PDS of your choosing (default: Bluesky).</li>
               <ul>
                 <li>Upon successful transmission, content will be deleted from our temporary holding storage.</li>
               </ul>
