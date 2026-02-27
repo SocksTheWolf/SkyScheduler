@@ -40,6 +40,10 @@ export const MAX_REPOST_POSTS: number = 50;
 // a limit for the maximum number of repost rules a single post can have
 export const MAX_REPOST_RULES_PER_POST: number = 7;
 
+// max weeks an account can be held with violations that have not been resolved
+// until the account is marked for termination
+export const MAX_VIOLATION_WEEKS: number = 12;
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

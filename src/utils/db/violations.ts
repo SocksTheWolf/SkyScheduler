@@ -1,8 +1,9 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, lte, ne, sql } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
+import { MAX_VIOLATION_WEEKS } from "../../limits";
 import { AccountStatus, AllContext, LooseObj, Violation } from "../../types";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
@@ -146,6 +147,16 @@ export const getViolationsForCurrentUser = async(c: AllContext): Promise<Violati
   const db: DrizzleD1Database = c.get("db");
   if (userId && db) {
     return await getViolationsForUser(db, userId);
+  }
+  return null;
+};
+
+export const getAllViolationsAfterTime = async(c: AllContext): Promise<string[]|null> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (db) {
+    const results = await db.select({id: violations.userId}).from(violations).where(
+      lte(violations.createdAt, sql`datetime('now', '-${Math.abs(MAX_VIOLATION_WEEKS)} weeks')`)).all();
+    return results.map((it) => it.id);
   }
   return null;
 };
