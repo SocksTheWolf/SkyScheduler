@@ -27,7 +27,7 @@ export default function TermsOfService() {
               <li>Not attempt to reverse engineer the software to cause damage or otherwise harm others</li>
               <li>Not hold the software nor its developers at fault for any damages, neither perceived nor tangible</li>
               <li>Grant {APP_NAME} a temporary, non-exclusive, royalty-free license to the content that you schedule
-                &nbsp;for the sole purpose of transmitting it on your behalf via the ATProtocol
+                for the sole purpose of transmitting it on your behalf via the ATProtocol
                 to the PDS of your choosing (default: Bluesky).</li>
               <ul>
                 <li>Upon successful transmission, content will be deleted from our temporary holding storage.</li>
