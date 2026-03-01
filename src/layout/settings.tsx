@@ -2,8 +2,8 @@ import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
 import { settingsScriptStr } from "../utils/appScripts";
-import { BSkyAppPasswordField, DashboardPasswordField } from "./passwordFields";
-import { UsernameField } from "./usernameField";
+import { BSkyAppPasswordField, DashboardPasswordField } from "./fields/passwordFields";
+import UsernameField from "./fields/usernameField";
 
 type SettingsTypeProps = {
   pds?: string;
@@ -24,7 +24,8 @@ export function Settings(props: SettingsTypeProps) {
       <br />
       <section>
         <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse"
-          hx-swap="innerHTML swap:1s" hx-indicator="#spinner" hx-disabled-elt="#settingsButtons button, find input" novalidate>
+          hx-swap="innerHTML swap:1s" hx-indicator="#spinner"
+          hx-disabled-elt="#settingsButtons button, find input" novalidate>
 
           <UsernameField required={false} title="BlueSky Handle:"
             hintText="Only change this if you have recently changed your Bluesky handle" />
@@ -85,11 +86,4 @@ export function Settings(props: SettingsTypeProps) {
   </dialog>
   <script type="text/javascript" src={settingsScriptStr}></script>
   </>);
-}
-
-export function SettingsButton() {
-  return (<button class="outline contrast" id="settingsButton">
-    <span>Account Settings</span>
-    <img src="/icons/settings.svg" height="20px" width="20px" alt="settings gear" />
-  </button>);
 }

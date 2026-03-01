@@ -1,6 +1,6 @@
 import { MAX_POSTED_LENGTH } from "../limits";
-import { RetweetOptions } from "./options/retweetOptions";
-import { ScheduleOptions } from "./options/scheduleOptions";
+import RetweetOptions from "./options/retweetOptions";
+import ScheduleOptions from "./options/scheduleOptions";
 
 export function MakeRetweet() {
   return (<article>

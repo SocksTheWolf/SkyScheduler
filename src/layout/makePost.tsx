@@ -9,9 +9,9 @@ import {
 import { APP_NAME } from "../siteinfo";
 import { ConstScriptStr } from "../utils/constScriptGen";
 import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
-import { ContentLabelOptions } from "./options/contentLabelOptions";
-import { RetweetOptions } from "./options/retweetOptions";
-import { ScheduleOptions } from "./options/scheduleOptions";
+import ContentLabelOptions from "./options/contentLabelOptions";
+import RetweetOptions from "./options/retweetOptions";
+import ScheduleOptions from "./options/scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
   {type: "script", href: ConstScriptStr },
@@ -25,8 +25,7 @@ export const PreloadPostCreation: PreloadRules[] = [
 export function PostCreation({ctx}: any) {
   const maxWidth: number|undefined = ctx.env.IMAGE_SETTINGS.max_width;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
-  return (
-  <section>
+  return (<section>
     <IncludeDependencyTags scripts={PreloadPostCreation} />
     <article>
       <form id="postForm" novalidate>
@@ -120,6 +119,5 @@ export function PostCreation({ctx}: any) {
         </footer>
       </form>
     </article>
-  </section>
-  );
+  </section>);
 }

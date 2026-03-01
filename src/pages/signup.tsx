@@ -4,8 +4,8 @@ import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
-import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/passwordFields";
-import { UsernameField } from "../layout/usernameField";
+import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/fields/passwordFields";
+import UsernameField from "../layout/fields/usernameField";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
@@ -17,9 +17,8 @@ export default function Signup(props:any) {
     (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
     "You can ask for the maintainer for it";
 
-  return (
-    <BaseLayout title="Signup"
-      preloads={[...TurnstileCaptchaPreloads(ctx)]}>
+  return (<BaseLayout title="Signup"
+    preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Create Account"
         submitText="Sign Up!"
@@ -29,41 +28,40 @@ export default function Signup(props:any) {
         redirect="/login"
         footerHTML={<FooterCopyright />}>
 
-        <UsernameField />
+      <UsernameField />
 
-        <label hx-history="false">
-          {APP_NAME} Dashboard Password
-          <DashboardPasswordField autocomplete={PWAutoCompleteSettings.NewPass} required={true} />
-          <small>Create a new password to use to login to {APP_NAME}. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
-        </label>
+      <label hx-history="false">
+        {APP_NAME} Dashboard Password
+        <DashboardPasswordField autocomplete={PWAutoCompleteSettings.NewPass} required={true} />
+        <small>Create a new password to use to login to {APP_NAME}. Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
+      </label>
 
+      <label>
+        Bluesky App Password
+        <BSkyAppPasswordField required={true} />
+        <small>
+          If you need a BlueSky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.<br />
+          If you use a separate PDS, you can change that in "Account Settings" on your dashboard, the site will attempt to infer your PDS for you.
+        </small>
+      </label>
+
+      {isUsingInviteKeys(ctx) ? (
         <label>
-          Bluesky App Password
-          <BSkyAppPasswordField required={true} />
-          <small>
-            If you need a BlueSky app password for your account, <a target="_blank" href="https://bsky.app/settings/app-passwords">you can get one here</a>.<br />
-            If you use a separate PDS, you can change that in "Account Settings" on your dashboard, the site will attempt to infer your PDS for you.
-          </small>
+          {APP_NAME} Invite Key/Signup Token
+          <input type="text" name="signupToken" placeholder="" required />
+          <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
         </label>
+      ) : ''}
 
-        {isUsingInviteKeys(ctx) ? (
-          <label>
-            {APP_NAME} Invite Key/Signup Token
-            <input type="text" name="signupToken" placeholder="" required />
-            <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
-          </label>
-        ) : ''}
-
-        <hr />
-        <fieldset>
-          <legend><label for="agreeTerms">Agree to {APP_NAME} Terms</label></legend>
-          <input id="agreeTerms" type="checkbox" name="agreeTerms" />
-          Check the box if you agree to {APP_NAME}'s <a href="/privacy" class="secondary" target="_blank" title="link to privacy policy">privacy policy
-          </a> and <a href="/tos" class="secondary" target="_blank" title="link to terms of service">terms of service</a>.
-        </fieldset>
-        <br />
-        <TurnstileCaptcha c={ctx} />
-      </AccountHandler>
-    </BaseLayout>
-  );
+      <hr />
+      <fieldset>
+        <legend><label for="agreeTerms">Agree to {APP_NAME} Terms</label></legend>
+        <input id="agreeTerms" type="checkbox" name="agreeTerms" />
+        Check the box if you agree to {APP_NAME}'s <a href="/privacy" class="secondary" target="_blank" title="link to privacy policy">privacy policy
+        </a> and <a href="/tos" class="secondary" target="_blank" title="link to terms of service">terms of service</a>.
+      </fieldset>
+      <br />
+      <TurnstileCaptcha c={ctx} />
+    </AccountHandler>
+  </BaseLayout>);
 }

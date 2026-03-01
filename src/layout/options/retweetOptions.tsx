@@ -10,7 +10,7 @@ type RetweetOptionsProps = {
   checkboxLabel?: string;
 };
 
-export function RetweetOptions(props: RetweetOptionsProps) {
+export default function RetweetOptions(props: RetweetOptionsProps) {
   const repostedFrom = !isEmpty(props.timeString) ? props.timeString : "the post time";
   const checkboxLabel = !isEmpty(props.checkboxLabel) ? props.checkboxLabel : "Should Auto-Retweet?";
   return (

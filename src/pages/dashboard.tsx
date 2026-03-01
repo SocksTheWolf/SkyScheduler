@@ -1,5 +1,8 @@
 import { Context } from "hono";
 import { AltTextDialog } from "../layout/altTextModal";
+import LogoutButton from "../layout/buttons/logout";
+import RefreshPostsButton from "../layout/buttons/refresh";
+import SettingsButton from "../layout/buttons/settings";
 import FooterCopyright from "../layout/helpers/footer";
 import { IncludeDependencyTags, PreloadRules } from "../layout/helpers/includesTags";
 import { LogoImage } from "../layout/helpers/logo";
@@ -7,7 +10,7 @@ import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
-import { Settings, SettingsButton } from "../layout/settings";
+import { Settings } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import {
@@ -47,13 +50,7 @@ export default function Dashboard(props: any) {
                 hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
             </div>
             <center class="postControls">
-              <button id="refresh-posts" hx-get="/post/all" hx-target="#posts"
-                  hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s"
-                  hx-on-htmx-before-request="this.classList.add('svgAnim');"
-                  hx-on-htmx-after-request="setTimeout(() => {this.classList.remove('svgAnim')}, 3000)">
-                <span>Refresh Posts</span>
-                <img src="/icons/refresh.svg" height="20px" width="20px" alt="refresh icon" />
-              </button>
+              <RefreshPostsButton />
               <SettingsButton />
             </center>
             <hr />
@@ -63,12 +60,7 @@ export default function Dashboard(props: any) {
             <ScheduledPostList ctx={ctx} />
           </div>
           <footer>
-            <div>
-              <button class="outline w-full btn-error logout" hx-post="/account/logout"
-                hx-target="body" hx-confirm="Are you sure you want to logout?">
-                Logout
-              </button>
-            </div>
+            <LogoutButton />
             <hr />
             <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR} showVersion={true} />
           </footer>
