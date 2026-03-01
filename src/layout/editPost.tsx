@@ -67,7 +67,8 @@ export function PostEdit({post}:EditedPostProps) {
         <div id={editResponse}>
         </div>
         <button tabindex={0}>Update Post</button>
-        <a tabindex={0} role="button" class="secondary cancelEditButton" hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
+        <a tabindex={0} role="button" class="secondary cancelEditButton"
+        hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
         hx-confirm="Are you sure you want to cancel editing?">Cancel</a>
       </center>
     </form>

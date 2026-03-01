@@ -89,9 +89,7 @@ post.post("/create/repost", async (c: Context) => {
 // Get all posts
 post.all("/all", async (c: Context) => {
   c.header("HX-Trigger-After-Swap", "timeSidebar");
-  return c.html(
-    <ScheduledPostList ctx={c} />
-  );
+  return c.html(<ScheduledPostList ctx={c} />);
 });
 
 // Edit posts

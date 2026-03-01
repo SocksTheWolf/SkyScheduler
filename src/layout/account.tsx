@@ -27,36 +27,34 @@ export default function AccountHandler(props: AccountFormProps) {
   const footerLinkHTML = props.footerLinks?.map((el: FooterLink) => {
     return (<span><a class="contrast outline" href={el.url}>{el.title}</a></span>);
   });
-  return (
-    <section class="container">
-      <article>
-        <header>
-          <center><h3>{props.title}</h3></center>
-        </header>
-        <form id="loginForm">
-          {props.children}
-          <center>
-            <button type="submit" disabled={props.disabledByDefault || false}>
-              {props.submitText || props.title}
-            </button>
-          </center>
-        </form>
+  return (<section class="container">
+    <article>
+      <header>
+        <center><h3>{props.title}</h3></center>
+      </header>
+      <form id="loginForm">
+        {props.children}
         <center>
-          <span aria-busy="true" id="loading" hidden>{props.loadingText}</span>
+          <button type="submit" disabled={props.disabledByDefault || false}>
+            {props.submitText || props.title}
+          </button>
         </center>
-        <footer>
-          <center>
-            <span id="footerLinks">
-              {props.footerLinks ? <small>{footerLinkHTML}</small> : (props.footerHTML || "")}
-            </span>
-          </center>
-        </footer>
-      </article>
-      <script type="text/javascript">
-      {html`
-        easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
-      `}
-      </script>
-    </section>
-  );
+      </form>
+      <center>
+        <span aria-busy="true" id="loading" hidden>{props.loadingText}</span>
+      </center>
+      <footer>
+        <center>
+          <span id="footerLinks">
+            {props.footerLinks ? <small>{footerLinkHTML}</small> : (props.footerHTML || "")}
+          </span>
+        </center>
+      </footer>
+    </article>
+    <script type="text/javascript">
+    {html`
+      easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
+    `}
+    </script>
+  </section>);
 }

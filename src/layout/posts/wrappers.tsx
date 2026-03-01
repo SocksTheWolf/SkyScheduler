@@ -1,6 +1,9 @@
 import { raw } from "hono/html";
 import { Post } from "../../classes/post";
-import { AddPostToThreadButton, AddRepostsButton, DeletePostButton, EditPostButton } from "./buttons";
+import {
+  AddPostToThreadButton, AddRepostsButton,
+  DeletePostButton, EditPostButton
+} from "../buttons/posts";
 import { RepostCountElement, RepostStatusIcon } from "./repostData";
 
 type PostDataHeaderOptions = {
