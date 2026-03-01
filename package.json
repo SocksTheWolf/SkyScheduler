@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
-    "deploy": "wrangler deploy --minify --env=''",
-    "staging": "wrangler deploy --env staging --minify",
+    "deploy": "wrangler deploy --minify",
     "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
     "auth:format": "prettier --write src/db/auth.schema.ts",
     "auth": "run-s auth:*",
@@ -17,10 +16,6 @@
     "migrate:prod:db": "wrangler d1 migrations apply skyposts --remote",
     "migrate:prod:pragma": "wrangler d1 execute skyposts --command \"PRAGMA optimize\" --remote -y",
     "migrate:prod": "run-s migrate:prod:*",
-    "migrate:staging:db": "wrangler d1 migrations apply skyposts-dev --remote",
-    "migrate:staging:pragma": "wrangler d1 execute skyposts-dev --command \"PRAGMA optimize\" --remote -y",
-    "migrate:staging": "run-s migrate:staging:*",
-    "migrate:remote": "npm run migrate:prod && npm run migrate:staging",
     "migrate:optimize": "run-s migrate:*:pragma",
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
     "minify:main": "minify assets/js/main.js > assets/js/main.min.js",
@@ -37,7 +32,7 @@
   "dependencies": {
     "@atproto/api": "^0.18.21",
     "@hono/standard-validator": "^0.2.2",
-    "better-auth": "^1.4.19",
+    "better-auth": "^1.4.20",
     "better-auth-cloudflare": "^0.2.9",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.1",
@@ -58,7 +53,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^24.10.15",
+    "@types/node": "^24.11.0",
     "drizzle-kit": "^0.31.9",
     "minify": "^14.1.0",
     "npm-run-all2": "^8.0.4",

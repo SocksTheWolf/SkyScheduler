@@ -112,34 +112,3 @@ TASK_SETTINGS={use_posts=true, use_reposts=true}
 
 # set this to true in your .dev.vars to turn off turnstile
 IN_DEV=false
-
-[env.staging]
-workers_dev = true
-
-[env.staging.vars]
-BETTER_AUTH_URL="*"
-IMAGE_SETTINGS={enabled=false}
-SIGNUP_SETTINGS = {use_captcha=false, invite_only=false, invite_thread="", invite_uses=10}
-QUEUE_SETTINGS = {enabled=false, repostsEnabled=false, postNowEnabled=false, threadEnabled=true, delay_val=10, post_queues=["POST_QUEUE"], repost_queues=[]}
-REDIRECTS = {contact="https://bsky.app/profile/skyscheduler.work", tip="https://ko-fi.com/socksthewolf/tip"}
-R2_SETTINGS={auto_prune=false, prune_days=3}
-TASK_SETTINGS={use_posts=true, use_reposts=true}
-IN_DEV=true
-
-[[env.staging.d1_databases]]
-binding = "DB"
-database_name = "skyposts-dev"
-database_id = "9e9e3275-c12e-4209-9b8c-a1ee57f7bb8d"
-migrations_table = "migrations"
-migrations_dir = "migrations"
-
-[[env.staging.kv_namespaces]]
-binding = "KV"
-id = "9b9c6cdfd40e405aa3df63544a553b08"
-
-[env.staging.images]
-binding = "IMAGES"
-
-[[env.staging.r2_buckets]]
-binding = "R2"
-bucket_name = "skyembeds-dev"
