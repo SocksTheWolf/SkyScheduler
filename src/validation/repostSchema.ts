@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
-import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
-import { atProtoPostURI, postRecordURI } from "./regexCases";
+import { MAX_POSTED_LENGTH, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
+import { atProtoPostURI, postRecordURI, repostContentRecord } from "./regexCases";
 
 export const RepostSchema = z.object({
   url: z.url({
@@ -19,6 +19,10 @@ export const RepostSchema = z.object({
     hours: z.coerce.number().min(1).max(MAX_REPOST_IN_HOURS),
     times: z.coerce.number().min(1).max(MAX_REPOST_INTERVAL_LIMIT)
   }).optional(),
+  content: z.xor([
+      z.string().trim().max(MAX_POSTED_LENGTH, "repost title is too long"),
+      z.string().trim().regex(repostContentRecord)
+    ], "invalid repost title").optional(),
   scheduledDate: z.string().refine((date) => {
     try {
       const parsed = new Date(date);

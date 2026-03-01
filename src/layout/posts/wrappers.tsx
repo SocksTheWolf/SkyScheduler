@@ -20,6 +20,7 @@ export function PostDataHeader(props: PostDataHeaderOptions) {
   const canSeeHeader = canBeEdited || canBeDeleted || canAddReposts;
   return (<header class="postItemHeader" data-item={content.postid} data-root={content.rootPost || content.postid}
     data-parent={content.isChildPost ? content.parentPost : undefined}
+    data-repost={content.isRepost || undefined}
     hidden={canSeeHeader ? undefined : true}>
       <RepostStatusIcon isRepost={content.isRepost} />
       {canBeEdited ? <EditPostButton id={content.postid} /> : null}

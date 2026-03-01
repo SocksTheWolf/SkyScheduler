@@ -344,7 +344,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   if (!validation.success) {
     return { ok: false, msg: validation.error.toString() };
   }
-  const { url, uri, cid, scheduledDate, repostData } = validation.data;
+  const { url, uri, cid, content, scheduledDate, repostData } = validation.data;
   const scheduleDate = floorGivenTime(new Date(scheduledDate));
   const timeNow = new Date();
 
@@ -384,15 +384,25 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
 
     // Add repost info object to existing array
-    let newRepostInfo:RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
+    let newRepostInfo: RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
     if (newRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
       return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
     }
 
-    newRepostInfo.push(repostInfo);
-    // push record update to add to json array
-    dbOperations.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
-      eq(posts.userId, userId), eq(posts.cid, cid))));
+    // Check to see if we have an exact repost match.
+    // If we do, do not update the repostInfo, as repost table will drop the duplicates for us anyways.
+    const isNewInfoNotDuped = (el: RepostInfo) => {
+      return el.time != repostInfo.time && el.count != repostInfo.count &&
+        el.hours != repostInfo.hours;
+    };
+    if (newRepostInfo.every(isNewInfoNotDuped)) {
+      newRepostInfo.push(repostInfo);
+
+      // push record update to add to json array
+      dbOperations.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
+        eq(posts.userId, userId), eq(posts.cid, cid))));
+    }
+
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
@@ -404,7 +414,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     // Create the post base for this repost
     postUUID = uuidv4();
     dbOperations.push(db.insert(posts).values({
-      content: `Repost of ${url}`,
+      content: !isEmpty(content) ? content! : `Repost of ${url}`,
       uuid: postUUID,
       cid: cid,
       uri: uri,
@@ -437,13 +447,19 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   }
   // Update repost counts
   if (existingPost !== null) {
+    // update existing content posts (but only for reposts, no one else)
+    if (existingPost.isRepost && !isEmpty(content)) {
+      dbOperations.push(db.update(posts).set({content: content!}).where(eq(posts.uuid, postUUID)));
+    }
     const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
     dbOperations.push(db.update(repostCounts)
-    .set({count: newCount})
-    .where(eq(repostCounts.uuid, postUUID)));
+      .set({count: newCount})
+      .where(eq(repostCounts.uuid, postUUID)));
   }
-  else
+  else {
+    // this is a first time repost post, so we know there were no conflicts
     dbOperations.push(db.insert(repostCounts).values({uuid: postUUID, count: totalRepostCount}));
+  }
 
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);

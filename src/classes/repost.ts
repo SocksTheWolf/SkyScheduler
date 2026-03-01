@@ -6,11 +6,15 @@ export class Repost {
   cid: string;
   userId: string;
   scheduleGuid?: string;
+  content?: string;
   constructor(data: any) {
     this.postid = data.uuid;
     this.cid = data.cid;
     this.uri = data.uri;
     this.userId = data.userId;
+
+    if (data.content)
+      this.content = data.content;
     if (data.scheduleGuid)
       this.scheduleGuid = data.scheduleGuid;
   }

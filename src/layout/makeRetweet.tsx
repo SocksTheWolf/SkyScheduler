@@ -1,3 +1,4 @@
+import { MAX_POSTED_LENGTH } from "../limits";
 import { RetweetOptions } from "./options/retweetOptions";
 import { ScheduleOptions } from "./options/scheduleOptions";
 
@@ -13,6 +14,11 @@ export function MakeRetweet() {
       <small>This must be a post, it cannot be anything else.
         It must also exist, and be reachable
         (i.e. a post that's not deleted, nor are you forbidden from seeing it)</small>
+      <blockquote id="repostTitleSection">
+        <label for="repostTitle">Repost Title (Optional)</label>
+        <input type="text" id="repostTitle" maxlength={MAX_POSTED_LENGTH} />
+        <small>A name or simple phrase to help you organize reposts. Max {MAX_POSTED_LENGTH} characters. Will update existing titles.</small>
+      </blockquote>
     </article>
     <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" header="Retweet At" />
     <article>

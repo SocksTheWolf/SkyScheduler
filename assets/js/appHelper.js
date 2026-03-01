@@ -151,6 +151,10 @@ function setElementRequired(el, required) {
     el.removeAttribute("required");
 }
 
+function isElementVisible(el) {
+  return !el.classList.contains("hidden");
+}
+
 function setElementVisible(el, shouldShow) {
   if (shouldShow)
     el.classList.remove("hidden");

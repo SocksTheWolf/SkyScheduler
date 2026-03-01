@@ -1,4 +1,6 @@
 const repostForm = document.getElementById("repostForm");
+const repostTitle = document.getElementById("repostTitle");
+const repostTitleSection = document.getElementById("repostTitleSection");
 const repostRecordURL = document.getElementById("repostRecordURL");
 
 async function getAccountHandle(account) {
@@ -29,6 +31,9 @@ document.addEventListener("resetRepost", () => {
   repostForm.reset();
   repostForm.removeAttribute("disabled");
   showRepostProgress(false);
+  setElementVisible(repostTitleSection, true);
+  setElementDisabled(repostTitle, false);
+  repostTitle.value = "";
   repostRecordURL.value = "";
 });
 
@@ -59,6 +64,11 @@ repostForm.addEventListener('submit', async (e) => {
       hours: repostValues[0].value,
       times: repostValues[1].value
     };
+  }
+
+  // Push any names we have for the post here too
+  if (repostTitle.value !== "" && isElementVisible(repostTitleSection)) {
+    postObject.content = repostTitle.value;
   }
 
   const {account, postid} = ATPROTO_RECORD_REGEX.exec(postRecordVal)?.groups;
@@ -109,8 +119,19 @@ repostForm.addEventListener('submit', async (e) => {
 document.addEventListener("addNewRepost", (ev) => {
   const postHeader = ev.detail.target;
   const postURIHolder = postHeader.parentElement.querySelector("footer small a:not(hidden)");
-  if (postURIHolder) {
+  const postBodyHolder = postHeader.parentElement.querySelector(".postText");
+  if (postURIHolder && postBodyHolder) {
+    setElementVisible(repostTitleSection, true);
+    setElementDisabled(repostTitle, false);
     const postURI = postURIHolder.getAttribute("href");
+    const isExistingRepost = postHeader.hasAttribute("data-repost");
+    if (isExistingRepost) {
+      repostTitle.value = postBodyHolder.innerText.trim();
+    } else {
+      setElementVisible(repostTitleSection, false);
+      setElementDisabled(repostTitle, true);
+      repostTitle.value = "";
+    }
     repostRecordURL.value = postURI;
     if (contentTabs !== null) {
       contentTabs.switchTab("dashtabs", 1);
