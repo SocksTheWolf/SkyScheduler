@@ -28,13 +28,6 @@ database_id = "5553e724-4dfb-4771-9c08-3584da5855d1"
 migrations_table = "migrations"
 migrations_dir = "migrations"
 
-[[d1_databases]]
-binding = "DBStaging"
-database_name = "skyposts-dev"
-database_id = "9e9e3275-c12e-4209-9b8c-a1ee57f7bb8d"
-migrations_table = "migrations"
-migrations_dir = "migrations"
-
 # media storage
 [[r2_buckets]]
 binding = "R2"
