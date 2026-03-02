@@ -26,23 +26,26 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
   for (const message of batch.messages) {
     let wasSuccess: boolean = false;
     const taskType: TaskType = message.body.type;
-    const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, message.body.data, taskType);
-    switch (taskType) {
-      case TaskType.Post:
+    if (taskType == TaskType.Post || taskType == TaskType.Repost) {
+      const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, message.body.data, taskType);
+
+      // For now, log that we don't have an agent, we should figure this out later though...
+      if (agent == null) {
+        console.warn(`Could not make an agent for ${message.body.data?.getUser()}, got null.`);
+      }
+
+      if (taskType == TaskType.Post) {
         wasSuccess = await handlePostTask(runtimeWrapper, message.body.data as Post, agent);
-      break;
-      case TaskType.Repost:
+      } else {
         wasSuccess = await handleRepostTask(runtimeWrapper, message.body.data as Repost, agent);
-      break;
-      case TaskType.Blast:
-        console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
-        wasSuccess = true;
-      break;
-      default:
-      case TaskType.None:
-        console.error("Got a message queue task type that was invalid");
-        message.ack();
-        return;
+      }
+    } else if (taskType == TaskType.Blast) {
+      console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
+      wasSuccess = true;
+    } else {
+      console.error("Got a message queue task type that was invalid");
+      message.ack();
+      return;
     }
     // Handle queue acknowledgement on success/failure
     if (!wasSuccess) {

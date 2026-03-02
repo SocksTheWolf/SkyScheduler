@@ -100,8 +100,7 @@ export class AgentMap {
     if (data === undefined || data === null) {
       return null;
     }
-    const userId: string = (type === TaskType.Post) ? (data as Post).user : (data as Repost).userId;
-    return await this.getOrAddAgent(c, userId, type);
+    return await this.getOrAddAgent(c, data.getUser(), type);
   };
   static async getAgentDirect(c: AllContext, userId: string) {
     return await makeAgentForUser(c, userId);

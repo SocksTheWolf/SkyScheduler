@@ -73,6 +73,9 @@ export class Post {
   getURI(): string|null {
     return this.uri ? "https://bsky.app/profile/" + this.uri.replace("at://","").replace("app.bsky.feed.","") : null;
   }
+  getUser(): string {
+    return this.user;
+  }
   canAddMoreRepostRules(): boolean {
     if (!this.posted)
       return false;

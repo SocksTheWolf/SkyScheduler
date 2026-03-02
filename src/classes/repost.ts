@@ -18,6 +18,9 @@ export class Repost {
     if (data.scheduleGuid)
       this.scheduleGuid = data.scheduleGuid;
   }
+  getUser(): string {
+    return this.userId;
+  }
 };
 
 // Contains the repost info for a post
