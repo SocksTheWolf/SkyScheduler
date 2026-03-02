@@ -1,8 +1,8 @@
 import AccountHandler from "../layout/account";
+import DashboardPasswordField from "../layout/fields/dashPasswordField";
+import UsernameField from "../layout/fields/usernameField";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
-import { DashboardPasswordField } from "../layout/fields/passwordFields";
-import UsernameField from "../layout/fields/usernameField";
 import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
 

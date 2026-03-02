@@ -2,7 +2,8 @@ import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
 import { settingsScriptStr } from "../utils/appScripts";
-import { BSkyAppPasswordField, DashboardPasswordField } from "./fields/passwordFields";
+import BSkyAppPasswordField from "./fields/appPasswordField";
+import DashboardPasswordField from "./fields/dashPasswordField";
 import UsernameField from "./fields/usernameField";
 
 type SettingsTypeProps = {

@@ -1,11 +1,12 @@
 import { Context } from "hono";
 import AccountHandler from "../layout/account";
+import BSkyAppPasswordField from "../layout/fields/appPasswordField";
+import DashboardPasswordField from "../layout/fields/dashPasswordField";
+import UsernameField from "../layout/fields/usernameField";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
-import { BSkyAppPasswordField, DashboardPasswordField } from "../layout/fields/passwordFields";
-import UsernameField from "../layout/fields/usernameField";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
