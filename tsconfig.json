@@ -10,6 +10,7 @@
     ],
     "types": [
       "node",
+      "./src/global.d.ts",
       "./src/wrangler.d.ts"
     ],
     "jsx": "react-jsx",
