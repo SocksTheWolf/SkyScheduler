@@ -205,11 +205,13 @@ post.delete("/delete/:id", async (c: Context) => {
     const response: DeleteResponse = await deletePost(c, id);
     if (response.success === true) {
       let postRefreshEvent = "";
+      // This is true if this was the root of a thread chain
       if (response.needsRefresh) {
         postRefreshEvent = ", refreshPosts, timeSidebar, scrollTop";
       }
-      const triggerEvents = `resetIfThreading, postDeleted, accountViolations${postRefreshEvent}`;
+      const triggerEvents = `resetIfThreading, accountViolations${postRefreshEvent}`;
       c.header("HX-Trigger-After-Swap", triggerEvents);
+      c.header("HX-Trigger-After-Settle", `{"postDeleted": ${response.isRepost}}`);
       return c.html(<></>);
     }
   }

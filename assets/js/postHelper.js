@@ -482,11 +482,11 @@ function showPostProgress(shouldShow) {
 // HTMX will call these
 document.addEventListener("editPost", function(event) {
   const postid = event.detail.value;
-  const editField = document.getElementById(`edit${postid}`);
-  const editForm = document.getElementById(`editPost${postid}`);
+  const editField = document.getElementById(`edit-${postid}`);
+  const editForm = document.getElementById(`editPost-${postid}`);
   const cancelButton = editForm.querySelector(".cancelEditButton");
 
-  addCounter(`edit${postid}`, `editCount${postid}`, MAX_LENGTH);
+  addCounter(`edit-${postid}`, `editCount-${postid}`, MAX_LENGTH);
   tributeToElement(editField);
 
   const cancelEditField = (ev) => {
@@ -560,69 +560,3 @@ function cancelThreadingKeyboard(ev) {
     document.dispatchEvent(new Event("resetPost"));
   }
 }
-
-function runPageReactors() {
-  const keys = ["Enter", " "];
-  document.querySelectorAll(".autoRepostBox").forEach(el => {
-    addClickKeyboardListener(el, (e) => {
-      setSelectDisable(e.target.parentElement, !e.target.checked);
-    }, keys, false);
-    if (el.getAttribute("startchecked") == "true") {
-      setSelectDisable(el.parentElement, false);
-    }
-  });
-
-  // find the post time scheduler object
-  document.querySelectorAll(".scheduledDateBlock").forEach(el => {
-    const dateScheduler = el.querySelector(".timeSelector");
-    const scheduledPostNowBox = el.querySelector(".postNow");
-
-    // rounddown minutes
-    dateScheduler.addEventListener('change', () => {
-      dateScheduler.value = convertTimeValueLocally(dateScheduler.value);
-    });
-
-    // push a minimum date to make it easier (less chance of typing 2025 by accident)
-    dateScheduler.setAttribute("min", getScheduleTimeForNextHour());
-
-    if (scheduledPostNowBox) {
-      addClickKeyboardListener(scheduledPostNowBox, () => {
-        const isChecked = scheduledPostNowBox.checked;
-        setElementRequired(dateScheduler, !isChecked);
-        setElementVisible(dateScheduler, !isChecked);
-        setElementVisible(dateScheduler.nextElementSibling, !isChecked);
-      }, keys, false);
-    }
-  });
-
-  const urlCardBox = document.getElementById('urlCard');
-  urlCardBox.addEventListener("paste", () => {
-    showContentLabeler(true);
-    setElementVisible(sectionImageAttach, false);
-  });
-
-  urlCardBox.addEventListener("input", (ev) => {
-    const isNotEmpty = ev.target.value.length > 0;
-    showContentLabeler(isNotEmpty);
-    setElementVisible(sectionImageAttach, !isNotEmpty);
-  });
-
-  // Handle character counting
-  addCounter("content", "count", MAX_LENGTH);
-  addCounter("altTextField", "altTextCount", MAX_ALT_LENGTH);
-  // Add mentions
-  tributeToElement(content);
-  // add event for the cancel button
-  if (cancelThreadBtn) {
-    addClickKeyboardListener(cancelThreadBtn, () =>
-      {document.dispatchEvent(new Event("resetPost")) });
-  }
-  document.dispatchEvent(new Event("timeSidebar"));
-  document.dispatchEvent(new Event("resetPost"));
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  runPageReactors();
-  // Var is defined in appHelper
-  contentTabs = new PicoTabs('[role="tablist"]');
-});
