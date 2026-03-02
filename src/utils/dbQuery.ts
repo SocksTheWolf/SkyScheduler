@@ -23,7 +23,7 @@ import {
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import { getChildPostsOfThread, getPostByCID, getPostThreadCount, updatePostForGivenUser } from "./db/data";
-import { getViolationsForUser, removeViolation, removeViolations, userHasViolations } from "./db/violations";
+import { getViolationsForUser, removeViolation, removeViolations, userHasViolationsDB } from "./db/violations";
 import { floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
@@ -77,7 +77,7 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
       // If we have new data about the username, pds, or password
       if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
         // check if the user has violations
-        if (await userHasViolations(db, userId)) {
+        if (await userHasViolationsDB(db, userId)) {
           // they do, so clear them out
           await removeViolations(c, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
         }
@@ -118,7 +118,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
     // delete the files from R2
     if (!postObj.posted) {
       await deleteEmbedsFromR2(c, postObj.embeds);
-      if (await userHasViolations(db, userId)) {
+      if (await userHasViolationsDB(db, userId)) {
         // Remove the media too big violation if it's been given
         await removeViolation(c, userId, AccountStatus.MediaTooBig);
       }

@@ -38,8 +38,12 @@ export const userHandleHasBan = async (c: AllContext, userName: string) => {
   return false;
 };
 
-export const userHasViolations = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
+export const userHasViolationsDB = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
   return (await getViolationsForUser(db, userId)) != null;
+};
+
+export const userHasViolations = async (c: AllContext, userId: string): Promise<boolean> => {
+  return await userHasViolationsDB(c.get("db"), userId);
 };
 
 function createObjForValuesChange (violationType: AccountStatus[], value: boolean) {
@@ -120,7 +124,7 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
     return;
   }
   // Check if they have a violation first
-  if ((await userHasViolations(db, userId)) == false) {
+  if ((await userHasViolationsDB(db, userId)) == false) {
     return;
   }
 
