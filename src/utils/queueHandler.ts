@@ -38,14 +38,17 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
       const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       // For now, log that we don't have an agent, we should figure this out later though...
       if (agent == null) {
+        // this is very suspicious though, because you should have an agent unless you deleted
+        // your account while the queue was running...
         console.warn(`Could not make an agent for ${postDataObj.getUser()}, got null.`);
       }
 
-      if (taskType == TaskType.Post) {
+      if (taskType == TaskType.Post)
         wasSuccess = await handlePostTask(runtimeWrapper, postDataObj as Post, agent);
-      } else {
+      else
         wasSuccess = await handleRepostTask(runtimeWrapper, postDataObj as Repost, agent);
-      }
+
+
     } else if (taskType == TaskType.Blast) {
       console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
       wasSuccess = true;

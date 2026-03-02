@@ -8,8 +8,6 @@ export const MIN_LENGTH: number = 1;
 export const MAX_REPOST_INTERVAL: number = 15;
 // max amount of time something can be reposted over
 export const MAX_REPOST_DAYS: number = 10;
-// max amount of days to hold a post after it's been posted and has no reposts before it's purged from the DB
-export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 // max length of an animated gif in minutes
 export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
@@ -39,10 +37,6 @@ export const MAX_REPOST_POSTS: number = 50;
 
 // a limit for the maximum number of repost rules a single post can have
 export const MAX_REPOST_RULES_PER_POST: number = 7;
-
-// max weeks an account can be held with violations that have not been resolved
-// until the account is marked for termination
-export const MAX_VIOLATION_WEEKS: number = 12;
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.

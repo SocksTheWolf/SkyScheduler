@@ -27,7 +27,9 @@ export const makeAgentForUser = async (c: AllContext, userId: string) => {
   if (loginResponse != AccountStatus.Ok) {
     const addViolation: boolean = await createViolationForUser(c, userId, loginResponse);
     if (addViolation)
-      console.error(`Unable to login to ${userId} with violation ${loginResponse}`);
+      console.error(`Unable to login for ${userId} with violation ${loginResponse}`);
+    else
+      console.error(`Unable to login ${userId}, no violation made, got ${loginResponse}`);
     return null;
   }
   return agent;
@@ -104,8 +106,7 @@ export class AgentMap {
     return await makeAgentForUser(c, userId);
   };
   usesAgentForType(type: TaskType) {
-    switch(type)
-    {
+    switch(type) {
       case TaskType.Post:
         return this.#forPosts;
       case TaskType.Repost:

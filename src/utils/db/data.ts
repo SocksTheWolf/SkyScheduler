@@ -7,7 +7,7 @@ import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
-import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
+import { MAX_POSTED_LENGTH } from "../../limits";
 import {
   AllContext,
   BatchQuery,
@@ -284,7 +284,7 @@ export const purgePostedPosts = async (c: AllContext): Promise<number> => {
   .where(
     and(
       and(
-        eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-${Math.abs(MAX_HOLD_DAYS_BEFORE_PURGE)} days')`)
+        eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-7 days')`)
       ),
       // skip child posts objects
       and(lte(posts.threadOrder, 0), lte(repostCounts.count, 0))
