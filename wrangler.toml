@@ -46,7 +46,7 @@ simple = { limit = 4, period = 60 }
 [[ratelimits]]
 name = "POST_LIMITER"
 namespace_id = "1002"
-simple = { limit = 2, period = 10 }
+simple = { limit = 3, period = 10 }
 [[ratelimits]]
 name = "UPDATE_LIMITER"
 namespace_id = "1003"

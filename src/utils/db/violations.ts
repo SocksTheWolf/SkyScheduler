@@ -76,7 +76,7 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
-    console.warn(`createViolationForUser got a not valid add request for user ${userId} with violation ${violationType}`);
+    console.warn(`createViolationForUser got an invalid add request for user ${userId} with violation ${violationType}`);
     return false;
   }
 
