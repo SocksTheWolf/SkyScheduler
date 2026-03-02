@@ -95,6 +95,7 @@ npm run migrate:all
    - `limits.ts` - site configuration and application limits
    - `siteinfo.ts` - site information such as name, description, domain, etc
    - `.ssclirc` - sitemap domain
+   - `site.webmanifest` - naming and color schemes
 
 10. Run your application and go to `/setup`. This will create the admin account.
 
