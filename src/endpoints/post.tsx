@@ -9,6 +9,7 @@ import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
+import { rateLimit } from "../middleware/rateLimit";
 import {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse, EmbedDataType, LooseObj
@@ -57,7 +58,7 @@ post.delete("/upload", async (c: Context) => {
 });
 
 // Create post
-post.post("/create", async (c: Context) => {
+post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c: Context) => {
   const body = await c.req.json();
   const response: CreatePostQueryResponse = await createPost(c, body);
   if (!response.ok) {
@@ -77,7 +78,7 @@ post.post("/create", async (c: Context) => {
 });
 
 // Create repost
-post.post("/create/repost", async (c: Context) => {
+post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Context) => {
   const body = await c.req.json();
   const response: CreateObjectResponse = await createRepost(c, body);
   if (!response.ok) {

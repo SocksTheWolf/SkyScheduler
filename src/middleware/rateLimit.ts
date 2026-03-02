@@ -7,11 +7,12 @@ type RateLimitProps = {
   limiter: string;
 };
 
-export const rateLimit = async (prop: RateLimitProps) => {
+export const rateLimit = (prop: RateLimitProps) => {
   return createMiddleware(async (c: Context, next: any) => {
     const userId: string = c.get("userId");
     const rateLimitObj: RateLimit|null = get(c.env, prop.limiter, null);
     if (rateLimitObj === null || isEmpty(userId)) {
+      console.warn("cannot apply rate limits, oh no");
       await next();
       return;
     }
