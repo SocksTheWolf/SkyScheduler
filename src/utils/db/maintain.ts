@@ -1,7 +1,10 @@
-import { eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
+import { count, eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
+import isEmpty from "just-is-empty";
+import remove from "just-remove";
+import { RepostInfo } from "../../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
@@ -66,12 +69,45 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
       .where(inArray(mediaFiles.fileName, flatten(userMedia))));
   }
 
-  const allPosts = await db.select({id: posts.uuid}).from(posts);
+  // clean up post data
+  const allPosts = await db.select({id: posts.uuid, info: posts.repostInfo}).from(posts);
   for (const post of allPosts) {
-    const count = db.$count(reposts, eq(reposts.uuid, post.id));
-    batchedQueries.push(db.insert(repostCounts).values({uuid: post.id,
-      count: count}).onConflictDoNothing());
+    // Clean up repost counts
+    const countHelper = db.$count(reposts, eq(reposts.uuid, post.id));
+    batchedQueries.push(db.insert(repostCounts)
+      .values({uuid: post.id, count: countHelper})
+      .onConflictDoUpdate({target: repostCounts.uuid, set: {count: countHelper}}));
+
+    // Clean up repost info of posts
+    // TODO: this doesn't work properly, and I accidentally obliterated my
+    // test data, and the bug is already fixed so there's no real reason to keep going with this
+    // it'll just be a silly quirk.
+    if (!isEmpty(post.info) && false) {
+      // this post has repost info
+      let repostInfoMap: Map<string, RepostInfo> = new Map();
+      post.info!.forEach((itm) => repostInfoMap.set(itm.guid, itm));
+      // Keep this too to make sure we worked on all objects, if anything is left over in this array, delete it.
+      // could probably do a where not exists but meh
+      let repostInfoGuids: string[] = post.info!.map((itm) => itm.guid);
+
+      const repostInfoData = await db.select({id: reposts.scheduleGuid, count: count()}).from(reposts)
+            .where(inArray(reposts.scheduleGuid, repostInfoGuids)).all();
+
+      for (const res of repostInfoData) {
+        // if the object is empty, remove from the map
+        if (res.count == 0) {
+          repostInfoMap.delete(res.id!);
+        }
+        // remove from this array
+        repostInfoGuids = remove(repostInfoGuids, [res.id]);
+      }
+      // delete any records that don't exist
+      repostInfoGuids.forEach((itm) => repostInfoMap.delete(itm));
+      const newRepostInfo = Array.from(repostInfoMap.values());
+      batchedQueries.push(db.update(posts).set({repostInfo: newRepostInfo}).where(eq(posts.uuid, post.id)));
+    }
   }
+
   if (batchedQueries.length > 0)
     await db.batch(batchedQueries as BatchQuery);
 };

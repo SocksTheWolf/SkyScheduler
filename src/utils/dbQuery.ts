@@ -390,11 +390,16 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
       return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
     }
 
+    const repostInfoTimeStr = repostInfo.time.toISOString();
     // Check to see if we have an exact repost match.
     // If we do, do not update the repostInfo, as repost table will drop the duplicates for us anyways.
-    const isNewInfoNotDuped = (el: RepostInfo) => {
-      return el.time != repostInfo.time && el.count != repostInfo.count &&
-        el.hours != repostInfo.hours;
+    const isNewInfoNotDuped = (el: any) => {
+      if (el.time == repostInfoTimeStr) {
+        if (el.count == repostInfo.count) {
+          return el.hours != repostInfo.hours;
+        }
+      }
+      return true;
     };
     if (newRepostInfo.every(isNewInfoNotDuped)) {
       newRepostInfo.push(repostInfo);
@@ -403,7 +408,6 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
       dbOperations.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
         eq(posts.userId, userId), eq(posts.cid, cid))));
     }
-
   } else {
     // Limit of post reposts on the user's account.
     const accountCurrentReposts = await db.$count(posts, and(eq(posts.userId, userId), eq(posts.isRepost, true)));
@@ -452,10 +456,14 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     if (existingPost.isRepost && !isEmpty(content)) {
       dbOperations.push(db.update(posts).set({content: content!}).where(eq(posts.uuid, postUUID)));
     }
+
+    // Because there could be conflicts that drop, run a count on the entire list and use the value from that
     const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
-    dbOperations.push(db.update(repostCounts)
-      .set({count: newCount})
-      .where(eq(repostCounts.uuid, postUUID)));
+    // we also don't know if the repost count table has repost values for this item, so we should
+    // attempt to always insert and update if it already exists
+    dbOperations.push(db.insert(repostCounts)
+      .values({uuid: postUUID, count: newCount})
+      .onConflictDoUpdate({target: repostCounts.uuid, set: {count: newCount}}));
   }
   else {
     // this is a first time repost post, so we know there were no conflicts
