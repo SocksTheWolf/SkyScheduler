@@ -19,7 +19,7 @@ export const rateLimit = async (prop: RateLimitProps) => {
     if (success) {
       await next();
     } else {
-      return c.json({ok: false, msg: "you are currently rate limited, try again in a minute"});
+      return c.json({ok: false, msg: "you are currently rate limited, try again in a minute"}, 429);
     }
   });
 };
