@@ -42,6 +42,6 @@ export async function requireAuth(c: Context, next: any) {
 
 export function hasAuth(c: Context) {
   return (c.get("session") !== null && c.get("userId") !== null);
-}
+};
 
 export const authMiddleware = every(pullAuthData, requireAuth);
