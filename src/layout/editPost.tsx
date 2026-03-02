@@ -14,18 +14,16 @@ export function PostAltTextEdit({post}: EditedPostProps) {
     if (embedData.type !== EmbedDataType.Image)
       return;
 
-    return (
-      <div class="editAltBlock" alteditfor={embedData.content}>
-        <img width="120px" height="120px" class="editImgThumb" src={`preview/file/${embedData.content}`} /><br />
-        <center>
-          <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
-          <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
-          {/* Accessible handlers will be added in via the htmx header */}
-          <a tabindex={0} role="button" data-file={embedData.content}
-            class="editPostAlt secondary outline">Edit Alt</a>
-        </center>
-      </div>
-    );
+    return (<div class="editAltBlock" alteditfor={embedData.content}>
+      <img width="120px" height="120px" class="editImgThumb" src={`preview/file/${embedData.content}`} /><br />
+      <center>
+        <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
+        <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />
+        {/* Accessible handlers will be added in via the htmx header */}
+        <a tabindex={0} role="button" data-file={embedData.content}
+          class="editPostAlt secondary outline">Edit Alt</a>
+      </center>
+    </div>);
   });
 
   const altEditBlock = embedAltTextEdit;
@@ -43,34 +41,39 @@ export function PostAltTextEdit({post}: EditedPostProps) {
   </section>);
 }
 
-export function PostEdit({post}:EditedPostProps) {
+export function PostEdit({post}: EditedPostProps) {
   // If this post is posted, just show the same object again.
   if (post.posted) {
     return (<PostContent text={post.text} posted={true} repost={false} />);
   }
 
-  const editSpinner: string = `editSpinner${post.postid}`;
-  const editResponse: string = `editResponse${post.postid}`;
-  return (
-    <form id={`editPost${post.postid}`} hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
-        hx-swap="innerHTML swap:0.2s" hx-indicator={`#${editSpinner}`}>
-      <section>
-        <textarea autofocus name="content" id={`edit${post.postid}`} rows={6} tabindex={0} required>
-          {post.text}
-        </textarea>
-        <small>Character Count: <span id={`editCount${post.postid}`}>0/{MAX_LENGTH}</span></small>
-      </section>
+  // yeah these are kind egregious...
+  const editSpinner: string = `editSpinner-${post.postid}`;
+  const editResponse: string = `editResponse-${post.postid}`;
+  const editPostField: string = `edit-${post.postid}`;
+  const editCountId: string = `editCount-${post.postid}`;
+  const postFormId: string = `editPost-${post.postid}`;
 
-      <PostAltTextEdit post={post} />
-      <progress id={editSpinner} class="htmx-indicator" />
-      <center class="postControls">
-        <div id={editResponse}>
-        </div>
-        <button tabindex={0}>Update Post</button>
-        <a tabindex={0} role="button" class="secondary cancelEditButton"
-        hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
-        hx-confirm="Are you sure you want to cancel editing?">Cancel</a>
-      </center>
-    </form>
-  );
-}
+  return (<form id={postFormId}
+    hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
+    hx-swap="innerHTML swap:0.2s" hx-indicator={`#${editSpinner}`}>
+
+    <section>
+      <textarea autofocus name="content" id={editPostField} rows={6} tabindex={0} required>
+        {post.text}
+      </textarea>
+      <small>Character Count: <span id={editCountId}>0/{MAX_LENGTH}</span></small>
+    </section>
+
+    <PostAltTextEdit post={post} />
+    <progress id={editSpinner} class="htmx-indicator" />
+    <center class="postControls">
+      <div id={editResponse}>
+      </div>
+      <button tabindex={0}>Update Post</button>
+      <a tabindex={0} role="button" class="secondary cancelEditButton"
+      hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
+      hx-confirm="Are you sure you want to cancel editing?">Cancel</a>
+    </center>
+  </form>);
+};

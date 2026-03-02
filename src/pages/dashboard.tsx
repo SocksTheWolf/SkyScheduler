@@ -1,16 +1,16 @@
 import { Context } from "hono";
-import { AltTextDialog } from "../layout/altTextModal";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
 import SettingsButton from "../layout/buttons/settings";
+import AltTextDialog from "../layout/dialogs/altTextDialog";
+import SettingsDialog from "../layout/dialogs/settingsDialog";
 import FooterCopyright from "../layout/helpers/footer";
 import { IncludeDependencyTags, PreloadRules } from "../layout/helpers/includesTags";
-import { LogoImage } from "../layout/helpers/logo";
+import LogoImage from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
 import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
-import { Settings } from "../layout/settings";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import {
@@ -82,6 +82,6 @@ export default function Dashboard(props: any) {
     </div>
     <AltTextDialog />
     <script type="text/javascript" src={dashboardScriptStr}></script>
-    <Settings pds={ctx.get("pds")} />
+    <SettingsDialog pds={ctx.get("pds")} />
   </BaseLayout>);
 };

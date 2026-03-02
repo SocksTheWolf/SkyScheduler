@@ -1,5 +1,5 @@
 import { APP_NAME } from "../../siteinfo";
-import { LogoImage } from "./logo";
+import LogoImage from "./logo";
 
 export default function NavTags() {
   return (

@@ -143,6 +143,7 @@ export type PostStatus = {
 
 export type DeleteResponse = {
   success: boolean;
+  isRepost: boolean;
   needsRefresh?: boolean;
 }
 

@@ -100,7 +100,7 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
 
 export const deletePost = async (c: AllContext, id: string): Promise<DeleteResponse> => {
   const userId = c.get("userId");
-  const returnObj: DeleteResponse = {success: false};
+  const returnObj: DeleteResponse = {success: false, isRepost: false};
   if (!userId) {
     return returnObj;
   }
@@ -113,7 +113,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 
   const postObj = await getPostById(c, id);
   if (postObj !== null) {
-    let queriesToExecute:BatchItem<"sqlite">[] = [];
+    let queriesToExecute: BatchItem<"sqlite">[] = [];
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postObj.posted) {
@@ -123,6 +123,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
         await removeViolation(c, userId, AccountStatus.MediaTooBig);
       }
     }
+    returnObj.isRepost = postObj.isRepost || false;
 
     // If the parent post is not null, then attempt to find and update the post chain
     const parentPost = postObj.parentPost;

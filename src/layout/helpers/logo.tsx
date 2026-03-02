@@ -5,7 +5,7 @@ type LogoImageProps = {
   height: number;
 };
 
-export function LogoImage(props: LogoImageProps) {
+export default function LogoImage(props: LogoImageProps) {
   if (LOGO_ENABLED == false)
     return null;
 

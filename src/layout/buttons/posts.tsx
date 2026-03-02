@@ -27,7 +27,7 @@ export function EditPostButton({id}: PostIDProps) {
     title="Click to edit post content"
     hx-get={`/post/edit/${id}`}
     hx-target={`#content-${id}`}
-    hx-swap={`innerHTML show:#editPost${id}:top"`}>
+    hx-swap={`innerHTML show:#editPost-${id}:top"`}>
       <span data-tooltip="Edit this post" data-placement="right">
         <img src="/icons/edit.svg" alt="edit icon" width="20px" height="20px" />
       </span>

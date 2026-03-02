@@ -1,16 +1,16 @@
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { APP_NAME } from "../siteinfo";
-import { PWAutoCompleteSettings } from "../types";
-import { settingsScriptStr } from "../utils/appScripts";
-import BSkyAppPasswordField from "./fields/appPasswordField";
-import DashboardPasswordField from "./fields/dashPasswordField";
-import UsernameField from "./fields/usernameField";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
+import { APP_NAME } from "../../siteinfo";
+import { PWAutoCompleteSettings } from "../../types";
+import { settingsScriptStr } from "../../utils/appScripts";
+import BSkyAppPasswordField from "../fields/appPasswordField";
+import DashboardPasswordField from "../fields/dashPasswordField";
+import UsernameField from "../fields/usernameField";
 
 type SettingsTypeProps = {
   pds?: string;
 };
 
-export function Settings(props: SettingsTypeProps) {
+export default function SettingsDialog(props: SettingsTypeProps) {
   // attempt to pull the user's current PDS information.
   const placeholderPDS = props.pds ? props.pds : "https://bsky.social";
   return (<>
