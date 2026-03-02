@@ -78,7 +78,12 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
   }
   let violationsArray = [];
   violationsArray.push(violationType);
-  const valuesUpdate: LooseObj = createObjForValuesChange(flatten(violationsArray), true);
+  violationsArray = flatten(violationsArray);
+
+  const valuesUpdate: LooseObj = createObjForValuesChange(violationsArray, true);
+  console.log(`making violations array ${violationsArray}, had updates of ${valuesUpdate}`);
+
+  // handle auto-bans
   if (violationType === AccountStatus.TOSViolation) {
     const bskyUsername = await getUsernameForUserId(c, userId);
     if (bskyUsername !== null) {
@@ -120,7 +125,7 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
   }
 
   // Create the update query
-  const valuesUpdate:LooseObj = createObjForValuesChange(violationType, false);
+  const valuesUpdate: LooseObj = createObjForValuesChange(violationType, false);
   await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId));
   // Delete the record if the user has no other violations
   await db.delete(violations).where(and(eq(violations.userId, userId),

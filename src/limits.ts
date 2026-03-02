@@ -33,10 +33,10 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 
 // the maximum amount of repost posts an account can have at any one time.
 // because some people went incredibly overboard.
-export const MAX_REPOST_POSTS: number = 50;
+export const MAX_REPOST_POSTS: number = 40;
 
 // a limit for the maximum number of repost rules a single post can have
-export const MAX_REPOST_RULES_PER_POST: number = 7;
+export const MAX_REPOST_RULES_PER_POST: number = 5;
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
