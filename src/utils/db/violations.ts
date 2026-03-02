@@ -7,7 +7,7 @@ import { AccountStatus, AllContext, LooseObj, Violation } from "../../types";
 import { lookupBskyHandle } from "../bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
-const createBanForUser = async (db: DrizzleD1Database, userName: string, reason: string) => {
+const createBanForUser = async(db: DrizzleD1Database, userName: string, reason: string) => {
   if (userName !== null) {
     const didHandle = await lookupBskyHandle(userName);
     if (didHandle !== null) {
@@ -17,9 +17,9 @@ const createBanForUser = async (db: DrizzleD1Database, userName: string, reason:
       console.warn(`unable to get did handle for banned user ${userName}`);
     }
   }
-}
+};
 
-export const userHasBan = async (c: AllContext, userDid: string): Promise<boolean> => {
+export const userHasBan = async(c: AllContext, userDid: string): Promise<boolean> => {
   const db: DrizzleD1Database = c.get("db");
   if (!db) {
     console.error("unable to check if user has ban, db was null");
@@ -29,7 +29,7 @@ export const userHasBan = async (c: AllContext, userDid: string): Promise<boolea
   return (usersBanned > 0);
 };
 
-export const userHandleHasBan = async (c: AllContext, userName: string) => {
+export const userHandleHasBan = async(c: AllContext, userName: string) => {
   if (userName !== null) {
     const didHandle = await lookupBskyHandle(userName);
     if (didHandle !== null)
@@ -38,33 +38,38 @@ export const userHandleHasBan = async (c: AllContext, userName: string) => {
   return false;
 };
 
-export const userHasViolationsDB = async (db: DrizzleD1Database, userId: string): Promise<boolean> => {
+export const userHasViolationsDB = async(db: DrizzleD1Database, userId: string): Promise<boolean> => {
   return (await getViolationsForUser(db, userId)) != null;
 };
 
-export const userHasViolations = async (c: AllContext, userId: string): Promise<boolean> => {
+export const userHasViolations = async(c: AllContext, userId: string): Promise<boolean> => {
   return await userHasViolationsDB(c.get("db"), userId);
 };
 
-function createObjForValuesChange (violationType: AccountStatus[], value: boolean) {
+function createObjForValuesChange(violationType: AccountStatus[], value: boolean) {
   let valuesUpdate: LooseObj = {};
-  if (violationType.includes(AccountStatus.InvalidAccount))
-    valuesUpdate.userPassInvalid = value;
-
-  if (violationType.includes(AccountStatus.Suspended))
-    valuesUpdate.accountSuspended = value;
-
-  if (violationType.includes(AccountStatus.MediaTooBig))
-    valuesUpdate.mediaTooBig = value;
-
-  if (violationType.includes(AccountStatus.TOSViolation))
-    valuesUpdate.tosViolation = value;
-
-  if (violationType.includes(AccountStatus.TakenDown) || violationType.includes(AccountStatus.Deactivated))
-    valuesUpdate.accountGone = value;
-
+  violationType.forEach((itm) => {
+    switch(itm) {
+      case AccountStatus.InvalidAccount:
+        valuesUpdate.userPassInvalid = value;
+      break;
+      case AccountStatus.Suspended:
+        valuesUpdate.accountSuspended = value;
+      break;
+      case AccountStatus.MediaTooBig:
+        valuesUpdate.mediaTooBig = value;
+      break;
+      case AccountStatus.TOSViolation:
+        valuesUpdate.tosViolation = value;
+      break;
+      case AccountStatus.TakenDown:
+      case AccountStatus.Deactivated:
+        valuesUpdate.accountGone = value;
+      break;
+    }
+  });
   return valuesUpdate;
-}
+};
 
 export const createViolationForUser = async(c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
   const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage,
@@ -140,7 +145,7 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
         ),
       ne(violations.tosViolation, true))
     )));
-}
+};
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
   const {results} = await db.select().from(violations)
