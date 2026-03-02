@@ -43,20 +43,20 @@ export const userHasViolations = async (db: DrizzleD1Database, userId: string): 
 };
 
 function createObjForValuesChange (violationType: AccountStatus[], value: boolean) {
-  let valuesUpdate:LooseObj = {};
-  if (AccountStatus.InvalidAccount in violationType)
+  let valuesUpdate: LooseObj = {};
+  if (violationType.includes(AccountStatus.InvalidAccount))
     valuesUpdate.userPassInvalid = value;
 
-  if (AccountStatus.Suspended in violationType)
+  if (violationType.includes(AccountStatus.Suspended))
     valuesUpdate.accountSuspended = value;
 
-  if (AccountStatus.MediaTooBig in violationType)
+  if (violationType.includes(AccountStatus.MediaTooBig))
     valuesUpdate.mediaTooBig = value;
 
-  if (AccountStatus.TOSViolation in violationType)
+  if (violationType.includes(AccountStatus.TOSViolation))
     valuesUpdate.tosViolation = value;
 
-  if (AccountStatus.TakenDown in violationType || AccountStatus.Deactivated in violationType)
+  if (violationType.includes(AccountStatus.TakenDown) || violationType.includes(AccountStatus.Deactivated))
     valuesUpdate.accountGone = value;
 
   return valuesUpdate;
@@ -76,12 +76,11 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     console.error("unable to get database to create violations for");
     return false;
   }
+
   let violationsArray = [];
   violationsArray.push(violationType);
   violationsArray = flatten(violationsArray);
-
   const valuesUpdate: LooseObj = createObjForValuesChange(violationsArray, true);
-  console.log(`making violations array ${violationsArray}, had updates of ${valuesUpdate}`);
 
   // handle auto-bans
   if (violationType === AccountStatus.TOSViolation) {
@@ -95,6 +94,7 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
 
   // if there are no violations, then give none.
   if (isEmpty(valuesUpdate)) {
+    //console.log("no value change");
     return false;
   }
 
