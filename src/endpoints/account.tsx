@@ -64,9 +64,9 @@ account.post("/login", async (c) => {
       c.res.headers.set("set-cookie", headers.get("set-cookie")!);
       return c.json({ok: true, msg: "logged in!"});
     }
-    return c.json({ok: false, msg: "could not login user"}, 401);
+    return c.json({ok: false, msg: "could not login user"}, 403);
   } catch (err: any) {
-    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 404);
+    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 401);
   }
 });
 

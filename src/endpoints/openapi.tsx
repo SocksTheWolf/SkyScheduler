@@ -219,13 +219,13 @@ openapiRoutes.post("/account/login", describeRoute({
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
     },
-    401: {
+    403: {
       description: "Failed to login",
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
     },
-    404: {
+    401: {
       description: "Unknown error",
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
