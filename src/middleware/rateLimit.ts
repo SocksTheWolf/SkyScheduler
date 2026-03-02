@@ -1,10 +1,12 @@
 import { Context } from "hono";
 import { createMiddleware } from "hono/factory";
+import { html } from "hono/html";
 import isEmpty from "just-is-empty";
 import get from 'just-safe-get';
 
 type RateLimitProps = {
   limiter: string;
+  html?: boolean;
 };
 
 export const rateLimit = (prop: RateLimitProps) => {
@@ -20,7 +22,11 @@ export const rateLimit = (prop: RateLimitProps) => {
     if (success) {
       await next();
     } else {
-      return c.json({ok: false, msg: "you are currently rate limited, try again in a minute"}, 429);
+      if (prop.html) {
+        return c.html(html`<b class="btn-error">You are being rate limited, try again later</b>`, 429);
+      } else {
+        return c.json({ok: false, msg: "You are currently rate limited, try again in a minute"}, 429);
+      }
     }
   });
 };

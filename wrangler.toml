@@ -47,6 +47,10 @@ simple = { limit = 4, period = 60 }
 name = "POST_LIMITER"
 namespace_id = "1002"
 simple = { limit = 2, period = 10 }
+[[ratelimits]]
+name = "UPDATE_LIMITER"
+namespace_id = "1003"
+simple = { limit = 2, period = 60 }
 
 [triggers]
 # Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:

@@ -5,6 +5,7 @@ import { ContextVariables } from "../auth";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
+import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import { Bindings, LooseObj } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bskyApi";
@@ -70,7 +71,7 @@ account.post("/login", async (c) => {
   }
 });
 
-account.post("/update", authMiddleware, async (c) => {
+account.post("/update", authMiddleware, rateLimit({limiter: "UPDATE_LIMITER", html: true}), async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
