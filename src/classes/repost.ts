@@ -8,7 +8,11 @@ export class Repost {
   scheduleGuid?: string;
   content?: string;
   constructor(data: any) {
-    this.postid = data.uuid;
+    if (has(data, "uuid"))
+      this.postid = data.uuid;
+    else
+      this.postid = data.postid;
+
     this.cid = data.cid;
     this.uri = data.uri;
     this.userId = data.userId;

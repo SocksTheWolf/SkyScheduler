@@ -96,11 +96,9 @@ export class AgentMap {
     }
     return agent;
   };
-  async getOrAddAgentFromObj(c: AllContext, data: Post|Repost|undefined|null, type: TaskType): Promise<AtpAgent|null> {
-    if (data === undefined || data === null) {
-      return null;
-    }
-    return await this.getOrAddAgent(c, data.getUser(), type);
+  async getOrAddAgentFromObj(c: AllContext, data: Post|Repost, type: TaskType): Promise<AtpAgent|null> {
+    const userId: string = (type === TaskType.Post) ? (data as Post).user : (data as Repost).userId;
+    return await this.getOrAddAgent(c, userId, type);
   };
   static async getAgentDirect(c: AllContext, userId: string) {
     return await makeAgentForUser(c, userId);

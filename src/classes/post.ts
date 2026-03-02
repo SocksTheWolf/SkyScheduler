@@ -31,11 +31,31 @@ export class Post {
   parentPost?: string;
 
   constructor(data: any) {
-    this.user = data.userId;
-    this.postid = data.uuid;
-    this.embeds = data.embedContent;
-    this.label = data.contentLabel;
-    this.text = data.content;
+    if (has(data, "userId"))
+      this.user = data.userId;
+    else
+      this.user = data.user;
+
+    if (has(data, "uuid"))
+      this.postid = data.uuid;
+    else
+      this.postid = data.postid;
+
+    if (has(data, "embedContent"))
+      this.embeds = data.embedContent;
+    else if (has(data, "embeds"))
+      this.embeds = data.embeds;
+
+    if (has(data, "contentLabel"))
+      this.label = data.contentLabel;
+    else
+      this.label = data.label;
+
+    if (has(data, "content"))
+      this.text = data.content;
+    else
+      this.text = data.text;
+
     this.postNow = data.postNow;
     this.threadOrder = data.threadOrder;
 

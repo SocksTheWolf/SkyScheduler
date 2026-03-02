@@ -4,6 +4,7 @@ import { Post } from "../classes/post";
 import { Repost } from "../classes/repost";
 import { Bindings, QueueTaskData, TaskType } from "../types";
 import { AgentMap } from "./bskyAgents";
+import { isPost } from "./helpers";
 import { enqueueEmptyWork } from "./queuePublisher";
 import { handlePostTask, handleRepostTask } from "./scheduler";
 
@@ -27,17 +28,23 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     let wasSuccess: boolean = false;
     const taskType: TaskType = message.body.type;
     if (taskType == TaskType.Post || taskType == TaskType.Repost) {
-      const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, message.body.data, taskType);
-
+      if (message.body.data == null) {
+        console.error(`got a task type of ${taskType} but the message body has no data. cannot be processed!`);
+        // maybe this was a bad send, so try it again later. Do not backblast as it was not an upstream failure.
+        message.retry();
+        continue;
+      }
+      const postDataObj: Post|Repost = (isPost(message.body.data)) ? new Post(message.body.data) : new Repost(message.body.data);
+      const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       // For now, log that we don't have an agent, we should figure this out later though...
       if (agent == null) {
         console.warn(`Could not make an agent for ${message.body.data?.getUser()}, got null.`);
       }
 
       if (taskType == TaskType.Post) {
-        wasSuccess = await handlePostTask(runtimeWrapper, message.body.data as Post, agent);
+        wasSuccess = await handlePostTask(runtimeWrapper, postDataObj as Post, agent);
       } else {
-        wasSuccess = await handleRepostTask(runtimeWrapper, message.body.data as Repost, agent);
+        wasSuccess = await handleRepostTask(runtimeWrapper, postDataObj as Repost, agent);
       }
     } else if (taskType == TaskType.Blast) {
       console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
