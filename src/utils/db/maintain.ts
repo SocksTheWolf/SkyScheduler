@@ -1,4 +1,4 @@
-import { count, eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
@@ -43,7 +43,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
     console.log(`Attempting to clean up post truncation for ${postTruncation.length} posts`);
     for (const item of postTruncation) {
       console.log(`Updating post ${item.id}`);
-      await db.update(posts).set({ content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH})`}).where(eq(posts.uuid, item.id));
+      await db.update(posts).set({ content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH})`}).where(and(eq(posts.uuid, item.id), eq(posts.posted, true)));
     }
   }
 
