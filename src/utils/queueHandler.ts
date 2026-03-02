@@ -38,7 +38,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
       const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       // For now, log that we don't have an agent, we should figure this out later though...
       if (agent == null) {
-        console.warn(`Could not make an agent for ${message.body.data?.getUser()}, got null.`);
+        console.warn(`Could not make an agent for ${postDataObj.getUser()}, got null.`);
       }
 
       if (taskType == TaskType.Post) {
