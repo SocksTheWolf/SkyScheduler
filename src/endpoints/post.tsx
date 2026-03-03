@@ -95,14 +95,14 @@ post.all("/all", async (c: Context) => {
 post.get("/edit/:id", async (c: Context) => {
   const { id } = c.req.param();
   if (!isValid(id))
-    return c.html(<></>, 400);
+    return c.html(<></>);
 
   const postInfo = await getPostById(c, id);
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
     return c.html(<PostEdit post={postInfo} />);
   }
-  return c.html(<></>, 400);
+  return c.html(<></>);
 });
 
 post.post("/edit/:id", async (c: Context) => {
@@ -110,13 +110,13 @@ post.post("/edit/:id", async (c: Context) => {
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   if (!isValid(id)) {
     c.header("HX-Trigger-After-Swap", swapErrEvents);
-    return c.html(<b class="btn-error">Post was invalid</b>, 400);
+    return c.html(<b class="btn-error">Post was invalid</b>);
   }
 
   const body = await c.req.json();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
-    return c.html(<b class="btn-error">New post had invalid data</b>, 400);
+    return c.html(<b class="btn-error">New post had invalid data</b>);
   }
 
   const { content, altEdits } = validation.data;
@@ -124,13 +124,13 @@ post.post("/edit/:id", async (c: Context) => {
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
     c.header("HX-Trigger-After-Settle", swapErrEvents);
-    return c.html(<b class="btn-error">Could not find post to edit</b>, 400);
+    return c.html(<b class="btn-error">Could not find post to edit</b>);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
     c.header("HX-Trigger-After-Settle", "scrollTop");
-    return c.html(<b class="btn-error">This post has already been posted</b>, 400);
+    return c.html(<b class="btn-error">This post has already been posted</b>);
   }
 
   // Handle alt text and stuffs
@@ -138,7 +138,7 @@ post.post("/edit/:id", async (c: Context) => {
     // Check to see if this post had editable data
     if (originalPost.embeds === undefined) {
       c.header("HX-Trigger-After-Settle", swapErrEvents);
-      return c.html(<b class="btn-error">Post did not have media content that was editable</b>, 400);
+      return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
     }
 
     // Create an easy map to match content with quickly
@@ -153,7 +153,7 @@ post.post("/edit/:id", async (c: Context) => {
       // if we have anything other than an image, this is an error
       if (embedData.type !== EmbedDataType.Image) {
         c.header("HX-Trigger-After-Settle", swapErrEvents);
-        return c.html(<b class="btn-error">Invalid operation performed</b>, 400);
+        return c.html(<b class="btn-error">Invalid operation performed</b>);
       }
       // Check to see if this text was edited
       const newAltText = editsMap.get(embedData.content);
@@ -177,13 +177,13 @@ post.post("/edit/:id", async (c: Context) => {
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
-  return c.html(<b class="btn-error">Failed to process edit</b>, 400);
+  return c.html(<b class="btn-error">Failed to process edit</b>);
 });
 
 post.get("/edit/:id/cancel", async (c: Context) => {
   const { id } = c.req.param();
   if (!isValid(id))
-    return c.html(<></>, 400);
+    return c.html(<></>);
 
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
@@ -194,7 +194,7 @@ post.get("/edit/:id/cancel", async (c: Context) => {
 
   // Refresh sidebar otherwise
   c.header("HX-Trigger-After-Swap", "refreshPosts, timeSidebar, scrollListTop, scrollTop");
-  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>, 400);
+  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
 });
 
 // delete a post
@@ -215,5 +215,5 @@ post.delete("/delete/:id", async (c: Context) => {
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
-  return c.html(<></>, 400);
+  return c.html(<></>);
 });

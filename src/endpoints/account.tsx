@@ -37,9 +37,9 @@ const serverParseValidationErr = (c: Context, errorJson: string) => {
             return <li>{el.message}</li>;
           })}
         </ul>
-      </div>, 400);
+      </div>);
   } catch {
-    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>, 400);
+    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>);
   }
 }
 
@@ -107,7 +107,7 @@ account.post("/update", authMiddleware, rateLimit({limiter: "UPDATE_LIMITER", ht
     c.header("HX-Trigger-After-Swap", "accountViolations");
     return c.html(<></>, 200);
   }
-  return c.html(<b class="btn-error">Unknown error occurred</b>, 400);
+  return c.html(<b class="btn-error">Unknown error occurred</b>);
 });
 
 // endpoint that just returns current username
@@ -299,7 +299,7 @@ account.post("/delete", authMiddleware, async (c) => {
 
     // Make sure we still have data
     if (!usrAccount || !usrAccount.password) {
-      return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 400);
+      return c.html(<b class="btn-error">Failed: User Data Missing...</b>);
     }
 
     // Do a hash verification on the user's input to see if the passwords match
@@ -316,10 +316,10 @@ account.post("/delete", authMiddleware, async (c) => {
       c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {
-      return c.html(<b class="btn-error">Failed: Invalid Password</b>, 400);
+      return c.html(<b class="btn-error">Failed: Invalid Password</b>);
     }
   } catch (err: any) {
     console.error(`failed to delete user ${userId} had error ${err.message || err.msg || 'no code'}`);
-    return c.html(<b class="btn-error">Failed: Server Error</b>, 501);
+    return c.html(<b class="btn-error">Failed: Server Error</b>);
   }
 });
