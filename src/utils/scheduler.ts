@@ -3,9 +3,9 @@ import isEmpty from 'just-is-empty';
 import { Post } from "../classes/post";
 import { Repost } from "../classes/repost";
 import { AllContext, TaskType } from '../types';
-import { AgentMap } from './bskyAgents';
-import { makePost, makeRepost } from './bskyApi';
-import { pruneBskyPosts } from './bskyPrune';
+import { AgentMap } from './bsky/bskyAgents';
+import { makePost, makeRepost } from './bsky/bskyApi';
+import { pruneBskyPosts } from './bsky/bskyPrune';
 import {
   deleteAllRepostsBeforeCurrentTime, deletePosts, getAllPostsForCurrentTime,
   getAllRepostsForCurrentTime, purgePostedPosts,
@@ -15,7 +15,7 @@ import { getAllAbandonedMedia } from './db/file';
 import {
   enqueuePost, enqueueRepost, isQueueEnabled,
   isRepostQueueEnabled, shouldPostNowQueue, shouldPostThreadQueue
-} from './queuePublisher';
+} from './queues/queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtpAgent|null) => {
@@ -43,7 +43,7 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       postStatus = false;
     }
   } else {
-    const agent = await AgentMap.getAgentDirect(c, postData.user);
+    const {agent} = await AgentMap.getAgentDirect(c, postData.user, false);
     if (agent === null) {
       console.error(`unable to get agent for user ${postData.user} to post now`);
       postStatus = false;

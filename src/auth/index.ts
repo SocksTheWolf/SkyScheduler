@@ -5,19 +5,11 @@ import { username } from "better-auth/plugins";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
-import { APP_NAME, SITE_URL } from "../siteinfo";
+import { APP_NAME } from "../siteinfo";
 import { Bindings } from "../types";
-import { lookupBskyHandle } from "../utils/bskyApi";
-import { createDMWithUser } from "../utils/bskyMsg";
-
-function createPasswordResetMessage(url: string, token: string) {
-  return `Your ${APP_NAME} password reset url is:
-${SITE_URL}/reset-password/${token}
-
-This URL will expire in about an hour.
-
-If you did not request a password reset, please ignore this message.`;
-}
+import { lookupBskyHandle } from "../utils/bsky/bskyApi";
+import { createDMWithUser } from "../utils/bsky/bskyMessage";
+import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {

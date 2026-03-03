@@ -4,25 +4,24 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import { Post } from "../classes/post";
-import { Repost } from "../classes/repost";
-import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../limits';
+import { Post } from "../../classes/post";
+import { Repost } from "../../classes/repost";
+import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../../limits';
 import {
   AccountStatus,
   AllContext,
   BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
   LooseObj, PostLabel,
   PostRecordResponse, PostStatus
-} from '../types';
-import { atpRecordURI } from '../validation/regexCases';
-import { makeAgentForUser } from './bskyAgents';
+} from '../../types';
+import { atpRecordURI } from '../../validation/regexCases';
 import {
   bulkUpdatePostedData, getChildPostsOfThread,
   isPostAlreadyPosted, setPostNowOffForPost
-} from './db/data';
-import { getUsernameForUserId } from './db/userinfo';
-import { createViolationForUser } from './db/violations';
-import { deleteEmbedsFromR2 } from './r2Query';
+} from '../db/data';
+import { getUsernameForUserId } from '../db/userinfo';
+import { createViolationForUser } from '../db/violations';
+import { deleteEmbedsFromR2 } from '../r2Query';
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -106,15 +105,8 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
 }
 
 export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtpAgent) => {
-  let bWasSuccess = true;
-  const agent: AtpAgent|null = (usingAgent === null) ? await makeAgentForUser(c, content.userId) : usingAgent;
-  if (agent === null) {
-    console.warn(`could not make agent for repost ${content.postid}`);
-    return false;
-  }
-
   try {
-    await agent.deleteRepost(content.uri);
+    await usingAgent.deleteRepost(content.uri);
   } catch {
     // This probably should not be a warning, and should silently fail.
     // the only thing that actually matters is the object below.
@@ -122,13 +114,12 @@ export const makeRepost = async (c: AllContext, content: Repost, usingAgent: Atp
   }
 
   try {
-    await agent.repost(content.uri, content.cid);
+    await usingAgent.repost(content.uri, content.cid);
+    return true;
   } catch(err) {
     console.error(`Failed to repost ${content.uri}, got error ${err}`);
-    bWasSuccess = false;
+    return false;
   }
-
-  return bWasSuccess;
 };
 
 const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {

@@ -4,7 +4,7 @@ import flatten from "just-flatten-it";
 import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus, AllContext, LooseObj, Violation } from "../../types";
-import { lookupBskyHandle } from "../bskyApi";
+import { lookupBskyHandle } from "../bsky/bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
 const createBanForUser = async(db: DrizzleD1Database, userName: string, reason: string) => {

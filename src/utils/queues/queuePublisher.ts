@@ -1,9 +1,9 @@
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
-import { Post } from "../classes/post";
-import { Repost } from "../classes/repost";
-import { AllContext, Bindings, QueueTaskData, TaskType } from "../types";
+import { Post } from "../../classes/post";
+import { Repost } from "../../classes/repost";
+import { AllContext, Bindings, QueueTaskData, TaskType } from "../../types";
 
 // picks a random queue to publish data to
 const getRandomQueue = (env: Bindings, listName: string): Queue|null => {

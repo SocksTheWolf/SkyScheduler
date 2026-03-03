@@ -4,7 +4,6 @@ export class BskyAPILoginCreds {
   pds: string;
   username: string;
   password: string;
-  valid: boolean;
   constructor(data: any) {
     if (isEmpty(data)) {
       this.password = this.username = this.pds = "";
@@ -13,6 +12,8 @@ export class BskyAPILoginCreds {
       this.username = data.user;
       this.password = data.pass;
     }
-    this.valid = !isEmpty(data.user) && !isEmpty(data.pass);
+  }
+  get valid(): boolean {
+    return !isEmpty(this.username) && !isEmpty(this.password);
   }
 };

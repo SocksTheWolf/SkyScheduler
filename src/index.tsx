@@ -21,7 +21,7 @@ import TermsOfService from "./pages/tos";
 import { SITE_URL } from "./siteinfo";
 import { Bindings, QueueTaskData } from "./types";
 import { makeConstScript } from "./utils/constScriptGen";
-import { processQueue } from "./utils/queueHandler";
+import { processQueue } from "./utils/queues/queueHandler";
 import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
