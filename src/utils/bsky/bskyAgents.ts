@@ -9,7 +9,7 @@ import {
   AllContext, TaskType
 } from "../../types";
 import { getBskyUserPassForId } from "../db/userinfo";
-import { createViolationForUser } from "../db/violations";
+import { createViolationForUser, shouldIgnoreViolation } from "../db/violations";
 import { resetAppPasswordMessage } from "../messages/resetAppPassword";
 import { loginToBsky } from "./bskyLogin";
 import { createDMWithUser } from "./bskyMessage";
@@ -17,7 +17,6 @@ import { createDMWithUser } from "./bskyMessage";
 type AgentLoginResponse = {
   agent: AtpAgent|null;
   violation: boolean;
-  wasNewViolation?: boolean;
   violationType?: AccountStatus;
 }
 
@@ -34,12 +33,12 @@ export class AgentMap {
     const usesAgent: boolean = this.usesAgentForType(type);
     let mappedAgent = (usesAgent) ? this.#map.get(userId) : null;
     if (mappedAgent === undefined) {
-      const {agent, violation} = await AgentMap.getAgentDirect(c, userId, false);
+      const {agent, violation, violationType} = await AgentMap.getAgentDirect(c, userId, false);
       mappedAgent = agent;
       if (usesAgent) {
         // only add this agent if it's not null
         // but if we have a violation, we should absolutely add it in.
-        if (agent !== null || violation) {
+        if (agent !== null || (violation && !shouldIgnoreViolation(violationType!))) {
           this.#map.set(userId, agent);
         }
       }
@@ -62,8 +61,8 @@ export class AgentMap {
 
     const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
     if (loginResponse != AccountStatus.Ok) {
-      const addViolation: boolean = await createViolationForUser(c, userId, loginResponse);
-      if (addViolation) {
+      // check to see if we should add a violation (will return false if no new violation needed)
+      if (await createViolationForUser(c, userId, loginResponse)) {
         console.error(`Unable to login for ${userId} with violation ${loginResponse}`);
         if (messageOnViolation && loginResponse == AccountStatus.InvalidAccount) {
           await createDMWithUser(c.env, username, resetAppPasswordMessage());
@@ -71,7 +70,7 @@ export class AgentMap {
       } else {
         console.error(`Unable to login ${userId}, no new violation made, got ${loginResponse}`);
       }
-      return {agent: null, violation: true, wasNewViolation: addViolation, violationType: loginResponse};
+      return {agent: null, violation: true, violationType: loginResponse};
     }
     return {agent: agent, violation: false};
   };

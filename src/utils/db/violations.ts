@@ -71,12 +71,19 @@ function createObjForValuesChange(violationType: AccountStatus[], value: boolean
   return valuesUpdate;
 };
 
-export const createViolationForUser = async(c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
+export const shouldIgnoreViolation = (violationType: AccountStatus): boolean => {
   const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage,
     AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
   if (violationType in NoHandleState) {
-    console.warn(`createViolationForUser got an invalid add request for user ${userId} with violation ${violationType}`);
+    return true;
+  }
+  return false;
+};
+
+export const createViolationForUser = async(c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
+  // if we should ignore the violation, return false to say no violations were added
+  if (shouldIgnoreViolation(violationType)) {
     return false;
   }
 
