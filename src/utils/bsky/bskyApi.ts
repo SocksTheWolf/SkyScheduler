@@ -8,11 +8,9 @@ import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../../limits';
 import {
-  AccountStatus,
-  AllContext,
+  AccountStatus, AllContext,
   BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj, PostLabel,
-  PostRecordResponse, PostStatus
+  LooseObj, PostLabel, PostRecordResponse, PostStatus
 } from '../../types';
 import { atpRecordURI } from '../../validation/regexCases';
 import {

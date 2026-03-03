@@ -15,10 +15,8 @@ import {
   DeleteResponse, EmbedDataType, LooseObj
 } from "../types";
 import {
-  createPost, createRepost,
-  deletePost, getPostById,
-  getPostByIdWithReposts,
-  updatePostForUser
+  createPost, createRepost, deletePost, getPostById,
+  getPostByIdWithReposts, updatePostForUser
 } from "../utils/dbQuery";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { handlePostNowTask } from "../utils/scheduler";

@@ -12,18 +12,20 @@ import { accounts, users } from "../db/auth.schema";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import {
-  AccountStatus,
-  AllContext,
-  BatchQuery,
+  AccountStatus, AllContext, BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse,
-  EmbedDataType,
-  PostLabel
+  DeleteResponse, EmbedDataType, PostLabel
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
-import { getChildPostsOfThread, getPostByCID, getPostThreadCount, updatePostForGivenUser } from "./db/data";
-import { getViolationsForUser, removeViolation, removeViolations, userHasViolationsDB } from "./db/violations";
+import {
+  getChildPostsOfThread, getPostByCID,
+  getPostThreadCount, updatePostForGivenUser
+} from "./db/data";
+import {
+  getViolationsForUser, removeViolation,
+  removeViolations, userHasViolationsDB
+} from "./db/violations";
 import { floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
