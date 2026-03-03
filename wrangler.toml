@@ -50,7 +50,7 @@ simple = { limit = 3, period = 10 }
 [[ratelimits]]
 name = "UPDATE_LIMITER"
 namespace_id = "1003"
-simple = { limit = 2, period = 60 }
+simple = { limit = 7, period = 60 }
 
 [triggers]
 # Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:
