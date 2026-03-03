@@ -90,7 +90,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     bufferBlasts = unique(bufferBlasts);
     console.log(`Attempting to backblast ${bufferBlasts.length} items`);
     for (const blast of bufferBlasts) {
-      await enqueueEmptyWork(runtimeWrapper, blast.type, blast.time);
+      await enqueueEmptyWork(runtimeWrapper, blast.type, blast.time + 10);
     }
   }
 };
