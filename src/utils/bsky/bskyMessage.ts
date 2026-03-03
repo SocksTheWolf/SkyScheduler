@@ -1,12 +1,13 @@
 import { AtpAgent, RichText } from '@atproto/api';
 import { AccountStatus, Bindings } from '../../types';
 import { loginToBsky } from './bskyLogin';
+import { lookupBskyHandle } from './bskyApi';
 
 const chatHeaders = {headers: {
   "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
 }};
 
-async function getDMConvo(agent: AtpAgent, env: Bindings, user: string) {
+async function getDMConvo(agent: AtpAgent, env: Bindings, user: string): Promise<string|null> {
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
   if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
@@ -24,14 +25,22 @@ async function getDMConvo(agent: AtpAgent, env: Bindings, user: string) {
 }
 
 // This is very slow, but like probably good to check?
-export const checkIfCanDMUser = async (env: Bindings, user: string) => {
+export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
   const agent = new AtpAgent({
     service: new URL('https://bsky.social')
   });
   return await getDMConvo(agent, env, user) !== null;
 };
 
-export const createDMWithUser = async (env: Bindings, user: string, msg: string) => {
+export const createDMWithUsername = async (env: Bindings, username: string, msg: string): Promise<boolean> => {
+  const bskyUserId = await lookupBskyHandle(username);
+  if (bskyUserId !== null) {
+    return await createDMWithUser(env, bskyUserId, msg);
+  }
+  return false;
+};
+
+export const createDMWithUser = async (env: Bindings, user: string, msg: string): Promise<boolean> => {
   const agent = new AtpAgent({
     service: new URL('https://bsky.social')
   });
@@ -55,10 +64,13 @@ export const createDMWithUser = async (env: Bindings, user: string, msg: string)
         return true;
       } else {
         console.error(`Unable to send the message to ${user}, could not sendMessage call`);
+        return false;
       }
     } catch(err) {
       console.error(`had error trying to message user ${user} ${err}`);
+      return false;
     }
   }
+  console.warn(`could not get the dm convo with ${user}`);
   return false;
 };

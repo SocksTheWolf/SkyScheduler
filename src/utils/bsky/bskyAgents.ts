@@ -12,7 +12,7 @@ import { getBskyUserPassForId } from "../db/userinfo";
 import { createViolationForUser, shouldIgnoreViolation } from "../db/violations";
 import { resetAppPasswordMessage } from "../messages/resetAppPassword";
 import { loginToBsky } from "./bskyLogin";
-import { createDMWithUser } from "./bskyMessage";
+import { createDMWithUsername } from "./bskyMessage";
 
 type AgentLoginResponse = {
   agent: AtpAgent|null;
@@ -33,7 +33,7 @@ export class AgentMap {
     const usesAgent: boolean = this.usesAgentForType(type);
     let mappedAgent = (usesAgent) ? this.#map.get(userId) : null;
     if (mappedAgent === undefined) {
-      const {agent, violation, violationType} = await AgentMap.getAgentDirect(c, userId, false);
+      const {agent, violation, violationType} = await AgentMap.getAgentDirect(c, userId, true);
       mappedAgent = agent;
       if (usesAgent) {
         // only add this agent if it's not null
@@ -64,8 +64,8 @@ export class AgentMap {
       // check to see if we should add a violation (will return false if no new violation needed)
       if (await createViolationForUser(c, userId, loginResponse)) {
         console.error(`Unable to login for ${userId} with violation ${loginResponse}`);
-        if (messageOnViolation && loginResponse == AccountStatus.InvalidAccount) {
-          await createDMWithUser(c.env, username, resetAppPasswordMessage());
+        if (messageOnViolation && loginResponse === AccountStatus.InvalidAccount) {
+          await createDMWithUsername(c.env, username, resetAppPasswordMessage());
         }
       } else {
         console.error(`Unable to login ${userId}, no new violation made, got ${loginResponse}`);
