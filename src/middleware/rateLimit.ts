@@ -23,9 +23,9 @@ export const rateLimit = (prop: RateLimitProps) => {
       await next();
     } else {
       if (prop.html) {
-        return c.html(html`<b class="btn-error">You are being rate limited, try again later</b>`);
+        return c.html(html`<b class="btn-error">You are currently rate limited, try again later</b>`);
       } else {
-        return c.json({ok: false, msg: "You are currently rate limited, try again in a minute"}, 429);
+        return c.json({ok: false, msg: "You are currently rate limited, try again later"}, 429);
       }
     }
   });
