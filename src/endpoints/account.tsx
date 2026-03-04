@@ -44,7 +44,7 @@ const serverParseValidationErr = (c: Context, errorJson: string) => {
 }
 
 // wrapper to login
-account.post("/login", async (c) => {
+account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const body = await c.req.json();
   const auth = c.get("auth");
   const validation = LoginSchema.safeParse(body);
@@ -137,7 +137,7 @@ account.post("/logout", authMiddleware, async (c) => {
   return c.text("");
 });
 
-account.post("/signup", verifyTurnstile, async (c: Context) => {
+account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: Context) => {
   const body = await c.req.json();
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
@@ -253,7 +253,7 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
   return c.json({ok: true, msg: "request processed"});
 });
 
-account.post("/reset", async (c: Context) => {
+account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: Context) => {
   const body = await c.req.json();
 
   const validation = AccountResetSchema.safeParse(body);

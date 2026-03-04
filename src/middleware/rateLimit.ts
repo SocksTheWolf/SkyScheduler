@@ -7,6 +7,7 @@ import get from 'just-safe-get';
 type RateLimitProps = {
   limiter: string;
   html?: boolean;
+  message?: string;
 };
 
 export const rateLimit = (prop: RateLimitProps) => {
@@ -22,10 +23,11 @@ export const rateLimit = (prop: RateLimitProps) => {
     if (success) {
       await next();
     } else {
+      const str: string = prop.message || "You are currently rate limited, try again later";
       if (prop.html) {
-        return c.html(html`<b class="btn-error">You are currently rate limited, try again later</b>`);
+        return c.html(html`<b class="btn-error">${str}</b>`);
       } else {
-        return c.json({ok: false, msg: "You are currently rate limited, try again later"}, 429);
+        return c.json({ok: false, msg: str}, 429);
       }
     }
   });
