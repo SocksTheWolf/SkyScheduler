@@ -10,6 +10,7 @@ type BaseLayoutProps = {
   title: string;
   noIndex?: boolean;
   mainClass?: string;
+  simple?: boolean;
   preloads?: PreloadRules[]
 };
 
@@ -18,13 +19,23 @@ export const BaseLayout = (props: BaseLayoutProps) => {
   const mainClass = (props.mainClass !== undefined) ? props.mainClass : "";
   const preloads = (props.preloads !== undefined) ? props.preloads : [];
   const defaultPreloads: PreloadRules[] = [
+    {type: "style", href: "/dep/pico.min.css"},
+    {type: "style", href: "/css/stylesheet.min.css"},
+  ];
+  const appDefaultPreloads: PreloadRules[] = [
     {type: "style", href: "/dep/toastify.min.css"},
     {type: "script", href: "/dep/htmx.min.js"},
     {type: "script", href: "/dep/toastify.js"},
-    {type: "style", href: "/dep/pico.min.css"},
-    {type: "style", href: "/css/stylesheet.min.css"},
+    ...defaultPreloads,
     {type: "script", href: mainScriptStr}
-  ]
+  ];
+
+  let preloadList: PreloadRules[] = [];
+  if (props.simple)
+    preloadList.concat(defaultPreloads);
+  else
+    preloadList.concat(appDefaultPreloads);
+  preloadList.concat(preloads);
 
   return (<>
   {raw("<!DOCTYPE html>")}
@@ -39,9 +50,9 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <PreloadDependencyTags scripts={[...defaultPreloads, ...preloads]} />
+      <PreloadDependencyTags scripts={preloadList} />
       <MetaTags />
-      <IncludeDependencyTags scripts={defaultPreloads} />
+      <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} />
     </head>
     <body>
       <container class="pico">

@@ -8,7 +8,7 @@ import {
 import { APP_NAME, APP_REPO } from "../siteinfo";
 
 export default function Homepage() {
-  return (<BaseLayout title="Home" mainClass="homepage">
+  return (<BaseLayout title="Home" simple={true} mainClass="homepage">
     <NavTags />
     <section class="container">
       <article>
