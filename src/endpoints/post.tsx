@@ -32,7 +32,7 @@ post.use(authMiddleware);
 // Create media upload
 post.post("/upload", async (c: Context) => {
   const formData = await c.req.parseBody();
-  const fileUploadResponse = await uploadFileR2(c, formData['file'], c.get("userId"));
+  const fileUploadResponse = await uploadFileR2(c, formData['file'] as File, c.get("userId"));
   if (fileUploadResponse.success === false)
     return c.json(fileUploadResponse, 400);
   else
