@@ -25,7 +25,6 @@ export const rateLimit = (prop: RateLimitProps) => {
     if (rateLimitKey === null) {
       rateLimitKey = c.req.header("cf-connecting-ip") || "";
     }
-    console.log(rateLimitKey);
 
     const { success } = await rateLimitObj.limit({ key: rateLimitKey! });
     if (success) {
