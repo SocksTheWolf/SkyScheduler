@@ -12,17 +12,27 @@ type RateLimitProps = {
 
 export const rateLimit = (prop: RateLimitProps) => {
   return createMiddleware(async (c: Context, next: any) => {
-    const userId: string = c.get("userId");
     const rateLimitObj: RateLimit|null = get(c.env, prop.limiter, null);
-    if (rateLimitObj === null || isEmpty(userId)) {
-      console.warn("cannot apply rate limits, oh no");
+    if (rateLimitObj === null) {
       await next();
       return;
     }
-    const { success } = await rateLimitObj.limit({ key: userId });
+
+    // by default use the userId key, but this may be blank...
+    let rateLimitKey: string|null = c.get("userId");
+
+    // if there's no rate limit key (because no auth, pull down the connecting ip address)
+    if (rateLimitKey === null) {
+      rateLimitKey = c.req.header("cf-connecting-ip") || "";
+    }
+    console.log(rateLimitKey);
+
+    const { success } = await rateLimitObj.limit({ key: rateLimitKey! });
     if (success) {
+      // not rate limited, continue.
       await next();
     } else {
+      // rate limited.
       const str: string = prop.message || "You are currently rate limited, try again later";
       if (prop.html) {
         return c.html(html`<b class="btn-error">${str}</b>`);

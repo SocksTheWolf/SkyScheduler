@@ -1,6 +1,21 @@
 import { Context } from "hono";
 import { every } from "hono/combine";
 
+function clearContext(c: Context) {
+  c.set("userId", null);
+  c.set("pds", "");
+  c.set("isAdmin", false);
+  c.set("session", null);
+}
+
+// Resets all environment variables to a blank state
+// this is so that they have default values, makes it easier to
+// query things like in the ratelimit middleware
+export async function blankAuthEnv(c: Context, next: any) {
+  clearContext(c);
+  await next();
+}
+
 // Middleware to verify authentication
 export async function pullAuthData(c: Context, next: any) {
   const auth = c.get("auth");
@@ -16,19 +31,10 @@ export async function pullAuthData(c: Context, next: any) {
       c.set("isAdmin", session.user.name === "admin");
       // We can probably drop this too
       c.set("session", session.session);
-    } else {
-      c.set("userId", null);
-      c.set("pds", "");
-      c.set("isAdmin", false);
-      c.set("session", null);
     }
-  }
-  catch (err) {
+  } catch (err) {
     console.error(`Failed to process authentication, got err: ${err}`);
-    c.set("userId", null);
-    c.set("pds", "");
-    c.set("isAdmin", false);
-    c.set("session", null);
+    clearContext(c);
   }
   await next();
 };

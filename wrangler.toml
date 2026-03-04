@@ -41,19 +41,19 @@ bucket_name = "skyscheduler-resize"
 # rate limits to help combat abuse
 [[ratelimits]]
 name = "REPOST_LIMITER"
-namespace_id = "1001"
+namespace_id = "5471001"
 simple = { limit = 4, period = 60 }
 [[ratelimits]]
 name = "POST_LIMITER"
-namespace_id = "1002"
+namespace_id = "5471002"
 simple = { limit = 5, period = 10 }
 [[ratelimits]]
 name = "UPDATE_LIMITER"
-namespace_id = "1003"
+namespace_id = "5471003"
 simple = { limit = 7, period = 60 }
 [[ratelimits]]
 name = "ACCOUNT_LIMITER"
-namespace_id = "1004"
+namespace_id = "5471004"
 simple = { limit = 10, period = 60 }
 
 [triggers]

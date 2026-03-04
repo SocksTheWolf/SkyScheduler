@@ -7,6 +7,7 @@ import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
+import { blankAuthEnv } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectHomeIfLogout } from "./middleware/redirectHome";
@@ -26,6 +27,7 @@ import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
+app.use(blankAuthEnv);
 
 ///// Static Pages /////
 
