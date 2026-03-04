@@ -1,4 +1,7 @@
-import { and, asc, desc, eq, inArray, isNotNull, lte, ne, notInArray, sql } from "drizzle-orm";
+import {
+  and, asc, desc, eq, inArray, isNotNull,
+  lte, ne, notInArray, or, sql
+} from "drizzle-orm";
 import { BatchItem } from "drizzle-orm/batch";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
@@ -248,7 +251,8 @@ export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, 
     eq(posts.userId, userId)));
 };
 
-// deletes multiple posted posts from a database.
+// deletes multiple posted posts from a database. Posts must be already posted as this does
+// no R2 db queries to clean
 export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promise<number> => {
   // Don't do anything on empty arrays.
   if (isEmpty(postsToDelete))
@@ -261,7 +265,11 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
   }
   let deleteQueries: BatchItem<"sqlite">[] = [];
   postsToDelete.forEach((itm) => {
-    deleteQueries.push(db.delete(posts).where(and(eq(posts.uuid, itm), eq(posts.posted, true))));
+    // this will wipe out any posts and their children if they are marked for delete
+    deleteQueries.push(db.delete(posts).where(
+      and(
+        or(eq(posts.uuid, itm), eq(posts.rootPost, itm)),
+      eq(posts.posted, true))));
   });
 
   // Batching this should improve db times
@@ -286,7 +294,7 @@ export const purgePostedPosts = async (c: AllContext): Promise<number> => {
       and(
         eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-7 days')`)
       ),
-      // skip child posts objects
+      // skip child posts objects, only get us root posts and non-threads
       and(lte(posts.threadOrder, 0), lte(repostCounts.count, 0))
     )
   ).all();
