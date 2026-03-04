@@ -27,7 +27,8 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
             data-tooltip="Tips are not required, the service is free, but if you like this service they are appreciated <3"
             title="Tip the dev" href="/tip">Tip</a> -
           <a class="secondary" {...newWinAttr} href="/tos" title="Terms of Service">Terms</a> -
-          <a class="secondary" {...newWinAttr} href="/privacy" title="Privacy Policy">Privacy</a>
+          <a class="secondary" {...newWinAttr} href="/privacy" title="Privacy Policy">Privacy</a> -
+          <a class="secondary" target="_blank" href="/contact" title="Contact">Contact</a>
           {props.showVersion ? <span><br /><small class="secondary">version {CURRENT_SCRIPT_VERSION}</small></span> : null}
         </small>
       </span>

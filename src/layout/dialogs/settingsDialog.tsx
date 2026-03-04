@@ -45,7 +45,7 @@ export default function SettingsDialog(props: SettingsTypeProps) {
           <label>
             BSky PDS:
             <input type="text" name="bskyUserPDS" placeholder={placeholderPDS} />
-            <small>If you have not changed your PDS (or do not know what that means), you should leave this blank!</small>
+            <small>If you have not changed your PDS (or do not know what that means), you should leave this blank to use your current value!</small>
           </label>
         </form>
         <progress id="spinner" class="htmx-indicator" />
