@@ -82,7 +82,7 @@ post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Co
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
   }
-  return c.json({ ok: true, msg: "Repost scheduled successfully!", id: response.postId});
+  return c.json({ ok: true, msg: "Retweet scheduled successfully!", id: response.postId});
 });
 
 // Get all posts

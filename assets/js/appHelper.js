@@ -65,7 +65,7 @@ document.addEventListener("scrollListToPost", function(ev) {
 });
 
 document.addEventListener("postDeleted", function(ev) {
-  const type = ev.detail.value ? "Repost" : "Post";
+  const type = ev.detail.value ? "Retweet" : "Post";
   pushToast(`${type} deleted`, true);
 });
 

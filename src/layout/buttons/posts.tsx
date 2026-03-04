@@ -41,7 +41,7 @@ type DeletePostProps = PostIDProps & {
 
 export function DeletePostButton(props: DeletePostProps) {
   const deleteTargetId = `#post-${props.id}`;
-  const postType = props.isRepost ? "repost" : "post";
+  const postType = props.isRepost ? "retweet" : "post";
   const deleteTarget = props.child ? `blockquote:has(${deleteTargetId})` : deleteTargetId;
   return (<button type="submit" hx-delete={`/post/delete/${props.id}`}
     hx-confirm={`Are you sure you want to delete this ${postType}?`}
