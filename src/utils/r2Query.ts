@@ -218,7 +218,7 @@ const uploadVideoToR2 = async (c: Context, file: File, userId: string) => {
   return await rawUploadToR2(c, await file.stream(), fileMetaData);
 };
 
-export const uploadFileR2 = async (c: Context, file: File|string, userId: string) => {
+export const uploadFileR2 = async (c: Context, file: File, userId: string) => {
   if (!(file instanceof File)) {
     console.warn("Failed to upload");
     return {"success": false, "error": "data invalid"};

@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
+import { csrf } from "hono/csrf";
 import { ContextVariables, createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
@@ -28,6 +29,7 @@ import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 app.use(blankAuthEnv);
+app.use(csrf({origin: SITE_URL}));
 
 ///// Static Pages /////
 
@@ -57,9 +59,9 @@ app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
 app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
 
 // Add redirects
-app.all("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
-app.all("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
-app.all("/terms", (c) => c.redirect("/tos"));
+app.get("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
+app.get("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
+app.get("/terms", (c) => c.redirect("/tos"));
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes
