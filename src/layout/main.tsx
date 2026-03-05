@@ -3,7 +3,7 @@ import { Child } from 'hono/jsx';
 import { APP_NAME } from "../siteinfo";
 import { mainScriptStr } from '../utils/appScripts';
 import { IncludeDependencyTags, PreloadDependencyTags, PreloadRules } from "./helpers/includesTags";
-import MetaTags from './helpers/metaTags';
+import { MetaTags, PersonaTags } from './helpers/metaTags';
 
 type BaseLayoutProps = {
   children: Child;
@@ -43,6 +43,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
     <head>
       <meta charset="UTF-8" />
       <title>{APP_NAME} - {props.title}</title>
+      <MetaTags />
       {noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
@@ -51,8 +52,8 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       <PreloadDependencyTags scripts={preloadList} />
-      <MetaTags />
       <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} />
+      <PersonaTags />
     </head>
     <body>
       <container class="pico">

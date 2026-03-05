@@ -2,6 +2,10 @@
   display: none !important;
 }
 
+html {
+  min-width: 354px;
+}
+
 .navHeader, .logoBox {
   display: flex;
   flex-direction: row;

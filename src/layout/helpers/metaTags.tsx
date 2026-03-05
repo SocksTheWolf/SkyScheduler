@@ -4,7 +4,7 @@ import {
   SITE_URL, SOCIAL_CARD_IMAGE
 } from "../../siteinfo";
 
-export default function MetaTags() {
+export function MetaTags() {
   return (<>
     <meta name="title" content={APP_NAME} />
     <meta name="description" content={SITE_DESCRIPTION} />
@@ -18,7 +18,11 @@ export default function MetaTags() {
     <meta property="twitter:title" content={APP_NAME} />
     <meta property="twitter:description" content={SITE_DESCRIPTION} />
     <meta property="twitter:image" content={SOCIAL_CARD_IMAGE} />
-    <script type="application/ld+json">
+  </>);
+};
+
+export function PersonaTags() {
+  return (<script type="application/ld+json">
     {raw(`{
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -27,6 +31,5 @@ export default function MetaTags() {
       "name": "${APP_NAME}",
       "url": "${SITE_URL}"
     }`)}
-    </script>
-  </>);
-};
+    </script>);
+}
