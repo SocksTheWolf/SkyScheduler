@@ -38,7 +38,7 @@ export default function Homepage() {
             <li>Handles multiple users/accounts easily, supports most PDS instances</li>
             <li>Schedule your posts any time in the future (to the nearest hour)</li>
             <li>Supports embeds, quote posts, links, tagging, mentions</li>
-            <li>Post <span data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with
+            <li>Post <span tabindex={0} data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with
               content labels and full support for alt text</li>
             <li>Schedule entire threads with support of up to {MAX_POSTS_PER_THREAD} posts per thread!</li>
             <li>Automatically retweet your content at an interval of your choosing, up to {MAX_REPOST_INTERVAL} times
