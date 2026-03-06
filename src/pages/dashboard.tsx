@@ -62,7 +62,8 @@ export default function Dashboard(props: any) {
           <footer>
             <LogoutButton />
             <hr />
-            <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR} showVersion={true} />
+            <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR}
+              showVersion={true} removeExcessTab={true} />
           </footer>
         </article>
       </section>
