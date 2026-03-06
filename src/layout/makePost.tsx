@@ -80,7 +80,7 @@ export function PostCreation({ctx}: any) {
             </section>
             <section id="section-weblink">
               <article>
-                <header>Link Embed</header>
+                <header><label for="urlCard">Link Embed</label></header>
                 <input type="text" id="urlCard" placeholder="https://" value="" />
                 <small>Add a social embed card for a link to your post. This link will not count against the {MAX_LENGTH} character limit.<br />
                 Thumbnails may get automatically resized down to fit 1280x720.</small>
@@ -95,7 +95,7 @@ export function PostCreation({ctx}: any) {
             <summary title="click to toggle section" role="button" class="outline secondary">Add Record (Quote Post)</summary>
             <section>
               <article>
-                <header>Insert Post/Feed/List Link</header>
+                <header><label for="recordBox">Insert Post/Feed/List Link</label></header>
                 <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto based record" />
                 <small>Posts must be quotable and all record types must be resolvable (exist) upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
