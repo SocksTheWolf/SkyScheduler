@@ -32,11 +32,10 @@ export const BaseLayout = (props: BaseLayoutProps) => {
 
   let preloadList: PreloadRules[] = [];
   if (props.simple)
-    preloadList.concat(defaultPreloads);
+    preloadList = defaultPreloads;
   else
-    preloadList.concat(appDefaultPreloads);
-  preloadList.concat(preloads);
-
+    preloadList = appDefaultPreloads;
+  preloadList = preloadList.concat(preloads);
   return (<>
   {raw("<!DOCTYPE html>")}
   <html data-theme="dark" lang="en">
@@ -44,6 +43,8 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <meta charset="UTF-8" />
       <title>{APP_NAME} - {props.title}</title>
       <MetaTags />
+      <PreloadDependencyTags scripts={preloadList} />
+      <PersonaTags />
       {noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
@@ -51,9 +52,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <PreloadDependencyTags scripts={preloadList} />
       <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} />
-      <PersonaTags />
     </head>
     <body>
       <container class="pico">
