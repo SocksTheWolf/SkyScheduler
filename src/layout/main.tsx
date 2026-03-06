@@ -55,6 +55,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} />
     </head>
     <body>
+      {props.simple ? <script>0</script> : null}
       <container class="pico">
         <main class={mainClass}>
           {props.children}
