@@ -17,16 +17,28 @@ html {
     display: flex;
     margin-top: 2px;
     margin-bottom: 0px;
-    line-height: unset;
+    line-height: 2;
   }
   img {
     float: left;
-    margin-right: 20px;
+    margin-right: 10px;
+    position: relative;
+    top: 2vh;
   }
 }
 
+.login {
+  button {
+    width: 110%;
+  }
+  min-width: 100px;
+  width: 20dvw;
+  max-width: 10em;
+}
+
+
 /* Shrink the nav icon on small handhead screens */
-@media (max-width: 410px) {
+@media (max-width: 430px) {
   .navHeader {
     img {
       width: 24px !important;
@@ -34,6 +46,14 @@ html {
       margin-right: 10px;
       margin-top: 0.7em;
     }
+  }
+  .appTitle {
+    font-size: 1.15rem !important;
+  }
+}
+@media (max-width: 360px) {
+  .appTitle {
+    font-size: 1rem !important;
   }
 }
 
