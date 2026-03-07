@@ -35,6 +35,7 @@ document.addEventListener("resetRepost", () => {
   setElementDisabled(repostTitle, false);
   repostTitle.value = "";
   repostRecordURL.value = "";
+  setTimeout(scrollTop, 400);
 });
 
 repostForm.addEventListener('submit', async (e) => {

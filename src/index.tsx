@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { csrf } from "hono/csrf";
+import isEmpty from "just-is-empty";
 import { ContextVariables, createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
@@ -20,7 +21,7 @@ import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
-import { SITE_URL } from "./siteinfo";
+import { ATPROTO_DID, SITE_URL } from "./siteinfo";
 import { Bindings, QueueTaskData } from "./types";
 import { makeConstScript } from "./utils/constScriptGen";
 import { processQueue } from "./utils/queues/queueHandler";
@@ -39,6 +40,11 @@ const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=2592
 
 // Root route
 app.all("/", staticPagesCache, (c) => c.html(<Homepage />));
+
+// atproto registration route
+if (!isEmpty(ATPROTO_DID)) {
+  app.get("/.well-known/atproto-did", staticFilesCache, (c) => c.text(ATPROTO_DID, 200));
+}
 
 // JS injection of const variables
 app.get("/js/consts.js", staticFilesCache, (c) => {
