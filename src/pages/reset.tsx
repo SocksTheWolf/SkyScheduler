@@ -21,13 +21,15 @@ export default function ResetPassword() {
 
         <label>
           New {APP_NAME} Password
-          <input type="password" name="password" id="password" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
+          <input type="password" name="password" id="password" autocomplete="new-password"
+            minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
           <small>Passwords should be {MIN_DASHBOARD_PASS} to {MAX_DASHBOARD_PASS} characters long.</small>
         </label>
 
         <label>
           Confirm {APP_NAME} Password
-          <input type="password" name="confirmPassword" id="confirmPassword" minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
+          <input type="password" name="confirmPassword" autocomplete="new-password" id="confirmPassword"
+            minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
         </label>
       </AccountHandler>
       <script type="text/javascript" src="js/reset.js"></script>
