@@ -45,8 +45,8 @@ export default function Dashboard(props: any) {
               <h4>{APP_NAME} Dashboard</h4>
             </div>
             <div class="sidebar-block">
-              <small><i>{DASHBOARD_TAG_LINE}</i>.</small><br />
-              <small>Account: <b id="currentUser" hx-get="/account/username"
+              <small><i>{DASHBOARD_TAG_LINE}</i>.<br />
+              Account: <b id="currentUser" hx-get="/account/username"
                 hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
             </div>
             <center class="postControls">

@@ -51,13 +51,15 @@ function addClickKeyboardListener(el, callback, keys=["Enter", " "], preventDefa
   addKeyboardListener(el, callback, keys, preventDefault);
 }
 
-function pushDeletedAccountToast() {
+function pushReturnToHomepageToast() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('deleted')) {
     pushToast("Account deleted!", true);
+  } else if (urlParams.has('logout')) {
+    pushToast("Logged out!", true);
   }
 }
-setTimeout(pushDeletedAccountToast, 1500);
+setTimeout(pushReturnToHomepageToast, 1500);
 
 const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;

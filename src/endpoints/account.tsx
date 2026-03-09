@@ -133,7 +133,7 @@ account.post("/logout", authMiddleware, async (c) => {
   }
 
   // Redirect to home
-  c.header("HX-Redirect", "/");
+  c.header("HX-Redirect", "/?logout");
   return c.text("");
 });
 

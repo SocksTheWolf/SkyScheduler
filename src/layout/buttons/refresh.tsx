@@ -2,7 +2,7 @@
 export default function RefreshPostsButton() {
   return (<>
     <button id="refresh-posts" hx-get="/post/all" hx-target="#posts"
-        hx-trigger="refreshPosts from:body, accountUpdated from:body, click throttle:3s"
+        hx-trigger="refreshPosts from:body throttle:3s, accountUpdated from:body, click throttle:10s"
         hx-on-htmx-before-request="this.classList.add('svgAnim');"
         hx-on-htmx-after-request="setTimeout(() => {this.classList.remove('svgAnim')}, 3000)">
       <span>Refresh Posts</span>

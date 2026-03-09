@@ -130,3 +130,15 @@ export const cleanupAbandonedFiles = async(c: AllContext) => {
     await deleteFromR2(c, abandonedFiles);
   }
 };
+
+export const handleSchedule = (c: AllContext, cronTime: string) => {
+  switch (cronTime) {
+    case "30 17 * * sun":
+      c.executionCtx.waitUntil(cleanUpPostsTask(c));
+    break;
+    default:
+    case "0 * * * *":
+      c.executionCtx.waitUntil(schedulePostTask(c));
+    break;
+  }
+};

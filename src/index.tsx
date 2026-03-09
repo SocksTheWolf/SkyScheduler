@@ -25,7 +25,7 @@ import { ATPROTO_DID, SITE_URL } from "./siteinfo";
 import { Bindings, QueueTaskData } from "./types";
 import { makeConstScript } from "./utils/constScriptGen";
 import { processQueue } from "./utils/queues/queueHandler";
-import { cleanUpPostsTask, schedulePostTask } from "./utils/scheduler";
+import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
@@ -128,15 +128,7 @@ app.get("/setup", async (c) => await setupAccounts(c));
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
     const runtimeWrapper = new ScheduledContext(env, ctx);
-    switch (event.cron) {
-      case "30 17 * * sun":
-        ctx.waitUntil(cleanUpPostsTask(runtimeWrapper));
-      break;
-      default:
-      case "0 * * * *":
-        ctx.waitUntil(schedulePostTask(runtimeWrapper));
-      break;
-    }
+    handleSchedule(runtimeWrapper, event.cron);
   },
   async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
     await processQueue(batch, env, ctx);
