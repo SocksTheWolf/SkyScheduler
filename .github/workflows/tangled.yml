@@ -1,9 +1,12 @@
-# Mirror everything to Tangle
-name: Tangle Bangle
+# Mirror everything to Tangled
+name: Tangled Bangled
 
 on:
   push: {}
   workflow_dispatch: {}
+
+permissions:
+  contents: read
 
 jobs:
   push:
@@ -11,7 +14,7 @@ jobs:
     environment:
       name: tangled
     steps:
-      - name: Push to Tangle
+      - name: Push to Tangled
         uses: gwennlbh/to-tangled@v0.4
         with:
           repo: socksthewolf.com/skyscheduler
