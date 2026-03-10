@@ -108,7 +108,7 @@ export function PostCreation({ctx}: any) {
 
           <details id="section-retweet">
             <summary role="button" title="click to toggle section" class="secondary outline">Auto-Retweet</summary>
-            <RetweetOptions id="makeReposts" />
+            <RetweetOptions id="makeReposts" contentType="post" />
           </details>
           <input type="hidden" id="threadInfo" />
         </div>
