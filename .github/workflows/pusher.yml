@@ -1,0 +1,17 @@
+# Mirror everything to Tangle
+name: Tangle Bangle
+
+on:
+  push: {}
+  workflow_dispatch: {}
+
+jobs:
+  tangle:
+    runs-on: ubuntu-latest
+    environment:
+      name: tangle
+    steps:
+      - uses: gwennlbh/to-tangled@v0.4
+      with:
+        repo: socksthewolf.com/skyscheduler
+        ssh-key: ${{ secrets.KEY }}

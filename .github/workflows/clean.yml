@@ -1,6 +1,5 @@
 # This workflow cleans up the cf cache for your application
 # as well as cleans up previous GH actions queues
-
 name: Clean Environment
 
 on:
