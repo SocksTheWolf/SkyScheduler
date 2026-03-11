@@ -2,7 +2,8 @@
 name: Tangled Bangled
 
 on:
-  push: {}
+  push:
+    branches: ["main"]
   workflow_dispatch: {}
 
 permissions:
