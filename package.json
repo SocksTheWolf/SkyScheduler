@@ -65,7 +65,7 @@
   },
   "overrides": {
     "miniflare": {
-      "undici": "7.24.0"
+      "undici": "^7.24.0"
     }
   },
   "engines": {
