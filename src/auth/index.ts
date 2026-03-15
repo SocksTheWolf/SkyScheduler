@@ -133,6 +133,11 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
     logger: {
       disabled: true
     },
+    advanced: {
+      ipAddress: {
+        ipAddressHeaders: ['cf-connecting-ip']
+      }
+    },
     // Only add database adapter for CLI schema generation
     ...(env ? {} : {
       database: drizzleAdapter({} as D1Database, {
