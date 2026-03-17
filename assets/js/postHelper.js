@@ -447,25 +447,6 @@ postForm.addEventListener('submit', async (e) => {
   showPostProgress(false);
 });
 
-function setSelectDisable(nodeBase, disable) {
-  nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
-    (el) => setElementDisabled(el, disable));
-}
-
-function showContentLabeler(shouldShow) {
-  const contentLabelSelector = document.getElementById("content-label-selector");
-  const contentLabelSelect = document.getElementById("contentLabels");
-  const urlEmbedBox = document.getElementById('urlCard');
-
-  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
-    return;
-
-  setElementVisible(contentLabelSelector, shouldShow);
-  setElementRequired(contentLabelSelect, shouldShow);
-  if (!shouldShow)
-    contentLabelSelect.value = "";
-}
-
 function showPostProgress(shouldShow) {
   const el = document.getElementById("makingPostRequest");
   el.setAttribute("aria-busy", shouldShow);

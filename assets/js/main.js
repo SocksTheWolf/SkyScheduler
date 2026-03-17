@@ -181,3 +181,7 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
       redirectAfterDelay(successLocation, customDelay);
   });
 }
+
+document.addEventListener("rateLimitNotice", function(ev) {
+  pushToast(ev.detail, false);
+});

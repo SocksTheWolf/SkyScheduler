@@ -156,6 +156,38 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
 }), validator("param", CheckGUIDSchema), async (c: Context) => {
 });
 
+openapiRoutes.get("/post/:id/repost", describeRoute({
+  description: "Get the given post's repost info modal",
+  responses: {
+    200: {
+      description: "modal returned"
+    },
+    400: {
+      description: "an error occurred"
+    },
+    401: {
+      description: "not logged in"
+    }
+  }
+}), validator("param", CheckGUIDSchema), async (c: Context) => {
+});
+
+openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
+  description: "Delete the given schedule for the given post",
+  responses: {
+    200: {
+      description: "command processed"
+    },
+    400: {
+      description: "an error occurred"
+    },
+    401: {
+      description: "not logged in"
+    }
+  }
+}), validator("param", CheckGUIDSchema), async (c: Context) => {
+});
+
 // Create media upload
 openapiRoutes.post("/post/upload", describeRoute({
   description: "Uploads a file to the service",

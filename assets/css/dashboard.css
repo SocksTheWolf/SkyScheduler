@@ -261,6 +261,13 @@ textarea {
   border-bottom: none !important;
   cursor: pointer;
 }
+.clicker {
+  cursor: pointer;
+}
+
+.modify-repost {
+  margin-left: 10px;
+}
 
 /** REFRESH ANIMATION **/
 

@@ -50,6 +50,6 @@ export function PostDataFooter(props: PostDataFooterOptions) {
     <span hidden={hasPosted}>Scheduled for</span>:
     &nbsp;<span class="timestamp">{raw(content.scheduledDate!)}</span>
     {content.hasEmbeds() ? ' | Embeds: ' + content.embeds!.length : null}
-    <RepostCountElement count={content.repostCount} repostInfo={content.repostInfo} />
+    <RepostCountElement id={content.postid} count={content.repostCount} repostInfo={content.repostInfo} />
   </small></footer>);
 };

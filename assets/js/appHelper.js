@@ -87,10 +87,41 @@ function sidebarButtonListener(className, eventName) {
   });
 }
 
-document.addEventListener("timeSidebar", function() {
+document.addEventListener("updateTimestamps", function() {
   updateAllTimes();
+});
+
+document.addEventListener("sidebarButtons", function() {
   sidebarButtonListener(".addThreadPost", "replyThreadCreate");
   sidebarButtonListener(".addRepostsButton", "addNewRepost");
+});
+
+document.addEventListener("showRepostPopover", function() {
+  const holder = document.getElementById("repostDataPopoverHolder");
+
+  // controls to close the popover
+  const closePopover = () => {
+    document.body.removeChild(holder);
+    refreshPosts();
+  }
+  holder.addEventListener("blur", closePopover);
+  addClickKeyboardListener(document.getElementById("click-close"), closePopover);
+
+  // add confirmation notices to all reposts
+  document.querySelectorAll(".repost-editor-item").forEach((el) => {
+    if (!el.lastElementChild.hasAttribute("hx-confirm")) {
+      const cleanedTimestamp = el.firstElementChild.innerText;
+      el.lastElementChild.setAttribute("hx-confirm",
+        `Are you sure you want to delete the repost series at ${cleanedTimestamp}?`);
+    }
+  });
+
+  // force open the popover
+  document.getElementById("repostDataPopover").showPopover();
+});
+
+document.addEventListener("repostScheduleDeleted", function() {
+  pushToast("Schedule deleted", true);
 });
 
 document.addEventListener("postUpdatedNotice", function() {
@@ -191,6 +222,25 @@ function getScheduleTimeForNextHour() {
   return convertTimeValueLocally(curDate);
 }
 
+function showContentLabeler(shouldShow) {
+  const contentLabelSelector = document.getElementById("content-label-selector");
+  const contentLabelSelect = document.getElementById("contentLabels");
+  const urlEmbedBox = document.getElementById('urlCard');
+
+  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
+    return;
+
+  setElementVisible(contentLabelSelector, shouldShow);
+  setElementRequired(contentLabelSelect, shouldShow);
+  if (!shouldShow)
+    contentLabelSelect.value = "";
+}
+
+function setSelectDisable(nodeBase, disable) {
+  nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
+    (el) => setElementDisabled(el, disable));
+}
+
 function setupDashboard() {
   const keys = ["Enter", " "];
   document.querySelectorAll(".autoRepostBox").forEach(el => {
@@ -254,7 +304,8 @@ function setupDashboard() {
       {document.dispatchEvent(new Event("resetPost")) });
   }
   // fire the events to keep our data nice and updated
-  document.dispatchEvent(new Event("timeSidebar"));
+  document.dispatchEvent(new Event("updateTimestamps"));
+  document.dispatchEvent(new Event("sidebarButtons"));
   // Clean all pages to defaults
   document.dispatchEvent(new Event("resetPost"));
   document.dispatchEvent(new Event("resetRepost"));

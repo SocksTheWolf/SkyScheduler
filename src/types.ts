@@ -66,6 +66,7 @@ export interface Bindings {
   REPOST_LIMITER: RateLimit;
   UPDATE_LIMITER: RateLimit;
   ACCOUNT_LIMITER: RateLimit;
+  REPOST_EDIT_LIMITER: RateLimit;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;

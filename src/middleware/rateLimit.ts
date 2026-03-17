@@ -7,6 +7,7 @@ import get from 'just-safe-get';
 type RateLimitProps = {
   limiter: string;
   html?: boolean;
+  toast?: boolean;
   message?: string;
 };
 
@@ -34,6 +35,9 @@ export const rateLimit = (prop: RateLimitProps) => {
       // rate limited.
       const str: string = prop.message || "You are currently rate limited, try again later";
       if (prop.html) {
+        if (prop.toast) {
+          c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
+        }
         return c.html(html`<b class="btn-error">${str}</b>`);
       } else {
         return c.json({ok: false, msg: str}, 429);

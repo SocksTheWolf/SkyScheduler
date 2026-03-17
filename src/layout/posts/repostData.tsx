@@ -1,6 +1,7 @@
 import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { RepostInfo } from "../../classes/repost";
+import { CAN_EDIT_REPOST_RULES } from "../../limits";
 
 type RepostStatusIconProps = {
   isRepost?: boolean;
@@ -19,6 +20,7 @@ export function RepostStatusIcon(props: RepostStatusIconProps) {
 };
 
 type RepostCountProps = {
+  id: string;
   count?: number;
   repostInfo?: RepostInfo[];
 };
@@ -40,10 +42,20 @@ export function RepostCountElement(props: RepostCountProps) {
       }
     }
   }
-  return (
-    <> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
-      <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>
-      Reposts Left: {props.count}</span>
-    </>
-  );
+  return (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
+    <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>
+    Reposts Left: {props.count}</span>
+    {CAN_EDIT_REPOST_RULES ? <RepostEditorLink id={props.id} /> : undefined }
+  </>);
 };
+
+function RepostEditorLink({id}: any) {
+  return (<small>
+    <span>
+      <a class="clicker modify-repost"
+      title="Modify repost rules"
+      hx-get={`/post/${id}/repost`}
+      hx-target="body" hx-swap="beforeend">(Modify...)</a>
+    </span>
+  </small>);
+}

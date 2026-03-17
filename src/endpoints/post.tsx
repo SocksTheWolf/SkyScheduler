@@ -7,6 +7,7 @@ import { Post } from "../classes/post";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
+import { RepostDataPopover } from "../layout/repostEditor";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { rateLimit } from "../middleware/rateLimit";
@@ -87,7 +88,7 @@ post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Co
 
 // Get all posts
 post.all("/all", async (c: Context) => {
-  c.header("HX-Trigger-After-Swap", "timeSidebar");
+  c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons");
   return c.html(<ScheduledPostList ctx={c} />);
 });
 
@@ -172,7 +173,7 @@ post.post("/edit/:id", async (c: Context) => {
   if (await updatePostForUser(c, id, payload)) {
     originalPost.text = content;
     c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
-    c.header("HX-Trigger-After-Swap", "postUpdatedNotice, timeSidebar, scrollTop");
+    c.header("HX-Trigger-After-Swap", "postUpdatedNotice, updateTimestamps, sidebarButtons, scrollTop");
     return c.html(<PostHTML post={originalPost} dynamic={true} />);
   }
 
@@ -188,12 +189,12 @@ post.get("/edit/:id/cancel", async (c: Context) => {
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
   if (postInfo !== null) {
-    c.header("HX-Trigger-After-Swap", "timeSidebar, scrollListTop, scrollTop");
+    c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons, scrollListTop, scrollTop");
     return c.html(<PostHTML post={postInfo} dynamic={true} />);
   }
 
   // Refresh sidebar otherwise
-  c.header("HX-Trigger-After-Swap", "refreshPosts, timeSidebar, scrollListTop, scrollTop");
+  c.header("HX-Trigger-After-Swap", "refreshPosts, updateTimestamps, sidebarButtons, scrollListTop, scrollTop");
   return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
 });
 
@@ -206,7 +207,7 @@ post.delete("/delete/:id", async (c: Context) => {
       let postRefreshEvent = "";
       // This is true if this was the root of a thread chain
       if (response.needsRefresh) {
-        postRefreshEvent = ", refreshPosts, timeSidebar, scrollTop";
+        postRefreshEvent = ", refreshPosts, updateTimestamps, scrollTop";
       }
       const triggerEvents = `resetIfThreading, accountViolations${postRefreshEvent}`;
       c.header("HX-Trigger-After-Swap", triggerEvents);
@@ -216,4 +217,24 @@ post.delete("/delete/:id", async (c: Context) => {
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
   return c.html(<></>);
+});
+
+// get the repost rule editor
+post.get("/:id/repost", async (c: Context) => {
+  const { id } = c.req.param();
+  if (isValid(id)) {
+    c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
+    return c.html(<RepostDataPopover ctx={c} id={id} />);
+  }
+  return c.html(<></>);
+});
+
+// delete a post's repost rule
+post.delete("/:id/repost/:scheduleId", rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c: Context) => {
+  const { id, scheduleId } = c.req.param();
+  if (isValid(id) && isValid(scheduleId)) {
+    // TODO: This needs an SQL query
+    c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
+  }
+  return c.html(<>Invalid</>);
 });

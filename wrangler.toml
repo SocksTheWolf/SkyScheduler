@@ -55,6 +55,10 @@ simple = { limit = 7, period = 60 }
 name = "ACCOUNT_LIMITER"
 namespace_id = "5471004"
 simple = { limit = 10, period = 60 }
+[[ratelimits]]
+name = "REPOST_EDIT_LIMITER"
+namespace_id = "5471005"
+simple = { limit = 5, period = 10 }
 
 [triggers]
 # Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:
