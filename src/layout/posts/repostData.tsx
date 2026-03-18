@@ -54,8 +54,9 @@ function RepostEditorLink({id}: any) {
     <span>
       <a class="clicker modify-repost"
       title="Modify repost rules"
+      hx-disabled-elt=".modify-repost"
       hx-get={`/post/${id}/repost`}
       hx-target="body" hx-swap="beforeend">(Modify Reposts...)</a>
     </span>
   </small>);
-}
+};

@@ -43,13 +43,13 @@ export async function RepostDataPopover(props: RepostDataPopoverProps) {
     <header>
       <h2>Edit Repost Rules</h2>
     </header>
-    <p>Here are the current repost rules for the targeted post</p>
+    <p>Here are the current repost rules for the given post. If a rule overlaps another, the first rule wins.</p>
     <table class="striped">
       <thead>
         <tr>
           <th scope="col">Repost Start Date</th>
           <th scope="col">Repost Cadance</th>
-          <th scope="col">Num Reposts</th>
+          <th scope="col">Approx Num Reposts</th>
           <th scope="col">Action</th>
         </tr>
       </thead>

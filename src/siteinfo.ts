@@ -21,7 +21,7 @@ export const PROJECT_AUTHOR_SITE: string = "https://socksthewolf.com";
 // This line shows up on the dashboard when the user logs in, located under the logo.
 export const DASHBOARD_TAG_LINE: string = "Schedule Bluesky posts effortlessly";
 
-// The atproto did for the /.well-known/ path. Leave blank for no support.
+// The atproto did for the /.well-known/ path. Leave blank for no injection.
 export const ATPROTO_DID: string = "did:plc:ecfcvvlqmadysyik3thlbs3c";
 
 // If the logo image should be rendered on the site.

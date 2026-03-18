@@ -220,7 +220,7 @@ post.delete("/delete/:id", async (c: Context) => {
 });
 
 // get the repost rule editor
-post.get("/:id/repost", async (c: Context) => {
+post.get("/:id/repost", rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", html: true, toast: true}), async (c: Context) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");

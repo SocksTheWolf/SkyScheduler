@@ -98,14 +98,12 @@ document.addEventListener("sidebarButtons", function() {
 
 document.addEventListener("showRepostPopover", function() {
   const holder = document.getElementById("repostDataPopoverHolder");
+  const popover = document.getElementById("repostDataPopover");
 
   // controls to close the popover
-  const closePopover = () => {
-    document.body.removeChild(holder);
-    refreshPosts();
-  }
-  holder.addEventListener("blur", closePopover);
-  addClickKeyboardListener(document.getElementById("click-close"), closePopover);
+  addClickKeyboardListener(document.getElementById("click-close"), function() {
+    popover.hidePopover();
+  });
 
   // add confirmation notices to all reposts
   document.querySelectorAll(".repost-editor-item").forEach((el) => {
@@ -117,7 +115,14 @@ document.addEventListener("showRepostPopover", function() {
   });
 
   // force open the popover
-  document.getElementById("repostDataPopover").showPopover();
+  popover.showPopover();
+
+  // Clean up the popover when it goes away (add event listener after open)
+  popover.addEventListener("beforetoggle", function(ev) {
+    ev.preventDefault();
+    document.body.removeChild(holder);
+    refreshPosts();
+  });
 });
 
 document.addEventListener("repostScheduleDeleted", function() {

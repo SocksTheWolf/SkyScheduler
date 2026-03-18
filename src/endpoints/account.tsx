@@ -71,7 +71,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   }
 });
 
-account.post("/update", authMiddleware, rateLimit({limiter: "UPDATE_LIMITER", html: true}), async (c) => {
+account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
