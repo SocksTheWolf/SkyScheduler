@@ -39,7 +39,7 @@ export const MAX_REPOST_POSTS: number = 40;
 export const MAX_REPOST_RULES_PER_POST: number = 5;
 
 // if the user can edit the repost rules for their posts
-export const CAN_EDIT_REPOST_RULES: boolean = false;
+export const CAN_EDIT_REPOST_RULES: boolean = true;
 
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
