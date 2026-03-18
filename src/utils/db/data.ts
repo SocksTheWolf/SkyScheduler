@@ -315,9 +315,10 @@ export const getPostByCID = async(db: DrizzleD1Database, userId: string, cid: st
   return null;
 };
 
-export const getRepostCountQuery = (db: DrizzleD1Database, postUUID: string) => {
-  const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
+export const getRepostCountQuery = (db: DrizzleD1Database, postUUID: string, newValue: number = -1) => {
+  // if we're given any value underneath 0, we need to recount for the entire post
+  const newCount = (newValue < 0) ? db.$count(reposts, eq(reposts.uuid, postUUID)) : newValue;
   return db.insert(repostCounts)
     .values({uuid: postUUID, count: newCount})
     .onConflictDoUpdate({target: repostCounts.uuid, set: {count: newCount}});
-}
+};

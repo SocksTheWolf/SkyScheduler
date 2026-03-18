@@ -462,12 +462,11 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     // Because there could be conflicts that drop, run a count on the entire list and use the value from that
     // we also don't know if the repost count table has repost values for this item, so we should
     // attempt to always insert and update if it already exists
-    dbOperations.push(getRepostCountQuery(db, postUUID));
+    totalRepostCount = -1;
   }
-  else {
-    // this is a first time repost post, so we know there were no conflicts
-    dbOperations.push(db.insert(repostCounts).values({uuid: postUUID, count: totalRepostCount}));
-  }
+
+  // pushing any value under zero causes a full recount
+  dbOperations.push(getRepostCountQuery(db, postUUID, totalRepostCount));
 
   const batchResponse = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
@@ -534,25 +533,32 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     return false;
   }
 
-  let queriesToExecute: BatchItem<"sqlite">[] = [];
-
-  // Update the post json
-  const currentPost = await getPostById(c, id);
+  // Get the post to make sure it's valid and update post json
+  const currentPost = await getPostByIdWithReposts(c, id);
   if (currentPost != null && currentPost.repostInfo !== undefined) {
     // remove the schedule from the current json object set
     let newRepostInfo: RepostInfo[] = currentPost.repostInfo!.filter((itm) => {
       return itm.guid !== scheduleId;
     });
 
+    let queriesToExecute: BatchItem<"sqlite">[] = [];
     // modify the current repost info
     queriesToExecute.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
         eq(posts.userId, currentPost.user), eq(posts.uuid, currentPost.postid))));
 
     // Delete batch schedule items
-    queriesToExecute.push(db.delete(reposts).where(eq(reposts.scheduleGuid, scheduleId)));
+    // we don't bundle this one because we want to get a count to make the operation below it, better
+    const deletedItems = await db.delete(reposts).where(eq(reposts.scheduleGuid, scheduleId)).returning({date: reposts.scheduledDate});
 
-    // Force update the repost count :(
-    queriesToExecute.push(getRepostCountQuery(db, id));
+    // did we delete anything at all?
+    if (deletedItems.length <= 0) {
+      // we did not, that's really strange.
+      console.warn(`When trying to delete reposts for ${currentPost.postid}, schedule id ${scheduleId} had empty items`);
+      return false;
+    }
+
+    // Force update the repost count :)
+    queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));
 
     // Batch push up everything
     const batchResponse = await db.batch(queriesToExecute as BatchQuery);
