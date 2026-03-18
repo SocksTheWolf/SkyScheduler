@@ -1,7 +1,7 @@
 // this file is used to handle atpagents and their reuse during cron/queues
 // this is done because logging into PDSes across tasks can be extremely
 // expensive time wise.
-import AtpAgent from "@atproto/api";
+import { Agent, ComAtprotoServerCreateSession, CredentialSession } from "@atproto/api";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import {
@@ -14,22 +14,17 @@ import { resetAppPasswordMessage } from "../messages/resetAppPassword";
 import { loginToBsky } from "./bskyLogin";
 import { createDMWithUsername } from "./bskyMessage";
 
-type AgentLoginResponse = {
-  agent: AtpAgent|null;
-  violation: boolean;
-  violationType?: AccountStatus;
-}
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 export class AgentMap {
   #forPosts: boolean;
   #forReposts: boolean;
-  #map: Map<string, AtpAgent|null>;
+  #map: Map<string, AtProtoAgent|null>;
   constructor(config: AgentConfigSettings) {
     this.#forPosts = config.use_posts;
     this.#forReposts = config.use_reposts;
     this.#map = new Map();
   }
-  async getOrAddAgent(c: AllContext, userId: string, type: TaskType): Promise<AtpAgent|null> {
+  async getOrAddAgent(c: AllContext, userId: string, type: TaskType): Promise<AtProtoAgent|null> {
     const usesAgent: boolean = this.usesAgentForType(type);
     let mappedAgent = (usesAgent) ? this.#map.get(userId) : null;
     if (mappedAgent === undefined) {
@@ -45,7 +40,7 @@ export class AgentMap {
     }
     return mappedAgent;
   };
-  async getOrAddAgentFromObj(c: AllContext, data: Post|Repost, type: TaskType): Promise<AtpAgent|null> {
+  async getOrAddAgentFromObj(c: AllContext, data: Post|Repost, type: TaskType): Promise<AtProtoAgent|null> {
     const userId: string = (type === TaskType.Post) ? (data as Post).user : (data as Repost).userId;
     return await this.getOrAddAgent(c, userId, type);
   };
@@ -57,7 +52,7 @@ export class AgentMap {
     }
     const {username, password, pds} = loginCreds;
     // Login to bsky
-    const agent = new AtpAgent({ service: new URL(pds) });
+    const agent = new AtProtoAgent(pds);
 
     const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
     if (loginResponse != AccountStatus.Ok) {
@@ -83,4 +78,30 @@ export class AgentMap {
     }
     return false;
   }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+export class AtProtoAgent extends Agent {
+  constructor(serviceURL: string) {
+    super(new CredentialSession(new URL(serviceURL)));
+  }
+  // We basically do the same thing as AtpAgent originally here, by not sharing sessionManagers
+  // and wrapping them entirely in agents. We cache the agents instead to keep them isolated.
+  async login(options: AtProtoAgentLoginOptions): Promise<ComAtprotoServerCreateSession.Response> {
+    return (this.sessionManager as CredentialSession).login(options);
+  }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+export type AgentLoginResponse = {
+  agent: AtProtoAgent | null;
+  violation: boolean;
+  violationType?: AccountStatus;
+};
+
+// login options, mostly the same as the credential store
+export interface AtProtoAgentLoginOptions {
+  identifier: string;
+  password: string;
+  allowTakendown?: boolean;
 };

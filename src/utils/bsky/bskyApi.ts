@@ -1,4 +1,4 @@
-import { type AppBskyFeedPost, AtpAgent, RichText } from '@atproto/api';
+import { type AppBskyFeedPost, RichText } from '@atproto/api';
 import { ResponseType, XRPCError } from '@atproto/xrpc';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
@@ -20,6 +20,7 @@ import {
 import { getUsernameForUserId } from '../db/userinfo';
 import { createViolationForUser } from '../db/violations';
 import { deleteEmbedsFromR2 } from '../r2Query';
+import { AtProtoAgent } from "./bskyAgents";
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -64,7 +65,7 @@ export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
   return "https://bsky.social";
 };
 
-export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtpAgent) => {
+export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtProtoAgent) => {
   if (content === null) {
     console.warn("Dropping invocation of makePost, content was null");
     return false;
@@ -102,7 +103,7 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
   return false;
 }
 
-export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtpAgent) => {
+export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtProtoAgent) => {
   try {
     await usingAgent.deleteRepost(content.uri);
   } catch {
@@ -120,7 +121,7 @@ export const makeRepost = async (c: AllContext, content: Repost, usingAgent: Atp
   }
 };
 
-const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promise<PostStatus|null> => {
+const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): Promise<PostStatus|null> => {
   const username = await getUsernameForUserId(c, content.user);
   // incredibly unlikely but we'll handle it
   if (username === null) {
@@ -569,13 +570,11 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtpAgent): Promi
 
 export const getPostRecords = async (records:string[]) => {
   // Access the bsky public API
-  const agent = new AtpAgent({
-    service: new URL('https://public.api.bsky.app'),
-  });
+  const agent = new AtProtoAgent('https://public.api.bsky.app');
   return await getAgentPostRecords(agent, records);
 }
 
-export const getAgentPostRecords = async (agent: AtpAgent, records: string[]) => {
+export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]) => {
   try
   {
     const response = await agent.app.bsky.feed.getPosts({uris: records});
@@ -587,7 +586,7 @@ export const getAgentPostRecords = async (agent: AtpAgent, records: string[]) =>
   return null;
 }
 
-export const getAgentFeedRecord = async (agent: AtpAgent, feedURI: string) => {
+export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) => {
   try {
     const response = await agent.app.bsky.feed.getFeedGenerator({feed: feedURI});
     if (response.success && response.data.isValid) {
@@ -599,7 +598,7 @@ export const getAgentFeedRecord = async (agent: AtpAgent, feedURI: string) => {
   return null;
 }
 
-export const getAgentListRecord = async (agent: AtpAgent, listURI: string) => {
+export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) => {
   try {
     const response = await agent.app.bsky.graph.getList({list: listURI, limit: 1});
     if (response.success) {

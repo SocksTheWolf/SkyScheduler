@@ -1,10 +1,10 @@
 // handles general login for agents.
 // most cases should not be interfacing directly with this function, but instead
 // use bskyAgents or bskyMsg to talk to the network
-import AtpAgent from "@atproto/api";
 import { AccountStatus, LooseObj } from "../../types";
+import { AtProtoAgent } from "./bskyAgents";
 
-export const loginToBsky = async (agent: AtpAgent, user: string, pass: string) => {
+export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: string) => {
   try {
     const loginResponse = await agent.login({
       identifier: user,

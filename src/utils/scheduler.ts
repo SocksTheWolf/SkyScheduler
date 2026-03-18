@@ -1,24 +1,25 @@
-import AtpAgent from '@atproto/api';
 import isEmpty from 'just-is-empty';
 import { Post } from "../classes/post";
 import { Repost } from "../classes/repost";
 import { AllContext, TaskType } from '../types';
-import { AgentMap } from './bsky/bskyAgents';
+import { AgentMap, AtProtoAgent } from './bsky/bskyAgents';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
 import {
-  deleteAllRepostsBeforeCurrentTime, deletePosts, getAllPostsForCurrentTime,
+  deleteAllRepostsBeforeCurrentTime, deletePosts,
+  getAllPostsForCurrentTime,
   getAllRepostsForCurrentTime, purgePostedPosts,
   setPostNowOffForPost
 } from './db/data';
 import { getAllAbandonedMedia } from './db/file';
 import {
   enqueuePost, enqueueRepost, isQueueEnabled,
-  isRepostQueueEnabled, shouldPostNowQueue, shouldPostThreadQueue
+  isRepostQueueEnabled, shouldPostNowQueue,
+  shouldPostThreadQueue
 } from './queues/queuePublisher';
 import { deleteFromR2 } from './r2Query';
 
-export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtpAgent|null) => {
+export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtProtoAgent|null) => {
   if (agent === null) {
     console.error(`Unable to make agent to post ${postData.postid}`);
     return false;
@@ -57,7 +58,7 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
   return postStatus;
 };
 
-export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtpAgent|null) => {
+export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtProtoAgent|null) => {
   if (agent === null) {
     console.error(`Unable to make agent to repost ${postData.postid}`);
     return false;

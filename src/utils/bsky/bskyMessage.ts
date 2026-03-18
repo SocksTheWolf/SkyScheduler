@@ -1,13 +1,14 @@
-import { AtpAgent, RichText } from '@atproto/api';
+import { RichText } from '@atproto/api';
 import { AccountStatus, Bindings } from '../../types';
-import { loginToBsky } from './bskyLogin';
+import { AtProtoAgent } from "./bskyAgents";
 import { lookupBskyHandle } from './bskyApi';
+import { loginToBsky } from './bskyLogin';
 
 const chatHeaders = {headers: {
   "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
 }};
 
-async function getDMConvo(agent: AtpAgent, env: Bindings, user: string): Promise<string|null> {
+async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Promise<string|null> {
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
   if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
@@ -26,9 +27,7 @@ async function getDMConvo(agent: AtpAgent, env: Bindings, user: string): Promise
 
 // This is very slow, but like probably good to check?
 export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
-  const agent = new AtpAgent({
-    service: new URL('https://bsky.social')
-  });
+  const agent = new AtProtoAgent('https://bsky.social');
   return await getDMConvo(agent, env, user) !== null;
 };
 
@@ -41,10 +40,7 @@ export const createDMWithUsername = async (env: Bindings, username: string, msg:
 };
 
 export const createDMWithUser = async (env: Bindings, user: string, msg: string): Promise<boolean> => {
-  const agent = new AtpAgent({
-    service: new URL('https://bsky.social')
-  });
-
+  const agent = new AtProtoAgent('https://bsky.social');
   const convoId = await getDMConvo(agent, env, user);
   if (convoId !== null) {
     // Generate facets so we get things like links.
