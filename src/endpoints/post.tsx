@@ -16,7 +16,7 @@ import {
   DeleteResponse, EmbedDataType, LooseObj
 } from "../types";
 import {
-  createPost, createRepost, deletePost, getPostById,
+  createPost, createRepost, deletePost, deleteRepostRule, getPostById,
   getPostByIdWithReposts, updatePostForUser
 } from "../utils/dbQuery";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
@@ -233,8 +233,10 @@ post.get("/:id/repost", async (c: Context) => {
 post.delete("/:id/repost/:scheduleId", rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c: Context) => {
   const { id, scheduleId } = c.req.param();
   if (isValid(id) && isValid(scheduleId)) {
-    // TODO: This needs an SQL query
-    c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
+    if (await deleteRepostRule(c, id, scheduleId)) {
+      c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
+      return c.html(<></>);
+    }
   }
   return c.html(<>Invalid</>);
 });

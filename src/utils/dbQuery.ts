@@ -20,7 +20,7 @@ import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import {
   getChildPostsOfThread, getPostByCID,
-  getPostThreadCount, updatePostForGivenUser
+  getPostThreadCount, getRepostCountQuery, updatePostForGivenUser
 } from "./db/data";
 import {
   getViolationsForUser, removeViolation,
@@ -460,12 +460,9 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
 
     // Because there could be conflicts that drop, run a count on the entire list and use the value from that
-    const newCount = db.$count(reposts, eq(reposts.uuid, postUUID));
     // we also don't know if the repost count table has repost values for this item, so we should
     // attempt to always insert and update if it already exists
-    dbOperations.push(db.insert(repostCounts)
-      .values({uuid: postUUID, count: newCount})
-      .onConflictDoUpdate({target: repostCounts.uuid, set: {count: newCount}}));
+    dbOperations.push(getRepostCountQuery(db, postUUID));
   }
   else {
     // this is a first time repost post, so we know there were no conflicts
@@ -525,4 +522,41 @@ export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<
   if (!isEmpty(result))
     return new Post(result[0]);
   return null;
+};
+
+export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: string) => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to delete schedule id ${scheduleId} from post ${id}, db was null`);
+    return false;
+  }
+  if (!uuidValid(id) || !uuidValid(scheduleId)) {
+    return false;
+  }
+
+  let queriesToExecute: BatchItem<"sqlite">[] = [];
+
+  // Update the post json
+  const currentPost = await getPostById(c, id);
+  if (currentPost != null && currentPost.repostInfo !== undefined) {
+    // remove the schedule from the current json object set
+    let newRepostInfo: RepostInfo[] = currentPost.repostInfo!.filter((itm) => {
+      return itm.guid !== scheduleId;
+    });
+
+    // modify the current repost info
+    queriesToExecute.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
+        eq(posts.userId, currentPost.user), eq(posts.uuid, currentPost.postid))));
+
+    // Delete batch schedule items
+    queriesToExecute.push(db.delete(reposts).where(eq(reposts.scheduleGuid, scheduleId)));
+
+    // Force update the repost count :(
+    queriesToExecute.push(getRepostCountQuery(db, id));
+
+    // Batch push up everything
+    const batchResponse = await db.batch(queriesToExecute as BatchQuery);
+    return batchResponse.every((el) => el.success);
+  }
+  return false;
 };

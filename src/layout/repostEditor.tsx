@@ -21,7 +21,8 @@ export function RepostEditorData(props: RepostEditorProps) {
       <td>{obj.count}</td>
       <td><a role="button" hx-delete={`/post/${props.id}/repost/${obj.guid}`}
         hx-indicator="#repostDataPopoverProgress"
-        hx-target="previous tr" hx-swap="delete">Delete</a></td>
+        hx-disabled-elt=".repost-editor-item a"
+        hx-target="closest tr" hx-swap="delete">Delete</a></td>
     </tr>);
   })}</>);
 };
