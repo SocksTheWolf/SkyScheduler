@@ -11,7 +11,7 @@ export function RepostStatusIcon(props: RepostStatusIconProps) {
   if (props.isRepost === true) {
     return (
       <span class="repostStatus">
-        <img src="/icons/is-repost.svg" class="repostIcon" alt="reposted post icon" width="20px" height="20px" />
+        <img src="/icons/repost.svg" class="repostIcon" alt="reposted post icon" width="20px" height="20px" />
         <small>&nbsp;Reposted Post</small>
       </span>
     );
