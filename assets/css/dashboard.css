@@ -26,10 +26,10 @@
 
 .repostStatus {
   margin-right: 1rem;
-  /* make it green */
-  svg, img {
-    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
-  }
+}
+
+.repostStatus img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
 }
 
 .sidebar-block {
@@ -72,6 +72,8 @@
 @media (max-width: 510px) {
   .scrollBtn {
     display: inline !important;
+    color: green !important;
+    border-color: green !important;
   }
 }
 
