@@ -82,7 +82,6 @@ document.addEventListener("resetPost", () => {
   document.getElementById('urlCard').value = "";
   recordUrlBox.value = "";
   resetCounter("count");
-  setTimeout(scrollTop, 400);
 
   // Remove all data in the dropzone as well
   fileDropzone.removeAllFiles();
@@ -426,6 +425,7 @@ postForm.addEventListener('submit', async (e) => {
     if (response.ok) {
       pushToast(data.msg, true);
       document.dispatchEvent(new Event("resetPost"));
+      setTimeout(scrollContentTop, 400);
       refreshPosts();
       if (data.id) {
         // TODO: this really should wait for refreshPosts to end
@@ -435,6 +435,7 @@ postForm.addEventListener('submit', async (e) => {
       // For postnow, we try again, immediate failures still add to the DB
       if (response.status === 406 && postNow) {
         document.dispatchEvent(new Event("resetPost"));
+        setTimeout(scrollContentTop, 400);
         htmx.trigger("body", "accountViolations");
         refreshPosts();
       }

@@ -34,6 +34,8 @@ function scrollToObject(el) {
 }
 
 function addKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
+  if (el === undefined || el === null)
+    return;
   el.addEventListener("keydown", (ev) => {
     if (keys.includes(ev.key)) {
       if (preventDefault)
@@ -43,6 +45,8 @@ function addKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=t
   });
 }
 function addClickKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
+  if (el === undefined || el === null)
+    return;
   el.addEventListener("click", (ev) => {
     if (preventDefault)
       ev.preventDefault();

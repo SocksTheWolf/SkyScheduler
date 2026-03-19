@@ -35,7 +35,6 @@ document.addEventListener("resetRepost", () => {
   setElementDisabled(repostTitle, false);
   repostTitle.value = "";
   repostRecordURL.value = "";
-  setTimeout(scrollTop, 400);
 });
 
 repostForm.addEventListener('submit', async (e) => {
@@ -104,11 +103,13 @@ repostForm.addEventListener('submit', async (e) => {
   if (response.ok) {
     pushToast(data.msg, true);
     document.dispatchEvent(new Event("resetRepost"));
+    setTimeout(scrollContentTop, 400);
     refreshPosts();
   } else {
     // For postnow, we try again, immediate failures still add to the DB
     if (response.status === 406 && postNow) {
       document.dispatchEvent(new Event("resetRepost"));
+      setTimeout(scrollContentTop, 400);
       htmx.trigger("body", "accountViolations");
       refreshPosts();
     }

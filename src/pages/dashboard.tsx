@@ -1,6 +1,7 @@
 import { Context } from "hono";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
+import ScrollToContent from "../layout/buttons/scroll";
 import SettingsButton from "../layout/buttons/settings";
 import AltTextDialog from "../layout/dialogs/altTextDialog";
 import SettingsDialog from "../layout/dialogs/settingsDialog";
@@ -52,6 +53,7 @@ export default function Dashboard(props: any) {
             <center class="postControls">
               <RefreshPostsButton />
               <SettingsButton />
+              <ScrollToContent />
             </center>
             <hr />
             <h5>Post List:</h5>
@@ -67,7 +69,7 @@ export default function Dashboard(props: any) {
           </footer>
         </article>
       </section>
-      <div class="col-9">
+      <div class="col-9" id="appView">
         <ViolationNoticeBar ctx={ctx} />
         <div role="tablist" name="dashtabs">
           <button id="tabone" class="w-half" role="tab" aria-selected="true" aria-controls="postTab">New Post</button>

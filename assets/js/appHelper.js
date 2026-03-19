@@ -52,6 +52,14 @@ function refreshPosts() {
   htmx.trigger("body", "refreshPosts");
 }
 
+function scrollContentTop() {
+  document.getElementById("appView").scrollIntoView();
+}
+
+document.addEventListener("scrollContentTop", function() {
+  scrollContentTop();
+});
+
 document.addEventListener("scrollTop", function() {
   scrollTop();
 });
@@ -255,6 +263,11 @@ function setupDashboard() {
     if (el.getAttribute("startchecked") == "true") {
       setSelectDisable(el.parentElement, false);
     }
+  });
+
+  addClickKeyboardListener(document.querySelector(".scrollBtn"), (e) => {
+    e.preventDefault();
+    scrollContentTop();
   });
 
   // find the post time scheduler object
