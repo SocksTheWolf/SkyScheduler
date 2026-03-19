@@ -167,11 +167,12 @@ skyscheduler/
 #### Client
 
 - htmx - client requests and responsiveness
-- tribute - client autocomplete library
+- countable - dynamic input counter
 - toastify - client notifications
 - dropzone - file upload negotiation
-- pico - styling, tabs, modals
-- countable - dynamic input counter
+- [tribute](https://github.com/redmine-ui/tribute) - client autocomplete library
+- [pico](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
+- [mingcute](https://github.com/mingcute-design/mingcute-icons) - most icons
 
 ## Contributions
 
