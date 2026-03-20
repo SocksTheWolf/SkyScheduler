@@ -134,6 +134,7 @@ skyscheduler/
 │   ├── dep/
 │   ├── icons/
 │   ├── js/
+│   ├── screenshots/
 │   └── thumbs/
 ├── src/
 │   ├── auth/
