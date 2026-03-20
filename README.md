@@ -4,12 +4,12 @@
 [![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.11-green?color=green)
+![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.11-5FA04E?logo=nodedotjs)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?color=blue)
 ![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)
 
 
-![SkyScheduler Dashboard](/assets/dashboard.png)
+![SkyScheduler Dashboard](https://raw.githubusercontent.com/SocksTheWolf/SkyScheduler/refs/heads/main/assets/dashboard.png)
 
 ## Overview
 
