@@ -1,0 +1,8 @@
+dep/original
+css/*
+!css/*.min.css
+!css/dropzoneMods.css
+
+js/*Helper.js
+js/main.js
+js/settings.js

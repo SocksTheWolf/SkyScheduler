@@ -166,10 +166,11 @@ skyscheduler/
 
 #### Client
 
-- htmx - client requests and responsiveness
-- countable - dynamic input counter
-- toastify - client notifications
-- dropzone - file upload negotiation
+- [htmx](https://htmx.org/) - client requests and responsiveness
+  - [form-json](https://github.com/xehrad/form-json) - for handling post edits
+- [countable](https://github.com/RadLikeWhoa/Countable) - dynamic input counter
+- [toastify](https://github.com/apvarun/toastify-js) - client notifications
+- [dropzone](https://github.com/dropzone/dropzone) - file upload negotiation
 - [tribute](https://github.com/redmine-ui/tribute) - client autocomplete library
 - [pico](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
 - [mingcute](https://github.com/mingcute-design/mingcute-icons) - most icons
