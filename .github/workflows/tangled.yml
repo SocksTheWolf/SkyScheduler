@@ -16,7 +16,7 @@ jobs:
       name: tangled
     steps:
       - name: Push to Tangled
-        uses: socksthewolf/to-tangled@v0.5
+        uses: gwennlbh/to-tangled@v0.5
         with:
           repo: socksthewolf.com/skyscheduler
           ssh-key: ${{ secrets.KEY }}
