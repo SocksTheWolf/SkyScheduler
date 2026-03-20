@@ -68,7 +68,7 @@ admin.get('/openapi.json', async (c) => {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.0.0',
+        version: '1.2.0',
         description: 'API Routes',
         termsOfService: `${SITE_URL}/tos`,
         license: {

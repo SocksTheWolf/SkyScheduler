@@ -312,6 +312,20 @@ openapiRoutes.get("/account/violations", describeRoute({
     }
   }
 }), async (c) => {
+});
+
+// endpoint that returns any violations
+openapiRoutes.post("/account/violations/resolve", describeRoute({
+  description: "Clears any BSky account violations that the user might have",
+  responses: {
+    200: {
+      description: "success"
+    },
+    401: {
+      description: "not logged in"
+    }
+  }
+}), async (c) => {
 })
 
 // proxy the logout call because of course this wouldn't work properly anyways

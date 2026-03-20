@@ -126,7 +126,7 @@ account.get("/violations", authMiddleware, async (c) => {
 
 // endpoint that allows the user to resolve conflicts.
 // We'll validate they are actually fixed bsky action is performed
-account.post("/conflict-resolve", authMiddleware, async (c) => {
+account.post("/violations/resolve", authMiddleware, async (c) => {
   const userId = c.get("userId");
   if (await userHasViolations(c, userId)) {
     // they do, so clear them out

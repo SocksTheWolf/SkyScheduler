@@ -14,7 +14,7 @@ export async function ViolationNoticeBar(props: ViolationNoticeProps) {
     let errorStr = "";
     const resolveConflictsButton = (<span>
       Once this issue is resolved on Bluesky, press this button to restore access:&nbsp;
-      <a role="button" class="secondary" hx-post="/account/conflict-resolve" hx-swap="delete" hx-disabled-elt="this">
+      <a role="button" class="secondary" hx-post="/account/violations/resolve" hx-swap="delete" hx-disabled-elt="this">
       Resolve Conflicts
       </a>
     </span>);
