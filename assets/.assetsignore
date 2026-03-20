@@ -1,7 +1,6 @@
 dep/original
-css/*
-!css/*.min.css
-!css/dropzoneMods.css
+css/dashboard.css
+css/stylesheet.css
 
 js/*Helper.js
 js/main.js
