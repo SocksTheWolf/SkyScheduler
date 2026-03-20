@@ -107,6 +107,11 @@ binding = "IMAGES"
 [build]
 command = "npm run minify"
 
+# this did give us issues in the past...
+[limits]
+# our current worse case is about 4s on login
+cpu_ms = 20000
+
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
