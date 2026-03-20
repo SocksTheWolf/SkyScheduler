@@ -187,14 +187,16 @@ function resetCounter(counter) {
   counterEl.dispatchEvent(new Event("reset"));
 }
 
-function addEasyModalOpen(buttonID, modalEl, closeButtonID) {
+function addEasyModalOpen(buttonID, modalEl, closeButtonID=null) {
   addClickKeyboardListener(document.getElementById(buttonID), () => {
     clearSettingsData();
     openModal(modalEl);
   });
-  addClickKeyboardListener(document.getElementById(closeButtonID), () => {
-    closeModal(modalEl);
-  });
+  if (closeButtonID !== null) {
+    addClickKeyboardListener(document.getElementById(closeButtonID), () => {
+      closeModal(modalEl);
+    });
+  }
 }
 
 function setElementRequired(el, required) {

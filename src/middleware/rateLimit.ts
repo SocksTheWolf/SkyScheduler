@@ -40,7 +40,7 @@ export const rateLimit = (prop: RateLimitProps) => {
         }
         return c.html(html`<b class="btn-error">${str}</b>`);
       } else {
-        return c.json({ok: false, msg: str}, 429);
+        return c.json({ok: false, msg: str, rate_limited: true}, 429);
       }
     }
   });

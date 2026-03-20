@@ -1,0 +1,1 @@
+ALTER TABLE `violations` ADD `takenDown` integer DEFAULT false;

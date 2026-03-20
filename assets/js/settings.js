@@ -18,7 +18,14 @@ function setupSettings() {
   }
 }
 
+document.addEventListener("violationOpenSettings", () => {
+  if (document.getElementById("violationSettingsLink")) {
+    addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   addUsernameFieldWatchers();
   setupSettings();
+  document.dispatchEvent(new Event("violationOpenSettings"));
 });

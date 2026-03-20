@@ -7,12 +7,12 @@ import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
-import { Bindings, LooseObj } from "../types";
+import { AccountStatus, Bindings, LooseObj } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyApi";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
 import { getAllMediaOfUser } from "../utils/db/file";
 import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
-import { userHasBan } from "../utils/db/violations";
+import { removeViolations, userHasBan, userHasViolations } from "../utils/db/violations";
 import { updateUserData } from "../utils/dbQuery";
 import { consumeInviteKey, doesInviteKeyHaveValues } from "../utils/inviteKeys";
 import { deleteFromR2 } from "../utils/r2Query";
@@ -120,8 +120,22 @@ account.get("/username", authMiddleware, async (c) => {
 
 // endpoint that returns any violations
 account.get("/violations", authMiddleware, async (c) => {
+  c.header("HX-Trigger-After-Swap", "violationOpenSettings");
   return c.html(<ViolationNoticeBar ctx={c} />);
-})
+});
+
+// endpoint that allows the user to resolve conflicts.
+// We'll validate they are actually fixed bsky action is performed
+account.post("/conflict-resolve", authMiddleware, async (c) => {
+  const userId = c.get("userId");
+  if (await userHasViolations(c, userId)) {
+    // they do, so clear them out
+    await removeViolations(c, userId, [AccountStatus.TakenDown,
+      AccountStatus.Suspended, AccountStatus.Deactivated]);
+  }
+  c.header("HX-Trigger-After-Swap", "accountViolations");
+  return c.html(<></>);
+});
 
 // proxy the logout call because of course this wouldn't work properly anyways
 account.post("/logout", authMiddleware, async (c) => {

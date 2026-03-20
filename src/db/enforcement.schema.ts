@@ -17,6 +17,8 @@ export const violations = sqliteTable('violations', {
   accountSuspended: integer('accountSuspended', { mode: 'boolean' }).default(false),
   // account is no longer available on BSKY, usually when the account is deleted from BSKY
   accountGone: integer('accountGone', { mode: 'boolean' }).default(false),
+  // account has been taken down (usually due to copyright infringement)
+  takenDown: integer('takenDown', { mode: 'boolean' }).default(false),
   // rare, when BSKY tells us that the media is not allowed to be posted.
   // mostly for older posts, as new code handles these states better
   // (self heals upon post deletion)

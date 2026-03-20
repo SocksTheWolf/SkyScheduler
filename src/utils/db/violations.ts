@@ -63,6 +63,8 @@ function createObjForValuesChange(violationType: AccountStatus[], value: boolean
         valuesUpdate.tosViolation = value;
       break;
       case AccountStatus.TakenDown:
+        valuesUpdate.takenDown = value;
+      break;
       case AccountStatus.Deactivated:
         valuesUpdate.accountGone = value;
       break;
@@ -150,8 +152,8 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
         and(ne(violations.accountSuspended, true), ne(violations.accountGone, true),
         and(ne(violations.userPassInvalid, true), ne(violations.mediaTooBig, true))
         ),
-      ne(violations.tosViolation, true))
-    )));
+      and(ne(violations.tosViolation, true), ne(violations.takenDown, true))
+    ))));
 };
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {

@@ -126,6 +126,7 @@ export type Violation = {
   userPassInvalid: boolean;
   accountSuspended: boolean;
   accountGone: boolean;
+  takenDown: boolean;
   mediaTooBig: boolean;
   createdAt: string;
 };
@@ -191,6 +192,7 @@ export type CreateObjectResponse = {
   ok: boolean;
   msg: string;
   postId?: string;
+  rate_limited?: boolean;
 };
 
 export type CreatePostQueryResponse = CreateObjectResponse & {
