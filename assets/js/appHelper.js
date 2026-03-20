@@ -338,4 +338,14 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(refreshPostTimer, timeUntilNextHour);
 
   contentTabs = new PicoTabs('[role="tablist"]');
+
+  if (URLBooster = new URLSearchParams(window.location.search)) {
+    if (URLBooster.has("retweet")) {
+      contentTabs.switchTab("dashtabs", 1);
+      scrollContentTop();
+    } else if (URLBooster.has("post")) {
+      contentTabs.switchTab("dashtabs", 0);
+      scrollContentTop();
+    }
+  }
 });

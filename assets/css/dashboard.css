@@ -107,6 +107,9 @@
   .header-btn img {
     margin-top: -.7dvh;
   }
+  .hideOnMobile {
+    display: inherit;
+  }
 }
 
 
@@ -222,6 +225,9 @@ textarea {
 @media (max-width: 510px) {
   .repostScheduleSimple select {
     width: 15%;
+  }
+  .hideOnMobile {
+    display: none;
   }
 }
 

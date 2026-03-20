@@ -55,7 +55,7 @@ export default function Dashboard(props: any) {
               <SettingsButton />
               <ScrollToContent />
             </center>
-            <hr />
+            <hr class="hideOnMobile" />
             <h5>Post List:</h5>
           </header>
           <div id="posts">

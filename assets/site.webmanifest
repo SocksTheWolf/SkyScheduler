@@ -1,17 +1,86 @@
 {
-  "name":"SkyScheduler",
-  "short_name":"SkyScheduler",
-  "categories": ["social", "social networking", "productivity", "utilities"],
-  "description": "Schedule your social media posts on Bluesky effortlessly!",
-  "icons":[
-    {"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png", "purpose": "maskable"},
-    {"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}
+  "name": "SkyScheduler",
+  "short_name": "SkyScheduler",
+  "categories": [
+    "social",
+    "social networking",
+    "productivity",
+    "utilities"
   ],
-  "theme_color":"#80b3e0",
+  "description": "Schedule your social media posts on Bluesky effortlessly!",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#80b3e0",
   "orientation": "portrait",
   "lang": "en",
   "scope": "https://skyscheduler.work",
-  "start_url": "/",
-  "background_color":"#3c5479",
-  "display":"standalone"
+  "start_url": "/dashboard",
+  "background_color": "#3c5479",
+  "display": "standalone",
+  "id": "com.socksthewolf.skyscheduler",
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "New Post",
+      "url": "/dashboard?post",
+      "description": "Schedule a new post"
+    },
+    {
+      "name": "New Retweet",
+      "url": "/dashboard?retweet",
+      "description": "Schedule a new retweet"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "495x857",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home screen of service"
+    },
+    {
+      "src": "screenshots/dashboard.png",
+      "sizes": "1200x618",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard view of SkyScheduler"
+    },
+    {
+      "src": "screenshots/Dash1.png",
+      "sizes": "495x857",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scheduled Post List"
+    },
+    {
+      "src": "screenshots/Dash2.png",
+      "sizes": "495x857",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "New Post View"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 510
+  }
 }

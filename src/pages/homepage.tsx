@@ -21,7 +21,7 @@ export default function Homepage() {
           <center>
             <figure>
               <img
-                src="/dashboard.png"
+                src="/screenshots/dashboard.png"
                 fetchpriority="high"
                 alt={`Picture of ${APP_NAME} Dashboard`}
                 height="618px"
