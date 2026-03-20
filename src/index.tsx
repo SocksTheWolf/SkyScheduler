@@ -65,8 +65,9 @@ app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
 app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
 
 // Add redirects
+app.get("/bsky", (c) => c.redirect(c.env.REDIRECTS.bsky_profile || c.env.REDIRECTS.contact));
 app.get("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
-app.get("/tip", (c) => c.redirect(c.env.REDIRECTS.tip));
+app.get("/tip", (c) => c.redirect(c.env.REDIRECTS.tip || SITE_URL));
 app.get("/terms", (c) => c.redirect("/tos"));
 
 ///// Inline Middleware /////

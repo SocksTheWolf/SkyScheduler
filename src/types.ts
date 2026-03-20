@@ -20,8 +20,9 @@ type SignupConfigSettings = {
 }
 
 type RedirectConfigSettings = {
+  bsky_profile?: string;
   contact: string;
-  tip: string;
+  tip?: string;
 }
 
 type R2ConfigSettings = {

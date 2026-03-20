@@ -1,11 +1,19 @@
 # SkyScheduler
 
+[![Deploy Cloudflare Workers](https://img.shields.io/badge/deploy-cloudflare_workers-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
+[![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Deploy to Cloudflare Workers](https://img.shields.io/badge/deploy-cloudflare_workers-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
+![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.11-green?color=green)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?color=blue)
+![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)
+
 
 ![SkyScheduler Dashboard](/assets/dashboard.png)
 
 ## Overview
+
+![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)
 
 SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
