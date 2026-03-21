@@ -51,10 +51,10 @@ jobs:
               - 'assets/**'
               - '!assets/screenshots/**'
               - '!assets/.assetsignore'
-      - name: Sleep for ~45 seconds
-        if: success() && (steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true')
+      - name: Sleep for ~50 seconds
+        if: success() && (steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true' || github.event_name == 'schedule')
         # the average build/deploy will take about this amount of time
-        run: sleep 45s
+        run: sleep 50s
         shell: bash
       - name: Cloudflare Cache Cleaner
         uses: Cyb3r-Jak3/action-cloudflare-cache@v3.0.0
