@@ -1,0 +1,51 @@
+name: Clear CF Cache
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+    - ".github/**"
+    - "README.md"
+    - "LICENSE"
+    - ".dev.vars*"
+    - ".gitattributes"
+    - ".markdownlint.json"
+  workflow_dispatch:
+    inputs:
+      clear_cache:
+          description: "Clear Cache"
+          required: true
+          type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clear_cache:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    environment:
+      name: cloudflare
+    steps:
+      - name: Cache Clean Check
+        uses: dorny/paths-filter@v4.0.1
+        id: filter
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            cache_clear:
+              - 'src/utils/appScripts.ts'
+              - 'src/pages/**'
+              - 'src/layout/helpers/**'
+              - 'src/layout/fields/**'
+              - 'assets/**'
+              - '!assets/screenshots/**'
+              - '!assets/.assetsignore'
+      - name: Cloudflare Cache Cleaner
+        uses: Cyb3r-Jak3/action-cloudflare-cache@v3.0.0
+        if: success() && (steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true')
+        with:
+          zone: ${{ secrets.CLOUDFLARE_ZONE }}
+          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+          account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
