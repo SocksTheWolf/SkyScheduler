@@ -1,5 +1,6 @@
 /* Functions & vars that are mostly used on the application side of things */
 var contentTabs = null;
+var refreshTimer;
 function getPostListElement(itemID) {
   return document.getElementById(`post-${itemID}`);
 }
@@ -42,10 +43,19 @@ function scrollToPost(id) {
 
 function refreshPostTimer() {
   console.log("ready to set post timer now");
+  clearTimeout(refreshTimer);
   // Call refresh posts every hour
-  setInterval(refreshPosts, 3600000);
+  refreshTimer = setInterval(refreshPosts, 3600000);
   // refresh the post once
   refreshPosts();
+}
+
+function setPostTimerForNearestHour() {
+  clearTimeout(refreshTimer);
+  // set up timer to update the post list
+  const timeUntilNextHour = 3600000 - new Date().getTime() % 3600000;
+  console.log(`Will run refresh timer in ${timeUntilNextHour}ms`);
+  refreshTimer = setTimeout(refreshPostTimer, timeUntilNextHour);
 }
 
 function refreshPosts() {
@@ -334,10 +344,7 @@ function setupDashboard() {
 // go.
 document.addEventListener("DOMContentLoaded", () => {
   setupDashboard();
-  // set up timer to update the post list
-  const timeUntilNextHour = 3600000 - new Date().getTime() % 3600000;
-  console.log(`Will run refresh timer in ${timeUntilNextHour}ms`);
-  setTimeout(refreshPostTimer, timeUntilNextHour);
+  setPostTimerForNearestHour();
 
   contentTabs = new PicoTabs('[role="tablist"]');
 
@@ -349,5 +356,9 @@ document.addEventListener("DOMContentLoaded", () => {
       contentTabs.switchTab("dashtabs", 0);
       scrollContentTop();
     }
+  }
+  // if we have violations scroll over to them
+  if (violationBar = document.getElementById("violationBar")) {
+    violationBar.scrollIntoView();
   }
 });

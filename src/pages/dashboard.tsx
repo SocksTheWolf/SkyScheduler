@@ -16,6 +16,7 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import {
   dashboardScriptStr,
+  dashboardStyleStr,
   settingsScriptStr
 } from "../utils/appScripts";
 
@@ -23,7 +24,7 @@ export default function Dashboard(props: any) {
   const ctx: Context = props.c;
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
-    {href: "/css/dashboard.min.css", type: "style"},
+    {href: dashboardStyleStr, type: "style"},
     {href: "/dep/countable.min.js", type: "script"},
     {href: "/dep/form-json.min.js", type: "script"},
     {href: "/dep/modal.min.js", type: "script"},
