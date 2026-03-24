@@ -178,17 +178,24 @@ fileDropzone.on("success", function(file, response) {
   const fileIsGif = gifTypes.includes(file.type);
   console.log(`Adding ${file.name} (${file.type}) to the fileData map with size: ${response.fileSize} at quality ${response.qualityLevel || 100}`);
   if (fileIsVideo) {
+    let isBlobURL = false;
     // Attempt to process the video type
     const videoTag = document.createElement("video");
-    const videoObjectURL = URL.createObjectURL(file);
+    videoTag.setAttribute("hidden", true);
+    let videoObjectURL;
+    try {
+      videoObjectURL = URL.createObjectURL(file);
+      isBlobURL = true;
+    } catch {
+      videoObjectURL = `/preview/file/${response.data}`;
+    }
     const cleanupVideoTag = () => {
       videoTag.removeAttribute("src");
-      URL.revokeObjectURL(videoObjectURL);
+      if (isBlobURL)
+        URL.revokeObjectURL(videoObjectURL);
       videoTag.remove();
     };
-    videoTag.setAttribute("hidden", true);
-    videoTag.setAttribute("src", videoObjectURL);
-    videoTag.addEventListener("loadeddata", () => {
+    const getVideoData = () => {
       const videoDuration = videoTag.duration;
       if (!deleteFileIfLengthOver(videoDuration, MAX_VIDEO_LENGTH)) {
         setFileData(file.name, {content: response.data, type: 3,
@@ -196,7 +203,10 @@ fileDropzone.on("success", function(file, response) {
         hasFileLimit = true;
       }
       cleanupVideoTag();
-    });
+    };
+    videoTag.setAttribute("src", videoObjectURL);
+    videoTag.addEventListener("loadedmetadata", getVideoData);
+    //videoTag.addEventListener("loadeddata", getVideoData);
     videoTag.addEventListener("error", () => {
       pushToast(`Unable to process ${file.name}, decoder error occurred`);
       deleteFileOnError();

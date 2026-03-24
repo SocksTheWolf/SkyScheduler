@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
-import { BSKY_IMG_MIME_TYPES } from "../limits";
+import { BSKY_IMG_MIME_TYPES, PREVENT_NON_IMAGE_PREVIEWS } from "../limits";
 import { hasAuth, pullAuthData } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { Bindings } from "../types";
@@ -30,7 +30,7 @@ preview.get("/file/:id", pullAuthData, async (c: Context) => {
   }
 
   const contentType = fetchedFile.httpMetadata?.contentType || fetchedFile.customMetadata["type"];
-  if (BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
+  if (PREVENT_NON_IMAGE_PREVIEWS && BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
     return c.redirect("/thumbs/missing.png");
   }
 

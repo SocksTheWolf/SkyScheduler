@@ -12,6 +12,8 @@ export const MAX_REPOST_DAYS: number = 10;
 export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
 export const GIF_UPLOAD_ALLOWED: boolean = false;
+// if we can preview anything other than images
+export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // max posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
 
