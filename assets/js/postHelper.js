@@ -159,6 +159,7 @@ fileDropzone.on("addedfile", file => {
 fileDropzone.on("success", function(file, response) {
   const deleteFileOnError = () => {
     const delButton = file.previewElement.querySelectorAll(".fileDel")[0];
+    delButton.removeAttribute("disabled");
     --waitingFiles;
     delButton.setAttribute("bad", true);
     delButton.click();
