@@ -39,7 +39,7 @@ export default function Dashboard(props: any) {
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
     <IncludeDependencyTags scripts={defaultDashboardPreloads} />
     <div class="row-fluid">
-      <section class="col-3">
+      <section class="col-3 sidebar">
         <article>
           <header>
             <div class="logoBox">
@@ -62,7 +62,7 @@ export default function Dashboard(props: any) {
           <div id="posts">
             <ScheduledPostList ctx={ctx} />
           </div>
-          <footer>
+          <footer class="sidebarBottom">
             <LogoutButton />
             <hr />
             <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR}

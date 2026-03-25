@@ -24,6 +24,11 @@
   }
 }
 
+.sidebar {
+  overflow-y: hidden;
+  margin-bottom: 0px !important;
+}
+
 .repostStatus {
   margin-right: 1rem;
 }
@@ -53,6 +58,10 @@
     padding-left: 0px;
     padding-right: 0px;
   }
+}
+
+.sidebarBottom {
+  margin-bottom: -55px !important;
 }
 
 /* Setting and refresh buttons */
