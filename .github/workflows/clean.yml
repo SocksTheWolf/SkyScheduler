@@ -20,7 +20,7 @@ jobs:
     permissions: write-all
     steps:
       - name: Cleanup Actions
-        uses: igorjs/gh-actions-clean-workflow@v7
+        uses: igorjs/gh-actions-clean-workflow@8de2bf6a685b49cbece3bdb16ca5cdb827684161
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           runs_to_keep: 1

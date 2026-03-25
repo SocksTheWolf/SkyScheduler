@@ -38,7 +38,7 @@ jobs:
       - name: Checkout Project
         uses: actions/checkout@v6
       - name: Cache Clean Check
-        uses: dorny/paths-filter@v4.0.1
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
         id: filter
         with:
           base: ${{ github.ref }}
@@ -57,7 +57,7 @@ jobs:
         run: sleep 50s
         shell: bash
       - name: Cloudflare Cache Cleaner
-        uses: Cyb3r-Jak3/action-cloudflare-cache@v3.0.0
+        uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
         if: steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true' || github.event_name == 'schedule'
         with:
           zone: ${{ secrets.CLOUDFLARE_ZONE }}
