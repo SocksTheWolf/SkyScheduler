@@ -17,7 +17,7 @@ export function PostDataHeader(props: PostDataHeaderOptions) {
 
   // if this post can be manipulated in some way
   const canBeEdited = !props.posted && !content.isRepost;
-  const canBeDeleted = (!props.posted || (content.isRepost && content.repostCount! > 0));
+  const canBeDeleted = (!props.posted || content.isRepost);
   const canAddReposts = !content.isChildPost && props.posted && content.canAddMoreRepostRules();
 
   // show the header if any of the above cases is true
