@@ -1,4 +1,4 @@
-// TODO: Come up with a better name for this, it is awful
+// TODO: Come up with a better name for this file, it is awful
 import { raw } from "hono/html";
 import { Post } from "../../classes/post";
 import {
@@ -18,7 +18,7 @@ export function PostDataHeader(props: PostDataHeaderOptions) {
   // if this post can be manipulated in some way
   const canBeEdited = !props.posted && !content.isRepost;
   const canBeDeleted = (!props.posted || content.isRepost);
-  const canAddReposts = !content.isChildPost && props.posted && content.canAddMoreRepostRules();
+  const canAddReposts = content.canAddMoreRepostRules();
 
   // show the header if any of the above cases is true
   const canSeeHeader = canBeEdited || canBeDeleted || canAddReposts;

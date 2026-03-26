@@ -97,8 +97,8 @@ export class Post {
     return this.user;
   }
   canAddMoreRepostRules(): boolean {
-    if (!this.posted)
-      return false;
+    /*if (!this.posted)
+      return false;*/
 
     return !this.isChildPost && (this.repostInfo === undefined || this.repostInfo.length < MAX_REPOST_RULES_PER_POST);
   }
