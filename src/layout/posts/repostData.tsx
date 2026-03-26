@@ -31,7 +31,14 @@ export function RepostCountElement(props: RepostCountProps) {
   }
   let repostInfoStr: string = "";
   if (!isEmpty(props.repostInfo)) {
-    for (const repostItem of props.repostInfo!) {
+    // Sort the repost info list
+    const sortedData = props.repostInfo!.toSorted((a, b) => {
+      if (a.time < b.time) return -1;
+      if (a.time > b.time) return 1;
+      return 0;
+    });
+    // and then traverse it for rendering
+    for (const repostItem of sortedData) {
       if (repostItem.count >= 1) {
         const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
         if (repostItem.count == 1 && repostItem.hours == 0)
