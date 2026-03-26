@@ -553,12 +553,13 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     // did we delete anything at all?
     if (deletedItems.length <= 0) {
       // we did not, that's really strange.
+      // Due to a bug, this would be invalid entries
       console.warn(`When trying to delete reposts for ${currentPost.postid}, schedule id ${scheduleId} had empty items`);
-      return false;
+      //return false;
+    } else {
+      // Force update the repost count :)
+      queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));
     }
-
-    // Force update the repost count :)
-    queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));
 
     // Batch push up everything
     const batchResponse = await db.batch(queriesToExecute as BatchQuery);
