@@ -230,12 +230,30 @@ textarea {
   }
 }
 
+#repostDataPopover {
+  max-width: 90%;
+  max-height: 80%;
+  overflow-x: hidden;
+  table {
+    width: unset;
+  }
+  thead {
+    word-wrap: anywhere;
+  }
+  p {
+    max-width: 30dvw;
+  }
+}
+
 @media (max-width: 510px) {
   .repostScheduleSimple select {
     width: 15%;
   }
   .hideOnMobile {
     display: none;
+  }
+  #repostDataPopover p {
+    max-width: unset;
   }
 }
 
