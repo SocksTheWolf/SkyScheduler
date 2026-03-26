@@ -543,7 +543,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
 });
 
 document.addEventListener("resetIfThreading", () => {
-  if (!cancelThreadBtn.classList.contains("hidden"))
+  if (!cancelThreadBtn.parentElement.classList.contains("hidden"))
     document.dispatchEvent(new Event("resetPost"));
 });
 
