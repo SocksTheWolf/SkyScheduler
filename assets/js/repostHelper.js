@@ -19,7 +19,8 @@ async function getAccountHandle(account) {
 }
 
 async function getPostCID(account, postid) {
-  const cidResponse = await fetch(`https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?collection=app.bsky.feed.post&repo=${account}&rkey=${postid}`);
+  const cidResponse = await fetch(
+    `https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?collection=app.bsky.feed.post&repo=${account}&rkey=${postid}`);
   if (cidResponse.ok) {
     const response = await cidResponse.json();
     if (response.hasOwnProperty("cid"))
