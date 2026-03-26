@@ -1,24 +1,15 @@
 /** SIDEBAR **/
 .postItemHeader {
-  min-height: 50px;
-  button {
-    display: inline-flex
+  min-height: 55px;
+
+  button, .repostStatus {
+    display: inline-flex;
+    vertical-align: middle;
+    float: left;
   }
   button span:hover {
     cursor: unset !important;
   }
-  /*button span:hover {
-    position: absolute;
-    border-bottom: none !important;
-    cursor: unset !important;
-    display: flex;
-    img {
-      display: inline-block;
-      position: relative;
-      top: 10px;
-      cursor: unset !important;
-    }
-  }*/
   button:has(+ button) {
     margin-right: 10px;
   }
@@ -31,6 +22,12 @@
 
 .repostStatus {
   margin-right: 1rem;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 0px;
+  padding-bottom: 2px;
+  border-radius: 7px;
+  border: 1px solid var(--pico-secondary);
 }
 
 .repostStatus img {
@@ -105,11 +102,14 @@
 }
 
 .deletePostsButton {
-  float: right;
+  float: right !important;
 }
 
-.header-btn img {
-  margin-left: 1px;
+.header-btn {
+  margin-bottom: 0px !important;
+  img {
+    margin-left: 1px;
+  }
 }
 
 @media (min-width: 510px) {
