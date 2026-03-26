@@ -13,8 +13,13 @@ export function RepostEditorData(props: RepostEditorProps) {
   if (props.data === undefined || !isValid(props.id)) {
     return (<>No Reposts To Edit</>);
   }
+  const sortedData = props.data.toSorted((a, b) => {
+    if (a.time < b.time) return -1;
+    if (a.time > b.time) return 1;
+    return 0;
+  });
   // The hx-confirm will get injected once the timestamps are localized on the client.
-  return (<>{props.data.map((obj) => {
+  return (<>{sortedData.map((obj) => {
     return (<tr class="repost-editor-item">
       <th scope="row" class="timestamp">{obj.time}</th>
       <td>{obj.hours > 0 ? `Every ${obj.hours} hours` : "once"}</td>
@@ -59,7 +64,7 @@ export async function RepostDataPopover(props: RepostDataPopoverProps) {
     </table>
     <progress id="repostDataPopoverProgress" class="htmx-indicator" />
     <footer>
-      <small id="click-close" class="clicker" tabindex={0}>Click to close this editor</small>
+      <small id="click-close" class="clicker noselect" tabindex={0}>Click to close this editor</small>
     </footer>
   </article>
   </div>);

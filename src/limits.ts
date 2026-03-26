@@ -38,7 +38,7 @@ export const MAX_THUMBNAIL_SIZE: number = 15;
 export const MAX_REPOST_POSTS: number = 40;
 
 // a limit for the maximum number of repost rules a single post can have
-export const MAX_REPOST_RULES_PER_POST: number = 5;
+export const MAX_REPOST_RULES_PER_POST: number = 6;
 
 // if the user can edit the repost rules for their posts
 export const CAN_EDIT_REPOST_RULES: boolean = true;

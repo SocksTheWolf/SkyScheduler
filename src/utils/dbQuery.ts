@@ -258,7 +258,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
 
   // Create repost metadata
   const scheduleGUID = (!isThreadedPost) ? uuidv4() : undefined;
-  const repostInfo = (!isThreadedPost) ?
+  const repostInfo = (!isThreadedPost && repostData !== undefined) ?
     new RepostInfo(scheduleGUID!, scheduleDate, false, repostData) : undefined;
 
   // Create the posts
@@ -294,7 +294,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
       scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData!.scheduledDate!),
       rootPost: rootPostID,
       parentPost: parentPostID,
-      repostInfo: (!isThreadedPost) ? [repostInfo!] : [],
+      repostInfo: (!isThreadedPost && repostInfo !== undefined) ? [repostInfo] : [],
       threadOrder: (!isThreadedPost) ? undefined : parentPostOrder,
       embedContent: embeds,
       contentLabel: label || PostLabel.None,
