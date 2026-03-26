@@ -51,14 +51,9 @@ jobs:
               - 'assets/**'
               - '!assets/screenshots/**'
               - '!assets/.assetsignore'
-      - name: Sleep for ~50 seconds
-        if: success() && (steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true' || github.event_name == 'schedule')
-        # the average build/deploy will take about this amount of time
-        run: sleep 50s
-        shell: bash
       - name: Cloudflare Cache Cleaner
         uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
-        if: steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true' || github.event_name == 'schedule'
+        if: success() && (steps.filter.outputs.cache_clear == 'true' || inputs.clear_cache == 'true' || github.event_name == 'schedule')
         with:
           zone: ${{ secrets.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
