@@ -2,6 +2,7 @@ const repostForm = document.getElementById("repostForm");
 const repostTitle = document.getElementById("repostTitle");
 const repostTitleSection = document.getElementById("repostTitleSection");
 const repostRecordURL = document.getElementById("repostRecordURL");
+const repostCycleOptions = document.getElementById("makeRepostOptions");
 
 async function getAccountHandle(account) {
   if (account.match(/did\:plc\:/i)) {
@@ -35,6 +36,9 @@ document.addEventListener("resetRepost", () => {
   setElementDisabled(repostTitle, false);
   repostTitle.value = "";
   repostRecordURL.value = "";
+  setSelectDisable(repostCycleOptions.parentElement, true);
+  repostCycleOptions.checked = false;
+  document.getElementById("repostTime").value = "";
 });
 
 repostForm.addEventListener('submit', async (e) => {
@@ -57,7 +61,6 @@ repostForm.addEventListener('submit', async (e) => {
   };
 
   // Add repost data if we should be making reposts
-  const repostCycleOptions = document.getElementById("makeRepostOptions");
   if (repostCycleOptions.checked) {
     const repostValues = repostCycleOptions.parentElement.querySelectorAll("select");
     postObject.repostData = {
