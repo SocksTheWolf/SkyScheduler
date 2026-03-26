@@ -243,6 +243,11 @@ textarea {
   text-transform: capitalize;
 }
 
+#click-close {
+  border: 1px solid var(--pico-color);
+  padding: 4px;
+}
+
 /* Checkbox Input Helpers */
 .checkboxLine {
   width: unset !important;

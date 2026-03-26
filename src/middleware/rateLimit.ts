@@ -34,10 +34,13 @@ export const rateLimit = (prop: RateLimitProps) => {
     } else {
       // rate limited.
       const str: string = prop.message || "You are currently rate limited, try again later";
-      if (prop.html) {
-        if (prop.toast) {
-          c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
+      if (prop.toast) {
+        c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
+        if (!prop.html) {
+          return c.html(html`<></>`);
         }
+      }
+      if (prop.html) {
         return c.html(html`<b class="btn-error">${str}</b>`);
       } else {
         return c.json({ok: false, msg: str, rate_limited: true}, 429);

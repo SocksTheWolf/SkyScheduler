@@ -187,5 +187,5 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
 }
 
 document.addEventListener("rateLimitNotice", function(ev) {
-  pushToast(ev.detail, false);
+  pushToast(ev.detail.value, false);
 });
