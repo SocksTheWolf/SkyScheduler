@@ -280,10 +280,13 @@ textarea {
 /** MISC **/
 .btn-sm span {
   border-bottom: none !important;
-  cursor: pointer;
 }
-.clicker {
-  cursor: pointer;
+
+.clicker:not(:disabled), .btn-sm span {
+  cursor: pointer !important;
+  * {
+    cursor: pointer !important;
+  }
 }
 
 .modify-repost {
