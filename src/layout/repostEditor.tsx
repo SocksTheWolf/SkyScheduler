@@ -20,10 +20,11 @@ export function RepostEditorData(props: RepostEditorProps) {
   });
   // The hx-confirm will get injected once the timestamps are localized on the client.
   return (<>{sortedData.map((obj) => {
+    const isMultiRetweet: boolean = obj.hours > 0;
     return (<tr class="repost-editor-item">
       <th scope="row" class="timestamp">{obj.time}</th>
-      <td>{obj.hours > 0 ? `Every ${obj.hours} hours` : "once"}</td>
-      <td>{obj.count}</td>
+      <td>{isMultiRetweet ? `Every ${obj.hours} hours` : "once"}</td>
+      <td>{isMultiRetweet ? obj.count : 0} + 1 (initial)</td>
       <td><a role="button" hx-delete={`/post/${props.id}/repost/${obj.guid}`}
         hx-indicator="#repostDataPopoverProgress"
         hx-disabled-elt=".repost-editor-item a"
