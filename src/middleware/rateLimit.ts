@@ -1,7 +1,6 @@
 import { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
-import isEmpty from "just-is-empty";
 import get from 'just-safe-get';
 
 type RateLimitProps = {
@@ -37,7 +36,7 @@ export const rateLimit = (prop: RateLimitProps) => {
       if (prop.toast) {
         c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
         if (!prop.html) {
-          return c.html(html`<></>`);
+          return c.html("");
         }
       }
       if (prop.html) {
