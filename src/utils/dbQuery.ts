@@ -536,10 +536,17 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
   // Get the post to make sure it's valid and update post json
   const currentPost = await getPostByIdWithReposts(c, id);
   if (currentPost != null && currentPost.repostInfo !== undefined) {
+    const originalRuleLength: number = currentPost.repostInfo!.length;
     // remove the schedule from the current json object set
     let newRepostInfo: RepostInfo[] = currentPost.repostInfo!.filter((itm) => {
       return itm.guid !== scheduleId;
     });
+
+    // Was this schedule id in the repostInfo array originally?
+    if (newRepostInfo.length == originalRuleLength) {
+      // It was not, so don't do anything more.
+      return false;
+    }
 
     let queriesToExecute: BatchItem<"sqlite">[] = [];
     // modify the current repost info
@@ -552,10 +559,8 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
 
     // did we delete anything at all?
     if (deletedItems.length <= 0) {
-      // we did not, that's really strange.
-      // Due to a bug, this would be invalid entries
+      // Log this out, but allow for the bad data to be deleted anyways
       console.warn(`When trying to delete reposts for ${currentPost.postid}, schedule id ${scheduleId} had empty items`);
-      //return false;
     } else {
       // Force update the repost count :)
       queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));
