@@ -115,7 +115,6 @@ document.addEventListener("sidebarButtons", function() {
 });
 
 document.addEventListener("showRepostPopover", function() {
-  const holder = document.getElementById("repostDataPopoverHolder");
   const popover = document.getElementById("repostDataPopover");
 
   // controls to close the popover
@@ -138,7 +137,10 @@ document.addEventListener("showRepostPopover", function() {
   // Clean up the popover when it goes away (add event listener after open)
   popover.addEventListener("beforetoggle", function(ev) {
     ev.preventDefault();
-    document.body.removeChild(holder);
+    // Force get rid of all of these holders
+    document.querySelectorAll("#repostDataPopoverHolder").forEach((el) => {
+      document.body.removeChild(el);
+    });
     refreshPosts();
   });
 });
