@@ -56,7 +56,7 @@ export function PostCreation({ctx}: any) {
                 </div>
                 <footer>
                   <details class="uploadGuidelines noselect clicker hide-arrow" open>
-                  <summary>Upload Limits/Guidelines</summary>
+                  <summary tabindex={-1}>Upload Limits/Guidelines</summary>
                   <small><ul>
                     <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
                       <ul>

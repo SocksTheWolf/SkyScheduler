@@ -35,15 +35,18 @@ export default function Homepage() {
           <hr />
           <h6 class="inline-header">Features:</h6>
           <ul>
-            <li>Handles multiple users/accounts easily, supports most PDS instances</li>
+            <li>Handles multiple users/accounts easily, supports most ATProto PDS instances</li>
             <li>Schedule your posts any time in the future (to the nearest hour)</li>
             <li>Supports embeds, quote posts, links, tagging, mentions</li>
             <li>Post <span tabindex={0} data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with
               content labels and full support for alt text</li>
-            <li>Schedule entire threads with support of up to {MAX_POSTS_PER_THREAD} posts per thread!</li>
-            <li>Automatically retweet your content at an interval of your choosing, up to {MAX_REPOST_INTERVAL} times
+            <li>Edit the content of posts <i>and</i> alt text before publish</li>
+            <li>Publish entire threads with up to {MAX_POSTS_PER_THREAD} child posts per thread</li>
+            <li>Automatically retweet <u>anything</u> at an interval of your choosing up to {MAX_REPOST_INTERVAL} times
               every {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
-            <li>Edit the content of posts and alt text before they are posted</li>
+            <ul>
+              <li><small>Even content that's wasn't originally made on {APP_NAME}</small></li>
+            </ul>
           </ul>
         </p>
         <footer>

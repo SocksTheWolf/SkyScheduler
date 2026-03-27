@@ -35,8 +35,8 @@ app.use(csrf({origin: SITE_URL}));
 ///// Static Pages /////
 
 // caches
-const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=604800' });
-const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=259200' });
+const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=604800, must-revalidate, proxy-revalidate' });
+const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=259200, must-revalidate, proxy-revalidate' });
 
 // Root route
 app.all("/", staticPagesCache, (c) => c.html(<Homepage />));
