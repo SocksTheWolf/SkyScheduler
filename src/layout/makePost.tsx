@@ -56,7 +56,7 @@ export function PostCreation({ctx}: any) {
                 </div>
                 <footer>
                   <details class="uploadGuidelines noselect clicker hide-arrow" open>
-                  <summary>Upload Guidelines</summary>
+                  <summary>Upload Limits/Guidelines</summary>
                   <small><ul>
                     <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
                       <ul>
@@ -89,7 +89,7 @@ export function PostCreation({ctx}: any) {
                 <input type="text" id="urlCard" placeholder="https://" value="" />
                 <small>Add a social embed card for a link to your post. This link will not count against the {MAX_LENGTH} character limit.<br />
                 Thumbnails may get automatically resized down to fit 1280x720.</small>
-                <footer><div class="uploadGuidelines"><small><b>NOTE</b>: File uploads will <b>always supersede</b> any link embeds.</small></div></footer>
+                <footer><div class="indent-10"><small><b>NOTE</b>: File uploads will <b>always supersede</b> any link embeds.</small></div></footer>
               </article>
             </section>
             <section id="content-label-selector" class="hidden">

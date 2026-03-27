@@ -203,12 +203,15 @@ textarea {
   }
 }
 
-.uploadGuidelines, .editAltBlock {
+.uploadGuidelines, .editAltBlock, .indent-10 {
   margin-left: 10px;
 }
 
 .uploadGuidelines {
   margin-bottom: 0px !important;
+  summary:focus {
+    color: var(--pico-accordion-close-summary-color) !important;
+  }
 }
 
 /* Character Counts */
