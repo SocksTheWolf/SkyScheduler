@@ -34,13 +34,6 @@ function updateAllTimes() {
   });
 }
 
-function scrollToPost(id) {
-  const postElement = getPostListElement(id);
-  if (postElement) {
-    postElement.scrollIntoView({behavior: "smooth", container: "nearest", block: "nearest", inline: "start" });
-  }
-}
-
 function refreshPostTimer() {
   console.log("ready to set post timer now");
   clearTimeout(refreshTimer);
@@ -60,6 +53,28 @@ function setPostTimerForNearestHour() {
 
 function refreshPosts() {
   htmx.trigger("body", "refreshPosts");
+}
+
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function scrollToObject(el) {
+  if (el) {
+    el.scroll({top:0, behavior:'smooth'});
+    const tabInvalidate = el.querySelector(".invalidateTab");
+    if (tabInvalidate) {
+      tabInvalidate.focus();
+      tabInvalidate.blur();
+    }
+  }
+}
+
+function scrollToPost(id) {
+  const postElement = getPostListElement(id);
+  if (postElement) {
+    postElement.scrollIntoView({behavior: "smooth", container: "nearest", block: "nearest", inline: "start" });
+  }
 }
 
 function scrollContentTop() {

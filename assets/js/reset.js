@@ -1,4 +1,4 @@
-function handleResetLoad() {
+document.addEventListener("DOMContentLoaded", () => {
   if (resetToken = new URLSearchParams(window.location.search).get("token")) {
     const resetTokenField = document.getElementById("resetToken");
     const submitButton = document.querySelector('button[type="submit"]');
@@ -11,8 +11,4 @@ function handleResetLoad() {
   } else {
     pushToast("Reset token is invalid! Request a new reset token to continue", false);
   }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  handleResetLoad();
 });

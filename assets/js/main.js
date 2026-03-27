@@ -18,21 +18,6 @@ function pushToast(msg, isSuccess) {
   newToast.showToast();
 }
 
-function scrollTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function scrollToObject(el) {
-  if (el) {
-    el.scroll({top:0, behavior:'smooth'});
-    const tabInvalidate = el.querySelector(".invalidateTab");
-    if (tabInvalidate) {
-      tabInvalidate.focus();
-      tabInvalidate.blur();
-    }
-  }
-}
-
 function addKeyboardListener(el, callback, keys=["Enter", " "], preventDefault=true) {
   if (el === undefined || el === null)
     return;
@@ -65,9 +50,9 @@ function pushReturnToHomepageToast() {
 }
 setTimeout(pushReturnToHomepageToast, 1500);
 
-const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
 function updateUsername(val) {
+  const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+  const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
   // Remove this bullshit unicode thing that gets injected on usernames if you copy them
   // from the bsky website, why the fuck did they do this?
   let inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
