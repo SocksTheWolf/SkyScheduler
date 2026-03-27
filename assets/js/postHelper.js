@@ -526,7 +526,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
   }
 
   content.addEventListener("keydown", cancelThreadingKeyboard);
-
+  content.focus();
   threadField.setAttribute("rootpost", rootID);
   const parentID = postDOM.hasAttribute("data-item") ? postDOM.getAttribute("data-item") : rootID;
   threadField.setAttribute("parentpost", parentID);

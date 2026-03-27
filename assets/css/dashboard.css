@@ -81,6 +81,9 @@
     color: green !important;
     border-color: green !important;
   }
+  .sidebarBottom {
+    margin-bottom: unset !important;
+  }
 }
 
 /** POSTS **/
