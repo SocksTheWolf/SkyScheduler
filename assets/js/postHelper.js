@@ -53,6 +53,7 @@ document.addEventListener("resetPost", () => {
   // reset sections
   setElementVisible(sectionImageAttach, true);
   setElementVisible(sectionLinkAttach, true);
+  toggleUploadGuidelines(true);
   setElementVisible(sectionRetweet, true);
   setElementVisible(sectionSchedule, true);
   setElementVisible(cancelThreadBtn.parentElement, false);
@@ -96,6 +97,7 @@ fileDropzone.on("reset", () => {
   clearOnUnloadBlocker();
   showContentLabeler(false);
   setElementVisible(sectionLinkAttach, true);
+  toggleUploadGuidelines(true);
 });
 
 fileDropzone.on("addedfile", file => {
@@ -107,6 +109,7 @@ fileDropzone.on("addedfile", file => {
   // Increase the number of waiting to be processed files.
   ++waitingFiles;
   setElementVisible(sectionLinkAttach, false);
+  toggleUploadGuidelines(false);
   const buttonHolder = Dropzone.createElement("<fieldset role='group' class='file-item-group'></fieldset>");
   const removeButton = Dropzone.createElement("<button class='fileDel clicker outline btn-error' disabled><small>Remove file</small></button>");
   const addAltText = Dropzone.createElement("<button class='outline clicker' disabled><small>Add Alt Text</small></button><br />");
@@ -147,6 +150,7 @@ fileDropzone.on("addedfile", file => {
       }
       if (fileData.length == 0) {
         setElementVisible(sectionLinkAttach, true);
+        toggleUploadGuidelines(true);
       }
     });
   });
@@ -174,6 +178,7 @@ fileDropzone.on("success", function(file, response) {
   }
   // show the labels
   showContentLabeler(true);
+  toggleUploadGuidelines(false);
   const fileIsImage = imageTypes.includes(file.type);
   const fileIsVideo = videoTypes.includes(file.type);
   const fileIsGif = gifTypes.includes(file.type);
@@ -307,6 +312,7 @@ fileDropzone.on("error", function(file, msg) {
   fileDropzone.removeFile(file);
   if (fileData.length == 0) {
     setElementVisible(sectionLinkAttach, true);
+    toggleUploadGuidelines(true);
   }
 });
 
@@ -469,6 +475,16 @@ function showPostProgress(shouldShow) {
     el.textContent = "Making Post...";
   } else {
     el.textContent = "Schedule Post";
+  }
+}
+
+function toggleUploadGuidelines(shouldShow) {
+  const el = document.querySelector(".uploadGuidelines");
+  if (el) {
+    if (shouldShow)
+      el.setAttribute("open", true);
+    else
+      el.removeAttribute("open");
   }
 }
 

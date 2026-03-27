@@ -55,26 +55,31 @@ export function PostCreation({ctx}: any) {
                   </div>
                 </div>
                 <footer>
-                <div class="uploadGuidelines"><small><b>Note</b>: <ul>
-                  <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
-                  <ul>
-                    <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
-                    <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
-                    {maxWidth ?
-                      <ol>
-                        <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{maxWidth}px</b> will also <u data-tooltip="will preserve aspect ratio">be resized</u> in addition to being compressed</li>
-                      </ol> : null}
+                  <details class="uploadGuidelines noselect clicker hide-arrow" open>
+                  <summary>Upload Guidelines</summary>
+                  <small><ul>
+                    <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
+                      <ul>
+                        <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
+                        <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
+                        {maxWidth ?
+                          <ol>
+                            <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{maxWidth}px</b> will also <u data-tooltip="will preserve aspect ratio">be resized</u> in addition to being compressed</li>
+                          </ol> : null}
+                        </li>
+                        <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
+                        <li>if an image fails to upload, you'll need to manually adjust the file to fit it properly</li>
+                      </ul>
                     </li>
-                    <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
-                    <li>if an image fails to upload, you'll need to manually adjust the file to fit it properly</li>
-                  </ul></li>
-                  <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>:
-                  <ul>
-                    <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
-                    <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-                    <li>will be processed on your PDS after they're posted. This may show a temporary <i>"Video not Found"</i> message for a bit after posting.</li>
-                  </ul></li>
-                  </ul></small></div>
+                    <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>:
+                      <ul>
+                        <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
+                        <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
+                        <li>will be processed on your PDS after they're posted. This may show a temporary <i>"Video not Found"</i> message for a bit after posting.</li>
+                      </ul>
+                    </li>
+                  </ul></small>
+                  </details>
                 </footer>
               </article>
             </section>

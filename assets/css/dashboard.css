@@ -207,6 +207,10 @@ textarea {
   margin-left: 10px;
 }
 
+.uploadGuidelines {
+  margin-bottom: 0px !important;
+}
+
 /* Character Counts */
 .smallLabel {
   display: block;
