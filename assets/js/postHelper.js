@@ -517,6 +517,10 @@ document.addEventListener("replyThreadCreate", function(ev) {
     return;
   }
 
+  // focus the main tab immediately
+  if (contentTabs !== null)
+    contentTabs.switchTab("dashtabs", 0);
+
   const rootID = postDOM.getAttribute("data-root");
   if (threadField.hasAttribute("rootpost")) {
     const currentEdit = threadField.getAttribute("rootpost");
