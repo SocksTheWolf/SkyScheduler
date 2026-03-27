@@ -540,6 +540,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
   setElementVisible(sectionSchedule, false);
 
   postFormTitle.innerText = "Schedule New Thread Reply";
+  scrollContentTop();
 });
 
 document.addEventListener("resetIfThreading", () => {

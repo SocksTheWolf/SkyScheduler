@@ -143,6 +143,7 @@ document.addEventListener("addNewRepost", (ev) => {
       contentTabs.switchTab("dashtabs", 1);
       scrollToObject(repostRecordURL);
       document.getElementById("repostTime").value = getScheduleTimeForNextHour();
+      scrollContentTop();
       return;
     }
   }
