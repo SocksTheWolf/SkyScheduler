@@ -6,7 +6,8 @@
         "toplevel": true,
         "reserved": ["pushToast", "addKeyboardListener", "addEasyModalOpen",
         "addClickKeyboardListener", "addKeyboardListener",
-        "addUsernameFieldWatchers", "translateErrorObject", "easySetup", "clearSettingsData"]
+        "addUsernameFieldWatchers", "translateErrorObject", "easySetup",
+        "clearSettingsData", "openAltText", "openPostAltEditor"]
       }
     },
     "putout": {

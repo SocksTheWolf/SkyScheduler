@@ -5,7 +5,14 @@ function clearSettingsData() {
   document.getElementById("accountDeleteResponse").innerHTML = "";
 }
 
-function setupSettings() {
+document.addEventListener("violationOpenSettings", () => {
+  if (document.getElementById("violationSettingsLink")) {
+    addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  addUsernameFieldWatchers();
   const changeInfoModal = document.getElementById("changeInfo");
   const deleteAccountModal = document.getElementById("deleteAccount");
   if (changeInfoModal) {
@@ -16,16 +23,5 @@ function setupSettings() {
     deleteAccountModal.addEventListener("close", clearSettingsData);
     addEasyModalOpen("deleteAccountButton", deleteAccountModal, "closeDeleteButton");
   }
-}
-
-document.addEventListener("violationOpenSettings", () => {
-  if (document.getElementById("violationSettingsLink")) {
-    addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  addUsernameFieldWatchers();
-  setupSettings();
   document.dispatchEvent(new Event("violationOpenSettings"));
 });

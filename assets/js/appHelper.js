@@ -294,10 +294,13 @@ function setupDashboard() {
     }
   });
 
-  addClickKeyboardListener(document.querySelector(".scrollBtn"), (e) => {
-    e.preventDefault();
-    scrollContentTop();
-  });
+  // Mobile scroll button functionality
+  if (scrollBtn = document.querySelector(".scrollBtn")) {
+    addClickKeyboardListener(scrollBtn, (e) => {
+      e.preventDefault();
+      scrollContentTop();
+    });
+  }
 
   // find the post time scheduler object
   document.querySelectorAll(".scheduledDateBlock").forEach(el => {
