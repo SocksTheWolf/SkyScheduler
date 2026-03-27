@@ -20,7 +20,6 @@
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
     "minify:js:main": "minify assets/js/main.js > assets/js/main.min.js",
     "minify:js:app": "cat assets/js/*Helper.js | minify --js > assets/js/app.min.js",
-    "minify:js:settings": "minify assets/js/settings.js > assets/js/settings.min.js",
     "minify:style:site": "minify assets/css/stylesheet.css > assets/css/stylesheet.min.css",
     "minify:style:dash": "minify assets/css/dashboard.css > assets/css/dashboard.min.css",
     "minify:js": "run-p minify:js:**",

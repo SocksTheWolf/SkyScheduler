@@ -4,10 +4,10 @@
     "terser": {
       "mangle": {
         "toplevel": true,
-        "reserved": ["pushToast", "addKeyboardListener", "addEasyModalOpen",
-        "addClickKeyboardListener", "addKeyboardListener",
-        "addUsernameFieldWatchers", "translateErrorObject", "easySetup",
-        "clearSettingsData", "openAltText", "openPostAltEditor"]
+        "reserved": ["pushToast", "addKeyboardListener",
+        "addClickKeyboardListener", "easySetup",
+        "addUsernameFieldWatchers", "translateErrorObject",
+        "openAltText", "openPostAltEditor"]
       }
     },
     "putout": {

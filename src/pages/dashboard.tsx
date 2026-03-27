@@ -14,11 +14,7 @@ import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
-import {
-  dashboardScriptStr,
-  dashboardStyleStr,
-  settingsScriptStr
-} from "../utils/appScripts";
+import { dashboardScriptStr, dashboardStyleStr } from "../utils/appScripts";
 
 export default function Dashboard(props: any) {
   const ctx: Context = props.c;
@@ -31,12 +27,8 @@ export default function Dashboard(props: any) {
     {href: "/dep/tabs.min.js", type: "script"}
   ];
 
-  // Our own homebrew js files
-  const dashboardScripts: PreloadRules[] = [dashboardScriptStr, settingsScriptStr].map((itm) => {
-    return {href: itm, type: "script"};
-  });
   return (<BaseLayout title="Dashboard" mainClass="dashboard"
-      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, ...dashboardScripts]}>
+      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, {href: dashboardScriptStr, type: "script"}]}>
     <IncludeDependencyTags scripts={defaultDashboardPreloads} />
     <div class="row-fluid">
       <section class="col-3 sidebar">
@@ -85,7 +77,7 @@ export default function Dashboard(props: any) {
       </div>
     </div>
     <AltTextDialog />
-    <script type="text/javascript" src={dashboardScriptStr}></script>
     <SettingsDialog pds={ctx.get("pds")} />
+    <script type="text/javascript" src={dashboardScriptStr}></script>
   </BaseLayout>);
 };

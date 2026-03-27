@@ -5,6 +5,18 @@ function clearSettingsData() {
   document.getElementById("accountDeleteResponse").innerHTML = "";
 }
 
+function addEasyModalOpen(buttonID, modalEl, closeButtonID=null) {
+  addClickKeyboardListener(document.getElementById(buttonID), () => {
+    clearSettingsData();
+    openModal(modalEl);
+  });
+  if (closeButtonID !== null) {
+    addClickKeyboardListener(document.getElementById(closeButtonID), () => {
+      closeModal(modalEl);
+    });
+  }
+}
+
 document.addEventListener("violationOpenSettings", () => {
   if (document.getElementById("violationSettingsLink")) {
     addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
