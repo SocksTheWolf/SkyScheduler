@@ -28,7 +28,7 @@ export function PostAltTextEdit({post}: EditedPostProps) {
 
   const altEditBlock = embedAltTextEdit;
   if (altEditBlock === undefined || altEditBlock?.at(0) === undefined || altEditBlock.length <= 0) {
-    return (<></>);
+    return null;
   }
 
   return (<section>

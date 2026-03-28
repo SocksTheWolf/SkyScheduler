@@ -1,8 +1,8 @@
 import isEmpty from 'just-is-empty';
+import { AgentMap, AtProtoAgent } from '../classes/bskyAgents';
 import { Post } from "../classes/post";
 import { Repost } from "../classes/repost";
 import { AllContext, TaskType } from '../types';
-import { AgentMap, AtProtoAgent } from './bsky/bskyAgents';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
 import {

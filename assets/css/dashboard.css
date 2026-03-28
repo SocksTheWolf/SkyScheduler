@@ -271,9 +271,13 @@ textarea {
   text-transform: capitalize;
 }
 
+#repostDataPopoverHolder footer {
+  margin-top: 0 !important;
+}
+
 #click-close {
-  border: 1px solid var(--pico-color);
   padding: 4px;
+  width: 100%;
 }
 
 /* Checkbox Input Helpers */

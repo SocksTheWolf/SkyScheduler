@@ -52,11 +52,14 @@ export function RepostCountElement(props: RepostCountProps) {
   return (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
     <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>
     Reposts Left: {props.count}</span>
-    {CAN_EDIT_REPOST_RULES ? <RepostEditorLink id={props.id} /> : undefined }
+    <RepostEditorLink id={props.id} />
   </>);
 };
 
 function RepostEditorLink({id}: any) {
+  if (!CAN_EDIT_REPOST_RULES) {
+    return null;
+  }
   return (<small>
     <span>
       <a class="clicker modify-repost"

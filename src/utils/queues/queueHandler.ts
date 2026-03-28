@@ -1,9 +1,9 @@
 import unique from "just-unique";
+import { AgentMap } from "../../classes/bskyAgents";
 import { ScheduledContext } from "../../classes/context";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { Bindings, QueueTaskData, TaskType } from "../../types";
-import { AgentMap } from "../bsky/bskyAgents";
 import { userHasViolations } from "../db/violations";
 import { isPost } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
@@ -36,9 +36,13 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         continue;
       }
 
-      // This probably doesn't need to be recreated anymore because we send the literal JS object now
-      // TODO: Check if we're already a class before new constructing
-      const postDataObj: Post|Repost = (isPost(message.body.data)) ? new Post(message.body.data) : new Repost(message.body.data);
+      let postDataObj: Post|Repost;
+      if (message.body.data instanceof Post || message.body.data instanceof Repost) {
+        postDataObj = message.body.data;
+      } else {
+        // recreate the object if we need to (for whatever reason)
+        postDataObj = (isPost(message.body.data)) ? new Post(message.body.data) : new Repost(message.body.data);
+      }
       const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       if (agent == null) {
         const userId = postDataObj.getUser();

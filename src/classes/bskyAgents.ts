@@ -2,17 +2,17 @@
 // this is done because logging into PDSes across tasks can be extremely
 // expensive time wise.
 import { Agent, ComAtprotoServerCreateSession, CredentialSession } from "@atproto/api";
-import { Post } from "../../classes/post";
-import { Repost } from "../../classes/repost";
 import {
   AccountStatus, AgentConfigSettings,
   AllContext, TaskType
-} from "../../types";
-import { getBskyUserPassForId } from "../db/userinfo";
-import { createViolationForUser, shouldIgnoreViolation } from "../db/violations";
-import { resetAppPasswordMessage } from "../messages/resetAppPassword";
-import { loginToBsky } from "./bskyLogin";
-import { createDMWithUsername } from "./bskyMessage";
+} from "../types";
+import { loginToBsky } from "../utils/bsky/bskyLogin";
+import { createDMWithUsername } from "../utils/bsky/bskyMessage";
+import { getBskyUserPassForId } from "../utils/db/userinfo";
+import { createViolationForUser, shouldIgnoreViolation } from "../utils/db/violations";
+import { resetAppPasswordMessage } from "../utils/messages/resetAppPassword";
+import { Post } from "./post";
+import { Repost } from "./repost";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export class AgentMap {

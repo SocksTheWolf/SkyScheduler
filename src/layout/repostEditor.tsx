@@ -65,7 +65,7 @@ export async function RepostDataPopover(props: RepostDataPopoverProps) {
     <RepostEditorTable id={props.id} data={repostInfoData?.repostInfo} />
     <progress id="repostDataPopoverProgress" class="htmx-indicator" />
     <footer>
-      <small id="click-close" class="clicker noselect" tabindex={0}>Click to close this editor</small>
+      <small><a role="button" id="click-close" class="clicker" tabindex={0}>Click to close this editor</a></small>
     </footer>
   </article>
   </div>);

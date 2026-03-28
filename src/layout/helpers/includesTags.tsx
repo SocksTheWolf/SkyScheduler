@@ -12,7 +12,7 @@ type DepTagsType = {
 // generate css/js tags for the given dependencies
 export function IncludeDependencyTags({scripts}: DepTagsType) {
   if (scripts === undefined) {
-    return (<></>);
+    return null;
   }
 
   const html = scripts.map((itm) => {
@@ -28,7 +28,7 @@ export function IncludeDependencyTags({scripts}: DepTagsType) {
 
 export function PreloadDependencyTags({scripts}: DepTagsType) {
   if (scripts === undefined) {
-    return (<></>);
+    return null;
   }
 
   const html = scripts.map((itm) => {
