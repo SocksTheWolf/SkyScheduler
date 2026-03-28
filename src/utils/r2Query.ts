@@ -47,13 +47,13 @@ export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQue
     return;
 
   console.log(`Deleting ${embeds}`);
-  const killFilesPromise = c.env.R2.delete(embeds);
+  const killFilesPromise: Promise<void> = c.env.R2.delete(embeds);
   const deleteFileListingPromise = deleteFileListings(c, embeds);
+  const deleteFilePromises = Promise.all([killFilesPromise, deleteFileListingPromise]);
   if (isQueued) {
-    await Promise.all([killFilesPromise, deleteFileListingPromise]);
+    await deleteFilePromises
   } else {
-    c.executionCtx.waitUntil(killFilesPromise);
-    c.executionCtx.waitUntil(deleteFileListingPromise);
+    c.executionCtx.waitUntil(deleteFilePromises);
   }
 };
 
