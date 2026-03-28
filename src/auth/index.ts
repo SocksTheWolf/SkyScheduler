@@ -7,8 +7,7 @@ import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import { Bindings } from "../types";
-import { lookupBskyHandle } from "../utils/bsky/bskyApi";
-import { createDMWithUser } from "../utils/bsky/bskyMessage";
+import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
 // Single auth configuration that handles both CLI and runtime scenarios
@@ -61,15 +60,11 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         requireEmailVerification: false,
         sendResetPassword: async ({user, url, token}, request) => {
           const userName = (user as any).username;
-          const bskyUserId = await lookupBskyHandle(userName);
-          if (bskyUserId !== null) {
-            const response = await createDMWithUser(env!, bskyUserId, createPasswordResetMessage(url, token));
-            if (!response)
-              throw new Error("FAILED_MESSAGE");
-            } else {
-              console.error(`Unable to look up bsky username for user ${userName}, got null`);
-              throw new Error("NO_LOOKUP");
-            }
+          await createDMWithUsername(env!, userName, createPasswordResetMessage(url, token))
+            .then((resp) => {
+              if (resp === false)
+                throw new Error("FAILED_MESSAGE");
+            });
           },
         },
         plugins: [
@@ -164,3 +159,4 @@ type ContextVariables = {
 
 // Export for runtime usage
 export { ContextVariables, createAuth };
+
