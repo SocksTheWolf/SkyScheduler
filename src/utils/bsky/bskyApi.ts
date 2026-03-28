@@ -32,37 +32,38 @@ export const doesHandleExist = async (user: string) => {
 };
 
 export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
-  const lookupRequest = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
+  return await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
     cf: {
       cacheTtlByStatus: {"200-299": 600, 404: 1, "500-599": 0},
       cacheEverything: true,
     }
-  });
-  if (lookupRequest.ok) {
-    const response: any = await lookupRequest.json();
-    if (has(response, "did")) {
-      return response.did;
-    } else {
-      return null;
+  }).then((resp) => {
+    if (resp.ok) {
+      return resp.json().then((jsonData: any) => {
+        if (has(jsonData, "did")) {
+          return jsonData.did;
+        }
+        return null;
+      });
     }
-  }
-  return null;
+    return null;
+  });
 };
 
 export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
-  const lookupRequest = await fetch(`https://plc.directory/${userDID}`);
-  if (lookupRequest.ok) {
-    const response: any = await lookupRequest.json();
-    if (has(response, "service")) {
-      for (const service of response.service) {
-        if (service.type === "AtprotoPersonalDataServer") {
-          return service.serviceEndpoint;
+  return await fetch(`https://plc.directory/${userDID}`).then((resp) => {
+    return resp.json().then((data: any) => {
+      if (has(data, "service")) {
+        for (const service of data.service) {
+          if (service.type === "AtprotoPersonalDataServer") {
+            return service.serviceEndpoint;
+          }
         }
       }
-    }
-  }
-  // Fallback is to always return the bsky pds
-  return "https://bsky.social";
+      // Fallback is to always return the bsky pds
+      return "https://bsky.social";
+    });
+  });
 };
 
 export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtProtoAgent) => {

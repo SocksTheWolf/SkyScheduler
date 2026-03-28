@@ -25,7 +25,7 @@ export async function verifyTurnstile(c: Context, next: any) {
     }
 
     // Check if the output was okay
-    const turnstileOutcome:any = await turnstileFetch.json();
+    const turnstileOutcome: any = await turnstileFetch.json();
     if (!turnstileOutcome.success) {
       return c.json({ok: false, msg: "captcha timed out"}, 401);
     }

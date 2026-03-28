@@ -32,8 +32,8 @@ post.use(authMiddleware);
 
 // Create media upload
 post.post("/upload", async (c: Context) => {
-  const formData = await c.req.parseBody();
-  const fileUploadResponse = await uploadFileR2(c, formData['file'] as File, c.get("userId"));
+  const fileUploadResponse = await c.req.parseBody()
+    .then((formData) => uploadFileR2(c, formData['file'] as File, c.get("userId")));
   if (fileUploadResponse.success === false)
     return c.json(fileUploadResponse, 400);
   else
@@ -58,8 +58,7 @@ post.delete("/upload", async (c: Context) => {
 
 // Create post
 post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c: Context) => {
-  const body = await c.req.json();
-  const response: CreatePostQueryResponse = await createPost(c, body);
+  const response: CreatePostQueryResponse = await c.req.json().then((body) => createPost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
   } else if (response.postNow && response.postId) {
@@ -78,8 +77,7 @@ post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c: Context) =>
 
 // Create repost
 post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Context) => {
-  const body = await c.req.json();
-  const response: CreateObjectResponse = await createRepost(c, body);
+  const response: CreateObjectResponse = await c.req.json().then((body) => createRepost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
   }
