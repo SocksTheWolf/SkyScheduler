@@ -7,7 +7,7 @@ import { AccountStatus, AllContext, LooseObj, Violation } from "../../types";
 import { lookupBskyHandle } from "../bsky/bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
-const createBanForUser = async(db: DrizzleD1Database, userName: string, reason: string) => {
+const createBanForUser = async(db: DrizzleD1Database, userName: string|null, reason: string) => {
   if (userName !== null) {
     const didHandle = await lookupBskyHandle(userName);
     if (didHandle !== null) {
@@ -19,7 +19,10 @@ const createBanForUser = async(db: DrizzleD1Database, userName: string, reason: 
   }
 };
 
-export const userHasBan = async(c: AllContext, userDid: string): Promise<boolean> => {
+export const userHasBan = async(c: AllContext, userDid: string|null): Promise<boolean> => {
+  if (userDid === null)
+    return false;
+
   const db: DrizzleD1Database = c.get("db");
   if (!db) {
     console.error("unable to check if user has ban, db was null");
@@ -31,9 +34,7 @@ export const userHasBan = async(c: AllContext, userDid: string): Promise<boolean
 
 export const userHandleHasBan = async(c: AllContext, userName: string) => {
   if (userName !== null) {
-    const didHandle = await lookupBskyHandle(userName);
-    if (didHandle !== null)
-      return await userHasBan(c, didHandle);
+    return await lookupBskyHandle(userName).then((didHandle) => userHasBan(c, didHandle));
   }
   return false;
 };
@@ -102,12 +103,8 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
 
   // handle auto-bans
   if (violationType === AccountStatus.TOSViolation) {
-    const bskyUsername = await getUsernameForUserId(c, userId);
-    if (bskyUsername !== null) {
-      await createBanForUser(db, bskyUsername, "tos violation");
-    } else {
-      console.warn(`unable to get bsky username for id ${userId}`);
-    }
+    await getUsernameForUserId(c, userId)
+      .then((bskyUsername) => createBanForUser(db, bskyUsername, "tos violation"));
   }
 
   // if there are no violations, then give none.
@@ -137,6 +134,10 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
     console.warn(`unable to remove violations for user ${userId}, db was null`);
     return;
   }
+  return await removeViolationsDB(db, userId, violationType);
+};
+
+export const removeViolationsDB = async(db: DrizzleD1Database, userId: string, violationType: AccountStatus[]) => {
   // Check if they have a violation first
   if ((await userHasViolationsDB(db, userId)) == false) {
     return;
@@ -144,16 +145,15 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
 
   // Create the update query
   const valuesUpdate: LooseObj = createObjForValuesChange(violationType, false);
-  await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId));
-  // Delete the record if the user has no other violations
-  await db.delete(violations).where(and(eq(violations.userId, userId),
-    and(
+  await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId))
+    .then(() => db.delete(violations).where(and(eq(violations.userId, userId),
       and(
-        and(ne(violations.accountSuspended, true), ne(violations.accountGone, true),
-        and(ne(violations.userPassInvalid, true), ne(violations.mediaTooBig, true))
-        ),
-      and(ne(violations.tosViolation, true), ne(violations.takenDown, true))
-    ))));
+        and(
+          and(ne(violations.accountSuspended, true), ne(violations.accountGone, true),
+          and(ne(violations.userPassInvalid, true), ne(violations.mediaTooBig, true))
+          ),
+        and(ne(violations.tosViolation, true), ne(violations.takenDown, true))
+    )))));
 };
 
 export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {

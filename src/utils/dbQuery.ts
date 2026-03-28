@@ -23,8 +23,8 @@ import {
   getPostThreadCount, getRepostCountQuery, updatePostForGivenUser
 } from "./db/data";
 import {
-  getViolationsForUser, removeViolation,
-  removeViolations, userHasViolationsDB
+  getViolationsForUser,
+  removeViolationsDB
 } from "./db/violations";
 import { floorGivenTime } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
@@ -78,11 +78,7 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
 
       // If we have new data about the username, pds, or password
       if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
-        // check if the user has violations
-        if (await userHasViolationsDB(db, userId)) {
-          // they do, so clear them out
-          await removeViolations(c, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
-        }
+        await removeViolationsDB(db, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
       }
 
       if (!isEmpty(newData)) {
@@ -119,11 +115,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postObj.posted) {
-      await deleteEmbedsFromR2(c, postObj.embeds);
-      if (await userHasViolationsDB(db, userId)) {
-        // Remove the media too big violation if it's been given
-        await removeViolation(c, userId, AccountStatus.MediaTooBig);
-      }
+      await deleteEmbedsFromR2(c, postObj.embeds).then(() => removeViolationsDB(db, userId, [AccountStatus.MediaTooBig]));
     }
     returnObj.isRepost = postObj.isRepost || false;
 
