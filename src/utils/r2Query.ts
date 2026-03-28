@@ -50,7 +50,7 @@ export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQue
   const killFilesPromise = c.env.R2.delete(embeds);
   const deleteFileListingPromise = deleteFileListings(c, embeds);
   if (isQueued) {
-    Promise.all([killFilesPromise, deleteFileListingPromise]);
+    await Promise.all([killFilesPromise, deleteFileListingPromise]);
   } else {
     c.executionCtx.waitUntil(killFilesPromise);
     c.executionCtx.waitUntil(deleteFileListingPromise);
