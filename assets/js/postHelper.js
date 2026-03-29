@@ -201,7 +201,10 @@ fileDropzone.on("success", function(file, response) {
         URL.revokeObjectURL(videoObjectURL);
       videoTag.remove();
     };
-    const getVideoData = () => {
+    videoTag.setAttribute("src", videoObjectURL);
+    // push things into the content map so we can delete easier
+    setFileData(file.name, {content: response.data, type: 3});
+    videoTag.addEventListener("loadedmetadata", () => {
       const videoDuration = videoTag.duration;
       if (!deleteFileIfLengthOver(videoDuration, MAX_VIDEO_LENGTH)) {
         setFileData(file.name, {content: response.data, type: 3,
@@ -209,10 +212,7 @@ fileDropzone.on("success", function(file, response) {
         hasFileLimit = true;
       }
       cleanupVideoTag();
-    };
-    videoTag.setAttribute("src", videoObjectURL);
-    videoTag.addEventListener("loadedmetadata", getVideoData);
-    //videoTag.addEventListener("loadeddata", getVideoData);
+    });
     videoTag.addEventListener("error", () => {
       pushToast(`Unable to process ${file.name}, decoder error occurred`);
       deleteFileOnError();
