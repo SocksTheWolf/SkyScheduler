@@ -194,7 +194,7 @@ We welcome contributions! Here's some ways to contribute:
 
 ## License
 
-This project's source code is licensed under the MIT License
+This project's source code is licensed under the MIT License.
 Name, Logos and Branding are copyright SocksTheWolf, all rights reserved.
 
 See the [LICENSE](LICENSE) file for details.
