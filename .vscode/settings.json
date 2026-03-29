@@ -1,0 +1,11 @@
+{
+  "search.exclude": {
+    "**/assets/dep": true,
+    "**/migrations": true,
+    "package-lock.json": true
+  },
+  "editor.tabSize": 2,
+  "C_Cpp.copilotHover": "disabled",
+  "chat.disableAIFeatures": true,
+  "chat.customizations.harnessSelector.enabled": false
+}

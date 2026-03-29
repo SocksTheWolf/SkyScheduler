@@ -147,6 +147,7 @@ skyscheduler/
 │   ├── utils/
 │   └── validation/
 ├── migrations/
+├── .vscode/
 ├── .dev.vars
 ├── .node-version
 ├── .markdownlint.json

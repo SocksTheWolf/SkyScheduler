@@ -1,0 +1,1 @@
+CREATE INDEX `rootPostedUUID_idx` ON `posts` (`rootPost`,`posted`) WHERE posted = 1;

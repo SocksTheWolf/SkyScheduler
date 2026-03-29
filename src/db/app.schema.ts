@@ -47,6 +47,10 @@ export const posts = sqliteTable('posts', {
     .where(sql`isRepost = 1`),
   // for db pruning and parity with the PDS
   index("postedUUID_idx").on(table.uuid, table.posted),
+  // for db deletion on delete posts
+  index("rootPostedUUID_idx")
+    .on(table.rootPost, table.posted)
+    .where(sql`posted = 1`),
   // Querying children
   index("generalThread_idx")
     .on(table.parentPost, table.rootPost)
