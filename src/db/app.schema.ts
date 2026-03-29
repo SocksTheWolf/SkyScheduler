@@ -50,7 +50,7 @@ export const posts = sqliteTable('posts', {
   // for db deletion on delete posts
   index("rootPostedUUID_idx")
     .on(table.rootPost, table.posted)
-    .where(sql`posted = 1`),
+    .where(sql`rootPost is not NULL and posted = 1`),
   // Querying children
   index("generalThread_idx")
     .on(table.parentPost, table.rootPost)
