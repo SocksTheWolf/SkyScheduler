@@ -104,6 +104,12 @@ export type EmbedData = {
   duration?: number;
 };
 
+export enum RepostType {
+  None = 0,
+  ExistingPost = 1,
+  FuturePost = 2,
+};
+
 export enum PostLabel {
   None = "None",
   Suggestive = "Suggestive",

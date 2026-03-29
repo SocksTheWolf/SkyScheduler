@@ -2,7 +2,7 @@ import has from "just-has";
 import isEmpty from "just-is-empty";
 import { EmbedData, PostLabel } from "../types";
 import { RepostInfo } from "./repost";
-import { MAX_REPOST_RULES_PER_POST } from "../limits";
+import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 
 // Basically a copy of the schema
 export class Post {
@@ -97,7 +97,7 @@ export class Post {
     return this.user;
   }
   canAddMoreRepostRules(): boolean {
-    if (!this.posted)
+    if (!this.posted && !CAN_REPOST_SCHEDULED_POSTS)
       return false;
 
     return !this.isChildPost && (this.repostInfo === undefined || this.repostInfo.length < MAX_REPOST_RULES_PER_POST);

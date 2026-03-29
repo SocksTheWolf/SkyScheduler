@@ -537,6 +537,7 @@ document.addEventListener("replyThreadCreate", function(ev) {
   if (contentTabs !== null)
     contentTabs.switchTab("dashtabs", 0);
 
+  // Check to see if we're already threading (I forget how reliable this check is)
   const rootID = postDOM.getAttribute("data-root");
   if (threadField.hasAttribute("rootpost")) {
     const currentEdit = threadField.getAttribute("rootpost");
@@ -545,6 +546,10 @@ document.addEventListener("replyThreadCreate", function(ev) {
     return;
   }
 
+  // reset us (this is really reliable)
+  document.dispatchEvent(new Event("resetPost"));
+
+  // get set up go
   content.addEventListener("keydown", cancelThreadingKeyboard);
   content.focus();
   threadField.setAttribute("rootpost", rootID);

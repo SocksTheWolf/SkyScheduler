@@ -43,6 +43,9 @@ export const MAX_REPOST_RULES_PER_POST: number = 5;
 // if the user can edit the repost rules for their posts
 export const CAN_EDIT_REPOST_RULES: boolean = true;
 
+// if users can repost scheduled posts before they are posted
+export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

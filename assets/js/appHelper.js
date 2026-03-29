@@ -341,6 +341,11 @@ function setupDashboard() {
     addClickKeyboardListener(cancelThreadBtn, () =>
       {document.dispatchEvent(new Event("resetPost")) });
   }
+  // add event for cancel future scheduled retweet
+  if (cancelScheduledRepostsBtn) {
+    addClickKeyboardListener(cancelScheduledRepostsBtn, () =>
+      {document.dispatchEvent(new Event("resetRepost")) });
+  }
   // fire the events to keep our data nice and updated
   document.dispatchEvent(new Event("updateTimestamps"));
   document.dispatchEvent(new Event("sidebarButtons"));

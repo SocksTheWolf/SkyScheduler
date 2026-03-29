@@ -14,7 +14,8 @@ import { APP_NAME } from "../siteinfo";
 import {
   AccountStatus, AllContext, BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse, EmbedDataType, PostLabel
+  DeleteResponse, EmbedDataType, PostLabel,
+  RepostType
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
@@ -339,7 +340,8 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   if (!validation.success) {
     return { ok: false, msg: validation.error.toString() };
   }
-  const { url, uri, cid, content, scheduledDate, repostData } = validation.data;
+  const { data, scheduledDate, repostData } = validation.data;
+  const isScheduledPost = (data.type === RepostType.FuturePost);
   const scheduleDate = floorGivenTime(new Date(scheduledDate));
   const timeNow = new Date();
 
@@ -364,7 +366,13 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
 
   // Check to see if the post already exists
   // (check also against the userId here as well to avoid cross account data collisions)
-  const existingPost = await getPostByCID(db, userId, cid);
+  const existingPost = (isScheduledPost) ? await getPostById(c, data.id) : await getPostByCID(db, userId, data.cid);
+
+  // if we were expecting a future post, check to see if the post data is invalid, if so, then
+  // give an error as a post that is not tied to the user's account attempted to be updated
+  if (existingPost === null && isScheduledPost) {
+    return { ok: false, msg: "Invalid post id"};
+  }
   if (existingPost !== null) {
     postUUID = existingPost.postid;
     const existingPostDate = existingPost.scheduledDate!;
@@ -398,9 +406,15 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     if (newRepostInfo.every(isNewInfoNotDuped)) {
       newRepostInfo.push(repostInfo);
 
+      let repostInfoUpdateQuery = db.update(posts).set({repostInfo: newRepostInfo});
       // push record update to add to json array
-      dbOperations.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
-        eq(posts.userId, userId), eq(posts.cid, cid))));
+      if (!isScheduledPost) {
+        dbOperations.push(repostInfoUpdateQuery.where(and(
+          eq(posts.userId, userId), eq(posts.cid, data.cid!))));
+      } else {
+        dbOperations.push(repostInfoUpdateQuery.where(and(
+          eq(posts.userId, userId), eq(posts.uuid, data.id))));
+      }
     }
   } else {
     // Limit of post reposts on the user's account.
@@ -410,13 +424,17 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
         `You've cannot create any more repost posts at this time. Using: (${accountCurrentReposts}/${MAX_REPOST_POSTS}) repost posts`};
     }
 
+    if (isScheduledPost) {
+      return {ok: false, msg: "Invalid data request"};
+    }
+
     // Create the post base for this repost
     postUUID = uuidv4();
     dbOperations.push(db.insert(posts).values({
-      content: !isEmpty(content) ? content! : `Repost of ${url}`,
+      content: !isEmpty(data.content) ? data.content! : `Repost of ${data.url}`,
       uuid: postUUID,
-      cid: cid,
-      uri: uri,
+      cid: data.cid,
+      uri: data.uri,
       posted: true,
       isRepost: true,
       repostInfo: [repostInfo],
@@ -447,8 +465,8 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   // Update repost counts
   if (existingPost !== null) {
     // update existing content posts (but only for reposts, no one else)
-    if (existingPost.isRepost && !isEmpty(content)) {
-      dbOperations.push(db.update(posts).set({content: content!}).where(eq(posts.uuid, postUUID)));
+    if (existingPost.isRepost && !isScheduledPost && !isEmpty(data.content)) {
+      dbOperations.push(db.update(posts).set({content: data.content!}).where(eq(posts.uuid, postUUID)));
     }
 
     // Because there could be conflicts that drop, run a count on the entire list and use the value from that

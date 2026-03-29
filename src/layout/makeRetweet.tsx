@@ -6,9 +6,13 @@ export function MakeRetweet() {
   return (<article>
     <header>
       <h4>Schedule New Retweet</h4>
+      <small class="thread-cancel hidden" data-placement="left" data-tooltip="Cancel adding retweet to highlighted post">
+        <a id="cancelScheduledRepost" tabindex={0} class="contrast" role="button">Cancel Scheduled Retweet</a>
+      </small>
     </header>
     <form id="repostForm" novalidate>
-    <article>
+    <input type="hidden" id="postBaseInfo" />
+    <article id="retweetFields">
       <header>Post To Retweet</header>
       <input type="text" id="repostRecordURL" placeholder="https://" />
       <small>This must be a post, it cannot be anything else.
