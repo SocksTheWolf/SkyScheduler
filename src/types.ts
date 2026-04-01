@@ -124,6 +124,7 @@ export enum TaskType {
   Blast,
   Post,
   Repost,
+  VideoPost,
 };
 
 export type Violation = {

@@ -1,6 +1,6 @@
 import has from "just-has";
 import isEmpty from "just-is-empty";
-import { EmbedData, PostLabel } from "../types";
+import { EmbedData, EmbedDataType, PostLabel } from "../types";
 import { RepostInfo } from "./repost";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 
@@ -104,6 +104,12 @@ export class Post {
   }
   hasEmbeds(): boolean {
     return this.embeds !== undefined && this.embeds.length > 0;
+  }
+  hasVideoEmbeds(): boolean {
+    if (this.hasEmbeds()) {
+      return this.embeds?.find((itm) => itm.type == EmbedDataType.Video) !== undefined;
+    }
+    return false;
   }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }

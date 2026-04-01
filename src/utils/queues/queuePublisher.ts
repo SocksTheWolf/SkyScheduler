@@ -45,9 +45,15 @@ export async function enqueuePost(c: AllContext, data: Post, delay: number = -1)
   } else if (!isQueueEnabled(c.env))
     return;
 
+  let postType = TaskType.Post, queueType = "post_queues";
+  if (false && data.hasVideoEmbeds()) {
+    postType = TaskType.VideoPost;
+    queueType = "video_queue";
+  }
+
   // Pick a random consumer to handle this post
-  const queueConsumer: Queue|null = getRandomQueue(c.env, "post_queues");
-  await pushToQueue(queueConsumer, data, TaskType.Post, delay);
+  const queueConsumer: Queue|null = getRandomQueue(c.env, queueType);
+  await pushToQueue(queueConsumer, data, postType, delay);
 };
 
 export async function enqueueRepost(c: AllContext, data: Repost, delay: number = -1) {
