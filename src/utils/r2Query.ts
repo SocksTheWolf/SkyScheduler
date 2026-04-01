@@ -65,7 +65,7 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
   const R2UploadRes = await c.env.R2.put(fileName, buffer, {
-    customMetadata: {"user": metaData.user, "type": metaData.type }
+    customMetadata: {"user": metaData.user, "type": metaData.type, "ext": fileExt, "filename": metaData.name }
   });
   if (R2UploadRes) {
     await addFileListing(c, fileName, metaData.user);

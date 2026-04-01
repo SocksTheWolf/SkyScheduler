@@ -82,13 +82,32 @@ export class AgentMap {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export class AtProtoAgent extends Agent {
+  serviceToken: string|null;
+  servTokenExpire: number|null;
   constructor(serviceURL: string) {
     super(new CredentialSession(new URL(serviceURL)));
+    this.serviceToken = null;
+    this.servTokenExpire = null;
   }
   // We basically do the same thing as AtpAgent originally here, by not sharing sessionManagers
   // and wrapping them entirely in agents. We cache the agents instead to keep them isolated.
   async login(options: AtProtoAgentLoginOptions): Promise<ComAtprotoServerCreateSession.Response> {
     return (this.sessionManager as CredentialSession).login(options);
+  }
+  async getServiceToken() {
+    if (this.serviceToken !== null && this.servTokenExpire !== null) {
+      if (this.servTokenExpire > Date.now()) {
+        return this.serviceToken;
+      }
+    }
+    this.servTokenExpire = Date.now() / 1000 + 60 * 30;
+    const { data: serviceAuth } = await this.com.atproto.server.getServiceAuth({
+      aud: `did:web:${(this.sessionManager as CredentialSession).dispatchUrl.host}`,
+      lxm: "com.atproto.repo.uploadBlob",
+      exp: this.servTokenExpire
+    });
+    this.serviceToken = serviceAuth.token;
+    return this.serviceToken;
   }
 };
 
