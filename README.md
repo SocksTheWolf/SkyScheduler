@@ -78,11 +78,12 @@ _Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk 
 npm install
 ```
 
-6. Run the development server
+6. Modify any site information located in:
 
-```bash
-npm run dev
-```
+   - `limits.ts` - site configuration and application limits
+   - `siteinfo.ts` - site information such as name, description, domain, etc
+   - `.ssclirc` - sitemap domain
+   - `site.webmanifest` - naming and color schemes
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
 
@@ -90,22 +91,17 @@ npm run dev
 npm run deploy
 ```
 
+**NOTE**: You can also run dev by using `npm run dev`.
+
 8. Create your D1 tables using the following command, this will set up your tables both locally and remotely.
 
-**NOTE**: If you encounter issues running remotely, you can run the command again.
+**NOTE**: If you encounter issues running remotely, you can run `npm run migrate:prod` or `npm run migrate:local` respectively.
 
 ```bash
 npm run migrate:all
 ```
 
-9. Modify any site information located in:
-
-   - `limits.ts` - site configuration and application limits
-   - `siteinfo.ts` - site information such as name, description, domain, etc
-   - `.ssclirc` - sitemap domain
-   - `site.webmanifest` - naming and color schemes
-
-10. Run your application and go to `/setup`. This will create the admin account.
+9. Run your application and go to `/setup`. This will create the admin account.
 
 ## Configuration
 
