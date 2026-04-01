@@ -8,6 +8,8 @@ export const uploadVideoToBlob = async (c: AllContext, agent: AtProtoAgent, file
     console.warn(`Could not get the video ${file} from R2 for post!`);
     return null;
   }
+
+  const fileType = fileData.httpMetadata?.contentType || fileData.customMetadata["type"];
   const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
   uploadUrl.searchParams.append("did", agent.did!);
   uploadUrl.searchParams.append("name", file);
@@ -17,7 +19,7 @@ export const uploadVideoToBlob = async (c: AllContext, agent: AtProtoAgent, file
     method: "POST",
     headers: {
       Authorization: `Bearer ${userToken}`,
-      "Content-Type": "video/mp4",
+      "Content-Type": fileType,
       "Content-Length": fileData.size
     },
     body: await fileData.blob(),
