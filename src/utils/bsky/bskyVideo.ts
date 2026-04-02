@@ -1,6 +1,5 @@
 import type { AppBskyVideoDefs, BlobRef } from "@atproto/api";
 import type { WorkflowStep } from "cloudflare:workers";
-import { NonRetryableError } from "cloudflare:workflows";
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import type { AllContext } from "../../types";
 
@@ -35,7 +34,6 @@ export const waitOnVideoStatus = async (jobStatus: AppBskyVideoDefs.JobStatus, s
   let blob: BlobRef | undefined = jobStatus.blob;
   const jobId = jobStatus.jobId;
   const videoAgent = new AtProtoAgent("https://video.bsky.app");
-  const isStepped = (step !== null);
 
   while (!blob) {
     const { data: status } = await videoAgent.app.bsky.video.getJobStatus({ jobId: jobId });
@@ -46,12 +44,10 @@ export const waitOnVideoStatus = async (jobStatus: AppBskyVideoDefs.JobStatus, s
     // if we have failed, exit this upload entirely.
     if (status.jobStatus.state == "JOB_STATE_FAILED") {
       console.error(`job for did ${status.jobStatus.did} failed with error ${status.jobStatus.error!}. had message ${status.jobStatus.message}`);
-      if (isStepped)
-        throw new NonRetryableError("video pipeline returned that job has failed");
       return null;
     }
-    // wait a second
-    if (isStepped) {
+    // wait a few seconds
+    if (step !== null) {
       await step.sleep("wait for upload", "2 seconds");
     } else {
       await new Promise((resolve) => setTimeout(resolve, 2000));

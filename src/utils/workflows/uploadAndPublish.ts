@@ -1,10 +1,11 @@
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";
-import { uploadVideoToBlob, waitOnVideoStatus } from "../bsky/bskyVideo";
-import { Post } from "../../classes/post";
-import { ScheduledContext } from "../../classes/context";
-import type { AllContext, Bindings, VideoWorkflowPayload } from "../../types";
-import { handlePostTask } from "../scheduler";
+import { NonRetryableError } from "cloudflare:workflows";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
+import { ScheduledContext } from "../../classes/context";
+import type { Post } from "../../classes/post";
+import type { AllContext, Bindings, VideoWorkflowPayload } from "../../types";
+import { uploadVideoToBlob, waitOnVideoStatus } from "../bsky/bskyVideo";
+import { handlePostTask } from "../scheduler";
 
 // After setting up queues and everything, I might have just wanted workflows.
 export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, VideoWorkflowPayload> {
@@ -14,7 +15,7 @@ export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, 
     const uploadJob = await step.do("upload video and get job", {
       retries: {
         limit: 5,
-        delay: 1000 * 60,
+        delay: "1 minute",
         backoff: "exponential"
       },
       timeout: "15 minutes"
@@ -28,19 +29,24 @@ export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, 
     const getUploadBlob = await step.do("wait for the upload blob", {
       retries: {
         limit: 3,
-        delay: 500 * 60,
+        delay: "30 seconds",
         backoff: "constant"
       },
       timeout: "5 minutes"
     }, async () => {
-      return await waitOnVideoStatus(uploadJob!, step);
+      const jobBlob = await waitOnVideoStatus(uploadJob!, step);
+      if (jobBlob === null) {
+        // TODO: Give violation?
+        throw new NonRetryableError("video pipeline returned that job has failed");
+      }
+      return jobBlob;
     });
 
     // make the post
     await step.do("make the bluesky post", {
       retries: {
         limit: 3,
-        delay: this.env.QUEUE_SETTINGS.delay_val,
+        delay: `${this.env.QUEUE_SETTINGS.delay_val} seconds`,
         backoff: "exponential"
       }
     }, async () => {
