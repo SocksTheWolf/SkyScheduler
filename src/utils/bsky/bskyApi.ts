@@ -1,17 +1,17 @@
-import { type AppBskyFeedPost, BlobRef, RichText } from '@atproto/api';
+import { type AppBskyFeedPost, type BlobRef, RichText } from '@atproto/api';
 import { ResponseType, XRPCError } from '@atproto/xrpc';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import { AtProtoAgent } from "../../classes/bskyAgents";
-import { Post } from "../../classes/post";
-import { Repost } from "../../classes/repost";
+import type { Post } from "../../classes/post";
+import type { Repost } from "../../classes/repost";
+import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../../limits';
-import {
-  AccountStatus, AllContext,
-  BskyEmbedWrapper, BskyRecordWrapper, EmbedData, EmbedDataType,
-  LooseObj, PostLabel, PostRecordResponse, PostStatus
+import type {
+  AllContext, BskyEmbedWrapper, BskyRecordWrapper, EmbedData,
+  LooseObj, PostRecordResponse, PostStatus
 } from '../../types';
 import { atpRecordURI } from '../../validation/regexCases';
 import {
@@ -578,7 +578,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
   return returnObj;
 }
 
-export const getPostRecords = async (records:string[]) => {
+export const getPostRecords = async (records: string[]) => {
   // Access the bsky public API
   const agent = new AtProtoAgent('https://public.api.bsky.app');
   return await getAgentPostRecords(agent, records);

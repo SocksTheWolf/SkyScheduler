@@ -1,4 +1,5 @@
-import { Context } from "hono";
+import type { Context } from "hono";
+import { PWAutoCompleteSettings } from "../enums";
 import AccountHandler from "../layout/account";
 import BSkyAppPasswordField from "../layout/fields/appPasswordField";
 import DashboardPasswordField from "../layout/fields/dashPasswordField";
@@ -9,7 +10,6 @@ import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/tu
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import { PWAutoCompleteSettings } from "../types";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 type SignupProps = {

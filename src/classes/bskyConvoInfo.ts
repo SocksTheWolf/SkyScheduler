@@ -1,4 +1,4 @@
-import { ConvoView } from '@atproto/api/dist/client/types/chat/bsky/convo/defs';
+import type { ConvoView } from '@atproto/api/dist/client/types/chat/bsky/convo/defs';
 
 export class BSkyConvoInfo {
   id: string;

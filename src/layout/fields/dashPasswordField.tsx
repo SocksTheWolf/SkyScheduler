@@ -1,5 +1,5 @@
+import { PWAutoCompleteSettings } from "../../enums";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
-import { PWAutoCompleteSettings } from "../../types";
 
 type DashboardPasswordFieldSettings = {
   required?: boolean

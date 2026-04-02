@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
-import { ExecutionContext } from "hono";
-import { Bindings } from "../types";
+import type { ExecutionContext } from "hono";
+import type { Bindings } from "../types";
 
 export class ScheduledContext {
   executionCtx: ExecutionContext;

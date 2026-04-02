@@ -3,8 +3,9 @@ import random from 'just-random';
 import get from 'just-safe-get';
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
+import { TaskType } from "../../enums";
 import { USE_VIDEO_WORKFLOWS } from '../../limits';
-import { AllContext, Bindings, QueueTaskData, TaskType } from "../../types";
+import type { AllContext, Bindings, QueueTaskData } from "../../types";
 
 // picks a random queue to publish data to
 const getRandomQueue = (env: Bindings, listName: string): Queue|null => {

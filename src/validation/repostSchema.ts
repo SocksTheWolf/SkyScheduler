@@ -1,7 +1,7 @@
 import * as z from "zod/v4";
+import { RepostType } from "../enums";
 import { MAX_POSTED_LENGTH, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
 import { atProtoPostURI, postRecordURI, repostContentRecord } from "./regexCases";
-import { RepostType } from "../types";
 
 const PublishedRepostSchema = z.object({
   url: z.url({

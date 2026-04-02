@@ -9,13 +9,13 @@ import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
+import { AccountStatus, EmbedDataType, PostLabel, RepostType } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import {
-  AccountStatus, AllContext, BatchQuery,
+import type {
+  AllContext, BatchQuery,
   CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse, EmbedDataType, PostLabel,
-  RepostType
+  DeleteResponse
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";

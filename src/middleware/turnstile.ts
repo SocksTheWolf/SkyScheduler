@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { useCFTurnstile } from "../utils/helpers";
 
 // Middleware that handles turnstile verification.

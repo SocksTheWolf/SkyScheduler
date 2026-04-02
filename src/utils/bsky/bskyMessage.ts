@@ -1,7 +1,8 @@
 import { RichText } from '@atproto/api';
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from '../../classes/bskyConvoInfo';
-import { AccountStatus, Bindings } from '../../types';
+import { AccountStatus } from "../../enums";
+import type { Bindings } from '../../types';
 import { lookupBskyHandle } from './bskyApi';
 import { loginToBsky } from './bskyLogin';
 

@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
 import get from 'just-safe-get';

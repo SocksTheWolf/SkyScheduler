@@ -1,9 +1,9 @@
 // Mediocre file to help with automatically generating endpoint bindings so that we can dump them to the
 // Cloudflare WAF to protect/log against abuse
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
-import { ContextVariables } from "../auth";
-import { Bindings } from "../types";
+import type { ContextVariables } from "../auth";
+import type { Bindings } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
@@ -48,7 +48,7 @@ openapiRoutes.post("/post/create", describeRoute({
     }
   },
 }),
-validator('json', PostSchema), async (c: Context) => {});
+validator('json', PostSchema));
 
 openapiRoutes.post("/post/create/repost", describeRoute({
   description: 'Makes a repost post',
@@ -70,7 +70,7 @@ openapiRoutes.post("/post/create/repost", describeRoute({
     }
   },
 }),
-validator('json', RepostSchema), async (c: Context) => {});
+validator('json', RepostSchema));
 
 // Get all posts
 openapiRoutes.all("/post/all", describeRoute({
@@ -86,7 +86,7 @@ openapiRoutes.all("/post/all", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c: Context) => { });
+}));
 
 // Edit posts
 openapiRoutes.get("/post/edit/:id", describeRoute({
@@ -102,7 +102,7 @@ openapiRoutes.get("/post/edit/:id", describeRoute({
       description: "not logged in"
     }
   }
-}), validator('param', CheckGUIDSchema), async (c: Context) => {});
+}), validator('param', CheckGUIDSchema));
 
 openapiRoutes.post("/post/edit/:id", describeRoute({
   description: "Edits the given post",
@@ -120,8 +120,7 @@ openapiRoutes.post("/post/edit/:id", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("param", CheckGUIDSchema), validator("json", EditSchema), async (c: Context) => {
-});
+}), validator("param", CheckGUIDSchema), validator("json", EditSchema));
 
 openapiRoutes.get("/post/edit/:id/cancel", describeRoute({
   description: "Cancel editing a post",
@@ -136,8 +135,7 @@ openapiRoutes.get("/post/edit/:id/cancel", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("param", CheckGUIDSchema), async (c: Context) => {
-});
+}), validator("param", CheckGUIDSchema));
 
 // delete a post
 openapiRoutes.delete("/post/delete/:id", describeRoute({
@@ -153,8 +151,7 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("param", CheckGUIDSchema), async (c: Context) => {
-});
+}), validator("param", CheckGUIDSchema));
 
 openapiRoutes.get("/post/:id/repost", describeRoute({
   description: "Get the given post's repost info modal",
@@ -169,8 +166,7 @@ openapiRoutes.get("/post/:id/repost", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("param", CheckGUIDSchema), async (c: Context) => {
-});
+}), validator("param", CheckGUIDSchema));
 
 openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
   description: "Delete the given schedule for the given post",
@@ -185,8 +181,7 @@ openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("param", CheckGUIDSchema), async (c: Context) => {
-});
+}), validator("param", CheckGUIDSchema));
 
 // Create media upload
 openapiRoutes.post("/post/upload", describeRoute({
@@ -208,9 +203,7 @@ openapiRoutes.post("/post/upload", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c: Context) => {
-
-});
+}));
 
 // Delete an upload
 openapiRoutes.delete("/post/upload", describeRoute({
@@ -232,8 +225,7 @@ openapiRoutes.delete("/post/upload", describeRoute({
       }
     }
   }
-}), validator("json", FileDeleteSchema), async (c: Context) => {
-});
+}), validator("json", FileDeleteSchema));
 
 // wrapper to login
 openapiRoutes.post("/account/login", describeRoute({
@@ -264,8 +256,7 @@ openapiRoutes.post("/account/login", describeRoute({
       }
     },
   }
-}), validator("json", LoginSchema), async (c) => {
-});
+}), validator("json", LoginSchema));
 
 openapiRoutes.post("/account/update", describeRoute({
   description: "Updates account settings",
@@ -283,8 +274,8 @@ openapiRoutes.post("/account/update", describeRoute({
       description: "not logged in"
     }
   }
-}), validator("form", AccountUpdateSchema, undefined, { media: "application/x-www-form-urlencoded" }), async (c) => {
-});
+}), validator("form", AccountUpdateSchema, undefined,
+  { media: "application/x-www-form-urlencoded" }));
 
 // endpoint that just returns current username
 openapiRoutes.get("/account/username", describeRoute({
@@ -297,8 +288,7 @@ openapiRoutes.get("/account/username", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c) => {
-});
+}));
 
 // endpoint that returns any violations
 openapiRoutes.get("/account/violations", describeRoute({
@@ -311,8 +301,7 @@ openapiRoutes.get("/account/violations", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c) => {
-});
+}));
 
 // endpoint that returns any violations
 openapiRoutes.post("/account/violations/resolve", describeRoute({
@@ -325,8 +314,7 @@ openapiRoutes.post("/account/violations/resolve", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c) => {
-})
+}));
 
 // proxy the logout call because of course this wouldn't work properly anyways
 openapiRoutes.post("/account/logout", describeRoute({
@@ -339,8 +327,7 @@ openapiRoutes.post("/account/logout", describeRoute({
       description: "not logged in"
     }
   }
-}), async (c) => {
-});
+}));
 
 openapiRoutes.post("/account/signup", describeRoute({
   description: "sign up for an account",
@@ -370,8 +357,7 @@ openapiRoutes.post("/account/signup", describeRoute({
       }
     }
   }
-}), validator("json", SignupSchema), async (c: Context) => {
-});
+}), validator("json", SignupSchema));
 
 openapiRoutes.post("/account/forgot", describeRoute({
   description: "attempt to get a password reset message",
@@ -401,8 +387,7 @@ openapiRoutes.post("/account/forgot", describeRoute({
       }
     }
   }
-}), validator("json", AccountForgotSchema), async (c: Context) => {
-});
+}), validator("json", AccountForgotSchema));
 
 openapiRoutes.post("/account/reset", describeRoute({
   description: "attempt to reset password",
@@ -432,9 +417,7 @@ openapiRoutes.post("/account/reset", describeRoute({
       }
     }
   }
-}), validator("json", AccountResetSchema), async (c: Context) => {
-
-});
+}), validator("json", AccountResetSchema));
 
 openapiRoutes.post("/account/delete", describeRoute({
   description: "attempt to delete the current account",
@@ -452,8 +435,7 @@ openapiRoutes.post("/account/delete", describeRoute({
       description: "internal error",
     }
   }
-}), validator("form", AccountDeleteSchema, undefined, { media: "application/x-www-form-urlencoded" }), async (c) => {
-});
+}), validator("form", AccountDeleteSchema, undefined, { media: "application/x-www-form-urlencoded" }));
 
 openapiRoutes.get("/preview/file/:id", describeRoute({
   description: "preview a file",

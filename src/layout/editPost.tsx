@@ -1,6 +1,6 @@
-import { Post } from "../classes/post";
+import type { Post } from "../classes/post";
+import { EmbedDataType } from "../enums";
 import { MAX_LENGTH } from "../limits";
-import { EmbedDataType } from "../types";
 import { PostContent } from "./post";
 
 type EditedPostProps = {

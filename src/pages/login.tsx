@@ -1,10 +1,10 @@
+import { PWAutoCompleteSettings } from "../enums";
 import AccountHandler from "../layout/account";
 import DashboardPasswordField from "../layout/fields/dashPasswordField";
 import UsernameField from "../layout/fields/usernameField";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { APP_NAME } from "../siteinfo";
-import { PWAutoCompleteSettings } from "../types";
 
 export default function Login() {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];

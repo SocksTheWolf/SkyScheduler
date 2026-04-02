@@ -3,7 +3,8 @@ import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
 import { ContextVariables } from "../auth";
-import { Post } from "../classes/post";
+import type { Post } from "../classes/post";
+import { EmbedDataType } from "../enums";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
@@ -11,9 +12,9 @@ import { RepostDataPopover } from "../layout/repostEditor";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { rateLimit } from "../middleware/rateLimit";
-import {
+import type {
   Bindings, CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse, EmbedDataType, LooseObj
+  DeleteResponse, LooseObj
 } from "../types";
 import {
   createPost, createRepost, deletePost, deleteRepostRule, getPostById,

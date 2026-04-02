@@ -3,7 +3,8 @@ import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
-import { AccountStatus, AllContext, LooseObj, Violation } from "../../types";
+import { AccountStatus } from "../../enums";
+import type { AllContext, LooseObj, Violation } from "../../types";
 import { lookupBskyHandle } from "../bsky/bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 

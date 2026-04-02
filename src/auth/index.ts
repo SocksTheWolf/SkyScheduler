@@ -6,7 +6,7 @@ import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import { Bindings } from "../types";
+import type { Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 

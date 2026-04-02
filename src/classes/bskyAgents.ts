@@ -3,9 +3,10 @@
 // expensive time wise.
 import { Agent, ComAtprotoServerCreateSession, CredentialSession } from "@atproto/api";
 import {
-  AccountStatus, AgentConfigSettings,
-  AllContext, TaskType
-} from "../types";
+  AgentConfigSettings,
+  AllContext} from "../types";
+import { AccountStatus } from "../enums";
+import { TaskType } from "../enums";
 import { loginToBsky } from "../utils/bsky/bskyLogin";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { getBskyUserPassForId } from "../utils/db/userinfo";

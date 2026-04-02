@@ -5,6 +5,7 @@ import type { AtProtoAgent } from "./classes/bskyAgents";
 import { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
+import { EmbedDataType, TaskType } from "./enums";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -87,14 +88,6 @@ export interface Bindings {
   REDIRECTS: RedirectConfigSettings;
 };
 
-export enum EmbedDataType {
-  None = 0,
-  Image = 1,
-  WebLink = 2,
-  Video = 3,
-  Record = 4,
-};
-
 export type EmbedData = {
   content: string;
   alt?: string;
@@ -105,29 +98,6 @@ export type EmbedData = {
   width?: number;
   height?: number;
   duration?: number;
-};
-
-export enum RepostType {
-  None = 0,
-  ExistingPost = 1,
-  FuturePost = 2,
-};
-
-export enum PostLabel {
-  None = "None",
-  Suggestive = "Suggestive",
-  Nudity = "Nudity",
-  Adult = "Adult",
-  Graphic = "Graphic",
-  GraphicAdult = "GraphicAdult"
-};
-
-export enum TaskType {
-  None,
-  Blast,
-  Post,
-  Repost,
-  VideoPost,
 };
 
 export type Violation = {
@@ -167,25 +137,6 @@ export type DeleteResponse = {
 
 export interface LooseObj {
   [key: string]: any;
-};
-
-export enum AccountStatus {
-  None = 0,
-  Ok,
-  Suspended,
-  Deactivated,
-  TakenDown,
-  InvalidAccount,
-  PlatformOutage,
-  MediaTooBig,
-  UnhandledError,
-  TOSViolation,
-};
-
-export enum PWAutoCompleteSettings {
-  Off,
-  NewPass,
-  CurrentPass
 };
 
 export type BskyEmbedWrapper = {

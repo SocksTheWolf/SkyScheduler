@@ -1,5 +1,6 @@
 import { imageDimensionsFromStream } from 'image-dimensions';
 import { v4 as uuidv4 } from 'uuid';
+import { EmbedDataType } from "../enums";
 import {
   BSKY_GIF_MIME_TYPES,
   BSKY_IMG_MIME_TYPES,
@@ -14,7 +15,7 @@ import {
   R2_FILE_SIZE_LIMIT,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
-import { AllContext, EmbedData, EmbedDataType, R2BucketObject } from '../types';
+import type { AllContext, EmbedData, R2BucketObject } from '../types';
 import { addFileListing, deleteFileListings } from './db/file';
 
 type FileMetaData = {

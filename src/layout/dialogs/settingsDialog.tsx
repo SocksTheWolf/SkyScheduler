@@ -1,6 +1,6 @@
+import { PWAutoCompleteSettings } from "../../enums";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
 import { APP_NAME } from "../../siteinfo";
-import { PWAutoCompleteSettings } from "../../types";
 import BSkyAppPasswordField from "../fields/appPasswordField";
 import DashboardPasswordField from "../fields/dashPasswordField";
 import UsernameField from "../fields/usernameField";

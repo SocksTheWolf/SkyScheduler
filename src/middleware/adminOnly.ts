@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { every } from "hono/combine";
 import { authMiddleware } from "./auth";
 

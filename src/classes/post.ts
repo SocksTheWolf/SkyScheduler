@@ -1,9 +1,10 @@
-import { type BlobRef } from "@atproto/api";
+import type { BlobRef } from "@atproto/api";
 import has from "just-has";
 import isEmpty from "just-is-empty";
+import { EmbedDataType, PostLabel } from "../enums";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
-import { EmbedData, EmbedDataType, PostLabel } from "../types";
-import { RepostInfo } from "./repost";
+import type { EmbedData } from "../types";
+import type { RepostInfo } from "./repost";
 
 // Basically a copy of the schema
 export class Post {

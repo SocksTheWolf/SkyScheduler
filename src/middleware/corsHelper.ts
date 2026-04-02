@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { cors } from "hono/cors";
 
 export const corsHelperMiddleware = async (c: Context, next: any) => {

@@ -1,9 +1,10 @@
 import isEmpty from 'just-is-empty';
 import { AgentMap, AtProtoAgent } from '../classes/bskyAgents';
-import { Post } from "../classes/post";
-import { Repost } from "../classes/repost";
+import type { Post } from "../classes/post";
+import type { Repost } from "../classes/repost";
+import { TaskType } from "../enums";
 import { USE_VIDEO_WORKFLOWS } from '../limits';
-import { AllContext, TaskType } from '../types';
+import type { AllContext } from '../types';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
 import {
