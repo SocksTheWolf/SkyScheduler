@@ -1,8 +1,9 @@
+import { type BlobRef } from "@atproto/api";
 import has from "just-has";
 import isEmpty from "just-is-empty";
+import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import { EmbedData, EmbedDataType, PostLabel } from "../types";
 import { RepostInfo } from "./repost";
-import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 
 // Basically a copy of the schema
 export class Post {
@@ -29,6 +30,8 @@ export class Post {
   threadOrder: number;
   rootPost?: string;
   parentPost?: string;
+  // blob override data
+  blobOverride?: null|BlobRef;
 
   constructor(data: any) {
     if (has(data, "userId"))
@@ -105,11 +108,11 @@ export class Post {
   hasEmbeds(): boolean {
     return this.embeds !== undefined && this.embeds.length > 0;
   }
-  hasVideoEmbeds(): boolean {
+  getVideoEmbed(): EmbedData|undefined {
     if (this.hasEmbeds()) {
-      return this.embeds?.find((itm) => itm.type == EmbedDataType.Video) !== undefined;
+      return this.embeds?.find((itm) => itm.type == EmbedDataType.Video);
     }
-    return false;
+    return undefined;
   }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }

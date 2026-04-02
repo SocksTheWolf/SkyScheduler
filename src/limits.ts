@@ -46,6 +46,9 @@ export const CAN_EDIT_REPOST_RULES: boolean = true;
 // if users can repost scheduled posts before they are posted
 export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
 
+// if we should use CF Workflows in order to handle video uploads when scheduled
+export const USE_VIDEO_WORKFLOWS: boolean = false;
+
 /** INTERNAL LIMITS, DO NOT CHANGE **/
 // Maximums used internally, do not change these directly.
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

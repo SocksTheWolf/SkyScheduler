@@ -1,4 +1,3 @@
-import { Context } from 'hono';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -27,7 +26,7 @@ type FileMetaData = {
 };
 
 export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
-  let itemsToDelete:string[] = [];
+  let itemsToDelete: string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach((data) => {
@@ -58,7 +57,7 @@ export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQue
 };
 
 const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
-  const fileExt:string|undefined = metaData.name.split(".").pop();
+  const fileExt: string|undefined = metaData.name.split(".").pop();
   if (fileExt === undefined) {
     return {"success": false, "error": "unable to upload, file name is invalid"};
   }
@@ -251,7 +250,7 @@ export const getAllFilesList = async (c: AllContext) => {
     limit: 1000,
     include: ["customMetadata"]
   };
-  let values:R2BucketObject[] = [];
+  let values: R2BucketObject[] = [];
 
   while (true) {
     const response = await c.env.R2.list(options);

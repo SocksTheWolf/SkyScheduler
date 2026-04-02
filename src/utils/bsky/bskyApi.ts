@@ -1,4 +1,4 @@
-import { type AppBskyFeedPost, RichText } from '@atproto/api';
+import { type AppBskyFeedPost, BlobRef, RichText } from '@atproto/api';
 import { ResponseType, XRPCError } from '@atproto/xrpc';
 import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
@@ -354,48 +354,57 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           continue;
         }
 
-        // Otherwise pull files from storage
-        const file = await c.env.R2.get(currentEmbed.content);
-        if (!file) {
-          console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
-          return false;
-        }
-        // Process the file and upload it to the blob service
-        const fileBlob = await file.blob();
-        let uploadFile = null;
-        try {
-          uploadFile = await agent.uploadBlob(fileBlob, {encoding: file.httpMetadata?.contentType });
-        } catch (err) {
-          if (err instanceof XRPCError) {
-            if (err.status === ResponseType.InternalServerError || err.status === ResponseType.UpstreamFailure
-              || err.status === ResponseType.UpstreamTimeout) {
-              console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
-              return false;
-            } else if (err.status === ResponseType.PayloadTooLarge || err.status === ResponseType.UnsupportedMediaType) {
-              // give the MediaTooBig if we get one of these errors
-              await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
-              return false;
-            }
+        let blobRef: BlobRef|null = null;
+        let rawFile: Blob|null = null;
+        // Blob overrides are from the video service. If it exists and is not null,
+        // then use that instead of trying to upload video again here.
+        if (postData.blobOverride == null) {
+          // Otherwise pull files from storage and upload directly with our agent.
+          const file: R2ObjectBody|null = await c.env.R2.get(currentEmbed.content);
+          if (!file) {
+            console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
+            return false;
           }
-          console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
-          return false;
-        }
+          // Process the file and upload it to the blob service
+          rawFile = await file.blob();
+          let uploadFile = null;
+          try {
+            uploadFile = await agent.uploadBlob(rawFile, {encoding: file.httpMetadata?.contentType });
+          } catch (err) {
+            if (err instanceof XRPCError) {
+              if (err.status === ResponseType.InternalServerError || err.status === ResponseType.UpstreamFailure
+                || err.status === ResponseType.UpstreamTimeout) {
+                console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
+                return false;
+              } else if (err.status === ResponseType.PayloadTooLarge || err.status === ResponseType.UnsupportedMediaType) {
+                // give the MediaTooBig if we get one of these errors
+                await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
+                return false;
+              }
+            }
+            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
+            return false;
+          }
 
-        // if we fail to upload anything, early out entirely.
-        if (!uploadFile.success) {
-          console.warn(`failed to upload ${currentEmbed.content} to blob service`);
-          return false;
+          // if we fail to upload anything, early out entirely.
+          if (!uploadFile.success) {
+            console.warn(`failed to upload ${currentEmbed.content} to blob service`);
+            return false;
+          }
+          blobRef = uploadFile.data.blob;
+        } else {
+          blobRef = postData.blobOverride;
         }
 
         // Handle images
         if (currentEmbedType == EmbedDataType.Image) {
           // we were able to upload to the blob, go ahead and add the image record to the post
           const bskyMetadata: LooseObj = {
-            image: uploadFile.data.blob,
+            image: blobRef,
             alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT)
           };
           // Attempt to get the width and height of the image file.
-          const sizeResult = await imageDimensionsFromStream(await fileBlob.stream());
+          const sizeResult = await imageDimensionsFromStream(await rawFile!.stream());
           // If we were able to parse the width and height of the image,
           // then append the "aspect ratio" into the image record.
           if (sizeResult) {
@@ -411,7 +420,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           // Handle videos
         } else if (currentEmbedType == EmbedDataType.Video) {
           const bskyMetadata: LooseObj = {
-            blob: uploadFile.data.blob,
+            blob: blobRef,
             ar: {
               width: currentEmbed.width,
               height: currentEmbed.height

@@ -1,9 +1,10 @@
 import { BatchItem } from "drizzle-orm/batch";
 import { Context } from "hono";
+import type { ContextVariables } from "./auth";
+import type { AtProtoAgent } from "./classes/bskyAgents";
 import { ScheduledContext } from "./classes/context";
-import { Post } from "./classes/post";
-import { Repost } from "./classes/repost";
-import { ContextVariables } from "./auth";
+import type { Post } from "./classes/post";
+import type { Repost } from "./classes/repost";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -70,6 +71,7 @@ export interface Bindings {
   ACCOUNT_LIMITER: RateLimit;
   REPOST_EDIT_LIMITER: RateLimit;
   REPOST_EDITOR_OPEN_LIMITER: RateLimit;
+  VIDEO_WORKFLOW: Workflow<VideoWorkflowPayload>;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -211,6 +213,13 @@ export type QueueTaskData = {
   type: TaskType;
   data: Post|Repost|null;
 };
+
+// Workflow types
+export type VideoWorkflowPayload = {
+  agent: AtProtoAgent;
+  post: Post;
+};
+
 
 // Used for the pruning and database operations
 export type GetAllPostedBatch = {

@@ -126,6 +126,10 @@ app.get("/reset-password/:id", (c) => {
 // Startup Application
 app.get("/setup", async (c) => await setupAccounts(c));
 
+// Worker workflow classes to export back to main
+export { UploadVideoAndPublishWorkflow } from "./utils/workflows/uploadAndPublish";
+
+// Default CF exports
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
     const runtimeWrapper = new ScheduledContext(env, ctx);

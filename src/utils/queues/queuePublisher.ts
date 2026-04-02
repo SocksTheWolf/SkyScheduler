@@ -1,8 +1,9 @@
 import isEmpty from 'just-is-empty';
 import random from 'just-random';
 import get from 'just-safe-get';
-import { Post } from "../../classes/post";
-import { Repost } from "../../classes/repost";
+import type { Post } from "../../classes/post";
+import type { Repost } from "../../classes/repost";
+import { USE_VIDEO_WORKFLOWS } from '../../limits';
 import { AllContext, Bindings, QueueTaskData, TaskType } from "../../types";
 
 // picks a random queue to publish data to
@@ -45,14 +46,14 @@ export async function enqueuePost(c: AllContext, data: Post, delay: number = -1)
   } else if (!isQueueEnabled(c.env))
     return;
 
-  let postType = TaskType.Post, queueType = "post_queues";
-  if (false && data.hasVideoEmbeds()) {
+  let postType = TaskType.Post, postQueue = "post_queues";
+  if (USE_VIDEO_WORKFLOWS && data.getVideoEmbed() !== undefined) {
     postType = TaskType.VideoPost;
-    queueType = "video_queue";
+    postQueue = "repost_queues";
   }
 
   // Pick a random consumer to handle this post
-  const queueConsumer: Queue|null = getRandomQueue(c.env, queueType);
+  const queueConsumer: Queue|null = getRandomQueue(c.env, postQueue);
   await pushToQueue(queueConsumer, data, postType, delay);
 };
 

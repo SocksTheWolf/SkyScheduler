@@ -11,6 +11,9 @@ preview_urls = false
 assets = { binding = "ASSETS", run_worker_first = ["/robots.txt"], directory = "./assets/", not_found_handling = "single-page-application" }
 routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
+[build]
+command = "npm run minify"
+
 # Redis for sessions
 [[kv_namespaces]]
 binding = "KV"
@@ -64,9 +67,9 @@ name = "REPOST_EDITOR_OPEN_LIMITER"
 namespace_id = "5471006"
 simple = { limit = 10, period = 10 }
 
+# Schedule cron triggers at the start of every hour and ~3:30am on sunday for big cleanups:
 [triggers]
-# Schedule cron triggers at the start of every hour and ~5:30pm on sunday for big cleanups:
-crons = [ "0 * * * *", "30 17 * * sun" ]
+crons = [ "0 * * * *", "30 03 * * sun" ]
 
 # flags required to run wrangler in linux
 [dev]
@@ -80,6 +83,7 @@ enabled = true
 head_sampling_rate = 0.5
 persist = true
 
+# Queues for handling posting at schedules
 [[queues.producers]]
 queue = "skyscheduler-post-queue"
 binding = "POST_QUEUE"
@@ -100,12 +104,15 @@ max_batch_size = 15
 max_batch_timeout = 10
 max_retries = 3
 
+# Workflows for video uploads
+[[workflows]]
+name = "video-workflow-publisher"
+binding = "VIDEO_WORKFLOW"
+class_name = "UploadVideoAndPublishWorkflow"
+
 # used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"
-
-[build]
-command = "npm run minify"
 
 # this did give us issues in the past...
 [limits]

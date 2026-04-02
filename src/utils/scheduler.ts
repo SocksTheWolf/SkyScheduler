@@ -2,6 +2,7 @@ import isEmpty from 'just-is-empty';
 import { AgentMap, AtProtoAgent } from '../classes/bskyAgents';
 import { Post } from "../classes/post";
 import { Repost } from "../classes/repost";
+import { USE_VIDEO_WORKFLOWS } from '../limits';
 import { AllContext, TaskType } from '../types';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
@@ -18,6 +19,7 @@ import {
   shouldPostThreadQueue
 } from './queues/queuePublisher';
 import { deleteFromR2 } from './r2Query';
+import { pushVideoPostWorkflow } from './workflows/uploadAndPublish';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtProtoAgent|null) => {
   if (agent === null) {
@@ -49,7 +51,11 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       console.error(`unable to get agent for user ${postData.user} to post now`);
       postStatus = false;
     } else {
-      postStatus = await makePost(c, postData, agent);
+      if (USE_VIDEO_WORKFLOWS && postData.getVideoEmbed() !== undefined) {
+        postStatus = await pushVideoPostWorkflow(c, postData, agent);
+      } else {
+        postStatus = await makePost(c, postData, agent);
+      }
     }
   }
   if (postStatus === false)
@@ -134,7 +140,7 @@ export const cleanupAbandonedFiles = async(c: AllContext) => {
 
 export const handleSchedule = (c: AllContext, cronTime: string) => {
   switch (cronTime) {
-    case "30 17 * * sun":
+    case "30 03 * * sun":
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
     break;
     default:
