@@ -1,6 +1,6 @@
 import isEmpty from 'just-is-empty';
 import split from 'just-split';
-import { AllContext } from '../../types';
+import type { AllContext } from '../../types';
 import { getAllPostedPosts, getAllPostedPostsOfUser } from '../db/data';
 import { getPostRecords } from './bskyApi';
 

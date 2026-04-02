@@ -1,5 +1,5 @@
 import isEmpty from 'just-is-empty';
-import { AgentMap, AtProtoAgent } from '../classes/bskyAgents';
+import { AgentMap, type AtProtoAgent } from '../classes/bskyAgents';
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
 import { TaskType } from "../enums";
