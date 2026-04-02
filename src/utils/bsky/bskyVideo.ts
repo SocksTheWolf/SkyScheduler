@@ -1,7 +1,8 @@
-import { AppBskyVideoDefs, BlobRef } from "@atproto/api";
-import { WorkflowStep } from "cloudflare:workers";
+import type { AppBskyVideoDefs, BlobRef } from "@atproto/api";
+import type { WorkflowStep } from "cloudflare:workers";
+import { NonRetryableError } from "cloudflare:workflows";
 import { AtProtoAgent } from "../../classes/bskyAgents";
-import { AllContext } from "../../types";
+import type { AllContext } from "../../types";
 
 export const uploadVideoToBlob = async (ctx: AllContext, agent: AtProtoAgent, fileName: string) => {
   const fileData = await ctx.env.R2.get(fileName);
@@ -34,17 +35,26 @@ export const waitOnVideoStatus = async (jobStatus: AppBskyVideoDefs.JobStatus, s
   let blob: BlobRef | undefined = jobStatus.blob;
   const jobId = jobStatus.jobId;
   const videoAgent = new AtProtoAgent("https://video.bsky.app");
+  const isStepped = (step !== null);
 
   while (!blob) {
     const { data: status } = await videoAgent.app.bsky.video.getJobStatus({ jobId: jobId });
+    // Check to see if we have job output
     if (status.jobStatus.blob) {
       blob = status.jobStatus.blob;
     }
+    // if we have failed, exit this upload entirely.
+    if (status.jobStatus.state == "JOB_STATE_FAILED") {
+      console.error(`job for did ${status.jobStatus.did} failed with error ${status.jobStatus.error!}. had message ${status.jobStatus.message}`);
+      if (isStepped)
+        throw new NonRetryableError("video pipeline returned that job has failed");
+      return null;
+    }
     // wait a second
-    if (step !== null) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (isStepped) {
+      await step.sleep("wait for upload", "2 seconds");
     } else {
-      await step!.sleep("wait for upload", "2 seconds");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   };
   return blob;
