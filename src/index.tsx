@@ -101,16 +101,16 @@ app.route("/admin", admin);
 app.route("/preview", preview);
 
 // Dashboard route
-app.get("/dashboard", redirectLoginIfLogout, (c) => c.html(<Dashboard c={c} />));
+app.get("/dashboard", redirectLoginIfLogout, (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
 app.get("/login", redirectToDashIfLogin, (c) => c.html(<Login />));
 
 // Signup route
-app.get("/signup", redirectToDashIfLogin, (c) => c.html(<Signup c={c} />));
+app.get("/signup", redirectToDashIfLogin, (c) => c.html(<Signup ctx={c} />));
 
 // Forgot Password route
-app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword c={c} />));
+app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
 app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword />));

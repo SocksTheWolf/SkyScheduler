@@ -7,8 +7,11 @@ import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/tu
 import { BaseLayout } from "../layout/main";
 import { APP_NAME } from "../siteinfo";
 
-export default function ForgotPassword(props:any) {
-  const ctx: Context = props.c;
+type ForgotPasswordProps = {
+  ctx: Context;
+}
+
+export default function ForgotPassword({ctx}: ForgotPasswordProps) {
   const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (<BaseLayout title="Forgot Password"
     preloads={[...TurnstileCaptchaPreloads(ctx)]} noIndex={true}>
@@ -29,7 +32,7 @@ export default function ForgotPassword(props:any) {
             <small><b>NOTE</b>: {APP_NAME} sends DMs via an one-way delivery method. No one (other than you) can see the account password reset URL.</small></p>
         </center>
         <UsernameField />
-        <TurnstileCaptcha c={ctx} />
+        <TurnstileCaptcha ctx={ctx} />
     </AccountHandler>
   </BaseLayout>);
 }

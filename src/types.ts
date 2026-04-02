@@ -3,6 +3,7 @@ import { Context } from "hono";
 import { ScheduledContext } from "./classes/context";
 import { Post } from "./classes/post";
 import { Repost } from "./classes/repost";
+import { ContextVariables } from "./auth";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -223,5 +224,5 @@ export type R2BucketObject = {
   date: Date
 }
 
-export type AllContext = Context|ScheduledContext;
+export type AllContext = Context<{Bindings: Bindings, Variables: ContextVariables}>|ScheduledContext;
 export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];

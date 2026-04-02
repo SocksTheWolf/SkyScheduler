@@ -16,8 +16,11 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import { dashboardScriptStr, dashboardStyleStr } from "../utils/appScripts";
 
-export default function Dashboard(props: any) {
-  const ctx: Context = props.c;
+type DashboardProps = {
+  ctx: Context;
+};
+
+export default function Dashboard({ctx}: DashboardProps) {
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
     {href: dashboardStyleStr, type: "style"},

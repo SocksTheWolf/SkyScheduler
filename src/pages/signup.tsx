@@ -12,8 +12,11 @@ import { APP_NAME } from "../siteinfo";
 import { PWAutoCompleteSettings } from "../types";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
-export default function Signup(props:any) {
-  const ctx: Context = props.c;
+type SignupProps = {
+  ctx: Context;
+}
+
+export default function Signup({ctx}: SignupProps) {
   const linkToInvites = isUsingInviteKeys(ctx) ?
     (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
     "You can ask for the maintainer for it";
@@ -62,7 +65,7 @@ export default function Signup(props:any) {
         </a> and <a href="/tos" class="secondary" target="_blank" title="link to terms of service">terms of service</a>.
       </fieldset>
       <br />
-      <TurnstileCaptcha c={ctx} />
+      <TurnstileCaptcha ctx={ctx} />
     </AccountHandler>
   </BaseLayout>);
 }

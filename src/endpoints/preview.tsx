@@ -13,7 +13,7 @@ export const preview = new Hono<{ Bindings: Bindings, Variables: ContextVariable
 preview.use(secureHeaders());
 preview.use(corsHelperMiddleware);
 
-preview.get("/file/:id", pullAuthData, async (c: Context) => {
+preview.get("/file/:id", pullAuthData, async (c) => {
   if (!hasAuth(c)) {
     return c.redirect("/thumbs/missing.png");
   }
@@ -29,16 +29,18 @@ preview.get("/file/:id", pullAuthData, async (c: Context) => {
     return c.redirect("/thumbs/missing.png");
   }
 
-  const contentType = fetchedFile.httpMetadata?.contentType || fetchedFile.customMetadata["type"];
+  const customData = fetchedFile.customMetadata !== undefined;
+  const contentType = fetchedFile.httpMetadata?.contentType || customData ? fetchedFile.customMetadata!["type"] : "";
   if (PREVENT_NON_IMAGE_PREVIEWS && BSKY_IMG_MIME_TYPES.includes(contentType) === false) {
     return c.redirect("/thumbs/missing.png");
   }
 
-  const uploaderId = fetchedFile.customMetadata["user"];
+  const uploaderId = customData ? fetchedFile.customMetadata["user"] : "";
   if (isEmpty(uploaderId) || c.get("userId") !== uploaderId) {
     return c.redirect("/thumbs/image.png");
   }
 
+  // @ts-ignore
   return c.body(await fetchedFile.blob(), 200, {
     "Content-Type": contentType
   })

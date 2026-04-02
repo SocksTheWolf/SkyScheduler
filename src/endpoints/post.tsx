@@ -31,7 +31,7 @@ post.use(corsHelperMiddleware);
 post.use(authMiddleware);
 
 // Create media upload
-post.post("/upload", async (c: Context) => {
+post.post("/upload", async (c) => {
   const fileUploadResponse = await c.req.parseBody()
     .then((formData) => uploadFileR2(c, formData['file'] as File, c.get("userId")));
   if (fileUploadResponse.success === false)
@@ -41,7 +41,7 @@ post.post("/upload", async (c: Context) => {
 });
 
 // Delete an upload
-post.delete("/upload", async (c: Context) => {
+post.delete("/upload", async (c) => {
   const body = await c.req.json();
 
   // Validate that this is a legitimate key
@@ -57,7 +57,7 @@ post.delete("/upload", async (c: Context) => {
 });
 
 // Create post
-post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c: Context) => {
+post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c) => {
   const response: CreatePostQueryResponse = await c.req.json().then((body) => createPost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
@@ -76,7 +76,7 @@ post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c: Context) =>
 });
 
 // Create repost
-post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Context) => {
+post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c) => {
   const response: CreateObjectResponse = await c.req.json().then((body) => createRepost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
@@ -85,13 +85,13 @@ post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c: Co
 });
 
 // Get all posts
-post.all("/all", async (c: Context) => {
+post.all("/all", async (c) => {
   c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons");
   return c.html(<ScheduledPostList ctx={c} />);
 });
 
 // Edit posts
-post.get("/edit/:id", async (c: Context) => {
+post.get("/edit/:id", async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>);
@@ -104,7 +104,7 @@ post.get("/edit/:id", async (c: Context) => {
   return c.html(<></>);
 });
 
-post.post("/edit/:id", async (c: Context) => {
+post.post("/edit/:id", async (c) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   if (!isValid(id)) {
@@ -179,7 +179,7 @@ post.post("/edit/:id", async (c: Context) => {
   return c.html(<b class="btn-error">Failed to process edit</b>);
 });
 
-post.get("/edit/:id/cancel", async (c: Context) => {
+post.get("/edit/:id/cancel", async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>);
@@ -197,7 +197,7 @@ post.get("/edit/:id/cancel", async (c: Context) => {
 });
 
 // delete a post
-post.delete("/delete/:id", async (c: Context) => {
+post.delete("/delete/:id", async (c) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
@@ -218,7 +218,7 @@ post.delete("/delete/:id", async (c: Context) => {
 });
 
 // get the repost rule editor
-post.get("/:id/repost", rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true}), async (c: Context) => {
+post.get("/:id/repost", rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true}), async (c) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
@@ -228,7 +228,7 @@ post.get("/:id/repost", rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast:
 });
 
 // delete a post's repost rule
-post.delete("/:id/repost/:scheduleId", rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c: Context) => {
+post.delete("/:id/repost/:scheduleId", rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c) => {
   const { id, scheduleId } = c.req.param();
   if (isValid(id) && isValid(scheduleId)) {
     if (await deleteRepostRule(c, id, scheduleId)) {

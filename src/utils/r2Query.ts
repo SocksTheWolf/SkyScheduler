@@ -77,7 +77,7 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
   }
 };
 
-const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
+const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   const originalName = file.name;
   // The maximum size of CF Image transforms.
   if (file.size > CF_IMAGES_FILE_SIZE_LIMIT) {
@@ -106,7 +106,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   if (file.size > BSKY_IMG_SIZE_LIMIT) {
     let failedToResize = true;
 
-    if (c.env.IMAGE_SETTINGS.enabled) {
+    if (c.env.IMAGE_SETTINGS.enabled && c.env.IMAGE_SETTINGS.steps !== undefined) {
       // Randomly generated id to be used during the resize process
       const resizeFilename = uuidv4();
       const resizeBucketPush = await c.env.R2RESIZE.put(resizeFilename, await file.bytes(), {
@@ -202,7 +202,7 @@ const uploadImageToR2 = async(c: Context, file: File, userId: string) => {
   return await rawUploadToR2(c, fileToProcess, fileMetaData);
 };
 
-const uploadVideoToR2 = async (c: Context, file: File, userId: string) => {
+const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
   // Technically this will never hit because it is greater than our own internal limits
   if (file.size > BSKY_VIDEO_SIZE_LIMIT) {
     return {"success": false, "error": `max video size is ${BSKY_VIDEO_SIZE_LIMIT}MB`};
@@ -217,7 +217,7 @@ const uploadVideoToR2 = async (c: Context, file: File, userId: string) => {
   return await rawUploadToR2(c, await file.stream(), fileMetaData);
 };
 
-export const uploadFileR2 = async (c: Context, file: File, userId: string) => {
+export const uploadFileR2 = async (c: AllContext, file: File, userId: string) => {
   if (!(file instanceof File)) {
     console.warn("Failed to upload");
     return {"success": false, "error": "data invalid"};

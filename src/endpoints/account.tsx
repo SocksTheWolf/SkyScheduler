@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { ContextVariables } from "../auth";
+import { ScheduledContext } from "../classes/context";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware } from "../middleware/auth";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
@@ -126,9 +127,10 @@ account.get("/violations", authMiddleware, async (c) => {
 // We'll validate they are actually fixed bsky action is performed
 account.post("/violations/resolve", authMiddleware, async (c) => {
   const userId = c.get("userId");
-  if (await userHasViolations(c, userId)) {
+  const context = new ScheduledContext(c.env, c.executionCtx);
+  if (await userHasViolations(context, userId)) {
     // they do, so clear them out
-    await removeViolations(c, userId, [AccountStatus.TakenDown,
+    await removeViolations(context, userId, [AccountStatus.TakenDown,
       AccountStatus.Suspended, AccountStatus.Deactivated]);
   }
   c.header("HX-Trigger-After-Swap", "accountViolations");
@@ -149,7 +151,7 @@ account.post("/logout", authMiddleware, async (c) => {
   return c.text("");
 });
 
-account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: Context) => {
+account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const body = await c.req.json();
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
@@ -197,6 +199,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     body: {
       name: username,
       email: `${username}@skyscheduler.tld`,
+      // @ts-ignore
       username: username,
       password: password,
       bskyAppPass: bskyAppPassword,
@@ -216,7 +219,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   return c.json({ok: false, msg: "unknown error occurred"}, 501);
 });
 
-account.post("/forgot", verifyTurnstile, async (c: Context) => {
+account.post("/forgot", verifyTurnstile, async (c) => {
   const body = await c.req.json();
 
   const validation = AccountForgotSchema.safeParse(body);
@@ -252,20 +255,20 @@ account.post("/forgot", verifyTurnstile, async (c: Context) => {
       `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
   }
 
-  const { data, error } = await auth.api.requestPasswordReset({
+  const { status, message } = await auth.api.requestPasswordReset({
     body: {
-      email: userEmail,
+      email: userEmail!,
       redirectTo: "/reset",
     }
   });
-  if (error) {
-    console.error(`Password reset encountered an error: ${error}`);
+  if (!status) {
+    console.error(`Password reset encountered an error: ${message}`);
     return c.json({ok: false, msg: "encountered reset error, try again later"}, 401);
   }
   return c.json({ok: true, msg: "request processed"});
 });
 
-account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: Context) => {
+account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const body = await c.req.json();
 
   const validation = AccountResetSchema.safeParse(body);
@@ -278,11 +281,11 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: Contex
     return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
   }
 
-  const { data, error } = await auth.api.resetPassword({body: {
+  const { status } = await auth.api.resetPassword({body: {
     newPassword: password,
     token: resetToken,
   }});
-  if (error) {
+  if (!status) {
     return c.json({ok: false, msg: "invalid token/password"}, 401);
   }
   return c.json({ ok: true, msg: "successfully updated password" });
@@ -320,8 +323,9 @@ account.post("/delete", authMiddleware, async (c) => {
       password: password
     });
     if (verify) {
-      c.executionCtx.waitUntil(getAllMediaOfUser(c, userId)
-        .then((media) => deleteFromR2(c, media))
+      const context = new ScheduledContext(c.env, c.executionCtx);
+      c.executionCtx.waitUntil(getAllMediaOfUser(context, userId)
+        .then((media) => deleteFromR2(context, media))
         .then(() => authCtx.internalAdapter.deleteSessions(userId))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
 

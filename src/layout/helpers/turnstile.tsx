@@ -8,8 +8,10 @@ export function TurnstileCaptchaPreloads(ctx: Context) {
   return [];
 }
 
-export function TurnstileCaptcha(props: any) {
-  const ctx: Context = props.c;
+type TurnstileCaptchaProps = {
+  ctx: Context;
+}
+export function TurnstileCaptcha({ctx}: TurnstileCaptchaProps) {
   return (
     <>
     {useCFTurnstile(ctx) ? (

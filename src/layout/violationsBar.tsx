@@ -7,8 +7,7 @@ type ViolationNoticeProps = {
   ctx: Context;
 }
 
-export async function ViolationNoticeBar(props: ViolationNoticeProps) {
-  const ctx: Context = props.ctx;
+export async function ViolationNoticeBar({ctx}: ViolationNoticeProps) {
   const violationData = await getViolationsForCurrentUser(ctx);
   if (violationData !== null) {
     let errorStr = "";
