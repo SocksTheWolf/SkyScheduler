@@ -10,7 +10,12 @@ export const uploadVideoToBlob = async (ctx: AllContext, agent: AtProtoAgent, fi
     return null;
   }
 
-  const fileType = fileData.httpMetadata?.contentType || fileData.customMetadata!["type"];
+  const customData = fileData.customMetadata !== undefined;
+  const fileType = fileData.httpMetadata?.contentType || customData ? fileData.customMetadata!["type"] : "";
+  // technically impossible, but log if we get to it.
+  if (fileType === "") {
+    console.warn(`the file type for ${fileName} could not be inferred somehow`);
+  }
   const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
   uploadUrl.searchParams.append("did", agent.did!);
   uploadUrl.searchParams.append("name", fileName);
