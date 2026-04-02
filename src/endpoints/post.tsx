@@ -1,4 +1,4 @@
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
