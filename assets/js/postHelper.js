@@ -9,6 +9,7 @@ const threadField = document.getElementById('threadInfo');
 const cancelThreadBtn = document.getElementById('cancelThreadPost');
 const postFormTitle = document.getElementById('postFormTitle')
 let hasFileLimit = false;
+let isPosting = false;
 let fileData = new Map();
 let waitingFiles = 0;
 
@@ -89,6 +90,8 @@ document.addEventListener("resetPost", () => {
   // Clear the file data map
   fileData.clear();
   waitingFiles = 0;
+  // unlock the file upload block
+  isPosting = false;
 });
 
 fileDropzone.on("reset", () => {
@@ -101,9 +104,12 @@ fileDropzone.on("reset", () => {
 });
 
 fileDropzone.on("addedfile", file => {
-  if (hasFileLimit === true) {
+  if (hasFileLimit === true || isPosting === true) {
     fileDropzone.removeFile(file);
-    pushToast("Maximum number of files reached", false);
+    if (isPosting)
+      pushToast("Not allowed to add files while posting", false);
+    else
+      pushToast("Maximum number of files reached", false);
     return;
   }
   // Increase the number of waiting to be processed files.
@@ -420,6 +426,7 @@ postForm.addEventListener('submit', async (e) => {
       }
       postObject.label = document.getElementById("contentLabels").value;
     }
+    // if we have post records, like a quote post or something
     if (hasRecord) {
       if (postObject.embeds === undefined)
         postObject.embeds = [];
@@ -471,6 +478,12 @@ function showPostProgress(shouldShow) {
   setElementDisabled(el, shouldShow);
   setElementDisabled(postForm, shouldShow);
   setElementDisabled(cancelThreadBtn, shouldShow);
+  // prevent uploads while we're trying to post
+  isPosting = shouldShow;
+  // Hide all the dropzone modifier buttons
+  document.querySelectorAll(".file-item-group button").forEach((itm) => {
+    setElementDisabled(itm, shouldShow);
+  });
   if (shouldShow) {
     el.textContent = "Making Post...";
   } else {
