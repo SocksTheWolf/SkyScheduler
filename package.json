@@ -31,7 +31,7 @@
     "types": "wrangler types src/wrangler.d.ts"
   },
   "dependencies": {
-    "@atproto/api": "^0.19.5",
+    "@atproto/api": "^0.19.6",
     "@hono/standard-validator": "^0.2.2",
     "better-auth": "~1.4.21",
     "better-auth-cloudflare": "^0.2.9",
@@ -54,7 +54,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^24.12.0",
+    "@types/node": "^24.12.2",
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
     "npm-run-all2": "^8.0.4",
@@ -62,7 +62,7 @@
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.7",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.78.0"
+    "wrangler": "^4.81.0"
   },
   "engines": {
     "node": ">=24.11.1"
@@ -73,6 +73,9 @@
     },
     "@better-auth/core": {
       "kysely": "~0.28.14"
+    },
+    "better-auth-cloudflare": {
+      "drizzle-orm": "^0.45.2"
     }
   }
 }
