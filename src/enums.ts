@@ -48,3 +48,10 @@ export enum PWAutoCompleteSettings {
   NewPass,
   CurrentPass
 };
+
+export enum ImageResizeResult {
+  None,
+  Success,
+  TooLarge,
+  ExhaustedResources
+};

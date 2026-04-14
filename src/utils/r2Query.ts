@@ -1,6 +1,6 @@
 import { imageDimensionsFromStream } from 'image-dimensions';
 import { v4 as uuidv4 } from 'uuid';
-import { EmbedDataType } from "../enums";
+import { EmbedDataType, ImageResizeResult } from "../enums";
 import {
   BSKY_GIF_MIME_TYPES,
   BSKY_IMG_MIME_TYPES,
@@ -104,7 +104,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   let fileToProcess: ArrayBuffer|ReadableStream|null = null;
 
   if (file.size > BSKY_IMG_SIZE_LIMIT) {
-    let failedToResize = true;
+    let resizeResult: ImageResizeResult = ImageResizeResult.TooLarge;
 
     if (c.env.IMAGE_SETTINGS.enabled && c.env.IMAGE_SETTINGS.steps !== undefined) {
       // Randomly generated id to be used during the resize process
@@ -149,7 +149,8 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
           const resizedHeader = response.headers.get("Cf-Resized");
           const returnType = response.headers.get("Content-Type") || "";
           const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
-          const resizeHadError: boolean = (resizedHeader === null || resizedHeader.indexOf("err=") !== -1);
+          const hasResizeHeader: boolean = (resizedHeader !== null);
+          const resizeHadError: boolean = (!hasResizeHeader || resizedHeader!.indexOf("err=") !== -1);
 
           if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
             console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
@@ -157,7 +158,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
             // If we make the file size less than the actual limit
             if (transformFileSize < BSKY_IMG_SIZE_LIMIT && transformFileSize !== 0) {
               console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
-              failedToResize = false;
+              resizeResult = ImageResizeResult.Success;
               // Set some extra variables
               finalQualityLevel = qualityLevel;
               finalFileSize = transformFileSize;
@@ -168,24 +169,41 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
                 // Print how over the image was if we cannot properly resize it
                 console.log(`${originalName}: file size ${transformFileSize - BSKY_IMG_SIZE_LIMIT} over the appropriate size`);
               }
-
               // dispose the body
               await response.body?.cancel();
             }
           } else {
             console.warn(`File ${file.name} was not handled ${response.statusText}`);
+            if (hasResizeHeader) {
+              // figure out if we have exhausted image transformations
+              const errCode = resizedHeader!.match(/err=(\d+)/);
+              if (errCode && parseInt(errCode[1]) === 9422) {
+                resizeResult = ImageResizeResult.ExhaustedResources;
+                break;
+              }
+            }
           }
         } else {
-          console.error(`image tfs got error: ${response.statusText}`);
+          console.error(`image tf service got error: ${response.statusText}`);
         }
       }
       // Delete the file from the resize bucket.
       c.executionCtx.waitUntil(c.env.R2RESIZE.delete(resizeFilename));
     }
 
-    if (failedToResize) {
-      const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
-      return {"success": false, "originalName": originalName, "error": `Image is too large for BSky, size is over by ${fileSizeOverAmount}MB`};
+    if (resizeResult != ImageResizeResult.Success) {
+      let errorString: string = "";
+      switch (resizeResult) {
+        case ImageResizeResult.ExhaustedResources:
+          errorString = "The image resize service is exhausted. You'll need to resize the images to fit under 1MB yourself.";
+        break;
+        default:
+        case ImageResizeResult.TooLarge:
+          const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
+          errorString = `Image is too large to post, the file size is over by ${fileSizeOverAmount}MB`;
+        break;
+      }
+      return {"success": false, "originalName": originalName, "error": errorString };
     }
   }
 
