@@ -108,9 +108,7 @@ export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtP
   try {
     await usingAgent.deleteRepost(content.uri);
   } catch {
-    // This probably should not be a warning, and should silently fail.
-    // the only thing that actually matters is the object below.
-    //console.warn(`failed to unrepost post ${content.uri} with err ${err}`);
+    // nothing.
   }
 
   try {
@@ -135,8 +133,6 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
   // Lambda that handles making a post record and submitting it to bsky
   const postSegment = async (postData: Post) => {
-    let currentEmbedIndex = 0;
-
     const rt = new RichText({
       text: postData.text,
     });
@@ -184,10 +180,9 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         return mediaEmbeds.type != EmbedDataType.None && mediaEmbeds.type != attemptToWrite
         && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
       }
-      // go until we run out of embeds or have hit the amount of embeds per post (+1 because there could be a record with media)
-      for (; embedsProcessed < MAX_EMBEDS_PER_POST + 1 && currentEmbedIndex < postData.embeds.length; ++currentEmbedIndex, ++embedsProcessed) {
-        const currentEmbed: EmbedData = postData.embeds[currentEmbedIndex];
+      for (const currentEmbed of postData.embeds) {
         const currentEmbedType: EmbedDataType = currentEmbed.type;
+        ++embedsProcessed;
 
         // If we never saw any record info, and the current type is not record itself, then we're on an overflow and need to back out.
         if (embedsProcessed > MAX_EMBEDS_PER_POST && currentEmbedType != EmbedDataType.Record && isEmpty(bskyRecordInfo)) {
@@ -217,9 +212,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
                 let thumbEncode = thumbnail.headers.get("content-type") || "image/png";
                 if (imageBlob.size > BSKY_IMG_SIZE_LIMIT) {
                   // Resize the thumbnail because while the blob service will accept
-                  // embed thumbnails of any size
-                  // it will fail when you try to make the post record, saying the
-                  // post record is invalid.
+                  // embed thumbnails of any size it will fail when you try to make the post record
+                  // with the error that the post record is invalid.
                   const imgTransform = (await c.env.IMAGES.input(imageBlob.stream())
                     .transform({width: 1280, height: 720, fit: "scale-down"})
                     .output({ format: "image/jpeg", quality: 85 })).response();
