@@ -58,7 +58,7 @@
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.2",
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.7",
     "typed-htmx": "^0.3.1",
