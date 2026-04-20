@@ -43,7 +43,7 @@ export default function Homepage() {
             <li>Edit the content of posts <i>and</i> alt text before publish</li>
             <li>Publish entire threads with up to {MAX_POSTS_PER_THREAD} child posts per thread</li>
             <li>Automatically retweet <u>anything</u> at an interval of your choosing up to {MAX_REPOST_INTERVAL} times
-              every {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
+              every {MAX_REPOST_IN_HOURS-1} hours ({MAX_REPOST_DAYS} days)</li>
             <ul>
               <li><small>Even content that's wasn't originally made on {APP_NAME}</small></li>
             </ul>
