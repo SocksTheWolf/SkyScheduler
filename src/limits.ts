@@ -69,9 +69,9 @@ export const MAX_ALT_TEXT: number = 2000;
 
 // Image limit values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L97
-export const BSKY_IMG_MAX_WIDTH: number = 2000;
-export const BSKY_IMG_MAX_HEIGHT: number = 2000;
-export const BSKY_IMG_SIZE_LIMIT_IN_MB: number = 1;
+export const BSKY_IMG_MAX_WIDTH: number = 4000;
+export const BSKY_IMG_MAX_HEIGHT: number = 4000;
+export const BSKY_IMG_SIZE_LIMIT_IN_MB: number = 2;
 export const BSKY_IMG_MIME_TYPES: string[] = [
   "image/png",
   "image/jpeg",
