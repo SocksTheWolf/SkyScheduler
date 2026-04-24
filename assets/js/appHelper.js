@@ -251,7 +251,7 @@ function localTimeChange(date) {
 function convertTimeValueLocally(number) {
   // this is a destructive operation,
   // so we'll take whatever the input is and make a new object
-  localTimeChange(new Date(number));
+  return localTimeChange(new Date(number));
 }
 
 function getScheduleTimeForNextHour() {
