@@ -6,7 +6,8 @@ function getPostListElement(itemID) {
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleString(undefined, {
+  const useDate = (date instanceof Date) ? date : new Date(date);
+  return useDate.toLocaleString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -19,7 +20,10 @@ function updateAllTimes() {
     if (el.hasAttribute("corrected"))
       return;
 
-    el.textContent = formatDate(el.innerText);
+    const timestampDate = new Date(el.innerText);
+    el.setAttribute("data-originaltime", timestampDate.toISOString());
+    el.setAttribute("data-convertedtime", convertTimeValueLocally(timestampDate));
+    el.textContent = formatDate(timestampDate);
     el.setAttribute("corrected", true);
   });
   document.querySelectorAll(".repostTimesLeft").forEach(el => {
@@ -239,17 +243,22 @@ function setElementDisabled(el, disabled) {
     el.removeAttribute("disabled");
 }
 
-function convertTimeValueLocally(number) {
-  const date = new Date(number);
+function localTimeChange(date) {
   date.setMinutes(0 - date.getTimezoneOffset());
   return date.toISOString().slice(0,16);
+}
+
+function convertTimeValueLocally(number) {
+  // this is a destructive operation,
+  // so we'll take whatever the input is and make a new object
+  localTimeChange(new Date(number));
 }
 
 function getScheduleTimeForNextHour() {
   // set current time to value of now + 1 hour
   const curDate = new Date();
   curDate.setHours(curDate.getHours() + 1);
-  return convertTimeValueLocally(curDate);
+  return localTimeChange(curDate);
 }
 
 function showContentLabeler(shouldShow) {

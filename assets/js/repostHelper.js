@@ -53,7 +53,9 @@ document.addEventListener("resetRepost", () => {
   setSelectDisable(repostCycleOptions.parentElement, true);
   setElementVisible(cancelScheduledRepostsBtn.parentElement, false);
   repostCycleOptions.checked = false;
-  document.getElementById("repostTime").value = "";
+  const repostTime = document.getElementById("repostTime");
+  repostTime.value = "";
+  repostTime.setAttribute("min", getScheduleTimeForNextHour());
   if (existingPostId.hasAttribute("data-id")) {
     const highlight = getPostListElement(existingPostId.getAttribute("data-id"));
     if (highlight) {
@@ -158,6 +160,7 @@ document.addEventListener("addNewRepost", (ev) => {
   const postHeader = ev.detail.target;
   const postURIHolder = postHeader.parentElement.querySelector(".postLink:not([hidden])");
   const postBodyHolder = postHeader.parentElement.querySelector(".postText");
+  const postFooterTime = postHeader.parentElement.querySelector(".timestamp");
   const isScheduled = postHeader.hasAttribute("data-scheduled");
   let canPost = false;
   if (postURIHolder) {
@@ -189,8 +192,18 @@ document.addEventListener("addNewRepost", (ev) => {
     contentTabs.switchTab("dashtabs", 1);
     scrollToObject(repostRecordURL);
     scrollContentTop();
+    // Set the schedule time for nice UX reasons
+    let newTimeValue = null;
     if (!isScheduled)
-      document.getElementById("repostTime").value = getScheduleTimeForNextHour();
+      newTimeValue = getScheduleTimeForNextHour();
+    else if (postFooterTime.hasAttribute("data-convertedtime"))
+      newTimeValue = postFooterTime.getAttribute("data-convertedtime");
+
+    const repostTime = document.getElementById("repostTime");
+    if (newTimeValue !== null) {
+      repostTime.setAttribute("min", newTimeValue);
+      repostTime.value = newTimeValue;
+    }
   } else {
     pushToast("cannot add reposts to this post", false);
   }
