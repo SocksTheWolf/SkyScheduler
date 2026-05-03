@@ -8,9 +8,12 @@ import { AtProtoAgent } from "../../classes/bskyAgents";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
-import { BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST } from '../../limits';
+import {
+  BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
+  USE_DEPRECATED_SIZE_PARSE
+} from '../../limits';
 import type {
-  AllContext, BskyEmbedWrapper, BskyRecordWrapper, EmbedData,
+  AllContext, BskyEmbedWrapper, BskyRecordWrapper,
   LooseObj, PostRecordResponse, PostStatus
 } from '../../types';
 import { atpRecordURI } from '../../validation/regexCases';
@@ -350,6 +353,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
         let blobRef: BlobRef|null = null;
         let rawFile: Blob|null = null;
+        let customMetadata: Record<string, string>|undefined = undefined;
         // Blob overrides are from the video service. If it exists and is not null,
         // then use that instead of trying to upload video again here.
         if (postData.blobOverride == null) {
@@ -359,11 +363,12 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
             return false;
           }
+          customMetadata = file.customMetadata;
           // Process the file and upload it to the blob service
           rawFile = await file.blob();
           let uploadFile = null;
           try {
-            uploadFile = await agent.uploadBlob(rawFile, {encoding: file.httpMetadata?.contentType });
+            uploadFile = await agent.uploadBlob(rawFile, { encoding: file.httpMetadata?.contentType });
           } catch (err) {
             if (err instanceof XRPCError) {
               if (err.status === ResponseType.InternalServerError || err.status === ResponseType.UpstreamFailure
@@ -392,23 +397,33 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
         // Handle images
         if (currentEmbedType == EmbedDataType.Image) {
-          // we were able to upload to the blob, go ahead and add the image record to the post
-          const bskyMetadata: LooseObj = {
-            image: blobRef,
-            alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT)
-          };
-          // Attempt to get the width and height of the image file.
-          const sizeResult = await imageDimensionsFromStream(await rawFile!.stream());
-          // If we were able to parse the width and height of the image,
-          // then append the "aspect ratio" into the image record.
-          if (sizeResult) {
-            bskyMetadata.aspectRatio = {
-              "width": sizeResult.width,
-              "height": sizeResult.height
+          // Image aspect ratio data
+          let aspectRatio: LooseObj|undefined = {"width": 0, "height": 0};
+          if (customMetadata && customMetadata.width !== undefined && customMetadata.height !== undefined) {
+            aspectRatio["width"] = Number(customMetadata.width);
+            aspectRatio["height"] = Number(customMetadata.height);
+          } else if (USE_DEPRECATED_SIZE_PARSE) {
+            // TODO: Remove this code as it is currently DEPRECATED (R2 Service holds the stream sizes)
+            const sizeResult = await imageDimensionsFromStream(await rawFile!.stream());
+            if (sizeResult) {
+              aspectRatio["width"] = sizeResult.width;
+              aspectRatio["height"] = sizeResult.height;
+            } else {
+              aspectRatio = undefined;
             }
+          } else {
+            console.warn(`Unable to get file dimensions for file ${currentEmbed.content}, custom metadata is missing :(`);
+            aspectRatio = undefined;
           }
+
+          // Create the record data for this image
+          const imageRecordData: LooseObj = {
+            image: blobRef,
+            alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT),
+            aspectRatio: aspectRatio
+          };
           // Push the image data to the array.
-          imagesArray.push(bskyMetadata);
+          imagesArray.push(imageRecordData);
           mediaEmbeds = { type: EmbedDataType.Image };
 
           // Handle videos

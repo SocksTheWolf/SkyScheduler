@@ -1,10 +1,12 @@
 import { imageDimensionsFromStream } from 'image-dimensions';
+import truncate from 'just-truncate';
 import { v4 as uuidv4 } from 'uuid';
 import { EmbedDataType, ImageResizeResult } from "../enums";
 import {
   BSKY_GIF_MIME_TYPES,
   BSKY_IMG_MIME_TYPES,
   BSKY_IMG_SIZE_LIMIT,
+  BSKY_IMG_SIZE_LIMIT_IN_MB,
   BSKY_VIDEO_MIME_TYPES,
   BSKY_VIDEO_SIZE_LIMIT,
   CF_IMAGES_FILE_SIZE_LIMIT,
@@ -24,6 +26,8 @@ type FileMetaData = {
   user: string,
   type: string,
   qualityLevel?: number;
+  height?: number;
+  width?: number;
 };
 
 export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
@@ -64,14 +68,29 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
   }
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
+  const R2Metadata: Record<string, string> = {"user": metaData.user,
+    "type": metaData.type, "ext": fileExt, "filename": truncate(metaData.name, 500) };
+
+  // add width and height metadata if they exist
+  if (metaData.width !== undefined) {
+    R2Metadata["width"] = metaData.width.toString();
+  }
+  if (metaData.height !== undefined) {
+    R2Metadata["height"] = metaData.height.toString();
+  }
+
+  // push file
   const R2UploadRes = await c.env.R2.put(fileName, buffer, {
-    customMetadata: {"user": metaData.user, "type": metaData.type, "ext": fileExt, "filename": metaData.name }
+    customMetadata: R2Metadata
   });
+
+  // successfully uploaded file
   if (R2UploadRes) {
+    // push file listing
     await addFileListing(c, fileName, metaData.user);
-    return {"success": true, "data": R2UploadRes.key,
-      "originalName": metaData.name, "fileSize": metaData.size,
-      "qualityLevel": metaData.qualityLevel};
+
+    return {"success": true, "data": R2UploadRes.key, "originalName": metaData.name,
+      "fileSize": metaData.size, "qualityLevel": metaData.qualityLevel};
   } else {
     return {"success": false, "error": "unable to push to file storage"};
   }
@@ -95,15 +114,16 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
     return {"success": false, "error": "image dimensions are too large to autosize. make sure your files fit the limits."};
   }
 
-  // If the image is over any bsky limits, we will need to resize it
-  let finalFileSize: number = file.size;
-  // final quality level
-  let finalQualityLevel: number = 100;
+  // our process data once handled.
+  let fileProcessData = {qualityLevel: 100, type: file.type, size: file.size,
+    width: imageMetaData.width, height: imageMetaData.height };
 
   // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
   let fileToProcess: ArrayBuffer|ReadableStream|null = null;
 
   if (file.size > BSKY_IMG_SIZE_LIMIT) {
+    // reset, we'll get this later.
+    fileProcessData.height = fileProcessData.width = 0;
     let resizeResult: ImageResizeResult = ImageResizeResult.TooLarge;
 
     if (c.env.IMAGE_SETTINGS.enabled && c.env.IMAGE_SETTINGS.steps !== undefined) {
@@ -160,9 +180,18 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
               console.log(`${originalName}: Quality level ${qualityLevel}% processed, fits correctly with size.`);
               resizeResult = ImageResizeResult.Success;
               // Set some extra variables
-              finalQualityLevel = qualityLevel;
-              finalFileSize = transformFileSize;
-              fileToProcess = response.body;
+              fileProcessData.qualityLevel = qualityLevel;
+              fileProcessData.size = transformFileSize;
+              fileProcessData.type = "image/jpeg";
+              // split the streams so we can read the response body more than once
+              const streams = response.body!.tee();
+              fileToProcess = streams[0];
+              // attempt to pull the image dimensions
+              const optimizedData = await imageDimensionsFromStream(streams[1]);
+              fileProcessData.width = optimizedData?.width || 0;
+              fileProcessData.height = optimizedData?.height || 0;
+              // dispose.
+              await streams[1].cancel();
               break;
             } else {
               if (transformFileSize !== 0) {
@@ -195,7 +224,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
       let errorString: string = "";
       switch (resizeResult) {
         case ImageResizeResult.ExhaustedResources:
-          errorString = "The image resize service is exhausted. You'll need to resize the images to fit under 1MB yourself.";
+          errorString = `Image resize service is exhausted, please manually resize the image to be under ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB.`;
         break;
         default:
         case ImageResizeResult.TooLarge:
@@ -209,10 +238,12 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
 
   const fileMetaData: FileMetaData = {
     name: originalName,
-    size: finalFileSize,
+    size: fileProcessData.size,
     user: userId,
-    type: file.type,
-    qualityLevel: finalQualityLevel
+    type: fileProcessData.type,
+    qualityLevel: fileProcessData.qualityLevel,
+    width: fileProcessData.width > 0 ? fileProcessData.width : undefined,
+    height: fileProcessData.height > 0 ? fileProcessData.height : undefined,
   };
 
   if (fileToProcess === null)
