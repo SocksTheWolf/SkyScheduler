@@ -69,10 +69,10 @@
   },
   "overrides": {
     "better-auth": {
-      "kysely": "~0.28.14"
+      "kysely": "~0.28.17"
     },
     "@better-auth/core": {
-      "kysely": "~0.28.14"
+      "kysely": "~0.28.17"
     },
     "better-auth-cloudflare": {
       "drizzle-orm": "^0.45.2"
