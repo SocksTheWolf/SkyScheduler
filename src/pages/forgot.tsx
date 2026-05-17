@@ -14,7 +14,7 @@ type ForgotPasswordProps = {
 export default function ForgotPassword({ctx}: ForgotPasswordProps) {
   const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (<BaseLayout title="Forgot Password"
-    preloads={[...TurnstileCaptchaPreloads(ctx)]} noIndex={true}>
+    preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Forgot Password Reset"
         submitText={`Request ${APP_NAME} Password Reset`}
