@@ -58,7 +58,6 @@ jobs:
           body: "Please commit to have latest mod time dates"
           assignees: socksthewolf
           labels: sitemap
-          reviewers: socksthewolf
       - name: PR Status
         if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
