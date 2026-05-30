@@ -1,0 +1,46 @@
+name: Build & Update Sitemap
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "src/pages/*.tsx"
+      - "!assets/sitemap.xml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: sitemap
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          node-version: "24.11.1"
+          package-manager-cache: true
+      - name: Run sitemap rebuild
+        run: npx run sitemap
+      - name: Create PR
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
+        with:
+          token: ${{ secrets.SITEMAP_TOKEN }}
+          add-paths: "assets/sitemap.xml"
+          commit-message: "Updated Sitemap"
+          delete-branch: true
+          branch: "sitemap-updates"
+          sign-commits: true
+          title: "Updated Sitemap Mod Dates"
+          assignees: socksthewolf
+          labels: sitemap

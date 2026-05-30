@@ -16,6 +16,7 @@ on:
     - ".dev.vars*"
     - ".gitattributes"
     - ".markdownlint.json"
+    - "assets/sitemap.xml"
   workflow_dispatch:
     inputs:
       clear_cache:
