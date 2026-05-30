@@ -29,6 +29,8 @@ jobs:
           fetch-depth: 0
       - name: Fix checkout timestamps
         uses: chetan/git-restore-mtime-action@d186aca54f8760da4dec55313195e51ed3ebb0b3
+        with:
+          args: --no-directories --skip-missing
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -36,8 +38,10 @@ jobs:
           node-version: "24.11.1"
           package-manager-cache: true
       - name: Install
+        if: success()
         run: npm ci
       - name: Run sitemap rebuild
+        if: success()
         run: npm run sitemap
       - name: Create PR
         if: success()
@@ -46,6 +50,7 @@ jobs:
           token: ${{ secrets.SITEMAP_TOKEN }}
           add-paths: "assets/sitemap.xml"
           commit-message: "Updated Sitemap File"
+          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           delete-branch: true
           branch: "sitemap-updates"
           sign-commits: true
@@ -53,3 +58,10 @@ jobs:
           body: "Please commit to have latest mod time dates"
           assignees: socksthewolf
           labels: sitemap
+          reviewers: socksthewolf
+      - name: PR Status
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Pull Request Signed - ${{ steps.cpr.outputs.pull-request-commits-verified }}"
