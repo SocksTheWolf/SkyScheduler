@@ -1,0 +1,7 @@
+contact_links:
+  - name: Account Support
+    url: https://bsky.app/profile/skyscheduler.work
+    about: If you need special support for your account, please use the DM feature. This method cannot reset passwords for you.
+  - name: Forgot SkyScheduler Password
+    url: https://skyscheduler.work/forgot
+    about: If you forgot your password, please use this method to reset it.
