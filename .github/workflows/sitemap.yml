@@ -31,8 +31,9 @@ jobs:
           node-version: "24.11.1"
           package-manager-cache: true
       - name: Run sitemap rebuild
-        run: npx run sitemap
+        run: npm run sitemap
       - name: Create PR
+        if: success()
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
           token: ${{ secrets.SITEMAP_TOKEN }}
