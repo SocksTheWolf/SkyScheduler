@@ -24,6 +24,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: "main"
+          fetch-depth: 0
+      - name: Fix checkout timestamps
+        uses: chetan/git-restore-mtime-action@d186aca54f8760da4dec55313195e51ed3ebb0b3
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
