@@ -45,10 +45,11 @@ jobs:
         with:
           token: ${{ secrets.SITEMAP_TOKEN }}
           add-paths: "assets/sitemap.xml"
-          commit-message: "Updated Sitemap"
+          commit-message: "Updated Sitemap File"
           delete-branch: true
           branch: "sitemap-updates"
           sign-commits: true
           title: "Updated Sitemap Mod Dates"
+          body: "Please commit to have latest mod time dates"
           assignees: socksthewolf
           labels: sitemap
