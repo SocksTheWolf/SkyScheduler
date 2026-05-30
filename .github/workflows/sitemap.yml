@@ -39,7 +39,7 @@ jobs:
           package-manager-cache: true
       - name: Install
         if: success()
-        run: npm ci
+        run: npm install
       - name: Run sitemap rebuild
         if: success()
         run: npm run sitemap
