@@ -3,6 +3,7 @@ import * as z from "zod/v4";
 import { EmbedDataType } from "../enums";
 import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits";
 import { FileContentSchema } from "./mediaSchema";
+import { StrongRecordSchema } from "./recordSchema";
 import { atpRecordURI } from "./regexCases";
 import { AltTextSchema } from "./sharedValidations";
 
@@ -55,7 +56,8 @@ export const LinkEmbedSchema = z.object({
     error: "provided link is not an URL, please check URL and try again"
   }).trim()
     .nonoptional("link embeds require a url"),
-  description: z.string().trim().default("")
+  description: z.string().trim().default(""),
+  associatedRefs: z.array(StrongRecordSchema).optional()
 });
 
 export const PostRecordSchema = z.object({

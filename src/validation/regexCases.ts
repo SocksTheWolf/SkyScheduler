@@ -8,5 +8,7 @@ export const atpRecordURI = /(?:^.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/(
 export const postRecordURI = /(?:^.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
 // atproto uris
 export const atProtoPostURI = /at\:\/\/(?:[0-9a-zA-Z\-\.\:]+)\/app\.bsky\.feed\.post\/(?:[a-z0-9]+)(?:\/)?$/i;
+// atproto schema uris
+export const atProtoRecordURI = /at\:\/\/(?:[0-9a-z\-\.\:]+)\/(?:[a-z0-9\.\#]+)\/(?:[a-z0-9]+)(?:\/)?$/i;
 // repost record
 export const repostContentRecord = /Repost of (?:.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;

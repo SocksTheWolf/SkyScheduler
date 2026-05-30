@@ -411,6 +411,8 @@ postForm.addEventListener('submit', async (e) => {
             webDataObj.description = extractData.description;
             webDataObj.title = extractData.title;
             webDataObj.content = extractData.image;
+            if (has(extractData, "view.external.associatedRefs"))
+              webDataObj.associatedRefs = extractData.view.external.associatedRefs;
           } else {
             console.error(extractData.error);
             pushToast("An error occurred with the URL card, please correct.", false);

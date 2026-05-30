@@ -98,6 +98,11 @@ export type EmbedData = {
   width?: number;
   height?: number;
   duration?: number;
+  associatedRefs?: WebAssociatedRef[];
+};
+
+export type WebAssociatedRef = BskyRecordWrapper & {
+  $type: "com.atproto.repo.strongRef";
 };
 
 export type Violation = {

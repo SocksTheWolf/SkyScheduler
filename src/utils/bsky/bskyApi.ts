@@ -14,7 +14,8 @@ import {
 } from '../../limits';
 import type {
   AllContext, BskyEmbedWrapper, BskyRecordWrapper,
-  LooseObj, PostRecordResponse, PostStatus
+  LooseObj, PostRecordResponse, PostStatus,
+  WebAssociatedRef
 } from '../../types';
 import { atpRecordURI } from '../../validation/regexCases';
 import {
@@ -205,6 +206,15 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             title: currentEmbed.title,
             description: currentEmbed.description
           };
+
+          // support standard.site formats
+          if (has(currentEmbed, "associatedRefs")) {
+            externalData.associatedRefs = [];
+            currentEmbed.associatedRefs!.forEach((itm) => {
+              const extraData: WebAssociatedRef = itm;
+              externalData.associatedRefs.push(extraData);
+            });
+          }
 
           // Attempt to fetch the thumbnail
           if (!isEmpty(currentEmbed.content)) {

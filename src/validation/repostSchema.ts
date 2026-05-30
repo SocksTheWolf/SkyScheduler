@@ -1,9 +1,11 @@
 import * as z from "zod/v4";
 import { RepostType } from "../enums";
 import { MAX_POSTED_LENGTH, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
-import { atProtoPostURI, postRecordURI, repostContentRecord } from "./regexCases";
+import { PostRecordSchema } from "./recordSchema";
+import { postRecordURI, repostContentRecord } from "./regexCases";
 
 const PublishedRepostSchema = z.object({
+  ...PostRecordSchema.shape,
   url: z.url({
     normalize: true,
     protocol: /^https?$/,
@@ -12,10 +14,6 @@ const PublishedRepostSchema = z.object({
   }).trim()
     .regex(postRecordURI, "url is not a valid post record link")
     .nonoptional("a valid url was not provided"),
-  uri: z.string().trim().min(1)
-    .regex(atProtoPostURI, "post record is invalid")
-    .nonoptional("post uri must be provided"),
-  cid: z.string().trim().min(1).nonoptional("post data must be provided"),
   content: z.xor([
       z.string().trim().max(MAX_POSTED_LENGTH, "repost title is too long"),
       z.string().trim().regex(repostContentRecord)
