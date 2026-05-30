@@ -19,6 +19,8 @@ export function IncludeDependencyTags({scripts}: DepTagsType) {
     switch (itm.type) {
       case "script":
         return (<script type="text/javascript" src={itm.href}></script>);
+      case "module":
+        return (<script type="module" src={itm.href}></script>);
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" />);
     }
