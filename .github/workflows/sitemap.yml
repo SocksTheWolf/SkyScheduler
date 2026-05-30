@@ -30,6 +30,8 @@ jobs:
           cache: "npm"
           node-version: "24.11.1"
           package-manager-cache: true
+      - name: Install
+        run: npm ci
       - name: Run sitemap rebuild
         run: npm run sitemap
       - name: Create PR
