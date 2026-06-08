@@ -100,7 +100,7 @@ export const BSKY_IMG_FILE_EXTS: string = [
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
 export const BSKY_MAX_USERNAME_LENGTH: number = 256; // since these are domains, they should be about 256
 export const BSKY_MAX_APP_PASSWORD_LENGTH: number = 20;
-export const MAX_EMBEDS_PER_POST: number = 4;
+export const MAX_EMBEDS_PER_POST: number = 10;
 
 // Video limits values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L184
