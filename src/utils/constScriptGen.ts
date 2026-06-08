@@ -8,7 +8,7 @@ import {
 } from "../limits";
 import { postRecordURI } from "../validation/regexCases";
 
-const CONST_SCRIPT_VERSION: number = 8;
+const CONST_SCRIPT_VERSION: number = 9;
 
 export const ConstScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {
