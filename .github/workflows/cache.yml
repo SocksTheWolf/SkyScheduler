@@ -1,7 +1,7 @@
 name: Clear CF Cache
 
 on:
-  # run every year
+  # run every year (this will refresh the copyright date)
   schedule:
     - cron: "5 0 1 1 *"
   push:

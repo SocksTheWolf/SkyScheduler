@@ -1,12 +1,14 @@
 name: Build & Update Sitemap
 
 on:
+  # check if the sitemap is up to date every sunday
   schedule:
     - cron: "0 1 * * 0"
   push:
     branches: ["main"]
     paths:
       - "src/pages/*.tsx"
+      - "src/layout/main.tsx"
       - "!assets/sitemap.xml"
   workflow_dispatch: {}
 
@@ -61,7 +63,7 @@ jobs:
           assignees: socksthewolf
           labels: sitemap
       - name: PR Status
-        if: ${{ steps.cpr.outputs.pull-request-number }}
+        if: success() && ${{ steps.cpr.outputs.pull-request-number }}
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
