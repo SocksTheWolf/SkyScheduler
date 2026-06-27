@@ -1,4 +1,9 @@
 version: 2
+registries:
+  npm-js:
+    type: npm-registry
+    url: https://registry.npmjs.org
+    replaces-base: true
 updates:
   # GH Actions updates
   - package-ecosystem: "github-actions"
@@ -23,3 +28,4 @@ updates:
           - 'version-update:semver-major'
       - dependency-name: 'wrangler'
       - dependency-name: 'minify'
+      - dependency-name: 'prettier'
