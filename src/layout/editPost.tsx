@@ -47,7 +47,7 @@ export function PostEdit(props: EditedPostProps) {
   const post: Post = props.post;
   // If this post is posted, just show the same object again.
   if (post.posted) {
-    return (<PostContent text={post.text} posted={true} repost={false} />);
+    return (<PostContent post={post} />);
   }
 
   // yeah these are kind egregious...

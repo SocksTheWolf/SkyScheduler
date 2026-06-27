@@ -17,8 +17,12 @@ export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // max posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
 
+// if we should truncate posted content
+export const TRUNCATE_POSTED_CONTENT: boolean = true;
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;
+// Max length of a repost title
+export const MAX_REPOST_TITLE_LENGTH: number = 100;
 
 // Dashboard password length settings
 export const MIN_DASHBOARD_PASS: number = 8;

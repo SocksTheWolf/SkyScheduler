@@ -10,7 +10,7 @@ import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
-import { MAX_POSTED_LENGTH } from "../../limits";
+import { MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
 import {
   AllContext,
   BatchQuery,
@@ -138,8 +138,8 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
 
     let wasPosted = (i == 0 && !allPosted) ? false : true;
     dbOperations.push(db.update(posts).set(
-      {content: sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})`, posted: wasPosted,
-        uri: record.uri, cid: record.cid, embedContent: []})
+      {content: TRUNCATE_POSTED_CONTENT ? sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})` : posts.content,
+        posted: wasPosted, uri: record.uri, cid: record.cid, embedContent: []})
     .where(eq(posts.uuid, record.postID)));
   }
 

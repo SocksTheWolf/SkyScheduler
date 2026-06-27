@@ -1,4 +1,4 @@
-import { MAX_POSTED_LENGTH } from "../limits";
+import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
 import RetweetOptions from "./options/retweetOptions";
 import ScheduleOptions from "./options/scheduleOptions";
@@ -21,8 +21,9 @@ export function MakeRetweet(props?: BaseElementProps) {
         (i.e. a post that's not deleted, nor are you forbidden from seeing it)</small>
       <blockquote id="repostTitleSection">
         <label for="repostTitle">Retweet Title <small>(Optional)</small></label>
-        <input type="text" id="repostTitle" maxlength={MAX_POSTED_LENGTH} placeholder="Leave blank to use existing/generated title" />
-        <small>A name or simple phrase to help you organize retweets. Max {MAX_POSTED_LENGTH} characters. Will update existing titles, cannot be used on scheduled posts.</small>
+        <input type="text" id="repostTitle" maxlength={MAX_REPOST_TITLE_LENGTH} placeholder="Leave blank to use existing/generated title" />
+        <small>A name or simple phrase to help you organize retweets. Max {MAX_REPOST_TITLE_LENGTH} characters. 
+          Will update existing titles, cannot be used on scheduled posts.</small>
       </blockquote>
     </article>
     <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" header="Retweet At" />

@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 import { RepostType } from "../enums";
-import { MAX_POSTED_LENGTH, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
+import { MAX_REPOST_TITLE_LENGTH, MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../limits";
 import { PostRecordSchema } from "./recordSchema";
 import { postRecordURI, repostContentRecord } from "./regexCases";
 
@@ -15,7 +15,7 @@ const PublishedRepostSchema = z.object({
     .regex(postRecordURI, "url is not a valid post record link")
     .nonoptional("a valid url was not provided"),
   content: z.xor([
-      z.string().trim().max(MAX_POSTED_LENGTH, "repost title is too long"),
+      z.string().trim().max(MAX_REPOST_TITLE_LENGTH, "repost title is too long"),
       z.string().trim().regex(repostContentRecord)
     ], "invalid repost title").optional(),
   type: z.literal(RepostType.ExistingPost)

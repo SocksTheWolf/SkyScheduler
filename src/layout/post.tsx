@@ -1,19 +1,20 @@
 import { html } from "hono/html";
 import { Post } from "../classes/post";
-import { MAX_POSTED_LENGTH } from "../limits";
+import { MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../limits";
 import type { BaseElementProps } from "../types";
 import PostDataFooter from "./posts/footer";
 import PostDataHeader from "./posts/header";
 
 type PostContentProps = {
-  text: string;
-  posted: boolean;
-  repost: boolean;
+  post: Post;
 };
 
 export function PostContent(props: PostContentProps) {
-  const ellipses = props.posted && !props.repost && props.text.length >= (MAX_POSTED_LENGTH-1) ? "..." : "";
-  return (<p class="postText">{props.text}{ellipses}</p>);
+  const post: Post = props.post;
+  const ellipses: string = post.isPosted && !post.isARepost && ((TRUNCATE_POSTED_CONTENT &&
+    post.text.length >= (MAX_POSTED_LENGTH-1)) || post.isChildPost) ? "..." : "";
+
+  return (<p class="postText">{post.text}{ellipses}</p>);
 };
 
 type ScheduledPostOptions = BaseElementProps & {
@@ -33,7 +34,7 @@ export function PostHTML(props: ScheduledPostOptions) {
     id="post-${content.postid}" ${oobSwapStr}>
     ${<PostDataHeader content={content} posted={hasBeenPosted} />}
     <div id="content-${content.postid}">
-      ${<PostContent text={content.text} posted={content.posted || false} repost={content.isRepost || false} />}
+      ${<PostContent post={content} />}
     </div>
     ${<PostDataFooter content={content} posted={hasBeenPosted} />}
   </article>`;
