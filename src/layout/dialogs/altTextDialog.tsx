@@ -1,6 +1,7 @@
 import { MAX_ALT_TEXT } from "../../limits";
+import type { BaseElementProps } from "../../types";
 
-export default function AltTextDialog() {
+export default function AltTextDialog(props?: BaseElementProps) {
   return (<dialog id="altTextDialog" class="modal-lg">
     <article>
       <header><h3>Add Alt Text</h3></header>

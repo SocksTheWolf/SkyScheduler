@@ -1,7 +1,8 @@
 import { raw } from "hono/html";
 import { BSKY_MIN_USERNAME_LENGTH } from "../../limits";
+import type { BaseElementProps } from "../../types";
 
-type UsernameFieldProps = {
+type UsernameFieldProps = BaseElementProps & {
   title?: string;
   hintText?: string;
   required?: boolean;

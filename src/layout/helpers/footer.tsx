@@ -1,8 +1,9 @@
 import { APP_NAME, APP_REPO, PROGRESS_MADE, PROGRESS_TOTAL, PROJECT_AUTHOR, PROJECT_AUTHOR_SITE } from "../../siteinfo";
 import { CURRENT_SCRIPT_VERSION } from "../../utils/appScripts";
+import type { BaseElementProps } from "../../types";
 
 // Helper footer for various pages
-type FooterCopyrightProps = {
+type FooterCopyrightProps = BaseElementProps & {
   inNewWindow?: boolean;
   showHomepage?: boolean;
   showProgressBar?: boolean;

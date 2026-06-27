@@ -4,8 +4,9 @@ import { APP_NAME } from "../../siteinfo";
 import BSkyAppPasswordField from "../fields/appPasswordField";
 import DashboardPasswordField from "../fields/dashPasswordField";
 import UsernameField from "../fields/usernameField";
+import type { BaseElementProps } from "../../types";
 
-type SettingsTypeProps = {
+type SettingsTypeProps = BaseElementProps & {
   pds?: string;
 };
 

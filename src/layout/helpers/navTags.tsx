@@ -1,7 +1,8 @@
 import { APP_NAME } from "../../siteinfo";
 import LogoImage from "./logo";
+import type { BaseElementProps } from "../../types";
 
-export default function NavTags() {
+export default function NavTags(props?: BaseElementProps) {
   return (
     <header>
       <div class="container navHeader">

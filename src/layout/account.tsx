@@ -1,15 +1,14 @@
-import { Context } from 'hono';
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
 import { HtmlEscapedString } from 'hono/utils/html';
+import type { BaseElementProps } from "../types";
 
 type FooterLink = {
   title: string;
   url: string;
 };
 
-type AccountFormProps = {
-  ctx?: Context;
+type AccountFormProps = BaseElementProps & {
   children: Child;
   title: string;
   submitText?: string;

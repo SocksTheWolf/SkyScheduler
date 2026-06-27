@@ -1,7 +1,8 @@
 import { PWAutoCompleteSettings } from "../../enums";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
+import type { BaseElementProps } from "../../types";
 
-type DashboardPasswordFieldSettings = {
+type DashboardPasswordFieldSettings = BaseElementProps & {
   required?: boolean
   autocomplete: PWAutoCompleteSettings
 }
