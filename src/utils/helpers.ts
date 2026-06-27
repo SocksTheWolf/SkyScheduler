@@ -1,6 +1,6 @@
 import { startOfHour, subDays } from "date-fns";
-import { Context } from "hono";
 import has from "just-has";
+import type { AllContext } from "../types";
 
 export function floorCurrentTime() {
   return startOfHour(new Date());
@@ -14,7 +14,10 @@ export function daysAgo(days: number) {
   return subDays(new Date(), days);
 }
 
-export function useCFTurnstile(ctx: Context): boolean {
+export function useCFTurnstile(ctx: AllContext|undefined): boolean {
+  if (ctx === undefined)
+    return false;
+
   return ctx.env.SIGNUP_SETTINGS.use_captcha && ctx.env.IN_DEV === false;
 }
 

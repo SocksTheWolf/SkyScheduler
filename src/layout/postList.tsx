@@ -1,14 +1,11 @@
-import { Context } from "hono";
+import type { BaseElementProps, AllContext } from "../types";
 import isEmpty from "just-is-empty";
 import { Post } from "../classes/post";
 import { getPostsForUser } from "../utils/dbQuery";
 import { PostHTML } from "./post";
 
-type ScheduledPostListProps = {
-  ctx?: Context;
-};
-
-export const ScheduledPostList = async ({ctx}: ScheduledPostListProps) => {
+export const ScheduledPostList = async (props: BaseElementProps) => {
+  const ctx: AllContext|undefined = props.ctx;
   if (ctx !== undefined) {
     const response: Post[]|null = await getPostsForUser(ctx);
     if (!isEmpty(response)) {

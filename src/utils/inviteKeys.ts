@@ -1,16 +1,16 @@
-import { Context } from "hono";
 import humanId from "human-id";
 import has from "just-has";
+import type { AllContext } from "../types";
 
-export const isUsingInviteKeys = (c: Context): boolean => {
+export const isUsingInviteKeys = (c: AllContext): boolean => {
   return has(c.env, "INVITE_POOL") && c.env.SIGNUP_SETTINGS.invite_only;
 }
 
-export const getInviteThread = (c: Context): string => {
+export const getInviteThread = (c: AllContext): string => {
   return c.env.SIGNUP_SETTINGS.invite_thread || "";
 }
 
-export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|undefined): Promise<boolean> => {
+export const doesInviteKeyHaveValues = async (c: AllContext, inviteKey: string|undefined): Promise<boolean> => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return false;
@@ -36,7 +36,7 @@ export const doesInviteKeyHaveValues = async (c: Context, inviteKey: string|unde
   return true;
 };
 
-export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) => {
+export const consumeInviteKey = async(c: AllContext, inviteKey: string|undefined) => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return;
@@ -71,7 +71,7 @@ export const consumeInviteKey = async(c: Context, inviteKey: string|undefined) =
   }
 }
 
-export const makeInviteKey = (c: Context): string|null => {
+export const makeInviteKey = (c: AllContext): string|null => {
   if (!isUsingInviteKeys(c)) {
     return null;
   }

@@ -1,13 +1,15 @@
 import type { Post } from "../classes/post";
+import type { BaseElementProps } from "../types";
 import { EmbedDataType } from "../enums";
 import { MAX_LENGTH } from "../limits";
 import { PostContent } from "./post";
 
-type EditedPostProps = {
+type EditedPostProps = BaseElementProps & {
   post: Post;
 };
 
-export function PostAltTextEdit({post}: EditedPostProps) {
+export function PostAltTextEdit(props: EditedPostProps) {
+  const post: Post = props.post;
   let num = -1;
   const embedAltTextEdit = post.embeds?.map((embedData) => {
     ++num;
@@ -41,7 +43,8 @@ export function PostAltTextEdit({post}: EditedPostProps) {
   </section>);
 }
 
-export function PostEdit({post}: EditedPostProps) {
+export function PostEdit(props: EditedPostProps) {
+  const post: Post = props.post;
   // If this post is posted, just show the same object again.
   if (post.posted) {
     return (<PostContent text={post.text} posted={true} repost={false} />);

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
-import { ContextVariables } from "../auth";
+import type { ContextVariables } from "../auth";
 import type { Post } from "../classes/post";
 import { EmbedDataType } from "../enums";
 import { PostEdit } from "../layout/editPost";

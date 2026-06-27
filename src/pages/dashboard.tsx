@@ -1,4 +1,3 @@
-import { Context } from "hono";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
 import ScrollToContent from "../layout/buttons/scroll";
@@ -14,13 +13,13 @@ import { MakeRetweet } from "../layout/makeRetweet";
 import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
+import type { AllContext, BaseElementProps } from "../types";
 import { dashboardScriptStr, dashboardStyleStr } from "../utils/appScripts";
 
-type DashboardProps = {
-  ctx: Context;
-};
+type DashboardProps = BaseElementProps;
 
-export default function Dashboard({ctx}: DashboardProps) {
+export default function Dashboard(props: DashboardProps) {
+  const ctx: AllContext = props.ctx!;
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
     {href: dashboardStyleStr, type: "style"},
@@ -47,7 +46,7 @@ export default function Dashboard({ctx}: DashboardProps) {
               Account: <b id="currentUser" hx-get="/account/username"
                 hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
             </div>
-            <center class="postControls">
+            <center class="postControls" role="group">
               <RefreshPostsButton />
               <SettingsButton />
               <ScrollToContent />

@@ -1,4 +1,4 @@
-/* Functions & vars that are mostly used on the application side of things */
+/* Functions & vars that are mostly used on the dashboard application side of things */
 var contentTabs = null;
 var refreshTimer;
 function getPostListElement(itemID) {
@@ -36,6 +36,15 @@ function updateAllTimes() {
         el.setAttribute("data-tooltip", repostInformation);
     }
   });
+
+  const currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.querySelectorAll(".timeZoneName").forEach(el => {
+    if (el.hasAttribute("set"))
+      return;
+
+    el.innerText = currentTimeZone;
+    el.setAttribute("set", "true");
+  })
 }
 
 function refreshPostTimer() {

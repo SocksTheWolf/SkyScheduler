@@ -191,3 +191,7 @@ export type R2BucketObject = {
 
 export type AllContext = Context<{Bindings: Bindings, Variables: ContextVariables}>|ScheduledContext;
 export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
+
+export type BaseElementProps = {
+  ctx?: AllContext
+};
