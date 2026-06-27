@@ -10,7 +10,7 @@ import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
-import { MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
 import {
   AllContext,
   BatchQuery,
@@ -287,12 +287,14 @@ export const purgePostedPosts = async (c: AllContext): Promise<number> => {
     console.error("could not purge posted posts, got error");
     return 0;
   }
+  const positiveDays: number = Math.abs(MAX_HOLD_DAYS_BEFORE_PURGE);
   const dbQuery = await db.select({ data: posts.uuid }).from(posts)
   .leftJoin(repostCounts, eq(posts.uuid, repostCounts.uuid))
   .where(
     and(
       and(
-        eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-7 days')`)
+        eq(posts.posted, true), lte(posts.updatedAt, sql.raw(`datetime('now', '-${positiveDays} days')`))
+        //eq(posts.posted, true), lte(posts.updatedAt, sql`datetime('now', '-7 days')`)
       ),
       // skip child posts objects, only get us root posts and non-threads
       and(lte(posts.threadOrder, 0), lte(repostCounts.count, 0))

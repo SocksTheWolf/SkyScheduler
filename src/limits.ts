@@ -24,6 +24,9 @@ export const MAX_POSTED_LENGTH: number = 50;
 // Max length of a repost title
 export const MAX_REPOST_TITLE_LENGTH: number = 100;
 
+// how long we should hold onto a posted post that has no additional updates (no reposts, etc)
+export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
+
 // Dashboard password length settings
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
