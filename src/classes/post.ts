@@ -117,4 +117,6 @@ export class Post {
   }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }
+  get isPosted() { return this.posted || false; }
+  get isARepost() { return this.isRepost || false; }
 };
