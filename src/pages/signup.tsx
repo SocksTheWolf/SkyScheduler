@@ -14,7 +14,7 @@ import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props: BaseElementProps) {
   if (props.ctx === undefined)
-    return (<>ERROR</>);
+    return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx!;
   const linkToInvites = isUsingInviteKeys(ctx) ?

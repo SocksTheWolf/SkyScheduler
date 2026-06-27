@@ -16,9 +16,10 @@ import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../site
 import type { AllContext, BaseElementProps } from "../types";
 import { dashboardScriptStr, dashboardStyleStr } from "../utils/appScripts";
 
-type DashboardProps = BaseElementProps;
+export default function Dashboard(props: BaseElementProps) {
+  if (props.ctx === undefined)
+    return (<b class="btn-error">Failed: Server Error</b>);
 
-export default function Dashboard(props: DashboardProps) {
   const ctx: AllContext = props.ctx!;
   // 3rd party dependencies
   const defaultDashboardPreloads: PreloadRules[] = [
