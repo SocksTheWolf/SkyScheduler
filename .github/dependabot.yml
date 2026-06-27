@@ -1,4 +1,10 @@
 version: 2
+registries:
+  npm-registry:
+    type: "npm-registry"
+    url: "https://registry.npmjs.org"
+    token: ${{secrets.GH_DUMMY}}
+    replaces-base: true
 updates:
   # GH Actions updates
   - package-ecosystem: "github-actions"
@@ -10,6 +16,8 @@ updates:
       default-days: 14
   # node updates
   - package-ecosystem: "npm"
+    registries:
+    - npm-registry
     directory: "/"
     schedule:
       interval: "weekly"

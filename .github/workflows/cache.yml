@@ -13,7 +13,6 @@ on:
     - "LICENSE"
     - "drizzle.config.ts"
     - ".gitignore"
-    - ".npmrc"
     - "tsconfig.json"
     - ".dev.vars*"
     - ".gitattributes"
