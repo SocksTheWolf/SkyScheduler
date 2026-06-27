@@ -8,6 +8,7 @@ on:
     branches: ["main"]
     paths-ignore:
     - ".github/**"
+    - ".vscode/**"
     - "README.md"
     - "LICENSE"
     - "drizzle.config.ts"
@@ -16,7 +17,14 @@ on:
     - ".dev.vars*"
     - ".gitattributes"
     - ".markdownlint.json"
-    - "assets/sitemap.xml"
+    - "package.json"
+    - "package-lock.json"
+    - "migrations/**"
+    - "src/middleware/**"
+    - "src/validation/**"
+    - "src/classes/**"
+    - "src/db/**"
+    - "src/auth/**"
   workflow_dispatch:
     inputs:
       clear_cache:
@@ -50,6 +58,7 @@ jobs:
             cache_clear:
               - 'src/utils/appScripts.ts'
               - 'src/pages/**'
+              - 'src/layout/main.tsx'
               - 'src/layout/helpers/**'
               - 'src/layout/fields/**'
               - 'assets/**'
