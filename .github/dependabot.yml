@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: "weekly"
     cooldown:
-      default-days: 7
+      default-days: 14
   # node updates
   - package-ecosystem: "npm"
     directory: "/"
