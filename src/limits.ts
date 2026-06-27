@@ -18,7 +18,7 @@ export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 export const MAX_POSTS_PER_THREAD: number = 10;
 
 // if we should truncate posted content
-export const TRUNCATE_POSTED_CONTENT: boolean = true;
+export const TRUNCATE_POSTED_CONTENT: boolean = false;
 // This is the length of how much we keep in the DB after a post has been made
 export const MAX_POSTED_LENGTH: number = 50;
 // Max length of a repost title
