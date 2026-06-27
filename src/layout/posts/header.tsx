@@ -1,8 +1,9 @@
 import { Post } from "../../classes/post";
 import { AddPostToThreadButton, AddRepostsButton, DeletePostButton, EditPostButton } from "../buttons/posts";
 import { RepostStatusIcon } from "./repostData";
+import type { BaseElementProps } from "../../types";
 
-type PostDataHeaderOptions = {
+type PostDataHeaderOptions = BaseElementProps & {
   content: Post;
   posted: boolean;
 };

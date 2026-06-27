@@ -9,12 +9,10 @@ import {
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../../limits";
 import { APP_NAME } from "../../siteinfo";
+import type { BaseElementProps } from "../../types";
 
-type UploadInfoProps = {
-  width?: number;
-};
-
-export default function UploadInfo({width}: UploadInfoProps) {
+export default function UploadInfo(props: BaseElementProps) {
+  const width: number|undefined = props.ctx?.env.IMAGE_SETTINGS.max_width;
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (<details class="uploadGuidelines noselect clicker hide-arrow" open>
     <summary tabindex={-1}>Upload Limits/Guidelines</summary>

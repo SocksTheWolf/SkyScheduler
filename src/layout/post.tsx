@@ -1,6 +1,7 @@
 import { html } from "hono/html";
 import { Post } from "../classes/post";
 import { MAX_POSTED_LENGTH } from "../limits";
+import type { BaseElementProps } from "../types";
 import PostDataFooter from "./posts/footer";
 import PostDataHeader from "./posts/header";
 
@@ -15,7 +16,7 @@ export function PostContent(props: PostContentProps) {
   return (<p class="postText">{props.text}{ellipses}</p>);
 };
 
-type ScheduledPostOptions = {
+type ScheduledPostOptions = BaseElementProps & {
   post: Post;
   // if the object should be dynamically replaced.
   // usually in edit/cancel edit settings.

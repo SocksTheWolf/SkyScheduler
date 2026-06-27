@@ -1,5 +1,6 @@
+import type { BaseElementProps } from "../../types";
 
-type ContentLabelProps = {
+type ContentLabelProps = BaseElementProps & {
   id: string;
 };
 

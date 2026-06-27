@@ -2,8 +2,9 @@ import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { APP_NAME } from "../siteinfo";
+import type { BaseElementProps } from "../types";
 
-export default function TermsOfService() {
+export default function TermsOfService(props?: BaseElementProps) {
   return (<BaseLayout title="Terms of Service" simple={true} mainClass="homepage">
     <NavTags />
     <section class="container">

@@ -4,8 +4,9 @@ import { APP_NAME } from "../siteinfo";
 import { mainScriptStr } from '../utils/appScripts';
 import { IncludeDependencyTags, PreloadDependencyTags, PreloadRules } from "./helpers/includesTags";
 import { MetaTags, PersonaTags } from './helpers/metaTags';
+import type { BaseElementProps } from "../types";
 
-type BaseLayoutProps = {
+type BaseLayoutProps = BaseElementProps & {
   children: Child;
   title: string;
   noIndex?: boolean;

@@ -3,8 +3,9 @@ import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
+import type { BaseElementProps } from "../types";
 
-export default function ResetPassword() {
+export default function ResetPassword(props?: BaseElementProps) {
   const links = [{title: "Forgot Password", url: "/forgot"}];
   return (
     <BaseLayout title="Reset Password" noIndex={true}>

@@ -488,7 +488,10 @@ export const updatePostForUser = async (c: AllContext, id: string, newData: Obje
   return await updatePostForGivenUser(c, userId, id, newData);
 };
 
-export const getPostById = async(c: AllContext, id: string): Promise<Post|null> => {
+export const getPostById = async(c: AllContext|undefined, id: string): Promise<Post|null> => {
+  if (c === undefined)
+    return null;
+
   const userId = c.get("userId");
   if (!userId || !uuidValid(id))
     return null;

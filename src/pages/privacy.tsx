@@ -2,8 +2,9 @@ import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { APP_NAME, APP_REPO } from "../siteinfo";
+import type { BaseElementProps } from "../types";
 
-export default function PrivacyPolicy() {
+export default function PrivacyPolicy(props?: BaseElementProps) {
   return (<BaseLayout title="Privacy Policy" simple={true} mainClass="homepage">
     <NavTags />
     <section class="container">

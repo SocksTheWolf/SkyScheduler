@@ -1,13 +1,13 @@
-import { Context } from "hono";
 import { raw } from "hono/html";
 import { APP_NAME } from "../siteinfo";
+import type { AllContext, BaseElementProps } from "../types";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
-type ViolationNoticeProps = {
-  ctx: Context;
-}
+export async function ViolationNoticeBar(props: BaseElementProps) {
+  if (props.ctx === undefined)
+    return (<></>);
 
-export async function ViolationNoticeBar({ctx}: ViolationNoticeProps) {
+  const ctx: AllContext = props.ctx!;
   const violationData = await getViolationsForCurrentUser(ctx);
   if (violationData !== null) {
     let errorStr = "";

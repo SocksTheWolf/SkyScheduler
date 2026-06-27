@@ -1,4 +1,3 @@
-import type { Context } from "hono";
 import { PWAutoCompleteSettings } from "../enums";
 import AccountHandler from "../layout/account";
 import BSkyAppPasswordField from "../layout/fields/appPasswordField";
@@ -10,13 +9,14 @@ import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/tu
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
 import { APP_NAME } from "../siteinfo";
+import type { AllContext, BaseElementProps } from "../types";
 import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
 
-type SignupProps = {
-  ctx: Context;
-}
+export default function Signup(props: BaseElementProps) {
+  if (props.ctx === undefined)
+    return (<>ERROR</>);
 
-export default function Signup({ctx}: SignupProps) {
+  const ctx: AllContext = props.ctx!;
   const linkToInvites = isUsingInviteKeys(ctx) ?
     (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
     "You can ask for the maintainer for it";

@@ -1,7 +1,8 @@
 import isEmpty from "just-is-empty";
 import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../../limits";
+import type { BaseElementProps } from "../../types";
 
-type RetweetOptionsProps = {
+type RetweetOptionsProps = BaseElementProps & {
   id: string;
   contentType?: string;
   checked?: boolean;

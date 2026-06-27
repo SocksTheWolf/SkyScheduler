@@ -1,8 +1,9 @@
 import { raw } from "hono/html";
 import { Post } from "../../classes/post";
 import { RepostCountElement } from "./repostData";
+import type { BaseElementProps } from "../../types";
 
-type PostDataFooterOptions = {
+type PostDataFooterOptions = BaseElementProps & {
   content: Post;
   posted: boolean;
 };

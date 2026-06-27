@@ -6,8 +6,9 @@ import {
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import { APP_NAME, APP_REPO } from "../siteinfo";
+import type { BaseElementProps } from "../types";
 
-export default function Homepage() {
+export default function Homepage(props?: BaseElementProps) {
   return (<BaseLayout title="Home" mainClass="homepage">
     <NavTags />
     <section class="container">

@@ -1,10 +1,10 @@
 import { validate as isValid } from 'uuid';
 import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
-import { AllContext } from "../types";
+import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
 
-type RepostEditorTableProps = {
+type RepostEditorTableProps = BaseElementProps & {
   id: string;
   data?: RepostInfo[];
 };
@@ -44,8 +44,7 @@ function RepostEditorTable(props: RepostEditorTableProps) {
   </table>);
 }
 
-type RepostDataPopoverProps = {
-  ctx: AllContext;
+type RepostDataPopoverProps = BaseElementProps & {
   id: string;
 };
 

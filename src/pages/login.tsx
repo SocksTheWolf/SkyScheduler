@@ -5,8 +5,9 @@ import UsernameField from "../layout/fields/usernameField";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { APP_NAME } from "../siteinfo";
+import type { BaseElementProps } from "../types";
 
-export default function Login() {
+export default function Login(props?: BaseElementProps) {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];
   return (<BaseLayout title="Login">
     <NavTags />

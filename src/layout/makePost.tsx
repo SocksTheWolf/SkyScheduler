@@ -1,5 +1,5 @@
 import { MAX_LENGTH } from "../limits";
-import { AllContext } from "../types";
+import type { BaseElementProps } from "../types";
 import { ConstScriptStr } from "../utils/constScriptGen";
 import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
 import UploadInfo from "./helpers/uploadInfo";
@@ -16,12 +16,7 @@ export const PreloadPostCreation: PreloadRules[] = [
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
-type PostCreationProps = {
-  ctx: AllContext;
-}
-
-export function PostCreation({ctx}: PostCreationProps) {
-  const maxWidth: number|undefined = ctx.env.IMAGE_SETTINGS.max_width;
+export function PostCreation(props: BaseElementProps) {
   return (<section>
     <IncludeDependencyTags scripts={PreloadPostCreation} />
     <article>
@@ -52,7 +47,7 @@ export function PostCreation({ctx}: PostCreationProps) {
                   </div>
                 </div>
                 <footer>
-                  <UploadInfo width={maxWidth} />
+                  <UploadInfo ctx={props.ctx} />
                 </footer>
               </article>
             </section>

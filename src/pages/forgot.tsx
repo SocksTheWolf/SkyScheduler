@@ -1,4 +1,3 @@
-import { Context } from "hono";
 import AccountHandler from "../layout/account";
 import UsernameField from "../layout/fields/usernameField";
 import FooterCopyright from "../layout/helpers/footer";
@@ -6,12 +5,10 @@ import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
 import { APP_NAME } from "../siteinfo";
+import type { AllContext, BaseElementProps } from "../types";
 
-type ForgotPasswordProps = {
-  ctx: Context;
-}
-
-export default function ForgotPassword({ctx}: ForgotPasswordProps) {
+export default function ForgotPassword(props: BaseElementProps) {
+  const ctx: AllContext = props.ctx!;
   const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
   return (<BaseLayout title="Forgot Password"
     preloads={[...TurnstileCaptchaPreloads(ctx)]}>

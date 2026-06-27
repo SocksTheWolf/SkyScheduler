@@ -2,8 +2,9 @@ import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
 import { RepostInfo } from "../../classes/repost";
 import { CAN_EDIT_REPOST_RULES } from "../../limits";
+import type { BaseElementProps } from "../../types";
 
-type RepostStatusIconProps = {
+type RepostStatusIconProps = BaseElementProps & {
   isRepost?: boolean;
 };
 
@@ -19,7 +20,7 @@ export function RepostStatusIcon(props: RepostStatusIconProps) {
   return null;
 };
 
-type RepostCountProps = {
+type RepostCountProps = BaseElementProps & {
   id: string;
   count?: number;
   repostInfo?: RepostInfo[];
@@ -56,7 +57,12 @@ export function RepostCountElement(props: RepostCountProps) {
   </>);
 };
 
-function RepostEditorLink({id}: any) {
+type RepostEditorLinkProps = BaseElementProps & {
+  id: string;
+}
+
+function RepostEditorLink(props: RepostEditorLinkProps) {
+  const id: string = props.id;
   if (!CAN_EDIT_REPOST_RULES) {
     return null;
   }

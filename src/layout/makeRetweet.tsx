@@ -1,8 +1,9 @@
 import { MAX_POSTED_LENGTH } from "../limits";
+import type { BaseElementProps } from "../types";
 import RetweetOptions from "./options/retweetOptions";
 import ScheduleOptions from "./options/scheduleOptions";
 
-export function MakeRetweet() {
+export function MakeRetweet(props?: BaseElementProps) {
   return (<article>
     <header>
       <h4>Schedule New Retweet</h4>
