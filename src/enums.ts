@@ -55,3 +55,11 @@ export enum ImageResizeResult {
   TooLarge,
   ExhaustedResources
 };
+
+export enum TimeIntervalSettings {
+  Hour = 60,
+  HalfHour = 30,
+  QuarterHour = 15,
+  TenMinutes = 10,
+  FiveMinutes = 5
+};

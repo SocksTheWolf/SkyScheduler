@@ -1,4 +1,5 @@
 import remove from "just-remove";
+import { TimeIntervalSettings } from "./enums";
 
 /** APPLICATION CONFIGURATIONS **/
 
@@ -16,6 +17,14 @@ export const GIF_UPLOAD_ALLOWED: boolean = false;
 export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // max posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
+
+// interval of posts that are allowed. This means nearest 1hr/30min/15min/etc options
+// if this value is changed from the default of 1hr, you must also change the cron job settings as well
+export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+
+// interval for reposts, same as above but since reposts are cheaper, this value could be changed to something else
+// without compromising application integrity
+export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
 
 // if we should truncate posted content
 export const TRUNCATE_POSTED_CONTENT: boolean = false;
