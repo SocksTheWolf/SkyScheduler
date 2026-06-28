@@ -48,13 +48,12 @@ jobs:
         if: success()
         run: npm run sitemap
       - name: Create PR
+        id: cpr
         if: success()
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
-          token: ${{ secrets.SITEMAP_TOKEN }}
           add-paths: "assets/sitemap.xml"
           commit-message: "Updated Sitemap File"
-          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           delete-branch: true
           branch: "sitemap-updates"
           sign-commits: true
@@ -63,7 +62,7 @@ jobs:
           assignees: socksthewolf
           labels: sitemap
       - name: PR Status
-        if: success() && ${{ steps.cpr.outputs.pull-request-number }}
+        if: ${{ success() && steps.cpr.outputs.pull-request-number }}
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
