@@ -150,22 +150,21 @@ post.post("/edit/:id", async (c) => {
     // process and match up all of the alt text properly
     for (let i = 0; i < originalPost.embeds?.length; ++i) {
       let embedData = originalPost.embeds[i];
-      // if we have anything other than an image, this is an error
+      // if we have anything other than an image, skip it
       if (embedData.type !== EmbedDataType.Image) {
-        c.header("HX-Trigger-After-Settle", swapErrEvents);
-        return c.html(<b class="btn-error">Invalid operation performed</b>);
+        continue;
       }
       // Check to see if this text was edited
       const newAltText = editsMap.get(embedData.content);
       if (newAltText !== undefined) {
         // it was
         originalPost.embeds[i].alt = newAltText;
+        hasEmbedEdits = true;
       }
     }
-    hasEmbedEdits = true;
   }
   const payload: LooseObj = { content: content };
-  // push embedContent as editable yes.
+  // push edited embedContent.
   if (hasEmbedEdits)
     payload.embedContent = originalPost.embeds;
 
