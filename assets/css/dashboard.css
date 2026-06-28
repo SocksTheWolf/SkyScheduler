@@ -59,10 +59,14 @@
 
 .sidebarBottom {
   margin-bottom: -55px !important;
+  hr {
+    margin-bottom: 5px !important;
+  }
 }
 
 /* Setting and refresh buttons */
 .postControls {
+  --pico-group-box-shadow: unset !important;
   margin-top: 0.6rem;
 }
 
@@ -229,10 +233,15 @@ textarea {
 
 /* Retweet Options */
 .repostScheduleSimple {
+  /* Get rid of this ugly af box on focus */
+  --pico-group-box-shadow: unset !important;
   display: inherit !important;
   text-align: center;
+  :first-child {
+    margin-right: 10px;
+  }
   select {
-    width: 10%;
+    width: 13em;
     height: 50px;
     margin-left: 15px;
     margin-right: 15px;
@@ -251,7 +260,7 @@ textarea {
     word-wrap: anywhere;
   }
   p {
-    max-width: 30dvw;
+    max-width: 30rem;
   }
 }
 /* mobile */
@@ -260,14 +269,22 @@ textarea {
     margin-top: 5px !important;
     line-height: 2rem;
     select {
-      min-width: 4rem;
+      width: 100%;
     }
   }
   .hideOnMobile {
     display: none;
   }
-  #repostDataPopover p {
-    max-width: unset;
+  #repostDataPopover {
+    p {
+       max-width: unset;
+    }
+    thead {
+      word-wrap: unset;
+    }
+  }
+  .smallMobileButton {
+    font-size: small !important;
   }
 }
 
