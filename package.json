@@ -57,7 +57,7 @@
     "@types/node": "^24.13.2",
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
-    "npm-run-all2": "^9.0.1",
+    "npm-run-all2": "^9.0.2",
     "prettier": "^3.8.4",
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.7",
