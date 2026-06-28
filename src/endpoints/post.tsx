@@ -67,7 +67,7 @@ post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c) => {
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
       if (await handlePostNowTask(c, postInfo!) === false)
-        return c.json({ok: false, msg: "Unable to post now, will try again during next nearest hour"}, 406);
+        return c.json({ok: false, msg: "Unable to post now, will try again during next nearest posting time"}, 406);
       return c.json({ok: true, msg: "Created Post!", id: response.postId});
     } else {
       return c.json({ok: false, msg: "Unable to get post content, post may have been lost"}, 401);
