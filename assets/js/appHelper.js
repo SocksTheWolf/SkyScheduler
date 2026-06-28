@@ -5,14 +5,18 @@ function getPostListElement(itemID) {
   return document.getElementById(`post-${itemID}`);
 }
 
-function formatDate(date) {
+function formatDate(date, forRepost=false) {
   const useDate = (date instanceof Date) ? date : new Date(date);
-  return useDate.toLocaleString(undefined, {
+  let dateSettings = {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "numeric",
-  });
+  };
+  const settingsCheck = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
+  if (settingsCheck != 60)
+    dateSettings.minute = "numeric";
+  return useDate.toLocaleString(undefined, dateSettings);
 }
 
 function updateAllTimes() {
@@ -20,10 +24,11 @@ function updateAllTimes() {
     if (el.hasAttribute("corrected"))
       return;
 
+    const isRepost = el.hasAttribute("repost");
     const timestampDate = new Date(el.innerText);
     el.setAttribute("data-originaltime", timestampDate.toISOString());
-    el.setAttribute("data-convertedtime", convertTimeValueLocally(timestampDate));
-    el.textContent = formatDate(timestampDate);
+    el.setAttribute("data-convertedtime", convertTimeValueLocally(timestampDate, isRepost));
+    el.textContent = formatDate(timestampDate, isRepost);
     el.setAttribute("corrected", true);
   });
   document.querySelectorAll(".repostTimesLeft").forEach(el => {
@@ -252,21 +257,31 @@ function setElementDisabled(el, disabled) {
     el.removeAttribute("disabled");
 }
 
-function localTimeChange(date) {
-  date.setMinutes(0 - date.getTimezoneOffset());
+function localTimeChange(date, forRepost=false) {
+  let curMinutes = 0;
+  const settingsCheck = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
+  if (settingsCheck != 60) {
+    // This will get us the nearest value to whatever the setting is
+    curMinutes = Math.floor(date.getMinutes() / settingsCheck) * settingsCheck;
+  }
+
+  date.setMinutes(curMinutes - date.getTimezoneOffset());
+  // remove ms and timezone, we already accounted for it
   return date.toISOString().slice(0,16);
 }
 
-function convertTimeValueLocally(number) {
+function convertTimeValueLocally(number, forRepost=false) {
   // this is a destructive operation,
   // so we'll take whatever the input is and make a new object
-  return localTimeChange(new Date(number));
+  return localTimeChange(new Date(number), forRepost);
 }
 
-function getScheduleTimeForNextHour() {
-  // set current time to value of now + 1 hour
+function getNextAvailPostingTime(forRepost=false) {
   const curDate = new Date();
-  curDate.setHours(curDate.getHours() + 1);
+  // set current time to value of now + 1 hour
+  const settingsCheck = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
+  if (settingsCheck == 60)
+    curDate.setHours(curDate.getHours() + 1);
   return localTimeChange(curDate);
 }
 
@@ -315,11 +330,11 @@ function setupDashboard() {
 
     // rounddown minutes
     dateScheduler.addEventListener('change', () => {
-      dateScheduler.value = convertTimeValueLocally(dateScheduler.value);
+      dateScheduler.value = convertTimeValueLocally(dateScheduler.value, false);
     });
 
     // push a minimum date to make it easier (less chance of typing 2025 by accident)
-    dateScheduler.setAttribute("min", getScheduleTimeForNextHour());
+    dateScheduler.setAttribute("min", getNextAvailPostingTime());
 
     if (scheduledPostNowBox) {
       addClickKeyboardListener(scheduledPostNowBox, () => {

@@ -1,5 +1,6 @@
 import isEmpty from "just-is-empty";
 import type { BaseElementProps } from "../../types";
+import { explainPostingTimeInterval } from "../../utils/helpers";
 
 type ScheduleOptionsProps = BaseElementProps & {
   timeID: string;
@@ -27,7 +28,7 @@ export default function ScheduleOptions(props: ScheduleOptionsProps) {
       {postNowHTML}
       <footer>
         <small>
-          <i>You can schedule {props.type}s in the future, hourly. Time is rounded down to the nearest hour.</i>
+          <i>You can schedule {props.type}s in the future, at every {explainPostingTimeInterval()}. Time is rounded down to the nearest interval.</i>
         </small>
       </footer>
     </article>

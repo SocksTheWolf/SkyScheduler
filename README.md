@@ -21,7 +21,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - **Multiple user/account handling**: Manage multiple users/bsky accounts easily
 - **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
-- **Hourly Time Slots**: Time selection is limited to hourly intervals to optimize worker execution and reduce unnecessary runs
+- **Custom Time Slots**: Time selection is limited to 1hr/30m/15m/10m/5m intervals (configurable, default 1hr) to optimize worker execution and reduce unnecessary runs
 - **Post Threading**: Schedule entire post threads with full media support per post!
 - **Simple Setup**: Fairly minimal setup and easy to use
 - **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images

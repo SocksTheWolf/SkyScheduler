@@ -7,6 +7,7 @@ import {
 } from "../limits";
 import { APP_NAME, APP_REPO } from "../siteinfo";
 import type { BaseElementProps } from "../types";
+import { explainPostingTimeInterval } from "../utils/helpers";
 
 export default function Homepage(props?: BaseElementProps) {
   return (<BaseLayout title="Home" mainClass="homepage">
@@ -37,7 +38,7 @@ export default function Homepage(props?: BaseElementProps) {
           <h6 class="inline-header">Features:</h6>
           <ul>
             <li>Handles multiple users/accounts easily, supports most ATProto PDS instances</li>
-            <li>Schedule your posts any time in the future (to the nearest hour)</li>
+            <li>Schedule your posts any time in the future (to the nearest {explainPostingTimeInterval()})</li>
             <li>Supports embeds, quote posts, links, tagging, mentions</li>
             <li>Post <span tabindex={0} data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with
               content labels and full support for alt text</li>

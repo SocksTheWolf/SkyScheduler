@@ -16,10 +16,10 @@ export const ImageEmbedSchema = z.object({
 export const VideoEmbedSchema = z.object({
   ...FileContentSchema.shape,
   type: z.literal(EmbedDataType.Video),
-  width: z.number("media width is not a number")
+  width: z.int("media width is not a number")
     .min(1, "media width value is below 1")
     .nonoptional("media width is required"),
-  height: z.number("media height is not a number")
+  height: z.int("media height is not a number")
     .min(1, "media height value is below 1")
     .nonoptional("media height is required"),
   duration: z.number("media duration is invalid")

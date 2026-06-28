@@ -21,7 +21,7 @@ function RepostEditorTable(props: RepostEditorTableProps) {
   return (<table class="striped">
     <thead>
       <tr>
-        <th scope="col">Repost Start Date</th>
+        <th scope="col">Start Date</th>
         <th scope="col">Repost Cadance</th>
         <th scope="col"><span data-tooltip="This field does not update with the number of reposts that have been made">Approx Num Reposts</span></th>
         <th scope="col">Action</th>
@@ -31,10 +31,10 @@ function RepostEditorTable(props: RepostEditorTableProps) {
       {sortedData.map((obj) => {
         const isMultiRetweet: boolean = obj.hours > 0;
         return (<tr class="repost-editor-item">
-          <th scope="row" class="timestamp">{obj.time}</th>
+          <th scope="row" class="timestamp" repost="true">{obj.time}</th>
           <td>{isMultiRetweet ? `Every ${obj.hours} hours` : "once"}</td>
           <td>{isMultiRetweet ? obj.count : 0} + 1 (initial)</td>
-          <td><a role="button" hx-delete={`/post/${props.id}/repost/${obj.guid}`}
+          <td><a class="smallMobileButton" role="button" hx-delete={`/post/${props.id}/repost/${obj.guid}`}
             hx-indicator="#repostDataPopoverProgress"
             hx-disabled-elt=".repost-editor-item a"
             hx-target="closest tr" hx-swap="delete">Delete</a></td>
@@ -64,7 +64,7 @@ export async function RepostDataPopover(props: RepostDataPopoverProps) {
     <RepostEditorTable id={props.id} data={repostInfoData?.repostInfo} />
     <progress id="repostDataPopoverProgress" class="htmx-indicator" />
     <footer>
-      <small><a role="button" id="click-close" class="clicker" tabindex={0}>Click to close this editor</a></small>
+      <small><a role="button" id="click-close" class="clicker" tabindex={0}>Close this editor</a></small>
     </footer>
   </article>
   </div>);

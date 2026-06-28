@@ -1,8 +1,9 @@
 import * as z from "zod/v4";
 import { EmbedDataType, PostLabel } from "../enums";
-import { MAX_LENGTH, MAX_REPOST_INTERVAL_LIMIT, MAX_REPOST_IN_HOURS, MIN_LENGTH } from "../limits";
+import { MAX_LENGTH, MIN_LENGTH, POSTING_TIME_INTERVAL } from "../limits";
 import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
+import { RepostDataSchema } from "./repostDataSchema";
 import { AltTextSchema } from "./sharedValidations";
 
 const TextContent = z.object({
@@ -25,10 +26,7 @@ export const PostSchema = z.object({
   makePostNow: z.boolean().default(false),
   rootPost: z.uuidv4("root post id is invalid").optional(),
   parentPost: z.uuidv4("parent post id is invalid").optional(),
-  repostData: z.object({
-    hours: z.coerce.number().min(1).max(MAX_REPOST_IN_HOURS),
-    times: z.coerce.number().min(1).max(MAX_REPOST_INTERVAL_LIMIT)
-  }).optional(),
+  ...RepostDataSchema.shape,
   scheduledDate: z.string().refine((date) => {
     try {
       const parsed = new Date(date);
@@ -52,6 +50,17 @@ export const PostSchema = z.object({
       ctx.addIssue({
         code: "custom",
         message: "You cannot have reposts on child posts of threads",
+        path: ["repostData"]
+      });
+    }
+  }
+  // if we have repostData, check that the minimum is acceptable
+  if (repostData !== undefined) {
+    const minimumHourValue = POSTING_TIME_INTERVAL / 60;
+    if (repostData.hours < minimumHourValue) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Hour minimum value is not allowed",
         path: ["repostData"]
       });
     }

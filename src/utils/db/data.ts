@@ -67,7 +67,7 @@ export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date):
 };
 
 export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost[]> => {
-  return await getAllRepostsForGivenTime(c, floorCurrentTime());
+  return await getAllRepostsForGivenTime(c, floorCurrentTime(true));
 };
 
 export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
@@ -76,7 +76,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
     console.error("unable to delete all reposts before current time, db was null");
     return;
   }
-  const currentTime = floorCurrentTime();
+  const currentTime = floorCurrentTime(true);
   const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
     .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
 

@@ -41,7 +41,7 @@ export function RepostCountElement(props: RepostCountProps) {
     // and then traverse it for rendering
     for (const repostItem of sortedData) {
       if (repostItem.count >= 1) {
-        const repostWrapper = `<span class="timestamp">${repostItem.time}</span>`;
+        const repostWrapper = `<span class="timestamp" repost="true">${repostItem.time}</span>`;
         if (repostItem.count == 1 && repostItem.hours == 0)
           repostInfoStr += `* Repost at ${repostWrapper}`;
         else

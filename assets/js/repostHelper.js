@@ -55,7 +55,7 @@ document.addEventListener("resetRepost", () => {
   repostCycleOptions.checked = false;
   const repostTime = document.getElementById("repostTime");
   repostTime.value = "";
-  repostTime.setAttribute("min", getScheduleTimeForNextHour());
+  repostTime.setAttribute("min", getNextAvailPostingTime(true));
   if (existingPostId.hasAttribute("data-id")) {
     const highlight = getPostListElement(existingPostId.getAttribute("data-id"));
     if (highlight) {
@@ -195,7 +195,7 @@ document.addEventListener("addNewRepost", (ev) => {
     // Set the schedule time for nice UX reasons
     let newTimeValue = null;
     if (!isScheduled)
-      newTimeValue = getScheduleTimeForNextHour();
+      newTimeValue = getNextAvailPostingTime(true);
     else if (postFooterTime.hasAttribute("data-convertedtime"))
       newTimeValue = postFooterTime.getAttribute("data-convertedtime");
 

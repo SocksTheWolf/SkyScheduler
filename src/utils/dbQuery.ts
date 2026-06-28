@@ -342,7 +342,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   }
   const { data, scheduledDate, repostData } = validation.data;
   const isScheduledPost = (data.type === RepostType.FuturePost);
-  const scheduleDate = floorGivenTime(new Date(scheduledDate));
+  const scheduleDate = floorGivenTime(new Date(scheduledDate), true);
   const timeNow = new Date();
 
   // Ensure scheduled date is in the future
