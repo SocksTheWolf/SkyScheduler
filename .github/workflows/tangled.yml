@@ -18,5 +18,5 @@ jobs:
       - name: Push to Tangled
         uses: gwennlbh/to-tangled@50f70a6910307e6fffa632e6d7cfec6b9e9f94ec
         with:
-          repo: socksthewolf.com/skyscheduler
+          repo: ${{ vars.MIRROR_REPO }}
           ssh-key: ${{ secrets.KEY }}
