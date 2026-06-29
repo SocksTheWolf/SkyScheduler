@@ -96,6 +96,8 @@ account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMI
     // attempt to rehash the password (ugh slow.)
     const authCtx = await auth.$context;
     newObject.password = await authCtx.password.hash(password!);
+    // revoke other sessions that may be active
+    await auth.api.revokeOtherSessions({headers: c.req.raw.headers});
   }
 
   // Check to see if we made any changes at all

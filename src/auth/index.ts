@@ -27,7 +27,6 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
       "/get-access-token",
       "/verify-email",
       "/send-verification-email",
-      "/revoke-other-sessions",
       "/revoke-session",
       "/link-social",
       "/list-accounts",
