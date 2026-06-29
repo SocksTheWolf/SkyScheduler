@@ -31,7 +31,6 @@ function RepostEditorTable(props: RepostEditorTableProps) {
     <tbody>
       {sortedData.map((obj) => {
         const isMultiRetweet: boolean = obj.hours > 0;
-        const isFullHour: boolean = (obj.hours % 60) == 0;
         return (<tr class="repost-editor-item">
           <th scope="row" class="timestamp" repost="true">{obj.time}</th>
           <td>{isMultiRetweet ? `Every ${formatTimeFromHours(obj.hours)}` : "once"}</td>
