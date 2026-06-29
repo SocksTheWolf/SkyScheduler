@@ -1,9 +1,9 @@
-import { formatDuration, FormatDurationOptions } from "date-fns";
 import isEmpty from "just-is-empty";
 import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT, REPOSTING_TIME_INTERVAL } from "../../limits";
 import type { BaseElementProps } from "../../types";
+import { formatTime } from "../../utils/helpers";
 
-type RetweetOptionsProps = BaseElementProps & {
+type RepostOptionsProps = BaseElementProps & {
   id: string;
   contentType?: string;
   checked?: boolean;
@@ -12,10 +12,9 @@ type RetweetOptionsProps = BaseElementProps & {
   checkboxLabel?: string;
 };
 
-export default function RetweetOptions(props: RetweetOptionsProps) {
+export default function RepostOptions(props: RepostOptionsProps) {
   const repostedFrom = !isEmpty(props.timeString) ? props.timeString : "the post time";
   const checkboxLabel = !isEmpty(props.checkboxLabel) ? props.checkboxLabel : "Should Auto-Retweet?";
-  const formatDateOptions: FormatDurationOptions = {zero: false, format: ["days", "hours", "minutes"]};
   const subIntervalLimit: number = 60 / REPOSTING_TIME_INTERVAL;
   return (<section>
     <input class="autoRepostBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
@@ -30,7 +29,8 @@ export default function RetweetOptions(props: RetweetOptionsProps) {
           // This array is pure evil and ugly and horrible
           let evilArray = [];
           for (let t = 0; t < subIntervalLimit; ++t) {
-            evilArray.push(<option value={i + (t * (REPOSTING_TIME_INTERVAL as number))/60}>{formatDuration({days: dayField, hours: hourField, minutes: t * (REPOSTING_TIME_INTERVAL as number)}, formatDateOptions)}</option>);
+            const minutesValue = t * (REPOSTING_TIME_INTERVAL as number);
+            evilArray.push(<option value={i + minutesValue/60}>{formatTime(dayField, hourField, minutesValue)}</option>);
             // When at limit, we should not add sub options, so break out.
             if (i == MAX_REPOST_IN_HOURS-1)
               break;

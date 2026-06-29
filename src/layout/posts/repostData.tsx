@@ -3,6 +3,7 @@ import isEmpty from "just-is-empty";
 import { RepostInfo } from "../../classes/repost";
 import { CAN_EDIT_REPOST_RULES } from "../../limits";
 import type { BaseElementProps } from "../../types";
+import { formatTimeFromHours } from "../../utils/helpers";
 
 type RepostStatusIconProps = BaseElementProps & {
   isRepost?: boolean;
@@ -45,7 +46,7 @@ export function RepostCountElement(props: RepostCountProps) {
         if (repostItem.count == 1 && repostItem.hours == 0)
           repostInfoStr += `* Repost at ${repostWrapper}`;
         else
-          repostInfoStr += `* Every ${repostItem.hours} hours, ${repostItem.count} times from ${repostWrapper}`;
+          repostInfoStr += `* Every ${formatTimeFromHours(repostItem.hours)}, ${repostItem.count} times from ${repostWrapper}`;
         repostInfoStr += "\n";
       }
     }

@@ -1,9 +1,9 @@
 import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
-import RetweetOptions from "./options/retweetOptions";
+import RepostOptions from "./options/repostOptions";
 import ScheduleOptions from "./options/scheduleOptions";
 
-export function MakeRetweet(props?: BaseElementProps) {
+export function RepostCreation(props?: BaseElementProps) {
   return (<article>
     <header>
       <h4>Schedule New Retweet</h4>
@@ -29,7 +29,7 @@ export function MakeRetweet(props?: BaseElementProps) {
     <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" header="Retweet At" />
     <article>
       <header>Retweet Cadance</header>
-      <RetweetOptions id="makeRepostOptions" contentType="post" timeString="the time above" checkboxLabel="Should Retweet multiple times?" />
+      <RepostOptions id="makeRepostOptions" contentType="post" timeString="the time above" checkboxLabel="Should Retweet multiple times?" />
       <footer>This will schedule additional retweets starting from the time set in the previous section</footer>
     </article>
     <footer>

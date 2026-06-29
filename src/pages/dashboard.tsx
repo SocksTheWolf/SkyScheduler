@@ -9,7 +9,7 @@ import { IncludeDependencyTags, PreloadRules } from "../layout/helpers/includesT
 import LogoImage from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
 import { PostCreation, PreloadPostCreation } from "../layout/makePost";
-import { MakeRetweet } from "../layout/makeRetweet";
+import { RepostCreation } from "../layout/makeRepost";
 import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
@@ -75,7 +75,7 @@ export default function Dashboard(props: BaseElementProps) {
             <PostCreation ctx={ctx} />
           </div>
           <div id="repostTab" role="tabpanel" aria-labelledby="tabtwo" hidden>
-            <MakeRetweet />
+            <RepostCreation ctx={ctx} />
           </div>
         </div>
       </div>

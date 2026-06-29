@@ -23,7 +23,7 @@ export const MAX_POSTS_PER_THREAD: number = 10;
 export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
 
 // interval for reposts, same as above but since reposts are cheaper, this value could be changed to something else
-// without compromising application integrity
+// without compromising application integrity/cost/runtime
 export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
 
 // if we should truncate posted content

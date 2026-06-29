@@ -3,6 +3,7 @@ import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
 import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
+import { formatTimeFromHours } from '../utils/helpers';
 
 type RepostEditorTableProps = BaseElementProps & {
   id: string;
@@ -30,9 +31,10 @@ function RepostEditorTable(props: RepostEditorTableProps) {
     <tbody>
       {sortedData.map((obj) => {
         const isMultiRetweet: boolean = obj.hours > 0;
+        const isFullHour: boolean = (obj.hours % 60) == 0;
         return (<tr class="repost-editor-item">
           <th scope="row" class="timestamp" repost="true">{obj.time}</th>
-          <td>{isMultiRetweet ? `Every ${obj.hours} hours` : "once"}</td>
+          <td>{isMultiRetweet ? `Every ${formatTimeFromHours(obj.hours)}` : "once"}</td>
           <td>{isMultiRetweet ? obj.count : 0} + 1 (initial)</td>
           <td><a class="smallMobileButton" role="button" hx-delete={`/post/${props.id}/repost/${obj.guid}`}
             hx-indicator="#repostDataPopoverProgress"

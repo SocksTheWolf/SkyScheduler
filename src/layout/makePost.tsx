@@ -4,7 +4,7 @@ import { ConstScriptStr } from "../utils/constScriptGen";
 import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
 import UploadInfo from "./helpers/uploadInfo";
 import ContentLabelOptions from "./options/contentLabelOptions";
-import RetweetOptions from "./options/retweetOptions";
+import RepostOptions from "./options/repostOptions";
 import ScheduleOptions from "./options/scheduleOptions";
 
 export const PreloadPostCreation: PreloadRules[] = [
@@ -81,7 +81,7 @@ export function PostCreation(props: BaseElementProps) {
 
           <details id="section-retweet">
             <summary role="button" title="click to toggle section" class="secondary outline">Auto-Retweet</summary>
-            <RetweetOptions id="makeReposts" contentType="post" />
+            <RepostOptions id="makeReposts" contentType="post" />
           </details>
           <input type="hidden" id="threadInfo" />
         </div>
