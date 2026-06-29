@@ -9,6 +9,7 @@ on:
     paths:
       - "src/pages/*.tsx"
       - "src/layout/main.tsx"
+      - ".github/workflows/sitemap.yml"
       - "!assets/sitemap.xml"
   workflow_dispatch: {}
 
@@ -31,7 +32,7 @@ jobs:
         with:
           ref: "main"
           fetch-depth: 0
-      - name: Fix checkout timestamps
+      - name: Fix Timestamps
         uses: chetan/git-restore-mtime-action@d186aca54f8760da4dec55313195e51ed3ebb0b3
         with:
           args: --no-directories --skip-missing
@@ -41,13 +42,13 @@ jobs:
           cache: "npm"
           node-version: "24.15"
           package-manager-cache: true
-      - name: Install
+      - name: Node Install Packages
         if: success()
         run: npm install
       - name: Run sitemap rebuild
         if: success()
         run: npm run sitemap
-      - name: Create PR
+      - name: Create PR of Sitemap Changes
         id: cpr
         if: success()
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
@@ -61,7 +62,7 @@ jobs:
           body: "Please commit to have latest mod time dates"
           assignees: socksthewolf
           labels: sitemap
-      - name: PR Status
+      - name: Print PR Status
         if: ${{ success() && steps.cpr.outputs.pull-request-number }}
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
