@@ -142,7 +142,7 @@ account.post("/violations/resolve", authMiddleware, async (c) => {
 account.post("/logout", authMiddleware, async (c) => {
   try {
     const auth = c.get("auth");
-    await auth.api.signOut(c.req.raw as any);
+    await auth.api.signOut({ headers: c.req.raw.headers });
   } catch(err) {
     console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
   }
@@ -166,7 +166,10 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
 
   // Prevent sign ups with these accounts, they are setup using a different method.
   if (username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) {
-    return c.json({ok: false, msg: "forbidden account"});
+    if (c.env.IN_DEV === false)
+      return c.json({ok: false, msg: "forbidden account"}, 401);
+    else
+      console.error("ERROR: An admin account should not be set up this way, please use the /setup route");
   }
 
   // Check to see if we're using invite keys, and if so, check em.
@@ -327,7 +330,7 @@ account.post("/delete", authMiddleware, async (c) => {
       const context = new ScheduledContext(c.env, c.executionCtx);
       c.executionCtx.waitUntil(getAllMediaOfUser(context, userId)
         .then((media) => deleteFromR2(context, media))
-        .then(() => authCtx.internalAdapter.deleteSessions(userId))
+        .then(() => auth.api.revokeSessions({headers: c.req.raw.headers}))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
 
       c.header("HX-Redirect", "/?deleted");

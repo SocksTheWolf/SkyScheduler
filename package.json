@@ -6,7 +6,7 @@
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
-    "auth:generate": "npx @better-auth/cli@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
+    "auth:generate": "npx auth@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y",
     "auth:format": "prettier --write src/db/auth.schema.ts",
     "auth": "run-s auth:*",
     "generate": "drizzle-kit generate",
@@ -31,13 +31,13 @@
     "types": "wrangler types src/wrangler.d.ts"
   },
   "dependencies": {
-    "@atproto/api": "^0.20.16",
+    "@atproto/api": "^0.20.22",
     "@hono/standard-validator": "^0.2.2",
-    "better-auth": "~1.4.21",
-    "better-auth-cloudflare": "^0.2.9",
+    "better-auth": "^1.6.22",
+    "better-auth-cloudflare": "^0.3.0",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.26",
+    "hono": "^4.12.27",
     "hono-openapi": "^1.3.0",
     "human-id": "^4.2.0",
     "image-dimensions": "^2.5.1",
@@ -50,7 +50,7 @@
     "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",
     "just-unique": "^4.2.0",
-    "uuid": "^14.0.0",
+    "uuid": "^14.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -58,24 +58,13 @@
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
     "npm-run-all2": "^9.0.2",
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.1",
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.7",
     "typed-htmx": "^0.3.1",
     "wrangler": "^4.105.0"
   },
   "engines": {
-    "node": ">=24.11.1"
-  },
-  "overrides": {
-    "better-auth": {
-      "kysely": "~0.28.17"
-    },
-    "@better-auth/core": {
-      "kysely": "~0.28.17"
-    },
-    "better-auth-cloudflare": {
-      "drizzle-orm": "^0.45.2"
-    }
+    "node": ">=24.15.0"
   }
 }

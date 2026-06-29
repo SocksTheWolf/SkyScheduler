@@ -4,7 +4,7 @@
 [![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.11-5FA04E?logo=nodedotjs)
+![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.15-5FA04E?logo=nodedotjs)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?color=blue)
 ![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)
 
@@ -34,7 +34,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 ### Prerequisites
 
-- Node.js (v24.11 or later)
+- Node.js (v24.15 or later)
 - Package Manager
 - Cloudflare Pro Workers account (you will hit CPU limits due to betterauth and egress to atproto)
 

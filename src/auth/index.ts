@@ -52,6 +52,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
               },
             }
           : undefined,
+        // @ts-ignore
         kv: env?.KV,
       },
       {
