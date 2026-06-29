@@ -79,7 +79,7 @@ export const shouldIgnoreViolation = (violationType: AccountStatus): boolean => 
   const NoHandleState: AccountStatus[] = [AccountStatus.Ok, AccountStatus.PlatformOutage,
     AccountStatus.None, AccountStatus.UnhandledError];
   // Don't do anything in these cases
-  if (violationType in NoHandleState) {
+  if (NoHandleState.includes(violationType)) {
     return true;
   }
   return false;
