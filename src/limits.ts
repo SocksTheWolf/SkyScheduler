@@ -1,7 +1,9 @@
 import remove from "just-remove";
 import { TimeIntervalSettings } from "./enums";
 
-/** APPLICATION CONFIGURATIONS **/
+/*********************************************************/
+/****            APPLICATION CONFIGURATIONS           ****/
+/*********************************************************/
 
 // minimum length of a post
 export const MIN_LENGTH: number = 1;
@@ -9,26 +11,23 @@ export const MIN_LENGTH: number = 1;
 export const MAX_REPOST_INTERVAL: number = 15;
 // max amount of time something can be reposted over
 export const MAX_REPOST_DAYS: number = 10;
-// max length of an animated gif in minutes
-export const MAX_GIF_LENGTH: number = 1;
 // if gifs should be allowed to upload
 export const GIF_UPLOAD_ALLOWED: boolean = false;
+// max length of an animated gif in minutes
+export const MAX_GIF_LENGTH: number = 1; // gifs are big so this has a separate configurable setting
 // if we can preview anything other than images
 export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // max posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
-
-// interval of posts that are allowed. This means nearest 1hr/30min/15min/etc options
-// if this value is changed from the default of 1hr, you must also change the cron job settings as well
-export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
-
-// interval for reposts, same as above but since reposts are cheaper, this value could be changed to something else
-// without compromising application integrity/cost/runtime
-export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+// the maximum amount of repost posts (content not made from the app) an account can have at any one time.
+export const MAX_REPOST_POSTS: number = 40;
+// a limit for the maximum number of repost rules a single post can have
+export const MAX_REPOST_RULES_PER_POST: number = 5;
 
 // if we should truncate posted content
 export const TRUNCATE_POSTED_CONTENT: boolean = false;
-// This is the length of how much we keep in the DB after a post has been made
+// This is the length of how much we keep in the DB after a post has been made.
+// Only if TRUNCATE_POSTED_CONTENT is true
 export const MAX_POSTED_LENGTH: number = 50;
 // Max length of a repost title
 export const MAX_REPOST_TITLE_LENGTH: number = 100;
@@ -40,21 +39,15 @@ export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
 
+/** AutoSuggest Settings **/
 // max amount of returns from bsky handle search
 export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the same value bsky uses
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 
 // the maximum size of an image file to generate a thumbnail for, in MB.
-// generation is done on client side using canvas elements.
+// generation is done on client side using canvas elements, so keep this low for mobile.
 export const MAX_THUMBNAIL_SIZE: number = 15;
-
-// the maximum amount of repost posts an account can have at any one time.
-// because some people went incredibly overboard.
-export const MAX_REPOST_POSTS: number = 40;
-
-// a limit for the maximum number of repost rules a single post can have
-export const MAX_REPOST_RULES_PER_POST: number = 5;
 
 // if the user can edit the repost rules for their posts
 export const CAN_EDIT_REPOST_RULES: boolean = true;
@@ -63,13 +56,35 @@ export const CAN_EDIT_REPOST_RULES: boolean = true;
 export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
 
 // if we should use CF Workflows in order to handle video uploads when scheduled
+// NOTE: This currently does not work properly, and should only be set to true while testing
 export const USE_VIDEO_WORKFLOWS: boolean = false;
 
-// allow for deprecated image size parsing
+// allow for deprecated image size parsing.
+// NOTE: New applications should set this to false.
 export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 
-/** INTERNAL LIMITS, DO NOT CHANGE **/
-// Maximums used internally, do not change these directly.
+/*********************************************************/
+/****          APPLICATION INTERVAL SETTINGS          ****/
+/*********************************************************/
+
+// If these are changed from the default value of Hour (or have different values from each other),
+// then you must also do the following:
+//
+// 1. Set the new crontab values in wrangler.toml
+// 2. Modify handleSchedule in scheduler.ts to add a new switch case for the given action.
+// 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
+// 4. Remove any scheduleAllContentTasks
+
+export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+// This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
+// as there's no files that need to be uploaded or change
+export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+
+/*********************************************************/
+/**** INTERNAL/SERVICE LIMITS, DO NOT CHANGE DIRECTLY ****/
+/*********************************************************/
+
+// internal calculation values, pulled from above
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
 export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
@@ -87,9 +102,7 @@ export const MAX_LENGTH: number = 300;
 export const MAX_ALT_TEXT: number = 2000;
 
 // Image limit values via
-// https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L97
-export const BSKY_IMG_MAX_WIDTH: number = 4000;
-export const BSKY_IMG_MAX_HEIGHT: number = 4000;
+// https://github.com/bluesky-social/social-app/blob/b236f274c3524a0e091a12741b6b3855ae9283ef/src/lib/constants.ts#L102
 export const BSKY_IMG_SIZE_LIMIT_IN_MB: number = 2;
 export const BSKY_IMG_MIME_TYPES: string[] = [
   "image/png",
@@ -121,6 +134,8 @@ export const MAX_EMBEDS_PER_POST: number = 10;
 // Video limits values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L184
 export const BSKY_VIDEO_MAX_DURATION: number = 3; // in minutes
+// NOTE: this is still at 100MB due to reliability concerns, also we have no multipart upload support atm
+// but dropzone technically could support it.
 export const BSKY_VIDEO_MAX_SIZE_IN_MB: number = 100;
 export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/mp4",
@@ -148,7 +163,7 @@ export const BSKY_VIDEO_FILE_EXTS: string = remove([
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
-export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_MAX_SIZE_IN_MB * MB_TO_BYTES;
+export const BSKY_VIDEO_SIZE_LIMIT: number = Math.min(R2_FILE_SIZE_LIMIT_IN_MB, BSKY_VIDEO_MAX_SIZE_IN_MB) * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
 export const MAX_GIF_LENGTH_LIMIT: number = MAX_GIF_LENGTH * TO_SEC;
 // Max size of Cloudflare Images files

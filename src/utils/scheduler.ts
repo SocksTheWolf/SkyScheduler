@@ -3,7 +3,7 @@ import { AgentMap, type AtProtoAgent } from '../classes/bskyAgents';
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
 import { TaskType } from "../enums";
-import { USE_VIDEO_WORKFLOWS } from '../limits';
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_VIDEO_WORKFLOWS } from '../limits';
 import type { AllContext } from '../types';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
@@ -79,13 +79,26 @@ export const handleRepostTask = async(c: AllContext, postData: Repost, agent: At
   return madeRepost;
 };
 
-export const schedulePostTask = async (c: AllContext) => {
+// This will run both the scheduled post task and the schedule repost task.
+// default behavior.
+export const scheduleAllContentTasks = async (c: AllContext) => {
+  const agency: AgentMap = new AgentMap(c.env.TASK_SETTINGS);
+  if (POSTING_TIME_INTERVAL != REPOSTING_TIME_INTERVAL) {
+    // If you are going to have different cadances, it's recommended you do not use this function
+    // but instead swap over to calling schedulePostTask/scheduleRepostTask individually in the
+    // handleSchedule function in this file
+    console.warn("Posting time and Reposting time are on different cadances. Please change!");
+  }
+
+  await schedulePostTask(c, agency);
+  await scheduleRepostTask(c, agency);
+};
+
+export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => {
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(c);
-  const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(c);
   const queueEnabled: boolean = isQueueEnabled(c.env);
-  const repostQueueEnabled: boolean = isRepostQueueEnabled(c.env);
   const threadQueueEnabled: boolean = shouldPostThreadQueue(c.env);
-  const agency = new AgentMap(c.env.TASK_SETTINGS);
+  const agency = (withAgency) ? withAgency : new AgentMap(c.env.TASK_SETTINGS);
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
@@ -101,7 +114,12 @@ export const schedulePostTask = async (c: AllContext) => {
   } else {
     console.log("no posts scheduled for this time");
   }
+};
 
+export const scheduleRepostTask = async (c: AllContext, withAgency?: AgentMap) => {
+  const agency = (withAgency) ? withAgency : new AgentMap(c.env.TASK_SETTINGS);
+  const repostQueueEnabled: boolean = isRepostQueueEnabled(c.env);
+  const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(c);
   // Push any reposts
   if (!isEmpty(scheduledReposts)) {
     console.log(`handling ${scheduledReposts.length} reposts`);
@@ -140,13 +158,21 @@ export const cleanupAbandonedFiles = async(c: AllContext) => {
 };
 
 export const handleSchedule = (c: AllContext, cronTime: string) => {
+  // if any new crontime schedules are added, they should be handled in here
+  // otherwise the default will execute
   switch (cronTime) {
-    case "30 03 * * sun":
+    // Leave this cronjob alone
+    case "37 03 * * sun":
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
     break;
-    default:
+    /* MODIFY CRONJOBS FROM HERE */
     case "0 * * * *":
-      c.executionCtx.waitUntil(schedulePostTask(c));
+      // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
+      c.executionCtx.waitUntil(scheduleAllContentTasks(c));
+    break;
+    default:
+      // Remove any call instances of this function should you change the intervals.
+      c.executionCtx.waitUntil(scheduleAllContentTasks(c));
     break;
   }
 };

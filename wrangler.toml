@@ -67,9 +67,9 @@ name = "REPOST_EDITOR_OPEN_LIMITER"
 namespace_id = "5471006"
 simple = { limit = 10, period = 10 }
 
-# Schedule cron triggers at the start of every hour and ~3:30am on sunday for big cleanups:
+# Schedule cron triggers at the start of every hour and ~3:37am on sunday for big cleanups:
 [triggers]
-crons = [ "0 * * * *", "30 03 * * sun" ]
+crons = [ "0 * * * *", "37 03 * * sun" ]
 
 # flags required to run wrangler in linux
 [dev]
