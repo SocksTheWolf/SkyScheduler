@@ -1,4 +1,5 @@
 // Various information that is hardcoded here, that can be grabbed from anywhere else.
+//
 // Basically hard coded site info without the need for CF bindings passed around
 // or having to figure out the domain by parsing request urls.
 
@@ -26,6 +27,11 @@ export const ATPROTO_DID: string = "did:plc:ecfcvvlqmadysyik3thlbs3c";
 
 // If the logo image should be rendered on the site.
 export const LOGO_ENABLED: boolean = true;
+
+// App Manifest settings
+export const APP_MANIFEST_GUID: string = "com.socksthewolf.skyscheduler";
+export const APP_MANIFEST_THEME_COLOR: string = "#80b3e0";
+export const APP_MANIFEST_BG_COLOR: string = "#3c5479";
 
 // if the support bar should be shown or not. Currently is only visible on the dashboard page
 export const SHOW_SUPPORT_PROGRESS_BAR: boolean = false;

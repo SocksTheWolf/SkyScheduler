@@ -9,7 +9,9 @@ on:
     paths:
       - "src/pages/*.tsx"
       - "src/layout/main.tsx"
+      - "src/layout/helpers/*.tsx"
       - ".github/workflows/sitemap.yml"
+      - "!src/layout/helpers/(turnstile|uploadInfo|includesTags).tsx"
       - "!assets/sitemap.xml"
   workflow_dispatch: {}
 

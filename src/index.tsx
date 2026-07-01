@@ -23,6 +23,7 @@ import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { ATPROTO_DID, SITE_URL } from "./siteinfo";
 import type { Bindings, QueueTaskData } from "./types";
+import { appManifestGenerate } from "./utils/appManifest";
 import { makeConstScript } from "./utils/constScriptGen";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
@@ -48,8 +49,7 @@ if (!isEmpty(ATPROTO_DID)) {
 
 // JS injection of const variables
 app.get("/js/consts.js", staticFilesCache, (c) => {
-  const constScript = makeConstScript();
-  return c.body(constScript, 200, {'Content-Type': 'text/javascript'});
+  return c.body(makeConstScript(), 200, {'Content-Type': 'text/javascript'});
 });
 
 // Write the robots.txt file dynamically
@@ -58,6 +58,11 @@ app.get("/robots.txt", staticFilesCache, async (c) => {
   const robotsFile = await c.env.ASSETS!.fetch(`${origin}/robots.txt`)
     .then(async (resp) => await resp.text());
   return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200);
+});
+
+// Write site.webmanifest dynamically
+app.get("/site.webmanifest", staticFilesCache, (c) => {
+  return c.json(appManifestGenerate());
 });
 
 // Legal linkies
@@ -132,8 +137,7 @@ export { UploadVideoAndPublishWorkflow } from "./utils/workflows/uploadAndPublis
 // Default CF exports
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
-    const runtimeWrapper = new ScheduledContext(env, ctx);
-    handleSchedule(runtimeWrapper, event.cron);
+    handleSchedule(new ScheduledContext(env, ctx), event.cron);
   },
   async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
     await processQueue(batch, env, ctx);

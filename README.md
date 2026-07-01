@@ -83,7 +83,6 @@ npm install
    - `limits.ts` - site configuration and application limits
    - `siteinfo.ts` - site information such as name, description, domain, etc
    - `.ssclirc` - sitemap domain
-   - `site.webmanifest` - naming and color schemes
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
 
