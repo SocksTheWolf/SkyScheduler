@@ -24,10 +24,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   clear_cache:
     runs-on: ubuntu-latest
@@ -35,8 +31,6 @@ jobs:
     environment:
       name: cloudflare
     steps:
-      - name: Checkout Project
-        uses: actions/checkout@v7.0.0
       - name: Cloudflare Cache Cleaner
         uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
         with:
