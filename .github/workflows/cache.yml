@@ -6,25 +6,13 @@ on:
     - cron: "5 0 1 1 *"
   push:
     branches: ["main"]
-    paths-ignore:
-    - ".github/**"
-    - ".vscode/**"
-    - "README.md"
-    - "LICENSE"
-    - "drizzle.config.ts"
-    - ".gitignore"
-    - "tsconfig.json"
-    - ".dev.vars*"
-    - ".gitattributes"
-    - ".markdownlint.json"
-    - "package.json"
-    - "package-lock.json"
-    - "migrations/**"
-    - "src/middleware/**"
-    - "src/validation/**"
-    - "src/classes/**"
-    - "src/db/**"
-    - "src/auth/**"
+    paths:
+      - "assets/**"
+      - "!assets/.assetsignore"
+      - "src/utils/(appScripts|constScriptGen|appManifest).ts"
+      - "src/(layout|pages)/**"
+      - "src/(limits|siteinfo).ts"
+      - "src/index.tsx"
   workflow_dispatch:
     inputs:
       clear_cache:
