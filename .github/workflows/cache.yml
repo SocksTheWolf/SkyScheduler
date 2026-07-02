@@ -20,8 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
-  actions: write
+  deployments: write
 
 jobs:
   clear_cache:

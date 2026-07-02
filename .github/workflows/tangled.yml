@@ -8,8 +8,7 @@ on:
 
 permissions:
   contents: read
-  actions: write
-  id-token: write
+  deployments: write
 
 jobs:
   push:
