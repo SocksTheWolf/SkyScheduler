@@ -17,6 +17,7 @@ jobs:
   # Clean up github job
   clean_github:
     runs-on: ubuntu-latest
+    continue-on-error: true
     permissions: write-all
     steps:
       - name: Cleanup cloudflare env
