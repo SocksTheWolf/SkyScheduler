@@ -18,6 +18,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  deployments: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +27,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    continue-on-error: true
     environment:
       name: sitemap
     steps:
@@ -50,6 +52,7 @@ jobs:
       - name: Run sitemap rebuild
         if: success()
         run: npm run sitemap
+      # It would be nice if this were auto committed instead. Might want to move to that.
       - name: Create PR of Sitemap Changes
         id: cpr
         if: success()
@@ -70,3 +73,9 @@ jobs:
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
           echo "Pull Request Signed - ${{ steps.cpr.outputs.pull-request-commits-verified }}"
+      - name: Cleanup Previous Deploys
+        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: sitemap
+          onlyRemoveDeployments: true

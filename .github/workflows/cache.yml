@@ -13,6 +13,7 @@ on:
       - "src/(layout|pages)/**"
       - "src/(limits|siteinfo).ts"
       - "src/index.tsx"
+      - ".github/workflows/cache.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -29,15 +30,15 @@ jobs:
     environment:
       name: cloudflare
     steps:
-      - name: Cleanup Previous Deploys
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: cloudflare
-          onlyRemoveDeployments: true
       - name: Cloudflare Cache Cleaner
         uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
         with:
           zone: ${{ secrets.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
           account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Cleanup Previous Deploys
+        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: cloudflare
+          onlyRemoveDeployments: true
