@@ -7,48 +7,59 @@ import { TimeIntervalSettings } from "./enums";
 
 // minimum length of a post
 export const MIN_LENGTH: number = 1;
-// max amount of times something can be reposted
+// max amount of iterations a single repost rule can have
 export const MAX_REPOST_INTERVAL: number = 15;
-// max amount of time something can be reposted over
+// max amount of time content can be reposted over
 export const MAX_REPOST_DAYS: number = 10;
-// if gifs should be allowed to upload
-export const GIF_UPLOAD_ALLOWED: boolean = false;
-// max length of an animated gif in minutes
-export const MAX_GIF_LENGTH: number = 1; // gifs are big so this has a separate configurable setting
-// if we can preview anything other than images
-export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
-// max posts per thread
+// max amount of posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
 // the maximum amount of repost posts (content not made from the app) an account can have at any one time.
 export const MAX_REPOST_POSTS: number = 40;
 // a limit for the maximum number of repost rules a single post can have
-export const MAX_REPOST_RULES_PER_POST: number = 5;
-
-// if we should truncate posted content
-export const TRUNCATE_POSTED_CONTENT: boolean = false;
-// This is the length of how much we keep in the DB after a post has been made.
-// Only if TRUNCATE_POSTED_CONTENT is true
-export const MAX_POSTED_LENGTH: number = 50;
+export const MAX_REPOST_RULES_PER_POST: number = 7;
 // Max length of a repost title
 export const MAX_REPOST_TITLE_LENGTH: number = 100;
+
+/** Storage settings **/
+/* ------------------ */
+// if we should truncate posted content
+export const TRUNCATE_POSTED_CONTENT: boolean = false;
+// How much of the content we keep in the DB after a post has been made.
+// (Only if TRUNCATE_POSTED_CONTENT is true)
+export const MAX_POSTED_LENGTH: number = 50;
 
 // how long we should hold onto a posted post that has no additional updates (no reposts, etc)
 export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 
+/** Security settings **/
+/* ------------------- */
 // Dashboard password length settings
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
 
+/** Media content **/
+/* --------------- */
+// if gifs should be allowed to upload
+export const GIF_UPLOAD_ALLOWED: boolean = false;
+// max length of an animated gif in minutes
+// gifs are big so this has a separate configurable setting
+export const MAX_GIF_LENGTH: number = 1;
+
+// if we can preview anything other than images
+export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
+// the maximum size of an image file to generate a thumbnail for, in MB.
+// generation is done on client side using canvas elements, so keep this low for mobile.
+export const MAX_THUMBNAIL_SIZE: number = 15;
+
 /** AutoSuggest Settings **/
+/* ---------------------- */
 // max amount of returns from bsky handle search
 export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the same value bsky uses
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 
-// the maximum size of an image file to generate a thumbnail for, in MB.
-// generation is done on client side using canvas elements, so keep this low for mobile.
-export const MAX_THUMBNAIL_SIZE: number = 15;
-
+/** Feature Flags **/
+/* --------------- */
 // if the user can edit the repost rules for their posts
 export const CAN_EDIT_REPOST_RULES: boolean = true;
 
@@ -60,7 +71,7 @@ export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
 export const USE_VIDEO_WORKFLOWS: boolean = false;
 
 // allow for deprecated image size parsing.
-// NOTE: New applications should set this to false.
+// NOTE: All new applications should set this to false.
 export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 
 /*********************************************************/
@@ -73,7 +84,6 @@ export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 // 1. Set the new crontab values in wrangler.toml
 // 2. Modify handleSchedule in scheduler.ts to add a new switch case for the given action.
 // 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
-// 4. Remove any scheduleAllContentTasks
 
 export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
 // This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
