@@ -172,7 +172,7 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
     break;
     case "30 * * * *":
       c.executionCtx.waitUntil(scheduleRepostTask(c));
-    break:
+    break;
     /* END MODIFICATION */
     default:
       console.error(`No tasks have been defined for ${cronTime}`);
