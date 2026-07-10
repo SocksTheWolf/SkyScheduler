@@ -8,12 +8,12 @@ minify = true
 upload_source_maps = true
 preview_urls = false
 
-assets = { binding = "ASSETS", run_worker_first = ["/robots.txt"], directory = "./assets/", not_found_handling = "single-page-application" }
+assets = { binding = "ASSETS", run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
 routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
 [build]
 command = "npm run minify"
-watch_dir = ["/assets/js/*Helper.js", "/assets/js/main.js", "/assets/css/stylesheet.css", "/assets/css/dashboard.css", "/src/limits.ts", "/src/statics/**"]
+watch_dir = ["/assets/js/*Helper.js", "/assets/js/main.js", "/assets/css/stylesheet.css", "/assets/css/dashboard.css", "/src/limits.ts", "/src/statics"]
 
 # Redis for sessions
 [[kv_namespaces]]
@@ -114,6 +114,7 @@ class_name = "UploadVideoAndPublishWorkflow"
 # used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"
+remote = true
 
 # this did give us issues in the past...
 [limits]

@@ -28,6 +28,7 @@ import { makeConstScript } from "./statics/constScript";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
+import { robotsGenerate } from "./statics/robotsGenerator";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 app.use(blankAuthEnv);
@@ -54,10 +55,7 @@ app.get("/js/consts.js", staticFilesCache, (c) => {
 
 // Write the robots.txt file dynamically
 app.get("/robots.txt", staticFilesCache, async (c) => {
-  const origin: string = new URL(c.req.url).origin;
-  const robotsFile = await c.env.ASSETS!.fetch(`${origin}/robots.txt`)
-    .then(async (resp) => await resp.text());
-  return c.text(`${robotsFile}\nSitemap: ${SITE_URL}/sitemap.xml`, 200);
+  return c.text(robotsGenerate(), 200);
 });
 
 // Write site.webmanifest dynamically

@@ -10,7 +10,6 @@ on:
       - "assets/**"
       - "!assets/.assetsignore"
       - "!assets/_redirects"
-      - "!assets/robots.txt"
       - "!assets/.well-known/**"
       - "src/(layout|pages|statics)/**"
       - "src/(limits|siteinfo).ts"
