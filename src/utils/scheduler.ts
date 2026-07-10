@@ -170,9 +170,12 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
       c.executionCtx.waitUntil(scheduleAllContentTasks(c));
     break;
+    case "30 * * * *":
+      c.executionCtx.waitUntil(scheduleRepostTask(c));
+    break:
+    /* END MODIFICATION */
     default:
-      // Remove any call instances of this function should you change the intervals.
-      c.executionCtx.waitUntil(scheduleAllContentTasks(c));
+      console.error("No Content Post Tasks have been scheduled!");
     break;
   }
 };
