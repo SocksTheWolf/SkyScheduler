@@ -23,8 +23,8 @@ import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { ATPROTO_DID, SITE_URL } from "./siteinfo";
 import type { Bindings, QueueTaskData } from "./types";
-import { appManifestGenerate } from "./utils/appManifest";
-import { makeConstScript } from "./utils/constScriptGen";
+import { appManifestGenerate } from "./statics/appManifest";
+import { makeConstScript } from "./statics/constScript";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
@@ -68,12 +68,6 @@ app.get("/site.webmanifest", staticFilesCache, (c) => {
 // Legal linkies
 app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
 app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
-
-// Add redirects
-app.get("/bsky", (c) => c.redirect(c.env.REDIRECTS.bsky_profile || c.env.REDIRECTS.contact));
-app.get("/contact", (c) => c.redirect(c.env.REDIRECTS.contact));
-app.get("/tip", (c) => c.redirect(c.env.REDIRECTS.tip || SITE_URL));
-app.get("/terms", (c) => c.redirect("/tos"));
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes

@@ -14,7 +14,7 @@ import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import type { AllContext, BaseElementProps } from "../types";
-import { dashboardScriptStr, dashboardStyleStr } from "../utils/appScripts";
+import { dashboardScriptStr, dashboardStyleStr } from "../statics/appScripts";
 
 export default function Dashboard(props: BaseElementProps) {
   if (props.ctx === undefined)

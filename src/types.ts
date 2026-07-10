@@ -22,12 +22,6 @@ type SignupConfigSettings = {
   invite_uses: number;
 }
 
-type RedirectConfigSettings = {
-  bsky_profile?: string;
-  contact: string;
-  tip?: string;
-}
-
 type R2ConfigSettings = {
   auto_prune: boolean;
   prune_days?: number;
@@ -85,7 +79,6 @@ export interface Bindings {
   RESET_BOT_APP_PASS: string;
   ENCRYPTED_PASS_KEY: string;
   IN_DEV: boolean;
-  REDIRECTS: RedirectConfigSettings;
 };
 
 export type EmbedData = {

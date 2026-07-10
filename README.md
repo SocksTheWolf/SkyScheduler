@@ -81,6 +81,7 @@ npm install
 6. Modify any site information located in:
 
    - `limits.ts` - site configuration and application limits
+   - `/assets/_redirects` - redirect location information
    - `siteinfo.ts` - site information such as name, description, domain, etc
    - `.ssclirc` - sitemap domain
 

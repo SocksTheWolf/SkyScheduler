@@ -9,8 +9,10 @@ on:
     paths:
       - "assets/**"
       - "!assets/.assetsignore"
-      - "src/utils/(appScripts|constScriptGen|appManifest).ts"
-      - "src/(layout|pages)/**"
+      - "!assets/_redirects"
+      - "!assets/robots.txt"
+      - "!assets/.well-known/**"
+      - "src/(layout|pages|statics)/**"
       - "src/(limits|siteinfo).ts"
       - "src/index.tsx"
       - ".github/workflows/cache.yml"

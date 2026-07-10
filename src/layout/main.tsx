@@ -1,7 +1,7 @@
 import { raw } from 'hono/html';
 import { Child } from 'hono/jsx';
 import { APP_NAME } from "../siteinfo";
-import { mainScriptStr } from '../utils/appScripts';
+import { mainScriptStr } from '../statics/appScripts';
 import { IncludeDependencyTags, PreloadDependencyTags, PreloadRules } from "./helpers/includesTags";
 import { MetaTags, PersonaTags } from './helpers/metaTags';
 import type { BaseElementProps } from "../types";

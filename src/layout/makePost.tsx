@@ -1,6 +1,6 @@
 import { MAX_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
-import { ConstScriptStr } from "../utils/constScriptGen";
+import { ConstScriptStr } from "../statics/constScript";
 import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
 import UploadInfo from "./helpers/uploadInfo";
 import ContentLabelOptions from "./options/contentLabelOptions";

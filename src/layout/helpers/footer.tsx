@@ -1,5 +1,5 @@
 import { APP_NAME, APP_REPO, PROGRESS_MADE, PROGRESS_TOTAL, PROJECT_AUTHOR, PROJECT_AUTHOR_SITE } from "../../siteinfo";
-import { CURRENT_SCRIPT_VERSION } from "../../utils/appScripts";
+import { CURRENT_SCRIPT_VERSION } from "../../statics/appScripts";
 import type { BaseElementProps } from "../../types";
 
 // Helper footer for various pages
