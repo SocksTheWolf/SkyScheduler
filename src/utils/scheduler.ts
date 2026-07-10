@@ -175,7 +175,7 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
     break:
     /* END MODIFICATION */
     default:
-      console.error("No Content Post Tasks have been scheduled!");
+      console.error(`No tasks have been defined for ${cronTime}`);
     break;
   }
 };
