@@ -10,9 +10,8 @@ permissions:
   deployments: write
 
 jobs:
-  push:
+  push_tangled:
     runs-on: ubuntu-latest
-    continue-on-error: true
     environment:
       name: tangled
     steps:
@@ -22,6 +21,7 @@ jobs:
           repo: ${{ vars.MIRROR_REPO }}
           ssh-key: ${{ secrets.KEY }}
       - name: Cleanup Previous Deploys
+        if: success()
         uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

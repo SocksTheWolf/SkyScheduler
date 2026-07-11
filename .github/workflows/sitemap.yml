@@ -15,18 +15,15 @@ on:
       - "!assets/sitemap.xml"
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-  deployments: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  update:
+  update_sitemap:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    permissions:
+      contents: write
     outputs:
       needs_clear: ${{ steps.commit.outputs.changes_detected }}
     environment:
@@ -48,14 +45,11 @@ jobs:
           node-version: "24.15"
           package-manager-cache: true
       - name: Node Install Packages
-        if: success()
         run: npm install
       - name: Rebuild Sitemap
-        if: success()
         run: npm run sitemap
       - name: Setup GPG Key
         id: import-gpg
-        if: success()
         uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -63,7 +57,6 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Commit the Changes
-        if: success()
         id: commit
         uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d
         with:
@@ -73,17 +66,11 @@ jobs:
           commit_user_name: ${{ steps.import-gpg.outputs.name }}
           commit_user_email: ${{ steps.import-gpg.outputs.email }}
           commit_options: '-S'
-      - name: Cleanup Previous Deploys
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: sitemap
-          onlyRemoveDeployments: true
 
   clear_sitemap_cache:
     runs-on: ubuntu-latest
-    needs: update
-    if: ${{ needs.update.outputs.needs_clear == 'true' }}
+    needs: update_sitemap
+    if: ${{ needs.update_sitemap.outputs.needs_clear == 'true' }}
     environment:
       name: cloudflare
     steps:
@@ -95,3 +82,16 @@ jobs:
           account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           URLs: |
             https://skyscheduler.work/sitemap.xml
+
+  clean_sitemap_deploys:
+    runs-on: ubuntu-latest
+    needs: ["update_sitemap", "clear_sitemap_cache"]
+    permissions:
+      deployments: write
+    steps:
+      - name: Cleanup Previous Deploys
+        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: sitemap
+          onlyRemoveDeployments: true

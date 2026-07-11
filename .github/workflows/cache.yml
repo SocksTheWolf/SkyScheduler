@@ -21,13 +21,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  deployments: write
-
 jobs:
   clear_cache:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    permissions:
+      deployments: write
     environment:
       name: cloudflare
     steps:
@@ -39,6 +37,7 @@ jobs:
           account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       # remove Github deployments
       - name: Cleanup Previous Deploys
+        if: success()
         uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
