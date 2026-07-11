@@ -119,7 +119,7 @@ Modifying key values such as meta tag data, the application name and any descrip
 
 ### Minimization
 
-The application by default is configured to use the minified versions of the scripts in `assets/js` and `assets/css`. By default, all minimized files will rebuild whenever any typescript file is changed or the application is deployed/ran.
+SkyScheduler uses the minified versions of the scripts in `assets/js` and `assets/css`. These are generated on the fly whenever any typescript file is changed or the application is deployed/ran.
 
 ## Project Structure
 
@@ -140,6 +140,7 @@ skyscheduler/
 │   ├── layout/
 │   ├── middleware/
 │   ├── pages/
+│   ├── statics/
 │   ├── utils/
 │   └── validation/
 ├── migrations/
