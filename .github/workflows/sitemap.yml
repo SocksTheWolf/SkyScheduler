@@ -27,6 +27,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     continue-on-error: true
+    outputs:
+      needs_clear: ${{ steps.commit.outputs.changes_detected }}
     environment:
       name: sitemap
     steps:
@@ -48,7 +50,7 @@ jobs:
       - name: Node Install Packages
         if: success()
         run: npm install
-      - name: Run sitemap rebuild
+      - name: Rebuild Sitemap
         if: success()
         run: npm run sitemap
       - name: Setup GPG Key
@@ -62,6 +64,7 @@ jobs:
           git_commit_gpgsign: true
       - name: Commit the Changes
         if: success()
+        id: commit
         uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d
         with:
           file_pattern: "assets/sitemap.xml"
@@ -76,3 +79,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: sitemap
           onlyRemoveDeployments: true
+
+  clear_sitemap_cache:
+    runs-on: ubuntu-latest
+    needs: update
+    if: ${{ needs.update.outputs.needs_clear == 'true' }}
+    environment:
+      name: cloudflare
+    steps:
+      - name: Cloudflare Cache Cleaner
+        uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
+        with:
+          zone: ${{ secrets.CLOUDFLARE_ZONE }}
+          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+          account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          URLs:
+            - "https://skyscheduler.work/sitemap.xml"
