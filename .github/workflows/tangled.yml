@@ -12,7 +12,6 @@ permissions:
 jobs:
   push_tangled:
     runs-on: ubuntu-latest
-    permissions: write-all
     environment:
       name: tangled
     steps:
@@ -28,8 +27,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: tangled
           onlyRemoveDeployments: true
-      - name: Remove old environment
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: tangle
