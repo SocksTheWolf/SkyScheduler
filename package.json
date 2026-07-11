@@ -54,6 +54,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260710.1",
     "@types/node": "^24.13.2",
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
@@ -62,7 +63,12 @@
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.7",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.105.0"
+    "wrangler": "^4.110.0"
+  },
+  "overrides": {
+    "better-auth-cloudflare": {
+      "@cloudflare/workers-types": "latest"
+    }
   },
   "engines": {
     "node": ">=24.15.0"
