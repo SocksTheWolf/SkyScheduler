@@ -169,7 +169,6 @@ skyscheduler/
 - date-fns - date processing helpers
 - drizzle - database orm/schemas
 - just - js helper library
-- human-id - passphrase generation for invite keys
 
 #### Client
 

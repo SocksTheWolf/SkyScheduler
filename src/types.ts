@@ -19,7 +19,6 @@ type SignupConfigSettings = {
   use_captcha: boolean;
   invite_only: boolean;
   invite_thread?: string;
-  invite_uses: number;
 }
 
 type R2ConfigSettings = {

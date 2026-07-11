@@ -130,7 +130,7 @@ BETTER_AUTH_URL="https://skyscheduler.work"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/", max_width=3000}
 
 # Signup options and if keys should be used
-SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread="", invite_uses=10}
+SIGNUP_SETTINGS = {use_captcha=true, invite_only=false, invite_thread=""}
 
 # queue handling, pushing information.
 QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, pressure_retries=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE"], repost_queues=["REPOST_QUEUE"]}

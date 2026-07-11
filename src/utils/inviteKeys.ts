@@ -1,4 +1,3 @@
-import humanId from "human-id";
 import has from "just-has";
 import type { AllContext } from "../types";
 
@@ -69,21 +68,4 @@ export const consumeInviteKey = async(c: AllContext, inviteKey: string|undefined
     // put the new value on the stack
     await c.env.INVITE_POOL!.put(inviteKey, newValue.toString());
   }
-}
-
-export const makeInviteKey = (c: AllContext): string|null => {
-  if (!isUsingInviteKeys(c)) {
-    return null;
-  }
-
-  const usages: number = c.env.SIGNUP_SETTINGS.invite_uses;
-  if (usages === undefined)
-    return null;
-
-  const newKey: string = humanId({
-    separator: '-',
-    capitalize: false,
-  });
-  c.executionCtx.waitUntil(c.env.INVITE_POOL!.put(newKey, usages.toString()));
-  return newKey;
 }

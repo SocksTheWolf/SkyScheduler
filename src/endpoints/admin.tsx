@@ -8,7 +8,6 @@ import { APP_NAME, SITE_URL } from "../siteinfo";
 import type { Bindings } from "../types";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates } from "../utils/db/maintain";
-import { makeInviteKey } from "../utils/inviteKeys";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 import { openapiRoutes } from "./openapi";
 
@@ -17,15 +16,6 @@ export const admin = new Hono<{ Bindings: Bindings, Variables: ContextVariables 
 admin.use(secureHeaders());
 admin.use(corsHelperMiddleware);
 admin.use(authAdminOnlyMiddleware);
-
-// Generate invites route
-admin.get("/invite", (c) => {
-  const newKey = makeInviteKey(c);
-  if (newKey !== null)
-    return c.text(`${newKey} is good for ${c.env.SIGNUP_SETTINGS.invite_uses} uses`);
-  else
-    return c.text("Invite keys are disabled.");
-});
 
 // Admin Maintenance Cleanup
 admin.get("/cron", async (c) => {
