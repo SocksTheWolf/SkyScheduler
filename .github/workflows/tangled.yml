@@ -8,11 +8,11 @@ on:
 permissions:
   contents: read
   deployments: write
-  environments: write
 
 jobs:
   push_tangled:
     runs-on: ubuntu-latest
+    permissions: write-all
     environment:
       name: tangled
     steps:
