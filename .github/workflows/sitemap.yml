@@ -17,7 +17,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   deployments: write
 
 concurrency:
@@ -70,8 +69,7 @@ jobs:
           commit_author: "${{ steps.import-gpg.outputs.name }} <${{ steps.import-gpg.outputs.email }}>"
           commit_user_name: ${{ steps.import-gpg.outputs.name }}
           commit_user_email: ${{ steps.import-gpg.outputs.email }}
-          commit_options: '-S --amend --no-edit'
-          skip_fetch: true
+          commit_options: '-S'
       - name: Cleanup Previous Deploys
         uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
         with:
