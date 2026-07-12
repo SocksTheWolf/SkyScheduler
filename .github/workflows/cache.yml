@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   clear_cache:
+    name: Clear Cloudflare Cache
     runs-on: ubuntu-latest
     permissions:
       deployments: write

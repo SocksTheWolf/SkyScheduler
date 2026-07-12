@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   update_sitemap:
+    name: Build Sitemap
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,7 +42,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           cache: "npm"
-          node-version: "24.15"
+          node-version-file: ".node-version"
           package-manager-cache: true
       - name: Node Install Packages
         run: npm install
@@ -68,6 +69,7 @@ jobs:
 
   clear_sitemap_cache:
     runs-on: ubuntu-latest
+    name: Clear CF Cache for Sitemap
     needs: update_sitemap
     permissions: {}
     if: ${{ needs.update_sitemap.outputs.needs_clear == 'true' }}
@@ -85,6 +87,7 @@ jobs:
 
   clean_sitemap_deploys:
     runs-on: ubuntu-latest
+    name: Clean Github Sitemap Deploys
     needs: ["update_sitemap"]
     permissions:
       deployments: write
