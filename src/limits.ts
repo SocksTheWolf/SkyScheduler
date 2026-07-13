@@ -1,4 +1,3 @@
-import remove from "just-remove";
 import { TimeIntervalSettings } from "./enums";
 
 /*********************************************************/
@@ -125,7 +124,7 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_IMG_FILE_EXTS: string = [
+export const BSKY_IMG_FILE_EXTS_STR: string = [
   "png",
   "jpg",
   "jpeg",
@@ -154,20 +153,21 @@ export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/quicktime"
 ];
 
+export const BSKY_VIDEO_FILE_EXTS: string[] = [
+  "mp4",
+  "mpeg",
+  "mov",
+  "webm"
+];
+
 // Used for human readable display
 export const BSKY_GIF_MIME_TYPES: string[] = [
   "image/gif"
 ];
 
 // Used for human readable display
-export const BSKY_VIDEO_FILE_EXTS: string = remove([
-  "mp4",
-  "mpeg",
-  "mov",
-  "webm",
-   /* This is handled in a special case because bluesky */
-  (GIF_UPLOAD_ALLOWED ? "animated gif" : undefined)
-], [undefined]).join(", ");
+export const BSKY_VIDEO_FILES_STR: string = ((GIF_UPLOAD_ALLOWED) ?
+  [...BSKY_VIDEO_FILE_EXTS, "animated gif"] : BSKY_VIDEO_FILE_EXTS).join(", ");
 
 // Max size of files that can go to R2 without doing multipart uploads
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;

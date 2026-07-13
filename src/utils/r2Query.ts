@@ -1,7 +1,7 @@
 import { imageDimensionsFromStream } from 'image-dimensions';
 import truncate from 'just-truncate';
 import { v4 as uuidv4 } from 'uuid';
-import { EmbedDataType, ImageResizeResult } from "../enums";
+import { ImageResizeResult } from "../enums";
 import {
   BSKY_GIF_MIME_TYPES,
   BSKY_IMG_MIME_TYPES,
@@ -19,6 +19,7 @@ import {
 } from "../limits";
 import type { AllContext, EmbedData, R2BucketObject } from '../types';
 import { addFileListing, deleteFileListings } from './db/file';
+import { isAltEditableType } from './helpers';
 
 type FileMetaData = {
   name: string,
@@ -36,7 +37,7 @@ export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|unde
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach((data) => {
       // We don't store any data locally for weblinks/records
-      if (data.type === EmbedDataType.Image || data.type === EmbedDataType.Video) {
+      if (isAltEditableType(data.type)) {
         console.log(`Pushing ${data.content} for deletion...`);
         itemsToDelete.push(data.content.toLowerCase());
       }

@@ -160,7 +160,7 @@ fileDropzone.on("addedfile", file => {
       }
     });
   });
-  if (imageTypes.includes(file.type))
+  if (imageTypes.includes(file.type) || videoTypes.includes(file.type))
     buttonHolder.appendChild(addAltText);
 
   buttonHolder.appendChild(removeButton);

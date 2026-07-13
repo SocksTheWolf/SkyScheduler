@@ -1,7 +1,7 @@
 import {
-  BSKY_IMG_FILE_EXTS,
+  BSKY_IMG_FILE_EXTS_STR,
   BSKY_IMG_SIZE_LIMIT_IN_MB,
-  BSKY_VIDEO_FILE_EXTS,
+  BSKY_VIDEO_FILES_STR,
   BSKY_VIDEO_MAX_DURATION,
   CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
@@ -17,7 +17,7 @@ export default function UploadInfo(props: BaseElementProps) {
   return (<details class="uploadGuidelines noselect clicker hide-arrow" open>
     <summary tabindex={-1}>Upload Limits/Guidelines</summary>
     <small><ul>
-      <li><span data-tooltip={BSKY_IMG_FILE_EXTS}>Images</span>:
+      <li><span data-tooltip={BSKY_IMG_FILE_EXTS_STR}>Images</span>:
         <ul>
           <li>must be less than {CF_IMAGES_MAX_DIMENSION}x{CF_IMAGES_MAX_DIMENSION} pixels</li>
           <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
@@ -30,7 +30,7 @@ export default function UploadInfo(props: BaseElementProps) {
           <li>if an image fails to upload, you'll need to manually adjust the file to fit it properly</li>
         </ul>
       </li>
-      <li><span data-tooltip={BSKY_VIDEO_FILE_EXTS}>Videos</span>:
+      <li><span data-tooltip={BSKY_VIDEO_FILES_STR}>Videos</span>:
         <ul>
           <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
           <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>

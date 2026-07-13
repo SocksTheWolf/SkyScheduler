@@ -1,7 +1,8 @@
 import type { Post } from "../classes/post";
-import type { BaseElementProps } from "../types";
 import { EmbedDataType } from "../enums";
 import { MAX_LENGTH } from "../limits";
+import type { BaseElementProps } from "../types";
+import { isAltEditableType } from "../utils/helpers";
 import { PostContent } from "./post";
 
 type EditedPostProps = BaseElementProps & {
@@ -13,11 +14,12 @@ export function PostAltTextEdit(props: EditedPostProps) {
   let num = -1;
   const embedAltTextEdit = post.embeds?.map((embedData) => {
     ++num;
-    if (embedData.type !== EmbedDataType.Image)
+    if (!isAltEditableType(embedData.type))
       return;
 
+    const thumbURL = (embedData.type == EmbedDataType.Video) ? "thumbs/video.png" : `preview/file/${embedData.content}`;
     return (<div class="editAltBlock" alteditfor={embedData.content}>
-      <img width="120px" height="120px" class="editImgThumb" src={`preview/file/${embedData.content}`} /><br />
+      <img width="120px" height="120px" class="editThumbPreview" src={thumbURL} /><br />
       <center>
         <input type="hidden" name={`altEdits.${num}.content`} value={embedData.content} />
         <input type="hidden" data-alt={true} name={`altEdits.${num}.alt`} value={embedData.alt} />

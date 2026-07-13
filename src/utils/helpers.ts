@@ -3,7 +3,7 @@ import {
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
 import has from "just-has";
-import { TimeIntervalSettings } from "../enums";
+import { EmbedDataType, TimeIntervalSettings } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../limits";
 import type { AllContext, LooseObj } from "../types";
 
@@ -68,4 +68,8 @@ export function useCFTurnstile(ctx: AllContext|undefined): boolean {
 
 export function isPost(data: any): boolean {
   return has(data, "user");
+}
+
+export function isAltEditableType(type: EmbedDataType) {
+  return type === EmbedDataType.Image || type === EmbedDataType.Video;
 }

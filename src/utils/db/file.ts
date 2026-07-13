@@ -2,9 +2,8 @@ import { and, eq, inArray, lte } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
-import { EmbedDataType } from "../../enums";
 import type { AllContext, LooseObj } from "../../types";
-import { daysAgo } from "../helpers";
+import { daysAgo, isAltEditableType } from "../helpers";
 
 export const addFileListing = async (c: AllContext, file: string, user: string|null, createDate: Date|null=null) => {
   const db: DrizzleD1Database = c.get("db");
@@ -67,7 +66,7 @@ export const getAllMediaOfUser = async (c: AllContext, userId: string): Promise<
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;
     messyArray.push(postMedia
-      .filter(media => media.type == EmbedDataType.Image || media.type == EmbedDataType.Video)
+      .filter(media => isAltEditableType(media.type))
       .map(media => media.content));
   });
   return flatten(messyArray);
