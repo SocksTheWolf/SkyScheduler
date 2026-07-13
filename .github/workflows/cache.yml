@@ -11,8 +11,11 @@ on:
       - "!assets/.assetsignore"
       - "!assets/_redirects"
       - "!assets/.well-known/**"
-      - "src/(layout|pages|statics)/**"
-      - "src/(limits|siteinfo).ts"
+      - "src/layout/**"
+      - "src/pages/**"
+      - "src/statics/**"
+      - "src/limits.ts"
+      - "src/siteinfo.ts"
       - "src/index.tsx"
       - ".github/workflows/cache.yml"
   workflow_dispatch: {}

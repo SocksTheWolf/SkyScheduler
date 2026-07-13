@@ -11,7 +11,9 @@ on:
       - "src/layout/main.tsx"
       - "src/layout/helpers/*.tsx"
       - ".github/workflows/sitemap.yml"
-      - "!src/layout/helpers/(turnstile|uploadInfo|includesTags).tsx"
+      - "!src/layout/helpers/uploadInfo.tsx"
+      - "!src/layout/helpers/turnstile.tsx"
+      - "!src/layout/helpers/includesTags.tsx"
       - "!assets/sitemap.xml"
 
 concurrency:
