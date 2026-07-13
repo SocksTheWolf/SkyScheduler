@@ -10,6 +10,7 @@ on:
       - "assets/**"
       - "!assets/.assetsignore"
       - "!assets/_redirects"
+      - "!assets/_headers"
       - "!assets/.well-known/**"
       - "src/layout/**"
       - "src/pages/**"
@@ -17,7 +18,6 @@ on:
       - "src/limits.ts"
       - "src/siteinfo.ts"
       - "src/index.tsx"
-      - ".github/workflows/cache.yml"
   workflow_dispatch: {}
 
 concurrency:
