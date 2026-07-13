@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
   actions: write
 
 jobs:
