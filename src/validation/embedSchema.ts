@@ -15,6 +15,7 @@ export const ImageEmbedSchema = z.object({
 
 export const VideoEmbedSchema = z.object({
   ...FileContentSchema.shape,
+  ...AltTextSchema.shape,
   type: z.literal(EmbedDataType.Video),
   width: z.int("media width is not a number")
     .min(1, "media width value is below 1")

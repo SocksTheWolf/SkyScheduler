@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   push_tangled:
+    name: Update Tangled Mirror
     runs-on: ubuntu-latest
     environment:
       name: tangled

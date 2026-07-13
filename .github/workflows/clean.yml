@@ -9,11 +9,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write
+  actions: write
+
 jobs:
   # Clean up github job
   clean_github:
+    name: Remove Old Github Actions
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - name: Cleanup Actions
         uses: socksthewolf/gh-actions-clean-workflow@main

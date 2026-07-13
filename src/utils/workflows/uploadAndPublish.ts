@@ -10,7 +10,8 @@ import { handlePostTask } from "../scheduler";
 // After setting up queues and everything, I might have just wanted workflows.
 export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, VideoWorkflowPayload> {
   async run(event: WorkflowEvent<VideoWorkflowPayload>, step: WorkflowStep) {
-
+    // most of this won't work because it cannot be serialized.
+    /*
     // Upload the video to our bsky pds tunnel
     const uploadJob = await step.do("upload video and get job", {
       retries: {
@@ -33,7 +34,7 @@ export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, 
         backoff: "constant"
       },
       timeout: "5 minutes"
-    }, async () => {
+    }, async (ctx) => {
       const jobBlob = await waitOnVideoStatus(uploadJob!, step);
       if (jobBlob === null) {
         // TODO: Give violation?
@@ -56,7 +57,7 @@ export class UploadVideoAndPublishWorkflow extends WorkflowEntrypoint<Bindings, 
       if (await handlePostTask(runtimeWrapper, postObj, event.payload.agent) == false) {
         throw new Error("failed to make post");
       }
-    });
+    });*/
   }
 };
 

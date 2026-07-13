@@ -1,18 +1,33 @@
+function checkIsVideo(file) {
+  if (file instanceof File) {
+    return videoTypes.includes(file.type);
+  }
+  return videoFileExts.some(ext => file.includes(ext));
+}
+
 function openAltText(file, altTextButton, loadCallback, saveCallback) {
   // A bunch of DOM elements
   const altTextModal = document.getElementById("altTextDialog");
   const altTextField = document.getElementById("altTextField");
-  const altTextImgPreview = document.getElementById("altThumbImg");
   const saveButton = document.getElementById("altTextSaveButton");
   const cancelButton = document.getElementById("altTextCancelButton");
+  const mediaPlayerTag = document.getElementById("altMediaPlayer");
   const isFileInstance = file instanceof File;
-  const altTextPreviewImgURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
+  const previewContainer = document.getElementById("mediaPreview");
+  const isVideo = checkIsVideo(file);
+  const altTextPreviewURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
+  const filePreviewTag = (isVideo) ? document.createElement("video") : document.createElement("img");
+
+  if (isVideo) {
+    filePreviewTag.setAttribute("controls", true);
+  }
+  previewContainer.appendChild(filePreviewTag);
 
   // Handle page reset
   if (altTextModal.hasAttribute("hasReset") === false) {
     document.addEventListener("resetPost", () => {
       altTextField.value = "";
-      altTextImgPreview.src = "";
+      filePreviewTag.src = "";
       resetCounter("altTextCount");
     });
     altTextModal.setAttribute("hasReset", true);
@@ -37,18 +52,19 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
     saveButton.replaceWith(saveButton.cloneNode(true));
     cancelButton.replaceWith(cancelButton.cloneNode(true));
     altTextModal.removeEventListener("close", unbindAltModal);
-    altTextImgPreview.src = "";
+    filePreviewTag.src = "";
     if (isFileInstance)
-      URL.revokeObjectURL(altTextPreviewImgURL);
+      URL.revokeObjectURL(altTextPreviewURL);
     detachTribute(altTextField);
   }
 
   const closeAltModal = () => {
     unbindAltModal();
     closeModal(altTextModal);
+    filePreviewTag.remove();
   };
 
-  altTextImgPreview.src = altTextPreviewImgURL;
+  filePreviewTag.src = altTextPreviewURL;
   addClickKeyboardListener(saveButton, handleSave);
   addClickKeyboardListener(cancelButton, closeAltModal);
   altTextModal.addEventListener("close", unbindAltModal);

@@ -443,7 +443,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             ar: {
               width: currentEmbed.width,
               height: currentEmbed.height
-            }
+            },
+            alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT),
           }
           mediaEmbeds = { type: EmbedDataType.Video, data: bskyMetadata };
           continue;
@@ -479,6 +480,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           return {
             "$type": "app.bsky.embed.video",
             "video": mediaEmbeds.data.blob,
+            "alt": mediaEmbeds.data.alt,
             "aspectRatio": mediaEmbeds.data.ar
           }
           case EmbedDataType.Record:

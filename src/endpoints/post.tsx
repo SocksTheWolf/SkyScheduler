@@ -4,7 +4,6 @@ import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
 import type { ContextVariables } from "../auth";
 import type { Post } from "../classes/post";
-import { EmbedDataType } from "../enums";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
@@ -20,6 +19,7 @@ import {
   createPost, createRepost, deletePost, deleteRepostRule, getPostById,
   getPostByIdWithReposts, updatePostForUser
 } from "../utils/dbQuery";
+import { isAltEditableType } from "../utils/helpers";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { handlePostNowTask } from "../utils/scheduler";
 import { FileDeleteSchema } from "../validation/mediaSchema";
@@ -150,8 +150,8 @@ post.post("/edit/:id", async (c) => {
     // process and match up all of the alt text properly
     for (let i = 0; i < originalPost.embeds?.length; ++i) {
       let embedData = originalPost.embeds[i];
-      // if we have anything other than an image, skip it
-      if (embedData.type !== EmbedDataType.Image) {
+      // if we have anything other than an image or video, skip it
+      if (!isAltEditableType(embedData.type)) {
         continue;
       }
       // Check to see if this text was edited

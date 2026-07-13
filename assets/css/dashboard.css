@@ -319,7 +319,7 @@ textarea {
   margin-top: 10px;
 }
 
-#altThumbImg, .editImgThumb {
+#mediaPreview video, #mediaPreview img, .editThumbPreview {
   max-width: 25vw;
   max-height: 25vh;
   overflow: hidden;

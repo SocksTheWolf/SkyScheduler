@@ -9,7 +9,7 @@ import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { AccountStatus, EmbedDataType, PostLabel, RepostType } from "../enums";
+import { AccountStatus, PostLabel, RepostType } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import type {
@@ -27,7 +27,7 @@ import {
   getViolationsForUser,
   removeViolationsDB
 } from "./db/violations";
-import { floorGivenTime } from "./helpers";
+import { floorGivenTime, isAltEditableType } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
 export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
@@ -297,7 +297,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
   if (!isEmpty(embeds)) {
     // Loop through all data within an embed blob so we can mark it as posted
     for (const embed of embeds!) {
-      if (embed.type === EmbedDataType.Image || embed.type === EmbedDataType.Video) {
+      if (isAltEditableType(embed.type)) {
         dbOperations.push(
           db.update(mediaFiles).set({hasPost: true}).where(eq(mediaFiles.fileName, embed.content)));
       }

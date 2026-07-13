@@ -6,9 +6,7 @@ export default function AltTextDialog(props?: BaseElementProps) {
     <article>
       <header><h3>Add Alt Text</h3></header>
       <section>
-        <center>
-          <img id="altThumbImg" />
-        </center>
+        <center id="mediaPreview"></center>
         <textarea id="altTextField" placeholder="Alt text for this image" maxlength={MAX_ALT_TEXT}></textarea>
         <small>Current Alt Text Length: <span id="altTextCount">0/{MAX_ALT_TEXT}</span></small>
       </section>
