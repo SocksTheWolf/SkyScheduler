@@ -27,8 +27,8 @@ updates:
       semver-minor-days: 12
     ignore:
       - dependency-name: '@types/node'
+        # Always get patch and minor versions of node types
         update-types:
           - 'version-update:semver-major'
       - dependency-name: 'wrangler'
       - dependency-name: 'minify'
-      - dependency-name: 'prettier'
