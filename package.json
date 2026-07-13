@@ -34,7 +34,7 @@
     "sitemap": "run-s sitemap:*",
     "types": "wrangler types src/wrangler.d.ts"
   },
-  "scriptComments": {
+  "scriptsComments": {
     "dev": "run this application in development locally",
     "dev:queue": "runs the application in development but with queue support",
     "deploy": "uploads the local version directly to your worker",
