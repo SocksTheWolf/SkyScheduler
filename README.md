@@ -50,10 +50,10 @@ cd skyscheduler
 2. Copy environment variables template
 
 ```bash
-cp .dev.vars.example .dev.vars
+cp .env.example .env
 ```
 
-3. Configure your `.dev.vars` file with the following environment variables:
+3. Configure your `.env` file with the following environment variables:
    - `BETTER_AUTH_SECRET` - the cryptographic hash to use better auth ([you can generate one from this page](https://www.better-auth.com/docs/installation))
    - `BETTER_AUTH_URL` - the working url of your site (this should be "*" in dev).
    - `DEFAULT_ADMIN_USER` - the admin bsky handle
@@ -65,11 +65,12 @@ cp .dev.vars.example .dev.vars
 
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 
-_Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk FILENAME` to upload all the settings at once.
+_Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk .env.prod` to upload all the settings at once.
 
 4. Update your `wrangler.toml` with changes that reflect your account.
    - You'll need to update the values for the kv, r2, queues, d1 to reflect the bindings on your account.
    - Also make sure you update the `BETTER_AUTH_URL` to your working url as well.
+   - If you allow image resizing, you should also modify `IMAGE_SETTINGS`'s `bucket_url` to the correct host.
    - Do remember to update/remove the domain bindings!
 
 5. Install dependencies
@@ -81,7 +82,7 @@ npm install
 6. Modify any site information located in:
 
    - `limits.ts` - site configuration and application limits
-   - `/assets/_redirects` - redirect location information
+   - `/assets/_redirects` - redirect configuration
    - `siteinfo.ts` - site information such as name, description, domain, etc
    - `.ssclirc` - sitemap domain
 
@@ -107,7 +108,7 @@ npm run migrate:all
 
 ### Environment Variables
 
-Ensure you have configured the `.dev.vars` file with the necessary credentials and settings. The file is git-ignored to protect your sensitive information.
+Ensure you have configured the `.env` file with the necessary credentials and settings. The file is git-ignored to protect your sensitive information.
 
 ### Application Variables
 
@@ -115,11 +116,31 @@ Most of the application can be modified with `wrangler.toml`'s vars section or v
 
 ### Site Variables
 
-Modifying key values such as meta tag data, the application name and any descriptions is fully controlled via `src/siteinfo.ts`. Changing these fields will modify the rest of the application's web output.
+Modifying key values such as meta tag data, the application name and any descriptions is fully controlled via `src/siteinfo.ts`.
+
+Changing the values in that file will modify the visual display of the application's web output.
 
 ### Minimization
 
-SkyScheduler uses the minified versions of the scripts in `assets/js` and `assets/css`. These are generated on the fly whenever any typescript file is changed or the application is deployed/ran.
+SkyScheduler uses the minified versions of the scripts in `assets/js` and `assets/css`.
+
+These are generated on the fly whenever any typescript file is changed or the application is deployed/ran.
+
+## Commands
+
+SkyScheduler comes with a lot of commands to help manage the service. Documentation on the commands can be found in `package.json`.
+
+The most important ones to know:
+
+* `dev` - runs the app in a local environment
+* `generate` - run anytime you modify a file in the `src/db` folder. This will generate SQL migration files
+* `migrate` - commit the SQL migrations to local/prod databases.
+* `migrate:local` - migrates the SQL changes to your local dev instance
+* `migrate:prod` - does the same but commits remotely. **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute)
+* `invite:generate` - generates a valid invite key
+* `invite:local/remote` - commits an invite key to the invite store
+* `sitemap` - generates a sitemap.xml file (there's a github action that will do this automatically as well)
+* `types` - whenever `wrangler.toml` changes or wrangler updates, run this command
 
 ## Project Structure
 
@@ -145,7 +166,7 @@ skyscheduler/
 │   └── validation/
 ├── migrations/
 ├── .vscode/
-├── .dev.vars
+├── .env.example
 ├── .node-version
 ├── .markdownlint.json
 ├── .minify.json

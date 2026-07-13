@@ -141,5 +141,5 @@ R2_SETTINGS={auto_prune=true, prune_days=3}
 # settings about tasks
 TASK_SETTINGS={use_posts=true, use_reposts=true}
 
-# set this to true in your .dev.vars to turn off turnstile
+# set this to true in your .env to turn off turnstile
 IN_DEV=false
