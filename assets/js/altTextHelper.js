@@ -1,11 +1,10 @@
-function checkIsVideo(file) {
-  if (file instanceof File) {
-    return videoTypes.includes(file.type);
-  }
-  return videoFileExts.some(ext => file.includes(ext));
-}
-
 function openAltText(file, altTextButton, loadCallback, saveCallback) {
+  const checkIsVideo = (file) => {
+    if (file instanceof File) {
+      return videoTypes.includes(file.type);
+    }
+    return videoFileExts.some(ext => file.includes(ext));
+  };
   // A bunch of DOM elements
   const altTextModal = document.getElementById("altTextDialog");
   const altTextField = document.getElementById("altTextField");
@@ -15,7 +14,7 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
   const isFileInstance = file instanceof File;
   const previewContainer = document.getElementById("mediaPreview");
   const isVideo = checkIsVideo(file);
-  const altTextPreviewURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}`;
+  const altTextPreviewURL = isFileInstance ? URL.createObjectURL(file) : `preview/file/${file}?alt`;
   const filePreviewTag = (isVideo) ? document.createElement("video") : document.createElement("img");
 
   if (isVideo) {
