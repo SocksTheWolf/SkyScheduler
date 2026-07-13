@@ -23,6 +23,7 @@ concurrency:
 jobs:
   clean_sitemap_deploys:
     runs-on: ubuntu-latest
+    continue-on-error: true
     name: Clean Old Github Sitemap Deploys
     permissions:
       deployments: write

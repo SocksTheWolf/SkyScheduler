@@ -6,70 +6,51 @@
     "base:db:optimize": "wrangler d1 execute skyposts --command \"PRAGMA optimize\"",
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
     "base:addinvitekey": "wrangler kv key put --binding INVITE_POOL",
-
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
-
     "auth": "npx auth@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y && npx prettier --write src/db/auth.schema.ts",
-
     "optimize": "run-s migrate:*:pragma",
     "generate": "drizzle-kit generate",
-
     "migrate:local:db": "npm run base:db:migrate -- --local",
     "migrate:local:pragma": "npm run base:db:optimize -- --local -y",
-
     "migrate:prod:db": "npm run base:db:migrate -- --remote",
     "migrate:prod:pragma": "npm run base:db:optimize -- --remote -y",
-
     "migrate:local": "run-s migrate:local:*",
     "migrate:prod": "run-s migrate:prod:*",
     "migrate:remote": "npm run migrate:prod",
     "migrate:all": "npm run migrate:local && npm run migrate:prod",
-
     "minify:js:main": "minify assets/js/main.js > assets/js/main.min.js",
     "minify:js:app": "cat assets/js/*Helper.js | minify --js > assets/js/app.min.js",
     "minify:js": "run-p minify:js:**",
     "minify:style": "minify assets/css/stylesheet.css > assets/css/stylesheet.min.css && minify assets/css/dashboard.css > assets/css/dashboard.min.css",
     "minify": "run-p minify:*",
-
     "invite:generate": "npx human-id@4.1.3 lowercase -",
     "invite:local": "npm run base:addinvitekey -- --local",
     "invite:remote": "npm run base:addinvitekey -- --remote",
-
     "openapi": "npx chanfana -o openapi.json",
-
     "sitemap:make": "sscli > assets/sitemap.xml",
     "sitemap:clean": "replace-in-file \"/homepage|\\.tsx/g\" \"\" assets/sitemap.xml",
     "sitemap": "run-s sitemap:*",
-
     "types": "wrangler types src/wrangler.d.ts"
   },
   "scriptsComments": {
     "dev": "run this application in development locally",
     "dev:queue": "runs the application in development but with queue support",
     "deploy": "uploads the local version directly to your worker",
-
     "auth": "builds the better auth db tables, should only ever be used once",
-
     "generate": "generates any db schema changes and their migration sql commands",
     "optimize": "runs database optimizations for both local and production dbs",
-
     "migrate": "syncs the current migration steps directly into the given db, then optimizes it",
     "migrate:prod": "runs the above but only for production",
     "migrate:local": "runs migrate but only for local",
     "migrate:remote": "alias for migrate:prod",
-
     "minify": "runs minification/bundling on client scripts, done every build",
-
     "invite:generate": "generates an acceptable invite code",
     "invite:local <code> <usage #>": "commits an invite code directly to the local invite key store",
     "invite:remote <code> <usage #>": "the above for remote",
-
     "openapi": "creates the openapi.json file",
-
     "sitemap": "creates a sitemap.xml file",
-
     "types": "generates wrangler types"
   },
   "dependencies": {
@@ -81,7 +62,6 @@
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.27",
     "hono-openapi": "^1.3.0",
-    "human-id": "^4.2.0",
     "image-dimensions": "^2.5.1",
     "just-flatten-it": "^5.2.0",
     "just-has": "^2.3.0",
