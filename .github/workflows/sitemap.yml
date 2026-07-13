@@ -17,10 +17,23 @@ on:
       - "!assets/sitemap.xml"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: sitemap
   cancel-in-progress: true
 
 jobs:
+  clean_sitemap_deploys:
+    runs-on: ubuntu-latest
+    name: Clean Old Github Sitemap Deploys
+    permissions:
+      deployments: write
+    steps:
+      - name: Cleanup Previous Deploys
+        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: sitemap
+          onlyRemoveDeployments: true
+
   update_sitemap:
     name: Build Sitemap
     runs-on: ubuntu-latest
@@ -86,17 +99,3 @@ jobs:
           account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           URLs: |
             https://skyscheduler.work/sitemap.xml
-
-  clean_sitemap_deploys:
-    runs-on: ubuntu-latest
-    name: Clean Github Sitemap Deploys
-    needs: ["update_sitemap"]
-    permissions:
-      deployments: write
-    steps:
-      - name: Cleanup Previous Deploys
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: sitemap
-          onlyRemoveDeployments: true
