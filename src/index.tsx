@@ -22,13 +22,13 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import { ATPROTO_DID, SITE_URL } from "./siteinfo";
-import type { Bindings, QueueTaskData } from "./types";
 import { appManifestGenerate } from "./statics/appManifest";
 import { makeConstScript } from "./statics/constScript";
+import { robotsGenerate } from "./statics/robotsGenerator";
+import type { Bindings, QueueTaskData } from "./types";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
-import { robotsGenerate } from "./statics/robotsGenerator";
 
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 app.use(blankAuthEnv);
