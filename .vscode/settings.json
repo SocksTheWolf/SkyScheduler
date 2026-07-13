@@ -2,10 +2,24 @@
   "search.exclude": {
     "**/assets/dep": true,
     "**/migrations": true,
+    ".wrangler/**": true,
+    "/src/wrangler.d.ts": true,
     "package-lock.json": true
   },
   "editor.tabSize": 2,
-  "C_Cpp.copilotHover": "disabled",
+  "chat.extensionUnification.enabled": false,
+  "terminal.integrated.tabs.allowAgentCliTitle": false,
   "chat.disableAIFeatures": true,
-  "chat.customizations.harnessSelector.enabled": false
+  "chat.customizations.harnessSelector.enabled": false,
+  "chat.agent.enabled": false,
+  "chat.agent.sandbox.allowAutoApprove": false,
+  "chat.agent.sandbox.allowUnsandboxedCommands": false,
+  "chat.agent.sandbox.retryWithAllowNetworkRequests": false,
+  "chat.agent.thinking.generateTitles": false,
+  "chat.editor.localAgent.enabled": false,
+  "chat.titleBar.openInAgentsWindow.enabled": false,
+  "workbench.browser.enableChatTools": false,
+  "chat.useHooks": false,
+  "chat.plugins.enabled": false,
+  "chat.tools.riskAssessment.enabled": false
 }
