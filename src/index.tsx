@@ -7,10 +7,12 @@ import { type ContextVariables, createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
+import { generateOpenAPI } from "./endpoints/openapi";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
 import { blankAuthEnv } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
+import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import Dashboard from "./pages/dashboard";
@@ -66,6 +68,10 @@ app.get("/site.webmanifest", staticFilesCache, (c) => {
 // Legal linkies
 app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
 app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
+
+app.get('/openapi.json', onlyInDevelopment, async (c) => {
+  return c.json(await generateOpenAPI(c));
+});
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes

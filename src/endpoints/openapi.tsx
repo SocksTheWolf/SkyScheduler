@@ -1,9 +1,10 @@
 // Mediocre file to help with automatically generating endpoint bindings so that we can dump them to the
 // Cloudflare WAF to protect/log against abuse
 import { Hono } from "hono";
-import { describeRoute, resolver, validator } from "hono-openapi";
+import { describeRoute, generateSpecs, resolver, validator } from "hono-openapi";
 import type { ContextVariables } from "../auth";
-import type { Bindings } from "../types";
+import { APP_NAME, SITE_URL } from "../siteinfo";
+import type { BaseContext, Bindings } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
@@ -17,7 +18,7 @@ import {
 } from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
-export const openapiRoutes = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
+const openapiRoutes = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 
 openapiRoutes.post("/post/create", describeRoute({
   description: 'Makes a post',
@@ -448,3 +449,23 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
     }
   }
 }), validator("param", CheckFileSchema));
+
+export async function generateOpenAPI(c: BaseContext) {
+  return await generateSpecs(openapiRoutes, {
+    documentation: {
+      info: {
+        title: `${APP_NAME} API Routes`,
+        version: '1.2.1',
+        description: 'API Routes',
+        termsOfService: `${SITE_URL}/tos`,
+        license: {
+          name: "MIT",
+        }
+      },
+      openapi: "3.0",
+      servers: [
+        { url: SITE_URL, description: 'Production Server'}
+      ],
+    },
+  }, c);
+};
