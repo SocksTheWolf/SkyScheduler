@@ -1,0 +1,3 @@
+/.well-known/traffic-advice
+  Content-Type: application/trafficadvice+json;charset=utf-8
+  X-Content-Type-Options: nosniff
