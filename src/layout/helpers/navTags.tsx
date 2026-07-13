@@ -12,7 +12,7 @@ export default function NavTags(props?: BaseElementProps) {
             <h2 class="appTitle">{APP_NAME}</h2>
           </a>
         </div>
-        <div style="flex-grow: 1"></div>
+        <div class="nav-flex-space"></div>
         <nav>
           <ul>
             <li><a role="button" href="/signup">Sign Up</a></li>

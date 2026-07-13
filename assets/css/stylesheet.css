@@ -106,6 +106,25 @@ html {
   white-space: preserve-breaks !important;
 }
 
+.toast-notification {
+  padding-left: 12px;
+}
+
+.toast-red {
+  background: red;
+}
+.toast-green {
+  background: green;
+}
+
 .toastify-avatar {
   margin-left: 0px;
+}
+
+.privacy-note-container {
+  margin-left: 15px;
+}
+
+.nav-flex-space {
+  flex-grow: 1;
 }

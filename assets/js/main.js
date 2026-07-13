@@ -6,10 +6,7 @@ function pushToast(msg, isSuccess) {
     ariaLive: true,
     avatar: !isSuccess ? "/icons/warning.svg" : "/icons/success.svg",
     duration: !isSuccess ? 10000 : Toastify.defaults.duration,
-    style: {
-      "padding-left": "12px",
-      background: isSuccess ? 'green' : 'red'
-    },
+    className: `toast-notification ${isSuccess ? "toast-green" : "toast-red"}`,
     close: false,
     onClick: () => {
       newToast.hideToast();

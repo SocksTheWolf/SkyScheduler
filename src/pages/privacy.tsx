@@ -43,7 +43,7 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
         </p>
         <h4>How Data is Used</h4>
         <p>{APP_NAME} uses the data that you provide to transmit your content to the BlueSky PDS (or a PDS of your own choosing) on your behalf.<br />
-          <div style="margin-left: 15px">
+          <div class="privacy-note-container">
             <strong>Note that</strong>:
             <ul>
               <li>Data is not accessible to the maintainers of {APP_NAME}</li>
