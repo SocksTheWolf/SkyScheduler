@@ -78,6 +78,7 @@ export interface Bindings {
   RESET_BOT_APP_PASS: string;
   ENCRYPTED_PASS_KEY: string;
   IN_DEV: boolean;
+  CSP_REPORT_URL: string;
 };
 
 export type EmbedData = {

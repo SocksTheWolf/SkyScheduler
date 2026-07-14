@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { secureHeaders } from "hono/secure-headers";
 import type { ContextVariables } from "../auth";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
 import { corsHelperMiddleware } from "../middleware/corsHelper";
@@ -9,8 +8,6 @@ import { runMaintenanceUpdates } from "../utils/db/maintain";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 
 export const admin = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-
-admin.use(secureHeaders());
 admin.use(corsHelperMiddleware);
 admin.use(authAdminOnlyMiddleware);
 

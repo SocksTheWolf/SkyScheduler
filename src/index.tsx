@@ -15,6 +15,7 @@ import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
+import { secureHeadersMiddleware } from "./middleware/secureHeaders";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
 import Homepage from "./pages/homepage";
@@ -35,15 +36,15 @@ import { setupAccounts } from "./utils/setup";
 const app = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
 app.use(blankAuthEnv);
 app.use(csrf({origin: SITE_URL}));
+app.use(secureHeadersMiddleware);
 
 ///// Static Pages /////
 
+// Root route
+app.all("/", (c) => c.html(<Homepage ctx={c} />));
+
 // caches
 const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=604800, must-revalidate, proxy-revalidate' });
-const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=259200, must-revalidate, proxy-revalidate' });
-
-// Root route
-app.all("/", staticPagesCache, (c) => c.html(<Homepage ctx={c} />));
 
 // atproto registration route
 if (!isEmpty(ATPROTO_DID)) {
@@ -66,8 +67,8 @@ app.get("/site.webmanifest", staticFilesCache, (c) => {
 });
 
 // Legal linkies
-app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService ctx={c} />));
-app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy ctx={c} />));
+app.get("/tos", (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", (c) => c.html(<PrivacyPolicy ctx={c} />));
 
 app.get('/openapi.json', onlyInDevelopment, async (c) => {
   return c.json(await generateOpenAPI(c));

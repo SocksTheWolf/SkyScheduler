@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
 import type { ContextVariables } from "../auth";
@@ -26,8 +25,6 @@ import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
 export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-
-post.use(secureHeaders());
 post.use(corsHelperMiddleware);
 post.use(authMiddleware);
 

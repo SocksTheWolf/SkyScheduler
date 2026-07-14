@@ -73,6 +73,12 @@ export const USE_VIDEO_WORKFLOWS: boolean = false;
 // NOTE: All new applications should set this to false.
 export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 
+// controls if we inject granular content security policy headers into requests
+// or use the basic values from hono
+export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
+// the above must be on for this to be true
+export const USE_CSP_REPORT_ONLY: boolean = true;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/

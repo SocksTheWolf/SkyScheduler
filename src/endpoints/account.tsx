@@ -1,5 +1,4 @@
 import { type Context, Hono } from "hono";
-import { secureHeaders } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import type { ContextVariables } from "../auth";
 import { ScheduledContext } from "../classes/context";
@@ -25,8 +24,6 @@ import { LoginSchema } from "../validation/loginSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-
-account.use(secureHeaders());
 account.use(corsHelperMiddleware);
 
 const serverParseValidationErr = (c: Context, errorJson: string) => {
