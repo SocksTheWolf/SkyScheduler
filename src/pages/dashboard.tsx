@@ -33,7 +33,7 @@ export default function Dashboard(props: BaseElementProps) {
 
   return (<BaseLayout title="Dashboard" ctx={ctx} mainClass="dashboard"
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, {href: dashboardScriptStr, type: "script"}]}>
-    <IncludeDependencyTags scripts={defaultDashboardPreloads} />
+    <IncludeDependencyTags scripts={defaultDashboardPreloads} ctx={ctx} />
     <div class="row-fluid">
       <section class="col-3 sidebar">
         <article>

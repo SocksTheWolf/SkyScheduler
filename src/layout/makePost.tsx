@@ -18,7 +18,7 @@ export const PreloadPostCreation: PreloadRules[] = [
 
 export function PostCreation(props: BaseElementProps) {
   return (<section>
-    <IncludeDependencyTags scripts={PreloadPostCreation} />
+    <IncludeDependencyTags scripts={PreloadPostCreation} ctx={props.ctx} />
     <article>
       <form id="postForm" novalidate>
         <header>

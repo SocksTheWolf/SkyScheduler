@@ -7,6 +7,7 @@ export async function secureHeadersMiddleware(c: Context, next: any) {
   const cspReportURL = c.env.CSP_REPORT_URL;
   const hasReportURL = !isEmpty(cspReportURL);
   const secPolicy = {
+      baseUri: ["'none'"],
       connectSrc: ["'self'", cspReportURL, "https://challenges.cloudflare.com", "https://cardyb.bsky.app",
         "https://bsky.social", "https://public.api.bsky.app"],
       imgSrc: ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
