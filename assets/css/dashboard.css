@@ -359,11 +359,16 @@ textarea {
 
 /* Lightly adapted from https://github.com/n3r4zzurr0/svg-spinners */
 @keyframes refreshPostSpinner {
-  100% {
-    transform: rotate(360deg)
+  to {
+    transform: rotate(1turn)
   }
 }
-.svgAnim svg, .svgAnim img {
-  transform-origin:center;
+.refresh-icon:not(.htmx-request) {
+  transform-origin: center;
+  transform: rotate(0px);
+  animation-play-state: paused;
+}
+.htmx-request.refresh-icon, .refresh-icon .htmx-request {
   animation: refreshPostSpinner .75s infinite linear;
+  transition: transform 1.4s ease-out linear;
 }

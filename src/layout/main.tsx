@@ -39,7 +39,10 @@ export const BaseLayout = (props: BaseLayoutProps) => {
   preloadList = preloadList.concat(preloads);
 
   const currentNonce = props.ctx?.get("secureHeadersNonce");
-  const htmxConfig = `<meta name="htmx-config" content='{"inlineScriptNonce": "${currentNonce}", "inlineStyleNonce": "${currentNonce}"}' />`;
+  const htmxConfig = `<meta name="htmx-config"
+    content='{"allowEval": false, "inlineScriptNonce": "${currentNonce}",
+    "inlineStyleNonce": "${currentNonce}"}' />`;
+
   return (<>
   {raw("<!DOCTYPE html>")}
   <html data-theme="dark" lang="en">
