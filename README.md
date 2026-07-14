@@ -6,12 +6,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Static Badge](https://img.shields.io/badge/NodeJS_Version-v24.15-5FA04E?logo=nodedotjs)
-![GitHub branch check runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)
-![Website](https://img.shields.io/website?logo=cloudflare&color=teal&cacheSeconds=7200&down_color=red&url=https%3A%2F%2Fskyscheduler.work)
-![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)
+[![Website](https://img.shields.io/website?logo=cloudflare&color=teal&cacheSeconds=7200&down_color=red&url=https%3A%2F%2Fskyscheduler.work)](https://skyscheduler.work)
+[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)](https://developer.mozilla.org/en-US/observatory/analyze?host=skyscheduler.work)
 
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?color=blue)
-![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)
+[![GitHub branch check runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)
+![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](https://github.com/socksthewolf/skyscheduler)
 
 ![SkyScheduler Dashboard](https://raw.githubusercontent.com/SocksTheWolf/SkyScheduler/refs/heads/main/assets/screenshots/dashboard.png)
 
