@@ -37,6 +37,9 @@ export const BaseLayout = (props: BaseLayoutProps) => {
   else
     preloadList = appDefaultPreloads;
   preloadList = preloadList.concat(preloads);
+
+  const currentNonce = props.ctx?.get("secureHeadersNonce");
+  const htmxConfig = `<meta name="htmx-config" content='{"inlineScriptNonce": "${currentNonce}", "inlineStyleNonce": "${currentNonce}"}' />`;
   return (<>
   {raw("<!DOCTYPE html>")}
   <html data-theme="dark" lang="en">
@@ -54,9 +57,10 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} />
+      {currentNonce !== undefined && !props.simple ? raw(htmxConfig) : null}
     </head>
     <body>
-      {props.simple ? <script>0</script> : null}
+      {props.simple ? <script nonce={currentNonce}>0</script> : null}
       <container class="pico">
         <main class={mainClass}>
           {props.children}

@@ -50,7 +50,7 @@ export default function AccountHandler(props: AccountFormProps) {
         </center>
       </footer>
     </article>
-    <script type="text/javascript">
+    <script type="text/javascript" nonce={props.ctx?.get("secureHeadersNonce")}>
     {html`
       easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
     `}
