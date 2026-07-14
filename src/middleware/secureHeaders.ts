@@ -10,7 +10,7 @@ export async function secureHeadersMiddleware(c: Context, next: any) {
       connectSrc: ["'self'", cspReportURL, "https://cardyb.bsky.app", "https://bsky.social", "https://public.api.bsky.app"],
       imgSrc: ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
       mediaSrc: ["'self'", 'data:', 'blob:'],
-      frameSrc: ["https://challenges.cloudflare.com"],
+      frameSrc: ["'self'", "https://challenges.cloudflare.com"],
       scriptSrcAttr: ["'none'"],
       scriptSrcElem: ["'self'", "https://challenges.cloudflare.com", NONCE],
       styleSrcElem: ["'self'", NONCE],
