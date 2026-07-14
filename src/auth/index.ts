@@ -3,6 +3,7 @@ import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
+import type { SecureHeadersVariables } from "hono/secure-headers";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import { APP_NAME } from "../siteinfo";
@@ -148,7 +149,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
 export const auth = createAuth();
 
 // Export for variable types
-type ContextVariables = {
+type ContextVariables = SecureHeadersVariables & {
   auth: ReturnType<typeof createAuth>;
   userId: string;
   isAdmin: boolean;

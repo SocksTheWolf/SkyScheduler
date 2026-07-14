@@ -21,13 +21,14 @@ export default function Signup(props: BaseElementProps) {
     (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
     "You can ask for the maintainer for it";
 
-  return (<BaseLayout title="Signup"
+  return (<BaseLayout title="Signup" ctx={ctx}
     preloads={[...TurnstileCaptchaPreloads(ctx)]}>
       <NavTags />
       <AccountHandler title="Create Account"
         submitText="Sign Up!"
         loadingText="Signing up..."
         endpoint="/account/signup"
+        ctx={ctx}
         successText="Success! Redirecting to login..."
         redirect="/login"
         footerHTML={<FooterCopyright />}>

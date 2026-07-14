@@ -8,13 +8,14 @@ import type { BaseElementProps } from "../types";
 export default function ResetPassword(props?: BaseElementProps) {
   const links = [{title: "Forgot Password", url: "/forgot"}];
   return (
-    <BaseLayout title="Reset Password" noIndex={true}>
+    <BaseLayout title="Reset Password" ctx={props?.ctx} noIndex={true}>
       <NavTags />
       <AccountHandler title="Reset Password"
         loadingText="Resetting Password..."
         endpoint="/account/reset"
         successText="Success! Redirecting to login..."
         redirect="/login"
+        ctx={props?.ctx}
         disabledByDefault={true}
         footerLinks={links}>
 

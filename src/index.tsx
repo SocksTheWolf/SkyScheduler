@@ -43,7 +43,7 @@ const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=60
 const staticPagesCache = cache({ cacheName: 'pages', cacheControl: 'max-age=259200, must-revalidate, proxy-revalidate' });
 
 // Root route
-app.all("/", staticPagesCache, (c) => c.html(<Homepage />));
+app.all("/", staticPagesCache, (c) => c.html(<Homepage ctx={c} />));
 
 // atproto registration route
 if (!isEmpty(ATPROTO_DID)) {
@@ -66,8 +66,8 @@ app.get("/site.webmanifest", staticFilesCache, (c) => {
 });
 
 // Legal linkies
-app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService />));
-app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy />));
+app.get("/tos", staticPagesCache, (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", staticPagesCache, (c) => c.html(<PrivacyPolicy ctx={c} />));
 
 app.get('/openapi.json', onlyInDevelopment, async (c) => {
   return c.json(await generateOpenAPI(c));
@@ -107,7 +107,7 @@ app.route("/preview", preview);
 app.get("/dashboard", redirectLoginIfLogout, (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
-app.get("/login", redirectToDashIfLogin, (c) => c.html(<Login />));
+app.get("/login", redirectToDashIfLogin, (c) => c.html(<Login ctx={c} />));
 
 // Signup route
 app.get("/signup", redirectToDashIfLogin, (c) => c.html(<Signup ctx={c} />));
@@ -116,7 +116,7 @@ app.get("/signup", redirectToDashIfLogin, (c) => c.html(<Signup ctx={c} />));
 app.get("/forgot", redirectToDashIfLogin, (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
-app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword />));
+app.get("/reset", redirectToDashIfLogin, (c) => c.html(<ResetPassword ctx={c} />));
 
 // Reset Password Confirm route
 app.get("/reset-password/:id", (c) => {

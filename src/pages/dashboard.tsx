@@ -31,7 +31,7 @@ export default function Dashboard(props: BaseElementProps) {
     {href: "/dep/has.min.js", type: "script"}
   ];
 
-  return (<BaseLayout title="Dashboard" mainClass="dashboard"
+  return (<BaseLayout title="Dashboard" ctx={ctx} mainClass="dashboard"
       preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, {href: dashboardScriptStr, type: "script"}]}>
     <IncludeDependencyTags scripts={defaultDashboardPreloads} />
     <div class="row-fluid">

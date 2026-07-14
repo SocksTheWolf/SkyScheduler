@@ -5,7 +5,7 @@ import { APP_NAME, APP_REPO } from "../siteinfo";
 import type { BaseElementProps } from "../types";
 
 export default function PrivacyPolicy(props?: BaseElementProps) {
-  return (<BaseLayout title="Privacy Policy" simple={true} mainClass="homepage">
+  return (<BaseLayout title="Privacy Policy" simple={true} ctx={props?.ctx} mainClass="homepage">
     <NavTags />
     <section class="container">
       <article>

@@ -9,11 +9,12 @@ import type { BaseElementProps } from "../types";
 
 export default function Login(props?: BaseElementProps) {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];
-  return (<BaseLayout title="Login">
+  return (<BaseLayout title="Login" ctx={props?.ctx}>
     <NavTags />
     <AccountHandler title="Login"
       loadingText="Logging in..."
       footerLinks={links}
+      ctx={props?.ctx}
       endpoint="/account/login"
       successText="Success! Redirecting to dashboard..."
       redirect="/dashboard">

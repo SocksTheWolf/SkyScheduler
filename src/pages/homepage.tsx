@@ -10,7 +10,7 @@ import type { BaseElementProps } from "../types";
 import { explainPostingTimeInterval } from "../utils/helpers";
 
 export default function Homepage(props?: BaseElementProps) {
-  return (<BaseLayout title="Home" mainClass="homepage">
+  return (<BaseLayout title="Home" ctx={props?.ctx} mainClass="homepage">
     <NavTags />
     <section class="container">
       <article>
