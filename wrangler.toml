@@ -127,7 +127,7 @@ cpu_ms = 60000
 BETTER_AUTH_URL="https://skyscheduler.work"
 
 # the host for CSP reports to go to. if the CSP flags are off, this will not be used.
-CSP_REPORT_URL="https://csp.skyscheduler.work"
+CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 
 # If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/", max_width=3000}
