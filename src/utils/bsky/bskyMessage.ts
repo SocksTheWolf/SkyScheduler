@@ -2,6 +2,7 @@ import { RichText } from '@atproto/api';
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from '../../classes/bskyConvoInfo';
 import { AccountStatus } from "../../enums";
+import { DEFAULT_CHAT_PDS } from '../../limits';
 import type { Bindings } from '../../types';
 import { lookupBskyHandle } from './bskyApi';
 import { loginToBsky } from './bskyLogin';
@@ -26,7 +27,7 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
 
 // This is very slow, but like probably good to check?
 export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
-  const agent = new AtProtoAgent('https://bsky.social');
+  const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
   return await getDMConvo(agent, env, user) !== null;
 };
 
@@ -38,7 +39,7 @@ export const createDMWithUser = async (env: Bindings, user: string|null, msg: st
   if (user === null)
     return false;
 
-  const agent = new AtProtoAgent('https://bsky.social');
+  const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
   const convoData: BSkyConvoInfo|null = await getDMConvo(agent, env, user);
   if (convoData !== null) {
     // Generate facets so we get things like links.

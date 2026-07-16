@@ -57,6 +57,14 @@ export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the same value bsky use
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 
+/** Default PDS Settings **/
+/* ---------------------- */
+// What is the default PDS to use (if one cannot be inferred for an user)
+export const DEFAULT_PDS: string = "https://bsky.social";
+
+// What is the default chat endpoint (probably needs to match with wherever your bot account is)
+export const DEFAULT_CHAT_PDS: string = "https://bsky.social";
+
 /** Feature Flags **/
 /* --------------- */
 // if the user can edit the repost rules for their posts
@@ -76,7 +84,8 @@ export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 // controls if we inject granular content security policy headers into requests
 // or use the basic values from hono
 export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
-// the above must be on for this to be true
+// the above must be on, otherwise this will do nothing. This will only report CSP failures
+// Once CSP is good enough, change this to false to have it be enforced.
 export const USE_CSP_REPORT_ONLY: boolean = true;
 
 /*********************************************************/
@@ -98,9 +107,6 @@ export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSetting
 /*********************************************************/
 /**** INTERNAL/SERVICE LIMITS, DO NOT CHANGE DIRECTLY ****/
 /*********************************************************/
-
-// What is the default PDS to use (if one cannot be inferred for an user)
-export const DEFAULT_PDS: string = "https://bsky.social";
 
 // internal calculation values, pulled from above
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;

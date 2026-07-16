@@ -106,13 +106,13 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
     c.executionCtx.waitUntil(setPostNowOffForPost(c, content.postid));
   }
   return false;
-}
+};
 
 export const makeRepost = async (c: AllContext, content: Repost, usingAgent: AtProtoAgent) => {
   try {
     await usingAgent.deleteRepost(content.uri);
   } catch {
-    // nothing.
+    // nothing. if this fails, it probably was never reposted in the first place.
   }
 
   try {
@@ -597,13 +597,13 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
   console.log(`posted ${successes}/${expected}, did ${successThisRound} work units`);
 
   return returnObj;
-}
+};
 
 export const getPostRecords = async (records: string[]) => {
   // Access the bsky public API
   const agent = new AtProtoAgent('https://public.api.bsky.app');
   return await getAgentPostRecords(agent, records);
-}
+};
 
 export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]) => {
   try
@@ -615,7 +615,7 @@ export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]
     console.error(`Unable to get post records for ${records} had error ${err}`);
   }
   return null;
-}
+};
 
 export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) => {
   try {
@@ -627,7 +627,7 @@ export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) =
     console.error(`Unable to get feed record for ${feedURI} had error ${err}`);
   }
   return null;
-}
+};
 
 export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) => {
   try {
@@ -639,4 +639,4 @@ export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) =
     console.error(`Unable to resolve list record for ${listURI} had error ${err}`);
   }
   return null;
-}
+};
