@@ -1,6 +1,5 @@
 {
   "search.exclude": {
-    "**/assets/dep": true,
     "**/migrations": true,
     ".wrangler/**": true,
     "/src/wrangler.d.ts": true,
