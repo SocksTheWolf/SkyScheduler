@@ -72,9 +72,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
   if (props.preloads !== undefined)
     preloadList = preloadList.concat(props.preloads);
 
-  const htmxConfig = `<meta name="htmx-config"
-    content='{"allowEval": false, "inlineScriptNonce": "${props.nonce}",
-    "inlineStyleNonce": "${props.nonce}"}' />`;
+  const htmxConfig = `<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${props.nonce}","inlineStyleNonce":"${props.nonce}"}' />`;
 
   return (<>
   {raw("<!DOCTYPE html>")}
