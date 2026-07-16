@@ -149,6 +149,12 @@ function rawSubmitHandler(url, successCallback) {
       } else {
         const data = await response.json();
         pushToast(translateErrorObject(data, data.msg), false);
+        // attempt to restart turnstile
+        try {
+          turnstile.reset();
+        } catch (e) {
+          // literally do not do anything
+        }
       }
     } catch (err) {
       pushToast("An error occurred", false);
