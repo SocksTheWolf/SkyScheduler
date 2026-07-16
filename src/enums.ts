@@ -63,3 +63,9 @@ export enum TimeIntervalSettings {
   TenMinutes = 10,
   FiveMinutes = 5
 };
+
+export enum ScriptInclusionLevel {
+  NonInteractive,
+  Interactive,
+  DashboardApp
+};

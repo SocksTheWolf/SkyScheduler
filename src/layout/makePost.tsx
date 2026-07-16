@@ -1,24 +1,12 @@
 import { MAX_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
-import { ConstScriptStr } from "../statics/constScript";
-import { IncludeDependencyTags, PreloadRules } from "./helpers/includesTags";
 import UploadInfo from "./helpers/uploadInfo";
 import ContentLabelOptions from "./options/contentLabelOptions";
 import RepostOptions from "./options/repostOptions";
 import ScheduleOptions from "./options/scheduleOptions";
 
-export const PreloadPostCreation: PreloadRules[] = [
-  {type: "script", href: ConstScriptStr },
-  {type: "script", href: "/dep/dropzone.min.js"},
-  {type: "style", href: "/dep/dropzone.min.css"},
-  {type: "style", href: "/css/dropzoneMods.css"},
-  {type: "style", href: "/dep/tribute.css"},
-  {type: "script", href: "/dep/tribute.min.js"}
-];
-
 export function PostCreation(props: BaseElementProps) {
   return (<section>
-    <IncludeDependencyTags scripts={PreloadPostCreation} ctx={props.ctx} />
     <article>
       <form id="postForm" novalidate>
         <header>

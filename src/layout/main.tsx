@@ -1,42 +1,77 @@
 import { raw } from 'hono/html';
 import { Child } from 'hono/jsx';
+import { ScriptInclusionLevel } from '../enums';
 import { APP_NAME } from "../siteinfo";
-import { mainScriptStr } from '../statics/appScripts';
-import { IncludeDependencyTags, PreloadDependencyTags, PreloadRules } from "./helpers/includesTags";
-import { MetaTags, PersonaTags } from './helpers/metaTags';
+import { dashboardStyleStr, mainScriptStr } from '../statics/appScripts';
+import { constScriptStr } from '../statics/constScript';
 import type { BaseElementProps } from "../types";
+import { IncludeDependencyTags, PreloadDependencyTags, type PreloadRules } from "./helpers/includesTags";
+import { MetaTags, PersonaTags } from './helpers/metaTags';
 
 type BaseLayoutProps = BaseElementProps & {
   children: Child;
   title: string;
   noIndex?: boolean;
   mainClass?: string;
-  simple?: boolean;
+  interactivity?: ScriptInclusionLevel;
   preloads?: PreloadRules[]
 };
+
+// Basic scripts, no interactivity
+const defaultPreloads: PreloadRules[] = [
+  {type: "style", href: "/dep/pico.min.css"},
+  {type: "style", href: "/css/stylesheet.min.css"},
+];
+
+// Interactivity scripts
+const appDefaultPreloads: PreloadRules[] = [
+  {type: "style", href: "/dep/toastify.min.css"},
+  {type: "script", href: "/dep/htmx.min.js"},
+  {type: "script", href: "/dep/toastify.js"},
+  ...defaultPreloads,
+  {type: "script", href: mainScriptStr}
+];
+
+// Application scripts
+const dashboardDefaultPreloads: PreloadRules[] = [
+  ...appDefaultPreloads,
+  {href: dashboardStyleStr, type: "style"},
+  {href: "/dep/countable.min.js", type: "script"},
+  {href: "/dep/form-json.min.js", type: "script"},
+  {href: "/dep/modal.min.js", type: "script"},
+  {href: "/dep/tabs.min.js", type: "script"},
+  {href: "/dep/has.min.js", type: "script"},
+  {type: "script", href: constScriptStr },
+  {type: "script", href: "/dep/dropzone.min.js"},
+  {type: "style", href: "/dep/dropzone.min.css"},
+  {type: "style", href: "/css/dropzoneMods.css"},
+  {type: "style", href: "/dep/tribute.css"},
+  {type: "script", href: "/dep/tribute.min.js"}
+];
 
 export const BaseLayout = (props: BaseLayoutProps) => {
   const noIndex = (props.noIndex !== undefined) ? props.noIndex : false;
   const mainClass = (props.mainClass !== undefined) ? props.mainClass : "";
-  const preloads = (props.preloads !== undefined) ? props.preloads : [];
-  const defaultPreloads: PreloadRules[] = [
-    {type: "style", href: "/dep/pico.min.css"},
-    {type: "style", href: "/css/stylesheet.min.css"},
-  ];
-  const appDefaultPreloads: PreloadRules[] = [
-    {type: "style", href: "/dep/toastify.min.css"},
-    {type: "script", href: "/dep/htmx.min.js"},
-    {type: "script", href: "/dep/toastify.js"},
-    ...defaultPreloads,
-    {type: "script", href: mainScriptStr}
-  ];
-
   let preloadList: PreloadRules[] = [];
-  if (props.simple)
-    preloadList = defaultPreloads;
-  else
-    preloadList = appDefaultPreloads;
-  preloadList = preloadList.concat(preloads);
+  let scriptIncludeList: PreloadRules[] = [];
+
+  switch (props.interactivity) {
+    case ScriptInclusionLevel.NonInteractive:
+      preloadList = defaultPreloads;
+    break;
+    default:
+    case ScriptInclusionLevel.Interactive:
+      preloadList = appDefaultPreloads;
+    break;
+    case ScriptInclusionLevel.DashboardApp:
+      preloadList = dashboardDefaultPreloads;
+    break;
+  }
+  scriptIncludeList = preloadList;
+  // Preloaded scripts that were pushed in should
+  // implement their own includes into the DOM
+  if (props.preloads !== undefined)
+    preloadList = preloadList.concat(props.preloads);
 
   const currentNonce = props.ctx?.get("secureHeadersNonce");
   const htmxConfig = `<meta name="htmx-config"
@@ -59,11 +94,11 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <IncludeDependencyTags scripts={props.simple ? defaultPreloads : appDefaultPreloads} ctx={props.ctx} />
-      {currentNonce !== undefined && !props.simple ? raw(htmxConfig) : null}
+      <IncludeDependencyTags scripts={scriptIncludeList} nonce={currentNonce} />
+      {currentNonce !== undefined && props.interactivity != ScriptInclusionLevel.NonInteractive
+        ? raw(htmxConfig) : null}
     </head>
     <body>
-      {props.simple ? <script nonce={currentNonce}>0</script> : null}
       <container class="pico">
         <main class={mainClass}>
           {props.children}

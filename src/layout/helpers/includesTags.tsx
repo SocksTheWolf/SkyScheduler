@@ -1,23 +1,20 @@
 // handling preloading and injection of dependencies into the layout
-import type { BaseElementProps } from "../../types";
-
 export type PreloadRules = {
   type: string;
   href: string;
 };
 
-type DepTagsType = BaseElementProps & {
+type DepTagsType = {
   scripts?: PreloadRules[]
+  nonce?: string
 };
 
 // generate css/js tags for the given dependencies
-export function IncludeDependencyTags(props: DepTagsType) {
-  const scripts = props.scripts;
+export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
   if (scripts === undefined) {
     return null;
   }
 
-  const nonce: string|undefined = props.ctx?.get("secureHeadersNonce");
   const html = scripts.map((itm) => {
     switch (itm.type) {
       case "script":

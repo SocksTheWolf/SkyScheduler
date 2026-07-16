@@ -13,7 +13,7 @@ import { postRecordURI } from "../validation/regexCases";
 
 export const CONST_SCRIPT_VERSION: number = 11;
 
-export const ConstScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
+export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {
   const makeStringArray = (typeMap: string[]) => {
     return typeMap.map((type) => `"${type}"`).join()
@@ -24,7 +24,8 @@ export function makeConstScript() {
     fileTypeArray.push(...BSKY_GIF_MIME_TYPES);
   }
 
-  return `const fileTypesSupported = [${makeStringArray(fileTypeArray)}];
+  return `const DEFINITION_VERSION=${CONST_SCRIPT_VERSION};
+const fileTypesSupported = [${makeStringArray(fileTypeArray)}];
 const imageTypes = [${makeStringArray(BSKY_IMG_MIME_TYPES)}];
 const videoTypes = [${makeStringArray(BSKY_VIDEO_MIME_TYPES)}];
 const videoFileExts = [${makeStringArray(BSKY_VIDEO_FILE_EXTS)}];

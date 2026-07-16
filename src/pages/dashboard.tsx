@@ -1,3 +1,4 @@
+import { ScriptInclusionLevel } from "../enums";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
 import ScrollToContent from "../layout/buttons/scroll";
@@ -5,35 +6,24 @@ import SettingsButton from "../layout/buttons/settings";
 import AltTextDialog from "../layout/dialogs/altTextDialog";
 import SettingsDialog from "../layout/dialogs/settingsDialog";
 import FooterCopyright from "../layout/helpers/footer";
-import { IncludeDependencyTags, PreloadRules } from "../layout/helpers/includesTags";
 import LogoImage from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
-import { PostCreation, PreloadPostCreation } from "../layout/makePost";
+import { PostCreation } from "../layout/makePost";
 import { RepostCreation } from "../layout/makeRepost";
 import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
+import { dashboardScriptStr } from "../statics/appScripts";
 import type { AllContext, BaseElementProps } from "../types";
-import { dashboardScriptStr, dashboardStyleStr } from "../statics/appScripts";
 
 export default function Dashboard(props: BaseElementProps) {
   if (props.ctx === undefined)
     return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx!;
-  // 3rd party dependencies
-  const defaultDashboardPreloads: PreloadRules[] = [
-    {href: dashboardStyleStr, type: "style"},
-    {href: "/dep/countable.min.js", type: "script"},
-    {href: "/dep/form-json.min.js", type: "script"},
-    {href: "/dep/modal.min.js", type: "script"},
-    {href: "/dep/tabs.min.js", type: "script"},
-    {href: "/dep/has.min.js", type: "script"}
-  ];
-
   return (<BaseLayout title="Dashboard" ctx={ctx} mainClass="dashboard"
-      preloads={[...PreloadPostCreation, ...defaultDashboardPreloads, {href: dashboardScriptStr, type: "script"}]}>
-    <IncludeDependencyTags scripts={defaultDashboardPreloads} ctx={ctx} />
+      interactivity={ScriptInclusionLevel.DashboardApp}
+      preloads={[{href: dashboardScriptStr, type: "script"}]}>
     <div class="row-fluid">
       <section class="col-3 sidebar">
         <article>
