@@ -24,7 +24,7 @@ export default function ScheduleOptions(props: ScheduleOptionsProps) {
     <article>
       <header hidden={!hasHeader}>{headerText}</header>
       <input class="timeSelector" type="datetime-local" id={props.timeID} placeholder="" required />
-      <small>Time is based on your device's current timezone (<small class="timeZoneName"></small>) and is automatically converted for you.</small>
+      <small>Time is based on your device's current timezone (<small><code class="timeZoneName"></code></small>) and is automatically converted for you.</small>
       {postNowHTML}
       <footer>
         <small>

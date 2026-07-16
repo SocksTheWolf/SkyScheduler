@@ -23,7 +23,7 @@ export default function Dashboard(props: BaseElementProps) {
   const ctx: AllContext = props.ctx!;
   return (<BaseLayout title="Dashboard" nonce={ctx.get("secureHeadersNonce")} mainClass="dashboard"
       interactivity={ScriptInclusionLevel.DashboardApp}
-      preloads={[{href: dashboardScriptStr, type: "script"}]}>
+      preloads={[{href: dashboardScriptStr, type: "script"}, {type: "font", "href": "/fonts/LiberationMono.woff2"}]}>
     <div class="row-fluid">
       <section class="col-3 sidebar">
         <article>

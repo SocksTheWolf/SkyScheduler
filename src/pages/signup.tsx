@@ -22,7 +22,7 @@ export default function Signup(props: BaseElementProps) {
     "You can ask for the maintainer for it";
 
   return (<BaseLayout title="Signup" nonce={ctx.get("secureHeadersNonce")}
-    preloads={[...TurnstileCaptchaPreloads(ctx)]}>
+    preloads={[...TurnstileCaptchaPreloads(ctx), {type: "font", "href": "/fonts/LiberationMono.woff2"}]}>
       <NavTags />
       <AccountHandler title="Create Account"
         submitText="Sign Up!"

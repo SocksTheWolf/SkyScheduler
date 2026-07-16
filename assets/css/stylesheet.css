@@ -1,3 +1,6 @@
+/* Some computers may not have Liberation Mono, so here's it as a fallback */
+@font-face { font-family: 'Liberation Mono'; src: url('/fonts/LiberationMono.woff2') format('woff2'); }
+
 .hidden {
   display: none !important;
 }
