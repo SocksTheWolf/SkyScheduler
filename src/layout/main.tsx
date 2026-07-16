@@ -46,7 +46,7 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   {type: "script", href: "/dep/dropzone.min.js"},
   {type: "style", href: "/dep/dropzone.min.css"},
   {type: "style", href: "/dep/tribute.css"},
-  {type: "style", href: "/css/dropzoneMods.css"},
+  {type: "style", href: "/css/depmods.min.css"},
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
