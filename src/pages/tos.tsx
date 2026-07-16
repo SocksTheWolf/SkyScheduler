@@ -7,7 +7,7 @@ import type { BaseElementProps } from "../types";
 
 export default function TermsOfService(props?: BaseElementProps) {
   return (<BaseLayout title="Terms of Service" interactivity={ScriptInclusionLevel.NonInteractive}
-    ctx={props?.ctx} mainClass="homepage">
+    nonce={props?.ctx?.get("secureHeadersNonce")} mainClass="homepage">
     <NavTags />
     <section class="container">
       <article>

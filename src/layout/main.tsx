@@ -14,7 +14,8 @@ type BaseLayoutProps = BaseElementProps & {
   noIndex?: boolean;
   mainClass?: string;
   interactivity?: ScriptInclusionLevel;
-  preloads?: PreloadRules[]
+  preloads?: PreloadRules[];
+  nonce?: string;
 };
 
 // Basic scripts, no interactivity
@@ -44,14 +45,12 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   {type: "script", href: constScriptStr },
   {type: "script", href: "/dep/dropzone.min.js"},
   {type: "style", href: "/dep/dropzone.min.css"},
-  {type: "style", href: "/css/dropzoneMods.css"},
   {type: "style", href: "/dep/tribute.css"},
+  {type: "style", href: "/css/dropzoneMods.css"},
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
 export const BaseLayout = (props: BaseLayoutProps) => {
-  const noIndex = (props.noIndex !== undefined) ? props.noIndex : false;
-  const mainClass = (props.mainClass !== undefined) ? props.mainClass : "";
   let preloadList: PreloadRules[] = [];
   let scriptIncludeList: PreloadRules[] = [];
 
@@ -73,10 +72,9 @@ export const BaseLayout = (props: BaseLayoutProps) => {
   if (props.preloads !== undefined)
     preloadList = preloadList.concat(props.preloads);
 
-  const currentNonce = props.ctx?.get("secureHeadersNonce");
   const htmxConfig = `<meta name="htmx-config"
-    content='{"allowEval": false, "inlineScriptNonce": "${currentNonce}",
-    "inlineStyleNonce": "${currentNonce}"}' />`;
+    content='{"allowEval": false, "inlineScriptNonce": "${props.nonce}",
+    "inlineStyleNonce": "${props.nonce}"}' />`;
 
   return (<>
   {raw("<!DOCTYPE html>")}
@@ -87,20 +85,20 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <MetaTags />
       <PreloadDependencyTags scripts={preloadList} />
       <PersonaTags />
-      {noIndex ? <meta name="robots" content="noindex" /> : null}
+      {props.noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <IncludeDependencyTags scripts={scriptIncludeList} nonce={currentNonce} />
-      {currentNonce !== undefined && props.interactivity != ScriptInclusionLevel.NonInteractive
+      <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
+      {props.nonce !== undefined && props.interactivity != ScriptInclusionLevel.NonInteractive
         ? raw(htmxConfig) : null}
     </head>
     <body>
       <container class="pico">
-        <main class={mainClass}>
+        <main class={props.mainClass}>
           {props.children}
         </main>
       </container>

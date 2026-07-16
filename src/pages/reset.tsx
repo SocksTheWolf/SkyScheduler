@@ -7,15 +7,16 @@ import type { BaseElementProps } from "../types";
 
 export default function ResetPassword(props?: BaseElementProps) {
   const links = [{title: "Forgot Password", url: "/forgot"}];
+  const curNonce = props?.ctx?.get("secureHeadersNonce");
   return (
-    <BaseLayout title="Reset Password" ctx={props?.ctx} noIndex={true}>
+    <BaseLayout title="Reset Password" nonce={curNonce} noIndex={true}>
       <NavTags />
       <AccountHandler title="Reset Password"
         loadingText="Resetting Password..."
         endpoint="/account/reset"
         successText="Success! Redirecting to login..."
         redirect="/login"
-        ctx={props?.ctx}
+        nonce={curNonce}
         disabledByDefault={true}
         footerLinks={links}>
 
@@ -34,7 +35,7 @@ export default function ResetPassword(props?: BaseElementProps) {
             minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} required />
         </label>
       </AccountHandler>
-      <script type="text/javascript" src="js/reset.js"></script>
+      <script type="text/javascript" src="js/reset.js" nonce={curNonce}></script>
     </BaseLayout>
   );
 }

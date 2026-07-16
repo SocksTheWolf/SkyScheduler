@@ -21,7 +21,7 @@ export default function Dashboard(props: BaseElementProps) {
     return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx!;
-  return (<BaseLayout title="Dashboard" ctx={ctx} mainClass="dashboard"
+  return (<BaseLayout title="Dashboard" nonce={ctx.get("secureHeadersNonce")} mainClass="dashboard"
       interactivity={ScriptInclusionLevel.DashboardApp}
       preloads={[{href: dashboardScriptStr, type: "script"}]}>
     <div class="row-fluid">
@@ -72,6 +72,6 @@ export default function Dashboard(props: BaseElementProps) {
     </div>
     <AltTextDialog />
     <SettingsDialog pds={ctx.get("pds")} />
-    <script type="text/javascript" src={dashboardScriptStr}></script>
+    <script type="text/javascript" src={dashboardScriptStr} nonce={ctx.get("secureHeadersNonce")}></script>
   </BaseLayout>);
 };

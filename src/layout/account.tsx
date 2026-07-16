@@ -1,14 +1,13 @@
 import { html } from 'hono/html';
 import { Child } from 'hono/jsx';
 import { HtmlEscapedString } from 'hono/utils/html';
-import type { BaseElementProps } from "../types";
 
 type FooterLink = {
   title: string;
   url: string;
 };
 
-type AccountFormProps = BaseElementProps & {
+type AccountFormProps = {
   children: Child;
   title: string;
   submitText?: string;
@@ -19,7 +18,8 @@ type AccountFormProps = BaseElementProps & {
   disabledByDefault?: boolean;
   customRedirectDelay?: number;
   footerLinks?: FooterLink[]
-  footerHTML?: string | Promise<HtmlEscapedString>
+  footerHTML?: string | Promise<HtmlEscapedString>;
+  nonce?: string
 };
 
 export default function AccountHandler(props: AccountFormProps) {
@@ -50,7 +50,7 @@ export default function AccountHandler(props: AccountFormProps) {
         </center>
       </footer>
     </article>
-    <script type="text/javascript" nonce={props.ctx?.get("secureHeadersNonce")}>
+    <script type="text/javascript" nonce={props.nonce}>
     {html`
       easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
     `}

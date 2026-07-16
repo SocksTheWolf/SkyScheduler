@@ -1,7 +1,11 @@
 {
   "name": "skyscheduler",
+  "description": "Bluesky Post/Repost Scheduler on Cloudflare workers",
+  "funding": "https://ko-fi.com/socksthewolf",
   "license": "MIT",
   "homepage": "https://skyscheduler.work",
+  "repository": "github:socksthewolf/skyscheduler",
+  "private": true,
   "scripts": {
     "base:db:optimize": "wrangler d1 execute skyposts --command \"PRAGMA optimize\"",
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
