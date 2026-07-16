@@ -99,6 +99,9 @@ export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSetting
 /**** INTERNAL/SERVICE LIMITS, DO NOT CHANGE DIRECTLY ****/
 /*********************************************************/
 
+// What is the default PDS to use (if one cannot be inferred for an user)
+export const DEFAULT_PDS: string = "https://bsky.social";
+
 // internal calculation values, pulled from above
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
 export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;

@@ -1,10 +1,10 @@
 import { PWAutoCompleteSettings } from "../../enums";
-import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
+import { DEFAULT_PDS, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
 import { APP_NAME } from "../../siteinfo";
+import type { BaseElementProps } from "../../types";
 import BSkyAppPasswordField from "../fields/appPasswordField";
 import DashboardPasswordField from "../fields/dashPasswordField";
 import UsernameField from "../fields/usernameField";
-import type { BaseElementProps } from "../../types";
 
 type SettingsTypeProps = BaseElementProps & {
   pds?: string;
@@ -12,7 +12,7 @@ type SettingsTypeProps = BaseElementProps & {
 
 export default function SettingsDialog(props: SettingsTypeProps) {
   // attempt to pull the user's current PDS information.
-  const placeholderPDS = props.pds ? props.pds : "https://bsky.social";
+  const placeholderPDS = props.pds ? props.pds : DEFAULT_PDS;
   return (<>
   <dialog id="changeInfo">
     <article>

@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { DEFAULT_PDS } from "../limits";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -18,7 +19,7 @@ export const users = sqliteTable("users", {
   username: text("username").unique(),
   displayUsername: text("display_username"),
   bskyAppPass: text("bsky_app_pass").notNull(),
-  pds: text("pds").default("https://bsky.social").notNull(),
+  pds: text("pds").default(DEFAULT_PDS).notNull(),
 });
 
 export const sessions = sqliteTable(

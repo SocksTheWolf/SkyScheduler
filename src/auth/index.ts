@@ -5,7 +5,7 @@ import { username } from "better-auth/plugins";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import { schema } from "../db";
-import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
+import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH, DEFAULT_PDS } from "../limits";
 import { APP_NAME } from "../siteinfo";
 import type { Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
@@ -107,7 +107,7 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
         },
         pds: {
           type: "string",
-          defaultValue: "https://bsky.social",
+          defaultValue: DEFAULT_PDS,
           required: true
         }
       },

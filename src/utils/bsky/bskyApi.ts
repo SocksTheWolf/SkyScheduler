@@ -9,7 +9,7 @@ import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
-  BSKY_IMG_SIZE_LIMIT, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
+  BSKY_IMG_SIZE_LIMIT, DEFAULT_PDS, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
   USE_DEPRECATED_SIZE_PARSE
 } from '../../limits';
 import type {
@@ -65,7 +65,7 @@ export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
         }
       }
       // Fallback is to always return the bsky pds
-      return "https://bsky.social";
+      return DEFAULT_PDS;
     });
   });
 };
