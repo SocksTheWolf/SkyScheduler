@@ -2,7 +2,7 @@ import { raw } from 'hono/html';
 import { Child } from 'hono/jsx';
 import { ScriptInclusionLevel } from '../enums';
 import { APP_NAME } from "../siteinfo";
-import { dashboardStyleStr, mainScriptStr } from '../statics/appScripts';
+import { dashboardStyleStr, dependModsStyleStr, mainScriptStr } from '../statics/appScripts';
 import { constScriptStr } from '../statics/constScript';
 import type { BaseElementProps } from "../types";
 import { IncludeDependencyTags, PreloadDependencyTags, type PreloadRules } from "./helpers/includesTags";
@@ -46,7 +46,7 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   {type: "script", href: "/dep/dropzone.min.js"},
   {type: "style", href: "/dep/dropzone.min.css"},
   {type: "style", href: "/dep/tribute.min.css"},
-  {type: "style", href: "/css/depmods.min.css"},
+  {type: "style", href: dependModsStyleStr},
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
