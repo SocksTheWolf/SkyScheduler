@@ -20,7 +20,6 @@ export async function secureHeadersMiddleware(c: Context, next: any) {
       styleSrcAttr: ["'none'"],
       formAction: ["'self'"],
       frameAncestors: ["'none'"],
-      pluginTypes: ["'none'"],
       fontSrc: ["'self'"],
       manifestSrc: ["'self'"],
       workerSrc: ["'none'"],

@@ -12,7 +12,7 @@ export function TurnstileCaptcha(props: BaseElementProps) {
   return (<>
     {useCFTurnstile(props.ctx) ? (
       <label>
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer nonce={props.ctx?.get("secureHeadersNonce")}></script>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer nonce={props.ctx!.get("secureHeadersNonce")}></script>
         Captcha
         <div class="cf-turnstile" data-theme="dark" data-sitekey={props.ctx!.env.TURNSTILE_PUBLIC_KEY}></div>
       </label>
