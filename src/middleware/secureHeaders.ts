@@ -32,7 +32,7 @@ export async function secureHeadersMiddleware(c: Context, next: any) {
     contentSecurityPolicyReportOnly: USE_CSP_REPORT_ONLY ? secPolicy : undefined,
     referrerPolicy: "strict-origin-when-cross-origin",
     xXssProtection: false,
-    reportTo: hasReportURL ? [{group: "report-csp", max_age: 10886400, endpoints: [{url: cspReportURL}]}] : undefined,
+    reportingEndpoints: hasReportURL ? [{name: "report-csp", url: cspReportURL}] : undefined,
     removePoweredBy: true,
     crossOriginOpenerPolicy: "same-origin",
     strictTransportSecurity: "max-age=31536000; includeSubDomains; preload",
