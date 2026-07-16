@@ -12,7 +12,6 @@ import { explainPostingTimeInterval } from "../utils/helpers";
 export default function Homepage(props?: BaseElementProps) {
   return (<BaseLayout title="Home" nonce={props?.ctx?.get("secureHeadersNonce")} mainClass="homepage">
     <NavTags />
-    <script>0</script>
     <section class="container">
       <article>
         <noscript><header>Javascript is required to use this website!</header></noscript>

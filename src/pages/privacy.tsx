@@ -20,6 +20,7 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
           <ul>
             <li>Anything you explicitly provide to {APP_NAME} (post content, app password, attached media, etc)</li>
             <li>Anything you upload for processing in order to deliver your posts to the BlueSky network</li>
+            <li>Application error reports - security violations, web crashes, etc</li>
           </ul>
         </p>
         <h4>Who {APP_NAME} Shares Data With</h4>
