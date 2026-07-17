@@ -14,7 +14,7 @@ import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema, PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import {
-  CheckFileSchema, CheckGUIDSchema, CreateResponseSchema,
+  CheckFileSchema, CheckGUIDSchema, CreatePostResponseSchema,
   FileUploadFailSchema,
   FileUploadSuccessSchema, GenericResponseSchema
 } from "../validation/responseSchema";
@@ -28,7 +28,7 @@ openapiRoutes.post("/post/create", describeRoute({
     200: {
       description: 'Successful post',
       content: {
-        'application/json': { schema: resolver(CreateResponseSchema) },
+        'application/json': { schema: resolver(CreatePostResponseSchema) },
       },
     },
     400: {
@@ -59,7 +59,7 @@ openapiRoutes.post("/post/create/repost", describeRoute({
     200: {
       description: 'Successful post',
       content: {
-        'application/json': { schema: resolver(CreateResponseSchema) },
+        'application/json': { schema: resolver(CreatePostResponseSchema) },
       },
     },
     400: {
@@ -82,7 +82,7 @@ openapiRoutes.all("/post/all", describeRoute({
     200: {
       description: 'post list',
       content: {
-        'text/html': { schema: resolver(CreateResponseSchema) },
+        'text/html': { schema: resolver(CreatePostResponseSchema) },
       }
     },
     401: {
@@ -457,7 +457,7 @@ export async function generateOpenAPI(c: BaseContext) {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.1',
+        version: '1.2.2',
         description: 'API Routes',
         termsOfService: `${SITE_URL}/tos`,
         license: {
