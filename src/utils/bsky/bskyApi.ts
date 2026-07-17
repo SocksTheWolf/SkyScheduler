@@ -188,8 +188,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         const currentEmbedType: EmbedDataType = currentEmbed.type;
         ++embedsProcessed;
 
-        // If we never saw any record info, and the current type is not record itself, then we're on an overflow and need to back out.
-        if (embedsProcessed > MAX_EMBEDS_PER_POST && currentEmbedType != EmbedDataType.Record && isEmpty(bskyRecordInfo)) {
+        // If we've processed the max amount of embeds, exit.
+        if (embedsProcessed > MAX_EMBEDS_PER_POST) {
           break;
         }
 

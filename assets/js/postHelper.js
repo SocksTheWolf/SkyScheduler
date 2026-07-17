@@ -145,8 +145,8 @@ fileDropzone.on("addedfile", file => {
         body: JSON.stringify({"content": fileData.get(file.name).content })
     }).then(async response => {
       const data = await response.json();
-      if (!data.success) {
-        const errText = translateErrorObject(data.error, `Unknown Error`);
+      if (!data.ok) {
+        const errText = translateErrorObject(data.msg, `Unknown Error`);
         pushToast(`Unable to delete file ${file.name}! ${errText}`, false);
       } else {
         fileData.delete(file.name);
@@ -209,18 +209,22 @@ fileDropzone.on("success", function(file, response) {
     };
     videoTag.setAttribute("src", videoObjectURL);
     // push things into the content map so we can delete easier
-    setFileData(file.name, {content: response.data, type: 3});
+    setFileData(file.name, {content: response.data, type: VIDEO_DATA_TYPE});
     videoTag.addEventListener("loadedmetadata", () => {
       const videoDuration = videoTag.duration;
-      if (!deleteFileIfLengthOver(videoDuration, MAX_VIDEO_LENGTH)) {
-        setFileData(file.name, {content: response.data, type: 3,
+      // if we hit the video file limit, delete any other files that we were processing
+      if (hasFileLimit) {
+        deleteFileOnError();
+        pushToast(`Deleting ${file.name}, only one video file per post allowed`, false);
+      } else if (!deleteFileIfLengthOver(videoDuration, MAX_VIDEO_LENGTH)) {
+        setFileData(file.name, {content: response.data, type: VIDEO_DATA_TYPE,
           height: videoTag.videoHeight, width: videoTag.videoWidth, duration: videoDuration });
         hasFileLimit = true;
       }
       cleanupVideoTag();
     });
     videoTag.addEventListener("error", () => {
-      pushToast(`Unable to process ${file.name}, decoder error occurred`);
+      pushToast(`Unable to process ${file.name}, decoder error occurred`, false);
       deleteFileOnError();
       cleanupVideoTag();
     });
@@ -264,14 +268,14 @@ fileDropzone.on("success", function(file, response) {
       } else if (deleteFileIfLengthOver(videoDuration, MAX_GIF_LENGTH)) {
         return;
       } else {
-        setFileData(file.name, { content: response.data, type: 3, height: imageHeight, width: imageWidth, duration: videoDuration });
+        setFileData(file.name, { content: response.data, type: VIDEO_DATA_TYPE, height: imageHeight, width: imageWidth, duration: videoDuration });
         hasFileLimit = true;
       }
     };
     // Force the file to load.
     imgObj.src = gifImgURL;
   } else {
-    setFileData(file.name, {content: response.data, type: 1});
+    setFileData(file.name, {content: response.data, type: IMAGE_DATA_TYPE});
   }
 
   // Make the buttons pressable
@@ -306,11 +310,12 @@ fileDropzone.on("success", function(file, response) {
 });
 
 fileDropzone.on("error", function(file, msg) {
+  const translatedError = translateErrorObject(msg, msg.error || "Upload Error Occurred");
   if (msg.error !== undefined) {
-    pushToast(`Error: ${file.name} had error: "${msg.error}"`, false);
+    pushToast(`Error: ${file.name} had error: ${translatedError}`, false);
   } else if (msg !== "max files") {
     console.error(`file error was ${msg}`);
-    pushToast(`Error: ${file.name} had an unexpected error`, false);
+    pushToast(`Error: ${file.name} could not be processed`, false);
   }
 
   // file failed to upload, so drop the value here too
@@ -350,7 +355,8 @@ postForm.addEventListener('submit', async (e) => {
   // Handle conversion of date time to make sure that it is correct.
   let dateTime;
   try {
-    dateTime = isThreadPost || postNow ? new Date().toISOString() : new Date(scheduledDateVal).toISOString();
+    dateTime = isThreadPost || postNow ? new Date().toISOString() :
+      new Date(scheduledDateVal).toISOString();
   } catch(dateErr) {
     pushToast("Invalid date", false);
     showPostProgress(false);
@@ -401,9 +407,9 @@ postForm.addEventListener('submit', async (e) => {
         // Attempt to fetch the web information
         const webDataObj = {
           uri: linkCardURL,
-          type: 2
+          type: WEBLINK_DATA_TYPE
         };
-        // Going to rondezoop this from bsky as I don't want to write my own atm
+        // Going to rondezoop this from bsky as I don't want to write my own tbh
         const extractResponse = await fetch(`https://cardyb.bsky.app/v1/extract?url=${encodeURI(linkCardURL)}`);
         if (extractResponse.ok) {
           const extractData = await extractResponse.json();
@@ -435,7 +441,7 @@ postForm.addEventListener('submit', async (e) => {
 
       const recordObj = {
         content: recordURL,
-        type: 4
+        type: RECORD_DATA_TYPE
       }
       postObject.embeds.push(recordObj);
     }

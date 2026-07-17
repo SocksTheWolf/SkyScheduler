@@ -8,13 +8,15 @@ import type { BaseContext, Bindings } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
+import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema, PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import {
   CheckFileSchema, CheckGUIDSchema, CreateResponseSchema,
-  FileOperationResponseSchema, GenericResponseSchema
+  FileUploadFailSchema,
+  FileUploadSuccessSchema, GenericResponseSchema
 } from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
@@ -191,20 +193,20 @@ openapiRoutes.post("/post/upload", describeRoute({
     200: {
       description: "Successfully uploaded",
       content: {
-        'application/json': { schema: resolver(FileOperationResponseSchema) },
+        'application/json': { schema: resolver(FileUploadSuccessSchema)}
       },
     },
     400: {
       description: "Failed to upload",
       content: {
-        "application/json": { schema: resolver(FileOperationResponseSchema)}
+        "application/json": { schema: resolver(FileUploadFailSchema)}
       }
     },
     401: {
       description: "not logged in"
     }
   }
-}));
+}), validator("form", FileUploadSchema));
 
 // Delete an upload
 openapiRoutes.delete("/post/upload", describeRoute({
@@ -213,7 +215,7 @@ openapiRoutes.delete("/post/upload", describeRoute({
     200: {
       description: "File deleted successfully",
       content: {
-        "application/json": { schema: resolver(FileOperationResponseSchema)}
+        "application/json": { schema: resolver(GenericResponseSchema)}
       }
     },
     401: {
@@ -222,7 +224,7 @@ openapiRoutes.delete("/post/upload", describeRoute({
     402: {
       description: "Invalid operation performed",
       content: {
-        "application/json": { schema: resolver(FileOperationResponseSchema)}
+        "application/json": { schema: resolver(GenericResponseSchema)}
       }
     }
   }

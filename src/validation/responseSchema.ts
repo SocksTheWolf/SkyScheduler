@@ -26,7 +26,15 @@ export const CheckFileSchema = z.object({
     .nonempty()
 });
 
-export const FileOperationResponseSchema = z.object({
-  success: z.boolean(),
-  error: z.string().optional()
+export const FileUploadFailSchema = z.object({
+  success: z.literal(false),
+  error: z.string()
 });
+
+export const FileUploadSuccessSchema = z.object({
+  success: z.literal(true),
+  fileSize: z.number().min(1),
+  qualityLevel: z.number().min(1).max(100),
+  data: z.string(),
+  originalName: z.string()
+})

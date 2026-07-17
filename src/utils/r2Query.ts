@@ -8,14 +8,9 @@ import {
   BSKY_IMG_SIZE_LIMIT,
   BSKY_IMG_SIZE_LIMIT_IN_MB,
   BSKY_VIDEO_MIME_TYPES,
-  BSKY_VIDEO_SIZE_LIMIT,
-  CF_IMAGES_FILE_SIZE_LIMIT,
-  CF_IMAGES_FILE_SIZE_LIMIT_IN_MB,
   CF_IMAGES_MAX_DIMENSION,
   GIF_UPLOAD_ALLOWED,
-  MB_TO_BYTES,
-  R2_FILE_SIZE_LIMIT,
-  R2_FILE_SIZE_LIMIT_IN_MB
+  MB_TO_BYTES
 } from "../limits";
 import type { AllContext, EmbedData, R2BucketObject } from '../types';
 import { addFileListing, deleteFileListings } from './db/file';
@@ -99,15 +94,10 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
 
 const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   const originalName = file.name;
-  // The maximum size of CF Image transforms.
-  if (file.size > CF_IMAGES_FILE_SIZE_LIMIT) {
-    return {"success": false, "error": `An image has a maximum file size of ${CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB`};
-  }
-
   // We need to double check this image for various size information.
   const imageMetaData = await imageDimensionsFromStream(file.stream());
   if (imageMetaData === undefined) {
-    return {"success": false, "error": "image data could not be processed "}
+    return {"success": false, "error": "image data could not be processed "};
   }
 
   // if the image is over the cf image transforms, then return an error.
@@ -253,11 +243,6 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
 };
 
 const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
-  // Technically this will never hit because it is greater than our own internal limits
-  if (file.size > BSKY_VIDEO_SIZE_LIMIT) {
-    return {"success": false, "error": `max video size is ${BSKY_VIDEO_SIZE_LIMIT}MB`};
-  }
-
   const fileMetaData: FileMetaData = {
     name: file.name,
     size: file.size,
@@ -268,21 +253,6 @@ const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
 };
 
 export const uploadFileR2 = async (c: AllContext, file: File, userId: string) => {
-  if (!(file instanceof File)) {
-    console.warn("Failed to upload");
-    return {"success": false, "error": "data invalid"};
-  }
-
-  // Invalid file size check
-  if (file.size <= 0) {
-    return {"success": false, "error": "file had an invalid file size"};
-  }
-
-  // The file size limit for R2 before having to do a multipart upload.
-  if (file.size > R2_FILE_SIZE_LIMIT) {
-    return {"success": false, "error": `max file size is ${R2_FILE_SIZE_LIMIT_IN_MB}MB`};
-  }
-
   const fileType: string = file.type.toLowerCase();
   if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
     return await uploadImageToR2(c, file, userId);

@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 import { EmbedDataType, PostLabel } from "../enums";
-import { MAX_LENGTH, MIN_LENGTH, POSTING_TIME_INTERVAL } from "../limits";
+import { MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST, MAX_LENGTH, MAX_RECORDS_PER_POST, MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST, MIN_LENGTH, POSTING_TIME_INTERVAL } from "../limits";
 import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { RepostDataSchema } from "./repostDataSchema";
@@ -21,7 +21,7 @@ export const PostSchema = z.object({
     LinkEmbedSchema,
     VideoEmbedSchema,
     PostRecordSchema
-  ], "invalid media type").array().optional(),
+  ], "invalid media type").array().max(MAX_EMBEDS_PER_POST, "too many items were provided").optional(),
   label: z.enum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   rootPost: z.uuidv4("root post id is invalid").optional(),
@@ -65,17 +65,110 @@ export const PostSchema = z.object({
       });
     }
   }
-  // Check that labels are properly set if we have embed data
-  if (embeds !== undefined && embeds.length > 0 && label === undefined) {
-    // If it's only a quote post and nothing else, then no content label is required.
-    if (embeds.length == 1 && embeds[0].type == EmbedDataType.Record)
-      return;
+  // Verify embed data
+  if (embeds !== undefined && embeds.length > 0) {
+    // Check if labels are set
+    if (label === undefined) {
+      // If we only have one record and it's a quote post, don't bother
+      // checking for undefined labels or anything else in the refine
+      if (embeds.length == 1 && embeds[0].type == EmbedDataType.Record) {
+        return;
+      }
 
-    ctx.addIssue({
-      code: "custom",
-      message: "Content labels are required for posting media",
-      path: ["label"]
+      ctx.addIssue({
+        code: "custom",
+        message: "Content labels are required for posting media",
+        path: ["label"]
+      });
+    }
+
+    // Count up the types of records we have
+    let videoCount: number = 0, imageCount: number = 0,
+      recordCount: number = 0, linkCount: number = 0;
+
+    // Build up a usage map of all of the items in the embed stack
+    embeds.forEach((itm) => {
+      switch(itm.type) {
+        case EmbedDataType.Video:
+          ++videoCount;
+        break;
+        case EmbedDataType.Image:
+          ++imageCount;
+        break;
+        case EmbedDataType.Record:
+          ++recordCount;
+        break;
+        case EmbedDataType.WebLink:
+          ++linkCount;
+        break;
+      }
     });
+
+    // Check for video violations
+    if (videoCount > 0) {
+      // Cannot have videos and images in the same post
+      if (imageCount > 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Videos and images cannot be uploaded to the same post",
+          path: ["embeds"]
+        });
+      }
+      if (videoCount > MAX_VIDEOS_PER_POST) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Only one video is allowed to be posted per post",
+          path: ["embeds"]
+        });
+      }
+
+      // Someone is being naughty if they get to this check
+      if (linkCount > 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Embed links cannot be included with videos",
+          path: ["embeds"]
+        });
+      }
+    }
+
+    // Check for image violations
+    if (imageCount > 0) {
+      if (imageCount > MAX_IMAGES_PER_POST) {
+        ctx.addIssue({
+          code: "custom",
+          message: `Too many images have been included, the max is ${MAX_IMAGES_PER_POST}`,
+          path: ["embeds"]
+        });
+      }
+
+      // Someone is being naughty if they get to this check
+      if (linkCount > 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Embed links cannot be included with images",
+          path: ["embeds"]
+        });
+      }
+    }
+
+    // Check for number of post records
+    if (recordCount > MAX_RECORDS_PER_POST) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Too many post records have been included",
+        path: ["embeds"]
+      });
+    }
+
+    // Check for number of post records
+    if (linkCount > MAX_WEBLINKS_PER_POST) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Too many weblink embeds have been included",
+        path: ["embeds"]
+      });
+    }
   }
 });
 

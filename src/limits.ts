@@ -153,7 +153,21 @@ export const BSKY_IMG_FILE_EXTS_STR: string = [
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
 export const BSKY_MAX_USERNAME_LENGTH: number = 256; // since these are domains, they should be about 256
 export const BSKY_MAX_APP_PASSWORD_LENGTH: number = 20;
-export const MAX_EMBEDS_PER_POST: number = 10;
+
+// max amount of videos per post
+export const MAX_VIDEOS_PER_POST: number = 1;
+// max number of images per post
+export const MAX_IMAGES_PER_POST: number = 10;
+// max uploadable objects per post
+export const MAX_FILES_PER_POST: number = Math.max(MAX_VIDEOS_PER_POST, MAX_IMAGES_PER_POST);
+// max quote posts/lists/feeds per post
+export const MAX_RECORDS_PER_POST: number = 1;
+// max number of weblinks per post
+export const MAX_WEBLINKS_PER_POST: number = 1;
+// max extra data that can be added to a post
+export const MAX_METADATA_PER_POST: number = Math.max(MAX_WEBLINKS_PER_POST, MAX_RECORDS_PER_POST);
+// max amount of embed data per post object (you can have 1 extra data + the max amount of files)
+export const MAX_EMBEDS_PER_POST: number = MAX_METADATA_PER_POST + MAX_FILES_PER_POST;
 
 // Video limits values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L184
@@ -188,7 +202,8 @@ export const BSKY_VIDEO_FILES_STR: string = ((GIF_UPLOAD_ALLOWED) ?
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
-export const BSKY_VIDEO_SIZE_LIMIT: number = Math.min(R2_FILE_SIZE_LIMIT_IN_MB, BSKY_VIDEO_MAX_SIZE_IN_MB) * MB_TO_BYTES;
+export const BSKY_VIDEO_SIZE_LIMIT_IN_MB: number = Math.min(R2_FILE_SIZE_LIMIT_IN_MB, BSKY_VIDEO_MAX_SIZE_IN_MB);
+export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
 export const MAX_GIF_LENGTH_LIMIT: number = MAX_GIF_LENGTH * TO_SEC;
 // Max size of Cloudflare Images files

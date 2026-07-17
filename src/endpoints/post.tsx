@@ -21,6 +21,7 @@ import {
 import { isAltEditableType } from "../utils/helpers";
 import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { handlePostNowTask } from "../utils/scheduler";
+import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
@@ -30,8 +31,13 @@ post.use(authMiddleware);
 
 // Create media upload
 post.post("/upload", async (c) => {
-  const fileUploadResponse = await c.req.parseBody()
-    .then((formData) => uploadFileR2(c, formData['file'] as File, c.get("userId")));
+  const validation = await c.req.parseBody().then((body) => FileUploadSchema.safeParse(body));
+  if (!validation.success) {
+    return c.json({"success": false, "error": validation.error.toString()}, 400);
+  }
+
+  const { file } = validation.data;
+  const fileUploadResponse = await uploadFileR2(c, file as File, c.get("userId"));
   if (fileUploadResponse.success === false)
     return c.json(fileUploadResponse, 400);
   else
@@ -45,13 +51,13 @@ post.delete("/upload", async (c) => {
   // Validate that this is a legitimate key
   const validation = FileDeleteSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({"success": false, "error": validation.error}, 402);
+    return c.json({"ok": false, "msg": validation.error.toString()}, 402);
   }
 
   const { content } = validation.data;
   // delete item from r2
   c.executionCtx.waitUntil(deleteFromR2(c, content, false));
-  return c.json({"success": true}, 200);
+  return c.json({"ok": true, "msg": "deleted file"}, 200);
 });
 
 // Create post
