@@ -90,9 +90,9 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
       {props.nonce !== undefined && props.interactivity != ScriptInclusionLevel.NonInteractive
         ? raw(htmxConfig) : null}
+      <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
     </head>
     <body>
       <container class="pico">
