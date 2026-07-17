@@ -84,7 +84,8 @@ export const PostSchema = z.object({
 
     // Count up the types of records we have
     let videoCount: number = 0, imageCount: number = 0,
-      recordCount: number = 0, linkCount: number = 0;
+      recordCount: number = 0, linkCount: number = 0,
+      invalidCount: number = 0;
 
     // Build up a usage map of all of the items in the embed stack
     embeds.forEach((itm) => {
@@ -101,8 +102,19 @@ export const PostSchema = z.object({
         case EmbedDataType.WebLink:
           ++linkCount;
         break;
+        default:
+          ++invalidCount;
+        break;
       }
     });
+
+    if (invalidCount > 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "There is invalid data in this post, please remove",
+        path: ["embeds"]
+      });
+    }
 
     // Check for video violations
     if (videoCount > 0) {
