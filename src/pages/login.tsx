@@ -10,7 +10,7 @@ import type { BaseElementProps } from "../types";
 export default function Login(props?: BaseElementProps) {
   const links = [{title: "Sign Up", url: "/signup"}, {title: "Forgot Password", url: "/forgot"}];
   const curNonce = props?.ctx?.get("secureHeadersNonce");
-  return (<BaseLayout title="Login" nonce={curNonce} preloads={[{type: "font", "href": "/fonts/LiberationMono.woff2"}]}>
+  return (<BaseLayout title="Login" nonce={curNonce}>
     <NavTags />
     <AccountHandler title="Login"
       loadingText="Logging in..."
