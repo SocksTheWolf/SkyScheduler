@@ -43,6 +43,8 @@ let fileDropzone = new Dropzone("#fileUploads", {
   maxFiles: FILE_DROP_MAX_FILES,
   dictMaxFilesExceeded: "max files",
   maxFilesize: FILE_DROP_MAX_SIZE,
+  // We manually toggle thumbnail creation ourselves.
+  createImageThumbnails: false,
   maxThumbnailFilesize: FILE_DROP_MAX_THUMB_SIZE,
   acceptedFiles: fileTypesSupported.toString()
 });
@@ -301,6 +303,13 @@ fileDropzone.on("success", function(file, response) {
       } else if (fileIsGif) {
         this.emit('thumbnail', file, '/thumbs/gif.png');
       }
+    } else if (fileIsImage) {
+      // due to a bug in dropzone (not a surprise),
+      // thumbnails will process even if the server rejects the file
+      // so we manually toggle thumbnail creation here.
+      this.options.createImageThumbnails = true;
+      this._enqueueThumbnail(file);
+      this.options.createImageThumbnails = false;
     }
   } catch (err) {
     console.error(err);
@@ -310,12 +319,8 @@ fileDropzone.on("success", function(file, response) {
 });
 
 fileDropzone.on("error", function(file, msg) {
-  const translatedError = translateErrorObject(msg, msg.error || "Upload Error Occurred");
-  if (msg.error !== undefined) {
-    pushToast(`Error: ${file.name} had error: ${translatedError}`, false);
-  } else if (msg !== "max files") {
-    console.error(`file error was ${msg}`);
-    pushToast(`Error: ${file.name} could not be processed`, false);
+  if (msg.error !== undefined || msg !== "max files") {
+    pushToast(translateErrorObject(msg, msg.error || "Upload Error Occurred", `Error: failed to upload ${file.name}`), false);
   }
 
   // file failed to upload, so drop the value here too

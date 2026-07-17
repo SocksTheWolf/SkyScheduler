@@ -97,7 +97,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   // We need to double check this image for various size information.
   const imageMetaData = await imageDimensionsFromStream(file.stream());
   if (imageMetaData === undefined) {
-    return {"success": false, "error": "image data could not be processed "};
+    return {"success": false, "error": "image data could not be processed"};
   }
 
   // if the image is over the cf image transforms, then return an error.

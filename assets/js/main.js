@@ -95,7 +95,7 @@ function redirectAfterDelay(url, customDelay=0) {
   }, customDelay != 0 ? customDelay : 1200);
 }
 
-function translateErrorObject(obj, defaultString) {
+function translateErrorObject(obj, defaultString, defaultTitle="Error Occurred!") {
   let errData = defaultString;
   // If we have a json object in the error message field
   var hasJsonErr = false;
@@ -117,7 +117,7 @@ function translateErrorObject(obj, defaultString) {
       combinedErrors += `${error.message}\n`;
     errData = combinedErrors;
   }
-  return `Error Occurred!\n----\n${errData}`;
+  return `${defaultTitle}\n----\n${errData}`;
 }
 
 function rawSubmitHandler(url, successCallback) {
