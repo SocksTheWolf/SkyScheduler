@@ -136,15 +136,15 @@ SkyScheduler comes with a lot of commands to help manage the service. Documentat
 
 The most important ones to know:
 
-* `dev` - runs the app in a local environment
-* `generate` - run anytime you modify a file in the `src/db` folder. This will generate SQL migration files
-* `migrate` - commit the SQL migrations to local/prod databases.
-* `migrate:local` - migrates the SQL changes to your local dev instance
-* `migrate:prod` - does the same but commits remotely. **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute)
-* `invite:generate` - generates a valid invite key
-* `invite:local/remote` - commits an invite key to the invite store
-* `sitemap` - generates a sitemap.xml file (there's a github action that will do this automatically as well)
-* `types` - whenever `wrangler.toml` changes or wrangler updates, run this command
+- `dev` - runs the app in a local environment
+- `generate` - run anytime you modify a file in the `src/db` folder. This will generate SQL migration files
+- `migrate` - commit the SQL migrations to local/prod databases.
+- `migrate:local` - migrates the SQL changes to your local dev instance
+- `migrate:prod` - does the same but commits remotely. **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute)
+- `invite:generate` - generates a valid invite key
+- `invite:local/remote` - commits an invite key to the invite store
+- `sitemap` - generates a sitemap.xml file (there's a github action that will do this automatically as well)
+- `types` - whenever `wrangler.toml` changes or wrangler updates, run this command
 
 ## Project Structure
 
