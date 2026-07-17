@@ -13,7 +13,7 @@ import {
   MB_TO_BYTES
 } from "../limits";
 import type { AllContext, EmbedData, R2BucketObject } from '../types';
-import { addFileListing, deleteFileListings } from './db/file';
+import { addFileListing, deleteFileListings, isMediaOwnedByUser } from './db/file';
 import { isAltEditableType } from './helpers';
 
 type FileMetaData = {
@@ -40,6 +40,15 @@ export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|unde
     await deleteFromR2(c, itemsToDelete, isQueued);
   }
   return itemsToDelete;
+};
+
+export const requestDeleteFromR2 = async (c: AllContext, embedKey: string) => {
+  const checkOwnership = await isMediaOwnedByUser(c, embedKey);
+  if (checkOwnership) {
+    await deleteFromR2(c, embedKey, false);
+    return true;
+  }
+  return false;
 };
 
 export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQueued: boolean=false) => {

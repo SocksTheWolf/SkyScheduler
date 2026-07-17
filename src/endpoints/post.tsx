@@ -19,7 +19,7 @@ import {
   getPostByIdWithReposts, updatePostForUser
 } from "../utils/dbQuery";
 import { isAltEditableType } from "../utils/helpers";
-import { deleteFromR2, uploadFileR2 } from "../utils/r2Query";
+import { requestDeleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { handlePostNowTask } from "../utils/scheduler";
 import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
@@ -55,9 +55,11 @@ post.delete("/upload", async (c) => {
   }
 
   const { content } = validation.data;
-  // delete item from r2
-  c.executionCtx.waitUntil(deleteFromR2(c, content, false));
-  return c.json({"ok": true, "msg": "deleted file"}, 200);
+  const deleteRequest = await requestDeleteFromR2(c, content);
+  if (deleteRequest)
+    return c.json({"ok": true, "msg": "deleted file"}, 200);
+  else
+    return c.json({"ok": false, "msg": "unable to delete file"}, 400);
 });
 
 // Create post

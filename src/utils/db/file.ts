@@ -5,6 +5,24 @@ import { mediaFiles, posts } from "../../db/app.schema";
 import type { AllContext, LooseObj } from "../../types";
 import { daysAgo, isAltEditableType } from "../helpers";
 
+export const isMediaOwnedByUser = async (c: AllContext, file: string): Promise<boolean> => {
+  const db: DrizzleD1Database = c.get("db");
+  if (!db) {
+    console.error(`unable to check ownership of file ${file}, db was null`);
+    return false;
+  }
+
+  const userId = c.get("userId");
+  if (userId == null) {
+    return false;
+  }
+
+  const result = await db.select().from(mediaFiles).where(
+    and(eq(mediaFiles.userId, userId), eq(mediaFiles.fileName, file)))
+    .limit(1).all();
+  return result.length > 0;
+};
+
 export const addFileListing = async (c: AllContext, file: string, user: string|null, createDate: Date|null=null) => {
   const db: DrizzleD1Database = c.get("db");
   if (!db) {

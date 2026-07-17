@@ -218,6 +218,12 @@ openapiRoutes.delete("/post/upload", describeRoute({
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
     },
+    400: {
+      description: "File unable to be deleted",
+      content: {
+        "application/json": { schema: resolver(GenericResponseSchema)}
+      }
+    },
     401: {
       description: "not logged in"
     },
