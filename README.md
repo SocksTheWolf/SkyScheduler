@@ -175,6 +175,7 @@ skyscheduler/
 ├── .markdownlint.json
 ├── .minify.json
 ├── .ssclirc
+├── auth.config.ts
 ├── drizzle.config.ts
 ├── package.json
 ├── tsconfig.json

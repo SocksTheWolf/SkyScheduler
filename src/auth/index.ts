@@ -145,9 +145,6 @@ function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
   });
 }
 
-// Export for CLI schema generation
-export const auth = createAuth();
-
 // Export for variable types
 type ContextVariables = SecureHeadersVariables & {
   auth: ReturnType<typeof createAuth>;

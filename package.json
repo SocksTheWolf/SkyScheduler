@@ -13,7 +13,7 @@
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
-    "auth": "npx auth@latest generate --config src/auth/index.ts --output src/db/auth.schema.ts -y && npx prettier --write src/db/auth.schema.ts",
+    "auth": "npx auth@latest generate --config auth.config.ts --output src/db/auth.schema.ts -y && npx prettier --write src/db/auth.schema.ts",
     "optimize": "run-s migrate:*:pragma",
     "generate": "drizzle-kit generate",
     "migrate:local:db": "npm run base:db:migrate -- --local",
