@@ -36,7 +36,7 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   {type: "script", href: "/dep/tribute.min.js"}
 ];
 
-export function getScriptsForInteractivity(interactiveLevel: ScriptInclusionLevel|undefined): PreloadRules[] {
+export function getScriptsForInteractivity(interactiveLevel?: ScriptInclusionLevel): PreloadRules[] {
   switch (interactiveLevel) {
     case ScriptInclusionLevel.NonInteractive:
       return defaultPreloads;
