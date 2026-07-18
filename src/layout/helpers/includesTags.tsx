@@ -23,6 +23,8 @@ export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
         return (<script type="module" src={itm.href} nonce={nonce}></script>);
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" nonce={nonce} />);
+      default:
+        return (<></>);
     }
   });
   return (<>{html}</>);

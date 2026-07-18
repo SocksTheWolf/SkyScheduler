@@ -191,6 +191,6 @@ export type BaseElementProps = {
 };
 // handling preloading and injection of dependencies into the layout
 export type PreloadRules = {
-  type: string;
+  type: "image"|"style"|"script"|"module"|string;
   href: string;
 };

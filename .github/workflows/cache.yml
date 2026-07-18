@@ -12,7 +12,6 @@ on:
       - "!assets/_redirects"
       - "!assets/_headers"
       - "!assets/.well-known/**"
-      - "src/layout/**"
       - "src/pages/**"
       - "src/statics/**"
       - "src/limits.ts"
