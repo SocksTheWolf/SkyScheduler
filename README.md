@@ -9,15 +9,15 @@
 [![Website](https://img.shields.io/website?logo=cloudflare&color=teal&cacheSeconds=7200&down_color=red&url=https%3A%2F%2Fskyscheduler.work)](https://skyscheduler.work)
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)](https://developer.mozilla.org/en-US/observatory/analyze?host=skyscheduler.work)
 
-[![GitHub branch check runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)
-![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](https://github.com/socksthewolf/skyscheduler)
+![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)
 
 ![SkyScheduler Dashboard](https://raw.githubusercontent.com/SocksTheWolf/SkyScheduler/refs/heads/main/assets/screenshots/dashboard.png)
 
 ## Overview
 
-![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)
+[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](https://github.com/socksthewolf/skyscheduler)
 
 SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
@@ -44,6 +44,8 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - Cloudflare Pro Workers account (you will hit CPU limits due to betterauth and egress to atproto)
 
 ### Installation
+
+Clicking the Cloudflare Badge should get you a mostly one-click install. Manual instructions are provided below.
 
 1. Clone the repository
 
@@ -94,11 +96,11 @@ npm run deploy
 
 8. Create your D1 tables using the following command, this will set up your tables both locally and remotely.
 
-**NOTE**: If you encounter issues running remotely, you can run `npm run migrate:prod` or `npm run migrate:local` respectively.
-
 ```bash
 npm run migrate:all
 ```
+
+**NOTE**: If you encounter issues running remotely, you can run `npm run migrate:prod` or `npm run migrate:local` respectively.
 
 9. Run your application and go to `/setup`. This will create the admin account.
 
@@ -110,7 +112,9 @@ Ensure you have configured the `.env` file with the necessary credentials and se
 
 ### Application Variables
 
-Most of the application can be modified with `wrangler.toml`'s vars section or via `src/limits.ts`. Both files are heavily commented to explain what the options control.
+Most of the application can be modified with `wrangler.toml`'s vars section or via `src/limits.ts`.
+
+Both files are heavily commented to explain what the options control.
 
 ### Site Variables
 
@@ -145,8 +149,10 @@ The most important ones to know:
 ```text
 skyscheduler/
 ├── assets/
+│   ├── .well-known/
 │   ├── css/
 │   ├── dep/
+│   ├── fonts/
 │   ├── icons/
 │   ├── js/
 │   ├── screenshots/
@@ -164,12 +170,14 @@ skyscheduler/
 │   └── validation/
 ├── migrations/
 ├── .vscode/
+├── .github/
 ├── .env.example
 ├── .node-version
 ├── .markdownlint.json
 ├── .minify.json
 ├── .ssclirc
 ├── auth.config.ts
+├── build.ts
 ├── drizzle.config.ts
 ├── package.json
 ├── tsconfig.json
@@ -186,6 +194,7 @@ skyscheduler/
 - uuid - id generation
 - zod - data validation
 - image-dimensions - image data validation
+- toml - reading configs during SSG generation (if enabled)
 - date-fns - date processing helpers
 - drizzle - database orm/schemas
 - just - js helper library
@@ -211,7 +220,7 @@ We welcome contributions! Here's some ways to contribute:
 
 ## License
 
-This project's source code is licensed under the MIT License.
+Project's source code is licensed under the MIT License.
 Name, Logos and Branding are copyright SocksTheWolf, all rights reserved.
 
 See the [LICENSE](LICENSE) file for details.
