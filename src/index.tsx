@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { csrf } from "hono/csrf";
 import { disableSSG, isSSGContext } from "hono/ssg";
 import { createAuth } from "./auth";
-import buildStaticSite from "./utils/build";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
@@ -14,7 +13,6 @@ import { USE_STATIC_HTML } from "./limits";
 import { blankAuthEnv } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { cspHelper } from "./middleware/cspHelper";
-import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
@@ -52,13 +50,13 @@ app.all("/", (c) => {
 });
 app.get("/tos", (c) => {
   if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "tos");
+    return serveStaticPage(c);
   else
     return c.html(<TermsOfService ctx={c} />);
 });
 app.get("/privacy", (c) => {
   if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "privacy");
+    return serveStaticPage(c);
   else
     return c.html(<PrivacyPolicy ctx={c} />);
 });
@@ -89,7 +87,7 @@ app.get("/login", redirectToDashIfLogin, (c) => {
 // Signup route
 app.get("/signup", redirectToDashIfLogin, (c) => {
   if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "login");
+    return serveStaticPage(c);
   else
     return c.html(<Signup ctx={c} />);
 });
@@ -97,7 +95,7 @@ app.get("/signup", redirectToDashIfLogin, (c) => {
 // Forgot Password route
 app.get("/forgot", redirectToDashIfLogin, (c) => {
   if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "forgot");
+    return serveStaticPage(c);
   else
     return c.html(<ForgotPassword ctx={c} />);
 });
@@ -105,7 +103,7 @@ app.get("/forgot", redirectToDashIfLogin, (c) => {
 // Reset Password route
 app.get("/reset", redirectToDashIfLogin, (c) => {
   if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "reset");
+    return serveStaticPage(c);
   else
     return c.html(<ResetPassword ctx={c} />);
 });
@@ -141,10 +139,6 @@ app.get("/reset-password/:id", (c) => {
 
 // Setup Application route
 app.get("/setup", async (c) => await setupAccounts(c));
-
-app.get("/gen", onlyInDevelopment, async (c) => {
-  return c.text(await buildStaticSite(app), 200);
-});
 
 ///// Internal Application Exports /////
 

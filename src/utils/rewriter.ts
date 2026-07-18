@@ -14,10 +14,17 @@ class NonceInject {
   }
 }
 
-export const serveStaticPage = async (c: Context, page: string) => {
-  const origin: string = new URL(c.req.url).origin;
+export const serveStaticPage = async (c: Context, page?: string) => {
+  const url: URL = new URL(c.req.url);
+  const origin: string = url.origin;
+  if (page === undefined)
+    page = url.pathname.replace("/", "");
+
   const staticFile = await c.env.ASSETS!.fetch(`${origin}/pages/${page}.html`);
-  return new HTMLRewriter()
-    .on("script, link[rel='stylesheet'], meta[name='htmx-config'], style", new NonceInject(c.get("secureHeadersNonce")))
-    .transform(staticFile);
+  if (staticFile.ok) {
+    return new HTMLRewriter()
+      .on("script, link[rel='stylesheet'], meta[name='htmx-config'], style", new NonceInject(c.get("secureHeadersNonce")))
+      .transform(staticFile);
+  }
+  return c.notFound();
 };

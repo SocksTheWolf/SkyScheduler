@@ -12,9 +12,7 @@ assets = { binding = "ASSETS", run_worker_first = false, directory = "./assets/"
 routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
 
 [build]
-command = "npm run minify"
-# this will disable wrangler from building/bundling anything else in dev, which is super frustrating.
-#watch_dir = ["/assets/js/*Helper.js", "/assets/js/main.js", "/assets/css/stylesheet.css", "/assets/css/dashboard.css", "/src/limits.ts", "/src/statics"]
+command = "npm run build"
 
 # Redis for sessions
 [[kv_namespaces]]
