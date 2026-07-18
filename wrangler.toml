@@ -118,6 +118,12 @@ cpu_ms = 60000
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
+# The name of the bot that is used for password resets
+RESET_BOT_USERNAME="skyscheduler.work"
+
+# The turnstile captcha public key
+TURNSTILE_PUBLIC_KEY="0x4AAAAAABkTE_9TV_bUnLGK"
+
 # the host for CSP reports to go to. if the CSP flags are off, this will not be used.
 CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 
