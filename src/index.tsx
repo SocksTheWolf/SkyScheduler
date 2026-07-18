@@ -12,6 +12,7 @@ import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
 import { blankAuthEnv } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
+import { cspHelper } from "./middleware/cspHelper";
 import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
@@ -38,10 +39,7 @@ app.use(blankAuthEnv);
 app.use(csrf({origin: SITE_URL}));
 app.use(secureHeadersMiddleware);
 
-///// Static Pages /////
-
-// Root route
-app.all("/", (c) => c.html(<Homepage ctx={c} />));
+///// Static Files /////
 
 // caches
 const staticFilesCache = cache({ cacheName: 'statics', cacheControl: 'max-age=604800, must-revalidate, proxy-revalidate' });
@@ -66,13 +64,17 @@ app.get("/site.webmanifest", staticFilesCache, (c) => {
   return c.json(appManifestGenerate());
 });
 
-// Legal linkies
-app.get("/tos", (c) => c.html(<TermsOfService ctx={c} />));
-app.get("/privacy", (c) => c.html(<PrivacyPolicy ctx={c} />));
-
 app.get('/openapi.json', onlyInDevelopment, async (c) => {
   return c.json(await generateOpenAPI(c));
 });
+
+///// Static Pages /////
+
+// Start using CSP from here onwards
+app.use(cspHelper);
+app.all("/", (c) => c.render(<Homepage ctx={c} />));
+app.get("/tos", (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", (c) => c.html(<PrivacyPolicy ctx={c} />));
 
 ///// Inline Middleware /////
 // CORS configuration for auth routes
