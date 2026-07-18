@@ -13,7 +13,7 @@ const defaultPreloads: PreloadRules[] = [
 // Interactivity scripts
 const appDefaultPreloads: PreloadRules[] = [
   {type: "style", href: "/dep/toastify.min.css"},
-  {type: "script", href: "/dep/htmx.min.js", async: true},
+  {type: "script", href: "/dep/htmx.min.js"},
   {type: "script", href: "/dep/toastify.js"},
   ...defaultPreloads,
   {type: "script", href: mainScriptStr}
