@@ -1,12 +1,12 @@
-// handling preloading and injection of dependencies into the layout
-export type PreloadRules = {
-  type: string;
-  href: string;
+import { raw } from "hono/html";
+import type { PreloadRules } from "../../types";
+
+type NoncePropType = {
+  nonce?: string
 };
 
-type DepTagsType = {
+type DepTagsType = NoncePropType & {
   scripts?: PreloadRules[]
-  nonce?: string
 };
 
 // generate css/js tags for the given dependencies
@@ -26,7 +26,7 @@ export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
     }
   });
   return (<>{html}</>);
-}
+};
 
 export function PreloadDependencyTags({scripts}: DepTagsType) {
   if (scripts === undefined) {
@@ -37,4 +37,8 @@ export function PreloadDependencyTags({scripts}: DepTagsType) {
     return (<link rel="preload" href={itm.href} as={itm.type} />);
   });
   return (<>{html}</>);
+};
+
+export function HTMXNonceTag({nonce}: NoncePropType) {
+  return raw(`<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${nonce}","inlineStyleNonce":"${nonce}"}' />`);
 }
