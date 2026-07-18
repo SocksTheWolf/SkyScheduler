@@ -8,7 +8,7 @@ const BaseRecordSchema = z.object({
 export const AnyRecordSchema = z.object({
   ...BaseRecordSchema.shape,
   uri: z.string().trim().min(1)
-    .regex(atProtoRecordURI, "post record is invalid")
+    .regex(atProtoRecordURI, "record is invalid")
     .nonoptional("record uri must be provided"),
 });
 

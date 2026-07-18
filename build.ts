@@ -5,7 +5,6 @@ import * as app from "./src/index";
 import { USE_STATIC_HTML } from './src/limits';
 import type { HonoBase } from "./src/types";
 
-
 async function buildStaticSite(app: Hono<HonoBase>) {
   // If we do not build static html, then do not generate anything.
   if (!USE_STATIC_HTML)

@@ -35,7 +35,7 @@ export const PostSchema = z.object({
   rootPost: z.uuidv4("root post id is invalid").optional(),
   parentPost: z.uuidv4("parent post id is invalid").optional(),
   ...RepostDataSchema.shape,
-  scheduledDate: z.string().refine((date) => {
+  scheduledDate: z.string().trim().refine((date) => {
     try {
       const parsed = new Date(date);
       return !isNaN(parsed.getTime());
@@ -197,5 +197,5 @@ export const EditSchema = z.object({
   altEdits: z.object({
     ...FileContentSchema.shape,
     ...AltTextSchema.shape
-  }).array().optional()
+  }).array().max(MAX_EMBEDS_PER_POST, "too many items were provided").optional()
 });

@@ -6,5 +6,5 @@ export const SignupSchema = z.object({
   ...PasswordSchema.shape,
   ...BSkyAppPasswordSchema.shape,
   signupToken: z.string().trim().toLowerCase().optional(),
-  agreeTerms: z.literal(true, "TOS & Privacy Policy were not agreed to")
+  agreeTerms: z.literal(true, "TOS & Privacy Policy were not agreed to").nonoptional("Missing agreements")
 });

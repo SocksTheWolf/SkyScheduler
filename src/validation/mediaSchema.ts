@@ -2,7 +2,7 @@ import * as z from "zod/v4";
 import { fileKeyRegex } from "./regexCases";
 
 export const FileContentSchema = z.object({
-  content: z.string().toLowerCase()
+  content: z.string().trim().toLowerCase()
     .regex(fileKeyRegex, "file key is invalid")
     .nonempty("file key was empty")
 });

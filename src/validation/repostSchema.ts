@@ -33,7 +33,7 @@ export const RepostSchema = z.object({
     FutureRepostSchema,
   ], "invalid repost type"),
   ...RepostDataSchema.shape,
-  scheduledDate: z.string().refine((date) => {
+  scheduledDate: z.string().trim().refine((date) => {
     try {
       const parsed = new Date(date);
       return !isNaN(parsed.getTime());

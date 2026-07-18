@@ -54,7 +54,7 @@ export const LinkEmbedSchema = z.object({
     normalize: true,
     protocol: /^https?$/,
     hostname: z.regexes.domain,
-    error: "provided link is not an URL, please check URL and try again"
+    error: "provided link is not an URL, please check the value and try again"
   }).trim()
     .nonoptional("link embeds require a url"),
   description: z.string().trim().default(""),
