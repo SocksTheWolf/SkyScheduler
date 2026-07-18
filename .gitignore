@@ -39,3 +39,4 @@ src/css.ts
 *.db
 assets/js/*.min.js
 assets/css/*.min.css
+assets/pages/
