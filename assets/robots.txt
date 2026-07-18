@@ -5,3 +5,5 @@ Disallow: /admin
 Disallow: /thumbs
 Disallow: /icons
 Disallow: /openapi.json
+
+Sitemap: https://skyscheduler.work/sitemap.xml

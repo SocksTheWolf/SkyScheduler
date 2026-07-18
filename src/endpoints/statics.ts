@@ -7,7 +7,6 @@ import { onlyInDevelopment } from "../middleware/inDevOnly";
 import { ATPROTO_DID } from "../siteinfo";
 import { appManifestGenerate } from "../statics/appManifest";
 import { makeConstScript } from "../statics/constScript";
-import { robotsGenerate } from "../statics/robotsGenerator";
 import type { HonoBase } from "../types";
 import { generateOpenAPI } from "./openapi";
 
@@ -29,11 +28,6 @@ if (!isEmpty(ATPROTO_DID)) {
 // JS injection of const variables
 staticFiles.get("/js/consts.js", staticFileMiddleware, (c) => {
   return c.body(makeConstScript(), 200, {'Content-Type': 'text/javascript'});
-});
-
-// Write the robots.txt file dynamically
-staticFiles.get("/robots.txt", staticFileMiddleware, async (c) => {
-  return c.text(robotsGenerate(), 200);
 });
 
 // Write site.webmanifest dynamically
