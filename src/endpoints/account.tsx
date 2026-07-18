@@ -195,27 +195,34 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
 
   console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
   // create the user
-  const createUser = await auth.api.signUpEmail({
-    body: {
-      name: username,
-      email: `${username}@skyscheduler.tld`,
-      // @ts-ignore
-      username: username,
-      password: password,
-      bskyAppPass: bskyAppPassword,
-      pds: userPDS
+  try {
+    const createUser = await auth.api.signUpEmail({
+      body: {
+        name: username,
+        email: `${username}@skyscheduler.tld`,
+        // @ts-ignore
+        username: username,
+        password: password,
+        bskyAppPass: bskyAppPassword,
+        pds: userPDS
+      }
+    });
+
+    // check success of user creation
+    if (createUser.token !== null) {
+      // Burn the invite key
+      c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
+
+      console.log(`user ${username} created! with code ${signupToken||'none'}`);
+      return c.json({ok: true, msg: "signup success"});
     }
-  });
-
-  // check success of user creation
-  if (createUser.token !== null) {
-    // Burn the invite key
-    c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
-
-    console.log(`user ${username} created! with code ${signupToken||'none'}`);
-    return c.json({ok: true, msg: "signup success"});
+    // in case we actually made it to here, without getting an exception thrown, we should make note
+    // of this case
+    console.error(`could not sign up user ${username}, no token was returned`);
+  } catch(err) {
+    console.error(`unable to create user, got error ${err}`);
   }
-  console.error(`could not sign up user ${username}, no token was returned`);
+
   return c.json({ok: false, msg: "unknown error occurred, please try again"}, 501);
 });
 
