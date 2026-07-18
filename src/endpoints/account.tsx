@@ -216,7 +216,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     return c.json({ok: true, msg: "signup success"});
   }
   console.error(`could not sign up user ${username}, no token was returned`);
-  return c.json({ok: false, msg: "unknown error occurred"}, 501);
+  return c.json({ok: false, msg: "unknown error occurred, please try again"}, 501);
 });
 
 account.post("/forgot", verifyTurnstile, async (c) => {
@@ -281,14 +281,20 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
     return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
   }
 
-  const { status } = await auth.api.resetPassword({body: {
-    newPassword: password,
-    token: resetToken,
-  }});
-  if (!status) {
-    return c.json({ok: false, msg: "invalid token/password"}, 401);
+  try {
+    const status = await auth.api.resetPassword({body: {
+      newPassword: password,
+      token: resetToken,
+    }});
+    if (status) {
+      return c.json({ ok: true, msg: "successfully updated password" });
+    }
+  } catch (err) {
+    // we know this failed.
+    console.warn(`failed to reset password with error: ${err}`);
   }
-  return c.json({ ok: true, msg: "successfully updated password" });
+
+  return c.json({ok: false, msg: "invalid token/password"}, 401);
 });
 
 account.post("/delete", authMiddleware, async (c) => {
