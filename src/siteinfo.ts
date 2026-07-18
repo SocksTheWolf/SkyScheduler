@@ -22,6 +22,10 @@ export const PROJECT_AUTHOR_SITE: string = "https://socksthewolf.com";
 // This line shows up on the dashboard when the user logs in, located under the logo.
 export const DASHBOARD_TAG_LINE: string = "Schedule Bluesky posts effortlessly";
 
+// An optional link to a thread or other page to sign up for invite keys.
+// if not using invite keys, leave this string blank or undefined.
+export const SITE_INVITE_URL: string = "";
+
 // The atproto did for the /.well-known/ path. Leave blank for no injection.
 export const ATPROTO_DID: string = "did:plc:ecfcvvlqmadysyik3thlbs3c";
 

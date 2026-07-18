@@ -1,3 +1,4 @@
+import isEmpty from "just-is-empty";
 import { PWAutoCompleteSettings } from "../enums";
 import AccountHandler from "../layout/account";
 import BSkyAppPasswordField from "../layout/fields/appPasswordField";
@@ -8,17 +9,17 @@ import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME, SITE_INVITE_URL } from "../siteinfo";
 import type { AllContext, BaseElementProps } from "../types";
-import { getInviteThread, isUsingInviteKeys } from "../utils/inviteKeys";
+import { isUsingInviteKeys } from "../utils/inviteKeys";
 
 export default function Signup(props: BaseElementProps) {
   if (props.ctx === undefined)
     return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx!;
-  const linkToInvites = isUsingInviteKeys(ctx) ?
-    (<a href={getInviteThread(ctx)} target="_blank">Invite codes are routinely posted in this thread, grab one here</a>) :
+  const linkToInvites = !isEmpty(SITE_INVITE_URL) ?
+    (<a href={SITE_INVITE_URL} target="_blank">Invite codes can be found here</a>) :
     "You can ask for the maintainer for it";
 
   return (<BaseLayout title="Signup" nonce={ctx.get("secureHeadersNonce")}

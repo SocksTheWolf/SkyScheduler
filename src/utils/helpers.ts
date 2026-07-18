@@ -4,7 +4,7 @@ import {
 } from "date-fns";
 import has from "just-has";
 import { EmbedDataType, TimeIntervalSettings } from "../enums";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../limits";
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
 import type { AllContext, LooseObj } from "../types";
 
 export function floorCurrentTime(forRepost: boolean=false): Date {
@@ -63,7 +63,7 @@ export function useCFTurnstile(ctx: AllContext|undefined): boolean {
   if (ctx === undefined)
     return false;
 
-  return ctx.env.SIGNUP_SETTINGS.use_captcha && ctx.env.IN_DEV === false;
+  return USE_CAPTCHA && ctx.env.IN_DEV === false;
 }
 
 export function isPost(data: any): boolean {

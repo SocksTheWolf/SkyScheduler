@@ -56,7 +56,6 @@ export interface Bindings {
   QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL?: KVNamespace;
   IMAGE_SETTINGS: ImageConfigSettings;
-  SIGNUP_SETTINGS: SignupConfigSettings;
   TASK_SETTINGS: AgentConfigSettings;
   R2_SETTINGS: R2ConfigSettings;
   POST_LIMITER: RateLimit;

@@ -1,12 +1,9 @@
 import has from "just-has";
 import type { AllContext } from "../types";
+import { USE_INVITE_KEYS } from "../limits";
 
 export const isUsingInviteKeys = (c: AllContext): boolean => {
-  return has(c.env, "INVITE_POOL") && c.env.SIGNUP_SETTINGS.invite_only;
-}
-
-export const getInviteThread = (c: AllContext): string => {
-  return c.env.SIGNUP_SETTINGS.invite_thread || "";
+  return has(c.env, "INVITE_POOL") && USE_INVITE_KEYS;
 }
 
 export const doesInviteKeyHaveValues = async (c: AllContext, inviteKey: string|undefined): Promise<boolean> => {
