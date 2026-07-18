@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import { every } from "hono/combine";
+import { disableSSG } from "hono/ssg";
 import { hasAuth, pullAuthData } from "./auth";
 
 export async function goLoginIfLogout(c: Context, next: any) {
@@ -9,4 +10,4 @@ export async function goLoginIfLogout(c: Context, next: any) {
   await next();
 }
 
-export const redirectLoginIfLogout = every(pullAuthData, goLoginIfLogout);
+export const redirectLoginIfLogout = every(disableSSG(), pullAuthData, goLoginIfLogout);

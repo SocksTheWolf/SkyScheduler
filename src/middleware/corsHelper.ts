@@ -10,8 +10,7 @@ export const corsHelperMiddleware = async (c: Context, next: any) => {
       "HX-Push-Url", "HX-Replace-Url", "HX-Refresh", "Cache-Control",
       "HX-Redirect", "HX-Trigger-After-Swap", "HX-Trigger-After-Settle",
       "X-Retry-After", "Age"],
-    maxAge: 600,
-    credentials: true,
+    maxAge: 7200,
   });
   return middleware(c, next);
 };
