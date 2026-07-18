@@ -60,10 +60,10 @@ export function daysAgo(days: number): Date {
 }
 
 export function useCFTurnstile(ctx: AllContext|undefined): boolean {
-  if (ctx === undefined)
+  if (ctx?.env?.IN_DEV)
     return false;
 
-  return USE_CAPTCHA && ctx.env.IN_DEV === false;
+  return USE_CAPTCHA;
 }
 
 export function isPost(data: any): boolean {

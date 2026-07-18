@@ -15,12 +15,6 @@ type ImageConfigSettings = {
   max_width?: number;
 };
 
-type SignupConfigSettings = {
-  use_captcha: boolean;
-  invite_only: boolean;
-  invite_thread?: string;
-}
-
 type R2ConfigSettings = {
   auto_prune: boolean;
   prune_days?: number;
