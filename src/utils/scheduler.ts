@@ -3,7 +3,7 @@ import { AgentMap, type AtProtoAgent } from '../classes/bskyAgents';
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
 import { TaskType } from "../enums";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_VIDEO_WORKFLOWS } from '../limits';
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from '../limits';
 import type { AllContext } from '../types';
 import { makePost, makeRepost } from './bsky/bskyApi';
 import { pruneBskyPosts } from './bsky/bskyPrune';
@@ -20,7 +20,6 @@ import {
   shouldPostThreadQueue
 } from './queues/queuePublisher';
 import { deleteFromR2 } from './r2Query';
-import { pushVideoPostWorkflow } from './workflows/uploadAndPublish';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtProtoAgent|null) => {
   if (agent === null) {
@@ -52,11 +51,7 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       console.error(`unable to get agent for user ${postData.user} to post now`);
       postStatus = false;
     } else {
-      if (USE_VIDEO_WORKFLOWS && postData.getVideoEmbed() !== undefined) {
-        postStatus = await pushVideoPostWorkflow(c, postData, agent);
-      } else {
-        postStatus = await makePost(c, postData, agent);
-      }
+      postStatus = await makePost(c, postData, agent);
     }
   }
   if (postStatus === false)

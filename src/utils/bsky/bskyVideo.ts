@@ -1,5 +1,5 @@
+// This currently does not work and is thus unused.
 import type { AppBskyVideoDefs, BlobRef } from "@atproto/api";
-import type { WorkflowStep } from "cloudflare:workers";
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import type { AllContext } from "../../types";
 
@@ -35,7 +35,7 @@ export const uploadVideoToBlob = async (ctx: AllContext, agent: AtProtoAgent, fi
   throw new Error("Failed to upload!");
 };
 
-export const waitOnVideoStatus = async (jobStatus: AppBskyVideoDefs.JobStatus, step: WorkflowStep|null = null) => {
+export const waitOnVideoStatus = async (jobStatus: AppBskyVideoDefs.JobStatus, step: any|null = null) => {
   let blob: BlobRef | undefined = jobStatus.blob;
   const jobId = jobStatus.jobId;
   const videoAgent = new AtProtoAgent("https://video.bsky.app");

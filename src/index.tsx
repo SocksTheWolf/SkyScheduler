@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { csrf } from "hono/csrf";
 import { disableSSG, isSSGContext } from "hono/ssg";
 import { createAuth } from "./auth";
-import buildStaticSite from "./build";
+import buildStaticSite from "./utils/build";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
@@ -143,13 +143,10 @@ app.get("/reset-password/:id", (c) => {
 app.get("/setup", async (c) => await setupAccounts(c));
 
 app.get("/gen", onlyInDevelopment, async (c) => {
-  return await buildStaticSite(c, app);
+  return c.text(await buildStaticSite(app), 200);
 });
 
 ///// Internal Application Exports /////
-
-// Worker workflow classes to export back to main
-export { UploadVideoAndPublishWorkflow } from "./utils/workflows/uploadAndPublish";
 
 // Default CF exports
 export default {

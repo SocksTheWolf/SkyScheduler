@@ -26,8 +26,7 @@ export enum TaskType {
   None,
   Blast,
   Post,
-  Repost,
-  VideoPost
+  Repost
 };
 
 export enum AccountStatus {

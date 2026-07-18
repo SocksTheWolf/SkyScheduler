@@ -4,7 +4,6 @@ import get from 'just-safe-get';
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
-import { USE_VIDEO_WORKFLOWS } from '../../limits';
 import type { AllContext, Bindings, QueueTaskData } from "../../types";
 
 // picks a random queue to publish data to
@@ -48,11 +47,6 @@ export async function enqueuePost(c: AllContext, data: Post, delay: number = -1)
     return;
 
   let postType = TaskType.Post, postQueue = "post_queues";
-  if (USE_VIDEO_WORKFLOWS && data.getVideoEmbed() !== undefined) {
-    postType = TaskType.VideoPost;
-    postQueue = "repost_queues";
-  }
-
   // Pick a random consumer to handle this post
   const queueConsumer: Queue|null = getRandomQueue(c.env, postQueue);
   await pushToQueue(queueConsumer, data, postType, delay);

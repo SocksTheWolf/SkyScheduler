@@ -106,12 +106,6 @@ max_batch_size = 15
 max_batch_timeout = 10
 max_retries = 3
 
-# Workflows for video uploads
-[[workflows]]
-name = "video-workflow-publisher"
-binding = "VIDEO_WORKFLOW"
-class_name = "UploadVideoAndPublishWorkflow"
-
 # used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"

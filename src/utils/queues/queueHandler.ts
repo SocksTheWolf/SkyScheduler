@@ -8,7 +8,6 @@ import type { Bindings, QueueTaskData } from "../../types";
 import { userHasViolations } from "../db/violations";
 import { isPost } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
-import { pushVideoPostWorkflow } from "../workflows/uploadAndPublish";
 import { enqueueEmptyWork } from "./queuePublisher";
 
 type BufferBlast = {
@@ -30,7 +29,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
   for (const message of batch.messages) {
     let wasSuccess: boolean = false;
     const taskType: TaskType = message.body.type;
-    if (taskType == TaskType.Post || taskType == TaskType.Repost || taskType == TaskType.VideoPost) {
+    if (taskType == TaskType.Post || taskType == TaskType.Repost) {
       if (message.body.data == null) {
         console.error(`got a task type of ${taskType} but the message body has no data. cannot be processed!`);
         // maybe this was a bad send, so try it again later. Do not backblast as it was not an upstream failure.
@@ -60,9 +59,6 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
 
       } else {
         switch (taskType) {
-          case TaskType.VideoPost:
-            wasSuccess = await pushVideoPostWorkflow(runtimeWrapper, postDataObj as Post, agent);
-          break;
           case TaskType.Post:
             wasSuccess = await handlePostTask(runtimeWrapper, postDataObj as Post, agent);
           break;

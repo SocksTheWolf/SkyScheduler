@@ -79,10 +79,6 @@ export const CAN_EDIT_REPOST_RULES: boolean = true;
 // if users can repost scheduled posts before they are posted
 export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
 
-// if we should use CF Workflows in order to handle video uploads when scheduled
-// NOTE: This currently does not work properly, and should only be set to true while testing
-export const USE_VIDEO_WORKFLOWS: boolean = false;
-
 // allow for deprecated image size parsing.
 // NOTE: All new applications should set this to false.
 export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
