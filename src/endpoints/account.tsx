@@ -1,14 +1,12 @@
 import { type Context, Hono } from "hono";
 import isEmpty from "just-is-empty";
-import type { ContextVariables } from "../auth";
 import { ScheduledContext } from "../classes/context";
 import { AccountStatus } from "../enums";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddleware } from "../middleware/auth";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
-import type { Bindings, LooseObj } from "../types";
+import type { HonoBase, LooseObj } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyApi";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
 import { getAllMediaOfUser } from "../utils/db/file";
@@ -23,8 +21,7 @@ import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
-export const account = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-account.use(corsHelperMiddleware);
+export const account = new Hono<HonoBase>();
 
 const serverParseValidationErr = (c: Context, errorJson: string) => {
   try {

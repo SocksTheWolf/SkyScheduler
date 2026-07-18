@@ -182,7 +182,9 @@ export type R2BucketObject = {
   date: Date
 }
 
-export type BaseContext = Context<{Bindings: Bindings, Variables: ContextVariables}>;
+export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
+
+export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
 export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
 

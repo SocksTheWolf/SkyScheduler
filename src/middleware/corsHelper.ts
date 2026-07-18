@@ -1,7 +1,12 @@
 import type { Context } from "hono";
 import { cors } from "hono/cors";
+import { isSSGContext } from "hono/ssg";
 
 export const corsHelperMiddleware = async (c: Context, next: any) => {
+  if (isSSGContext(c)) {
+    await next();
+    return;
+  }
   const middleware = cors({
     origin: c.env.BETTER_AUTH_URL,
     allowHeaders: ["Content-Type", "Authorization"],

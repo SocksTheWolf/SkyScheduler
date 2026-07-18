@@ -1,14 +1,11 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
-import type { ContextVariables } from "../auth";
 import { BSKY_IMG_MIME_TYPES, PREVENT_NON_IMAGE_PREVIEWS } from "../limits";
 import { hasAuth, pullAuthData } from "../middleware/auth";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
-import type { Bindings } from "../types";
+import type { HonoBase } from "../types";
 import { FileContentSchema } from "../validation/mediaSchema";
 
-export const preview = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-preview.use(corsHelperMiddleware);
+export const preview = new Hono<HonoBase>();
 
 preview.get("/file/:id", pullAuthData, async (c) => {
   if (!hasAuth(c)) {

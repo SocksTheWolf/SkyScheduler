@@ -2,9 +2,8 @@
 // Cloudflare WAF to protect/log against abuse
 import { Hono } from "hono";
 import { describeRoute, generateSpecs, resolver, validator } from "hono-openapi";
-import type { ContextVariables } from "../auth";
 import { APP_NAME, SITE_URL } from "../siteinfo";
-import type { BaseContext, Bindings } from "../types";
+import type { BaseContext, HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
@@ -20,7 +19,7 @@ import {
 } from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
-const openapiRoutes = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
+const openapiRoutes = new Hono<HonoBase>();
 
 openapiRoutes.post("/post/create", describeRoute({
   description: 'Makes a post',

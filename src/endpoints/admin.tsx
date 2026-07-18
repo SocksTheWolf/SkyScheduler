@@ -1,14 +1,11 @@
 import { Hono } from "hono";
-import type { ContextVariables } from "../auth";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
-import type { Bindings } from "../types";
+import type { HonoBase } from "../types";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates } from "../utils/db/maintain";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 
-export const admin = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-admin.use(corsHelperMiddleware);
+export const admin = new Hono<HonoBase>();
 admin.use(authAdminOnlyMiddleware);
 
 // Admin Maintenance Cleanup

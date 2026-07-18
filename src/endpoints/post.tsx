@@ -1,18 +1,16 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from 'uuid';
-import type { ContextVariables } from "../auth";
 import type { Post } from "../classes/post";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
 import { RepostDataPopover } from "../layout/repostEditor";
 import { authMiddleware } from "../middleware/auth";
-import { corsHelperMiddleware } from "../middleware/corsHelper";
 import { rateLimit } from "../middleware/rateLimit";
 import type {
-  Bindings, CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse, LooseObj
+  CreateObjectResponse, CreatePostQueryResponse,
+  DeleteResponse, HonoBase, LooseObj
 } from "../types";
 import {
   createPost, createRepost, deletePost, deleteRepostRule, getPostById,
@@ -25,8 +23,7 @@ import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
-export const post = new Hono<{ Bindings: Bindings, Variables: ContextVariables }>();
-post.use(corsHelperMiddleware);
+export const post = new Hono<HonoBase>();
 post.use(authMiddleware);
 
 // Create media upload
