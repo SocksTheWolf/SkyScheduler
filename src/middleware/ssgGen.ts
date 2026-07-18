@@ -26,6 +26,16 @@ export async function ssgGenEnvironment(c: Context, next: any) {
 
         c.env[flag] = get(wranglerSettings.vars, flag);
       }
+
+      // laziest way to load a single flag from a .env
+      try {
+        const envFile = await readFile(".env");
+        const inDev = envFile.toString().search("IN_DEV=true");
+        c.env["IN_DEV"] = (inDev >= 0);
+      } catch (err) {
+        // file doesn't exist, but drop this anyways.
+        c.env["IN_DEV"] = false;
+      }
     }
   }
   await next();
