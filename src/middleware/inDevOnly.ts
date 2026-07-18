@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { every } from "hono/combine";
 import { disableSSG } from "hono/ssg";
 
-export async function devOnlyMiddleware(c: Context, next: any) {
+async function devOnlyMiddleware(c: Context, next: any) {
   if (c.env.IN_DEV === false) {
     return c.notFound();
   }

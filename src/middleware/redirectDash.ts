@@ -3,7 +3,7 @@ import { every } from "hono/combine";
 import { isSSGContext } from "hono/ssg";
 import { pullAuthData } from "./auth";
 
-export async function goDashIfLogin(c: Context, next: any) {
+async function goDashIfLogin(c: Context, next: any) {
   if (!isSSGContext(c)) {
     if (c.get("userId") !== null) {
       return c.redirect("/dashboard");

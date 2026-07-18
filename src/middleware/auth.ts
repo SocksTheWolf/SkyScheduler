@@ -14,7 +14,7 @@ function clearContext(c: Context) {
 export async function blankAuthEnv(c: Context, next: any) {
   clearContext(c);
   await next();
-}
+};
 
 // Middleware to verify authentication
 export async function pullAuthData(c: Context, next: any) {

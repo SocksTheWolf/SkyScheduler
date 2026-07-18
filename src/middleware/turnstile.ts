@@ -31,4 +31,4 @@ export async function verifyTurnstile(c: Context, next: any) {
     }
   }
   await next();
-}
+};

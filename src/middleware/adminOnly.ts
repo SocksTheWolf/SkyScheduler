@@ -4,7 +4,7 @@ import { authMiddleware } from "./auth";
 
 // This requires that the user is an admin, it must pipe through
 // the auth middleware first.
-export async function adminOnlyMiddleware(c: Context, next: any) {
+async function adminOnlyMiddleware(c: Context, next: any) {
   if (c.get("isAdmin")) {
     await next();
     return;

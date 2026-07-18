@@ -1,13 +1,28 @@
-// Middleware to help during the generation of SSG content. Does nothing in runtime.
 import { readFile } from "fs/promises";
 import type { Context } from "hono";
+import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
 import has from "just-has";
 import get from "just-safe-get";
 import * as toml from "toml";
+import { USE_STATIC_HTML } from "../limits";
+import { serveStaticPage } from "../utils/rewriter";
 
+type SSGServeProps = {
+  page: string;
+};
+
+export const ssgServe = (props?: SSGServeProps) => {
+  return createMiddleware(async (c: Context, next: any) => {
+    if (USE_STATIC_HTML && !isSSGContext(c))
+      return serveStaticPage(c, props?.page);
+    await next();
+  });
+};
+
+// Middleware to help during the generation of SSG content. Does nothing in runtime.
 const IMPORTANT_ENV_FLAGS = ["RESET_BOT_USERNAME", "TURNSTILE_PUBLIC_KEY", "IN_DEV"];
-export async function ssgGenEnvironment(c: Context, next: any) {
+export async function ssgGenMiddleware(c: Context, next: any) {
   // Are we building SSG content right now?
   if (isSSGContext(c)) {
     // Check if we need to add any flags that are missing (speeds up rebuild)

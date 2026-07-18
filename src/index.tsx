@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { csrf } from "hono/csrf";
-import { disableSSG, isSSGContext } from "hono/ssg";
+import { disableSSG } from "hono/ssg";
 import { createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
@@ -9,14 +9,13 @@ import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
 import { staticFiles } from "./endpoints/statics";
-import { USE_STATIC_HTML } from "./limits";
 import { blankAuthEnv } from "./middleware/auth";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { cspHelper } from "./middleware/cspHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
-import { ssgGenEnvironment } from "./middleware/ssgGen";
+import { ssgGenMiddleware, ssgServe } from "./middleware/ssg";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
 import Homepage from "./pages/homepage";
@@ -28,7 +27,6 @@ import TermsOfService from "./pages/tos";
 import { SITE_URL } from "./siteinfo";
 import type { Bindings, HonoBase, QueueTaskData } from "./types";
 import { processQueue } from "./utils/queues/queueHandler";
-import { serveStaticPage } from "./utils/rewriter";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
@@ -38,30 +36,15 @@ app.use(csrf({origin: SITE_URL}));
 app.use(secureHeadersMiddleware);
 app.use(corsHelperMiddleware);
 app.use(cspHelper);
-app.use(ssgGenEnvironment);
+app.use(ssgGenMiddleware);
 
 ///// Static Files /////
 app.route("/", staticFiles);
 
 ///// Static Pages /////
-app.all("/", (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "index");
-  else
-    return c.html(<Homepage ctx={c} />);
-});
-app.get("/tos", (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c);
-  else
-    return c.html(<TermsOfService ctx={c} />);
-});
-app.get("/privacy", (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c);
-  else
-    return c.html(<PrivacyPolicy ctx={c} />);
-});
+app.all("/", ssgServe({page: "index"}), (c) => c.html(<Homepage ctx={c} />));
+app.get("/tos", ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
 
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
@@ -74,40 +57,19 @@ app.use("*", async (c, next) => {
 ///// Application Routes /////
 
 // Dashboard route
-app.get("/dashboard", redirectLoginIfLogout,
-  (c) => c.html(<Dashboard ctx={c} />));
+app.get("/dashboard", redirectLoginIfLogout, (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
-app.get("/login", redirectToDashIfLogin, (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c, "login");
-  else
-    return c.html(<Login ctx={c} />);
-});
+app.get("/login", redirectToDashIfLogin, ssgServe(), (c) => c.html(<Login ctx={c} />));
 
 // Signup route
-app.get("/signup", redirectToDashIfLogin, (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c);
-  else
-    return c.html(<Signup ctx={c} />);
-});
+app.get("/signup", redirectToDashIfLogin, ssgServe(), (c) => c.html(<Signup ctx={c} />));
 
 // Forgot Password route
-app.get("/forgot", redirectToDashIfLogin, (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c);
-  else
-    return c.html(<ForgotPassword ctx={c} />);
-});
+app.get("/forgot", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
-app.get("/reset", redirectToDashIfLogin, (c) => {
-  if (USE_STATIC_HTML && !isSSGContext(c))
-    return serveStaticPage(c);
-  else
-    return c.html(<ResetPassword ctx={c} />);
-});
+app.get("/reset", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ResetPassword ctx={c} />));
 
 ///// Endpoint Routes /////
 app.use(disableSSG());

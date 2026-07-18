@@ -50,4 +50,4 @@ export async function cspHelper(c: Context, next: any) {
     }
   }
   await next();
-}
+};
