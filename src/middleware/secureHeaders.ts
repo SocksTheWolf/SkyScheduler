@@ -1,42 +1,18 @@
 import { Context } from "hono";
-import { NONCE, secureHeaders } from "hono/secure-headers";
-import isEmpty from "just-is-empty";
-import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../limits";
+import { secureHeaders } from "hono/secure-headers";
 
 export async function secureHeadersMiddleware(c: Context, next: any) {
-  const cspReportURL = c.env.CSP_REPORT_URL;
-  const hasReportURL = !isEmpty(cspReportURL);
-  const secPolicy = {
-      baseUri: ["'none'"],
-      connectSrc: ["'self'", cspReportURL, "https://challenges.cloudflare.com", "https://cardyb.bsky.app",
-        "https://bsky.social", "https://public.api.bsky.app"],
-      imgSrc: ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
-      mediaSrc: ["'self'", 'data:', 'blob:'],
-      frameSrc: ["'self'", "https://challenges.cloudflare.com"],
-      scriptSrc: ['https:', NONCE, "'strict-dynamic'"],
-      scriptSrcAttr: ["'none'"],
-      scriptSrcElem: ["'self'", "https://challenges.cloudflare.com", NONCE],
-      styleSrcElem: ["'self'", NONCE],
-      styleSrcAttr: ["'none'"],
-      formAction: ["'self'"],
-      frameAncestors: ["'none'"],
-      fontSrc: ["'self'"],
-      manifestSrc: ["'self'"],
-      workerSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      reportTo: hasReportURL ? "report-csp" : undefined,
-      reportUri: hasReportURL ? cspReportURL : undefined
-  };
-  const middleware = secureHeaders(USE_GRANULAR_CSP_SETTINGS ? {
-    contentSecurityPolicy: USE_CSP_REPORT_ONLY ? undefined : secPolicy,
-    contentSecurityPolicyReportOnly: USE_CSP_REPORT_ONLY ? secPolicy : undefined,
+  // Supposedly secureHeaders is eating up the majority of render time, so we
+  // do not use the CSP headers from here. Instead, we opt to do them manually
+  // in the cspHelper middleware
+  const middleware = secureHeaders({
     referrerPolicy: "strict-origin-when-cross-origin",
     xXssProtection: false,
-    reportingEndpoints: hasReportURL ? [{name: "report-csp", url: cspReportURL}] : undefined,
     removePoweredBy: true,
     crossOriginOpenerPolicy: "same-origin",
     strictTransportSecurity: "max-age=31536000; includeSubDomains; preload",
     xFrameOptions: "DENY"
-  } : undefined);
+  });
+
   return middleware(c, next);
 };
