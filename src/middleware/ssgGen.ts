@@ -17,8 +17,8 @@ export async function ssgGenEnvironment(c: Context, next: any) {
     }
     if (needsEnvFlags) {
       // Load up toml
-      const wranglerFile = await readFile("wrangler.toml");
-      const wranglerSettings = toml.parse(wranglerFile.toString());
+      const wranglerFile = (await readFile("wrangler.toml")).toString();
+      const wranglerSettings = toml.parse(wranglerFile);
       // Set the various vars that are needed
       for (const flag of IMPORTANT_ENV_FLAGS) {
         if (flag === "IN_DEV")
@@ -29,9 +29,9 @@ export async function ssgGenEnvironment(c: Context, next: any) {
 
       // laziest way to load a single flag from a .env
       try {
-        const envFile = await readFile(".env");
-        const inDev = envFile.toString().search("IN_DEV=true");
-        c.env["IN_DEV"] = (inDev >= 0);
+        const envFile = (await readFile(".env")).toString();
+        const inDev: boolean = envFile.search("IN_DEV=true") >= 0;
+        c.env["IN_DEV"] = inDev;
       } catch (err) {
         // file doesn't exist, but drop this anyways.
         c.env["IN_DEV"] = false;

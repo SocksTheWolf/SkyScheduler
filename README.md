@@ -33,6 +33,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 - **Automatic reposting**: Schedule how many times you want your post to be reposted on the network. Get more visibility and engagement without having to do more work
 - **Repost anything**: Need to retweet something made out of SkyScheduler? Yeah, you can.
 - **Invite Keys**: Want to throttle the signups to your portal or keep the pool to friends/org only? Use invite keys to manage signups
+- **SSG Page Generation**: Most pages can be automatically built and served statically, to save on processing overhead.
 
 ## Getting Started
 

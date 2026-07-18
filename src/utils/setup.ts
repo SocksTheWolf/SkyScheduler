@@ -7,7 +7,7 @@ export const setupAccounts = async(c: Context) => {
     return c.html("already created", 501);
 
   const settingsToCheck: string[] =
-    ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "DEFAULT_ADMIN_BSKY_PASS"];
+    ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS"];
 
   // Loop through and check all of the settings that are easy to miss
   for (const setting of settingsToCheck) {
@@ -23,7 +23,7 @@ export const setupAccounts = async(c: Context) => {
       // @ts-ignore: Property does not exist (it does via an extension)
       username: c.env.DEFAULT_ADMIN_USER,
       password: c.env.DEFAULT_ADMIN_PASS,
-      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
+      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS || ""
     }
   });
   if (data.token !== null)
