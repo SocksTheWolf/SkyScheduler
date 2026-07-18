@@ -18,9 +18,9 @@ export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
   const html = scripts.map((itm) => {
     switch (itm.type) {
       case "script":
-        return (<script type="text/javascript" src={itm.href} nonce={nonce}></script>);
+        return (<script type="text/javascript" src={itm.href} nonce={nonce} async={itm.async || undefined} defer={itm.defer||undefined}></script>);
       case "module":
-        return (<script type="module" src={itm.href} nonce={nonce}></script>);
+        return (<script type="module" src={itm.href} nonce={nonce} async={itm.async || undefined} defer={itm.defer||undefined}></script>);
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" nonce={nonce} />);
       default:

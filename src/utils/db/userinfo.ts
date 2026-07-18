@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { BskyAPILoginCreds } from "../../classes/bskyLogin";
 import { users } from "../../db/auth.schema";
-import { AllContext } from "../../types";
+import type { AllContext } from "../../types";
 
 export const doesUserExist = async (c: AllContext, username: string): Promise<boolean> => {
   const db: DrizzleD1Database = c.get("db");

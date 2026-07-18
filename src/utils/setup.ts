@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import has from "just-has";
 import { doesAdminExist } from "./db/userinfo";
 

@@ -2,8 +2,7 @@ import {
   and, asc, desc, eq, inArray, isNotNull,
   lte, ne, notInArray, or, sql
 } from "drizzle-orm";
-import { BatchItem } from "drizzle-orm/batch";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from 'uuid';
 import { Post } from "../../classes/post";
@@ -11,9 +10,10 @@ import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
-import {
+import type {
   AllContext,
   BatchQuery,
+  BatchQueryArray,
   GetAllPostedBatch,
   PostRecordResponse
 } from "../../types";
@@ -82,7 +82,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
 
   // This is really stupid and I hate it, but someone has to update repost counts once posted
   if (deletedPosts.length > 0) {
-    let batchedQueries:BatchItem<"sqlite">[] = [];
+    let batchedQueries: BatchQueryArray = [];
     for (const deleted of deletedPosts) {
       // Update counts
       const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
@@ -128,7 +128,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
     console.error("unable to bulk update posted data, db was null");
     return;
   }
-  let dbOperations: BatchItem<"sqlite">[] = [];
+  let dbOperations: BatchQueryArray = [];
 
   for (let i = 0; i < records.length; ++i) {
     const record = records[i];
@@ -263,7 +263,7 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
     console.error(`could not delete posts ${postsToDelete}, db was null`);
     return 0;
   }
-  let deleteQueries: BatchItem<"sqlite">[] = [];
+  let deleteQueries: BatchQueryArray = [];
   postsToDelete.forEach((itm) => {
     // this will wipe out any posts and their children if they are marked for delete
     deleteQueries.push(db.delete(posts).where(

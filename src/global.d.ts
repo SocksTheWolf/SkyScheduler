@@ -1,8 +1,8 @@
 // Global definition injection for getting HTMX attributes to be understood by typescript
 // and for extending the context renderer
 import 'typed-htmx';
-import { ScriptInclusionLevel } from './enums';
-import { PreloadRules } from './layout/helpers/includesTags';
+import type { ScriptInclusionLevel } from './enums';
+import type { PreloadRules } from './layout/helpers/includesTags';
 
 declare module 'hono/jsx' {
   namespace JSX {

@@ -2,7 +2,7 @@ import { betterAuth, Session } from "better-auth";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
-import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
+import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import { schema } from "../db";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH, DEFAULT_PDS } from "../limits";
@@ -156,5 +156,5 @@ type ContextVariables = SecureHeadersVariables & {
 };
 
 // Export for runtime usage
-export { ContextVariables, createAuth };
+export { type ContextVariables, createAuth };
 

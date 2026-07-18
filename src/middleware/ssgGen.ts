@@ -1,3 +1,4 @@
+// Middleware to help during the generation of SSG content. Does nothing in runtime.
 import { readFile } from "fs/promises";
 import type { Context } from "hono";
 import { isSSGContext } from "hono/ssg";
@@ -7,7 +8,9 @@ import * as toml from "toml";
 
 const IMPORTANT_ENV_FLAGS = ["RESET_BOT_USERNAME", "TURNSTILE_PUBLIC_KEY", "IN_DEV"];
 export async function ssgGenEnvironment(c: Context, next: any) {
+  // Are we building SSG content right now?
   if (isSSGContext(c)) {
+    // Check if we need to add any flags that are missing (speeds up rebuild)
     let needsEnvFlags = false;
     for (const flag of IMPORTANT_ENV_FLAGS) {
       if (!has(c.env, flag)) {
@@ -15,6 +18,7 @@ export async function ssgGenEnvironment(c: Context, next: any) {
         break;
       }
     }
+    // If we need to build up missing flags, do so.
     if (needsEnvFlags) {
       // Load up toml
       const wranglerFile = (await readFile("wrangler.toml")).toString();
@@ -28,6 +32,7 @@ export async function ssgGenEnvironment(c: Context, next: any) {
       }
 
       // laziest way to load a single flag from a .env
+      // for security reasons, we don't need to load any other flags
       try {
         const envFile = (await readFile(".env")).toString();
         const inDev: boolean = envFile.search("IN_DEV=true") >= 0;

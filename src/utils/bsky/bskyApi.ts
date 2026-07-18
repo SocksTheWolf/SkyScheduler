@@ -4,7 +4,7 @@ import { imageDimensionsFromStream } from 'image-dimensions';
 import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import { AtProtoAgent } from "../../classes/bskyAgents";
+import type { AtProtoAgent } from "../../classes/bskyAgents";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
@@ -597,12 +597,6 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
   console.log(`posted ${successes}/${expected}, did ${successThisRound} work units`);
 
   return returnObj;
-};
-
-export const getPostRecords = async (records: string[]) => {
-  // Access the bsky public API
-  const agent = new AtProtoAgent('https://public.api.bsky.app');
-  return await getAgentPostRecords(agent, records);
 };
 
 export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]) => {

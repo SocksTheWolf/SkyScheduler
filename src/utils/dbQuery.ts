@@ -1,7 +1,6 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
-import { BatchItem } from "drizzle-orm/batch";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import has from "just-has";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
@@ -14,6 +13,7 @@ import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } fro
 import { APP_NAME } from "../siteinfo";
 import type {
   AllContext, BatchQuery,
+  BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse
 } from "../types";
@@ -63,7 +63,7 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
       return false;
     }
     if (userId) {
-      let queriesToExecute:BatchItem<"sqlite">[] = [];
+      let queriesToExecute: BatchQueryArray = [];
 
       if (has(newData, "password")) {
         // cache out the new hash
@@ -112,7 +112,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 
   const postObj = await getPostById(c, id);
   if (postObj !== null) {
-    let queriesToExecute: BatchItem<"sqlite">[] = [];
+    let queriesToExecute: BatchQueryArray = [];
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postObj.posted) {
@@ -256,7 +256,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
 
   // Create the posts
   const postUUID = uuidv4();
-  let dbOperations: BatchItem<"sqlite">[] = [];
+  let dbOperations: BatchQueryArray = [];
 
   // if we're threaded, insert our post before the given parent
   if (isThreadedPost) {
@@ -360,7 +360,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
   }
   let postUUID;
-  let dbOperations: BatchItem<"sqlite">[] = [];
+  let dbOperations: BatchQueryArray = [];
   const scheduleGUID = uuidv4();
   const repostInfo: RepostInfo = new RepostInfo(scheduleGUID, scheduleDate, true, repostData);
 
@@ -561,7 +561,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
       return false;
     }
 
-    let queriesToExecute: BatchItem<"sqlite">[] = [];
+    let queriesToExecute: BatchQueryArray = [];
     // modify the current repost info
     queriesToExecute.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
         eq(posts.userId, currentPost.user), eq(posts.uuid, currentPost.postid))));

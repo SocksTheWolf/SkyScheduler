@@ -1,6 +1,6 @@
-import type { BaseElementProps, AllContext } from "../types";
 import isEmpty from "just-is-empty";
-import { Post } from "../classes/post";
+import type { Post } from "../classes/post";
+import type { AllContext, BaseElementProps } from "../types";
 import { getPostsForUser } from "../utils/dbQuery";
 import { PostHTML } from "./post";
 

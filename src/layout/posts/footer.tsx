@@ -1,7 +1,7 @@
 import { raw } from "hono/html";
-import { Post } from "../../classes/post";
-import { RepostCountElement } from "./repostData";
+import type { Post } from "../../classes/post";
 import type { BaseElementProps } from "../../types";
+import { RepostCountElement } from "./repostData";
 
 type PostDataFooterOptions = BaseElementProps & {
   content: Post;

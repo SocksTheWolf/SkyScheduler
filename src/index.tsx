@@ -66,8 +66,7 @@ app.get("/privacy", (c) => {
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
 app.use("*", async (c, next) => {
-  const auth = createAuth(c.env, (c.req.raw as any).cf || {});
-  c.set("auth", auth);
+  c.set("auth", createAuth(c.env, (c.req.raw as any).cf || {}));
   c.set("db", drizzle(c.env.DB));
   await next();
 });

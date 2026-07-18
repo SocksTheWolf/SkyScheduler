@@ -1,7 +1,15 @@
 import * as z from "zod/v4";
 import { EmbedDataType, PostLabel } from "../enums";
-import { MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST, MAX_LENGTH, MAX_RECORDS_PER_POST, MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST, MIN_LENGTH, POSTING_TIME_INTERVAL } from "../limits";
-import { ImageEmbedSchema, LinkEmbedSchema, PostRecordSchema, VideoEmbedSchema } from "./embedSchema";
+import {
+  MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST,
+  MAX_LENGTH, MAX_RECORDS_PER_POST,
+  MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST,
+  MIN_LENGTH, POSTING_TIME_INTERVAL
+} from "../limits";
+import {
+  ImageEmbedSchema, LinkEmbedSchema,
+  PostRecordSchema, VideoEmbedSchema
+} from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { RepostDataSchema } from "./repostDataSchema";
 import { AltTextSchema } from "./sharedValidations";

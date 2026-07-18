@@ -1,5 +1,5 @@
 import { and, eq, inArray, lte } from "drizzle-orm";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
 import type { AllContext, LooseObj } from "../../types";

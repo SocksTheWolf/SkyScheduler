@@ -1,11 +1,11 @@
-import { BatchItem } from "drizzle-orm/batch";
-import { Context } from "hono";
+import type { BatchItem } from "drizzle-orm/batch";
+import type { Context } from "hono";
 import type { ContextVariables } from "./auth";
 import type { AtProtoAgent } from "./classes/bskyAgents";
-import { ScheduledContext } from "./classes/context";
+import type { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
-import { EmbedDataType, TaskType } from "./enums";
+import type { EmbedDataType, TaskType } from "./enums";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -178,7 +178,9 @@ export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
 
 export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
-export type BatchQuery = [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]];
+export type BatchQueryItem = BatchItem<"sqlite">;
+export type BatchQueryArray = BatchQueryItem[];
+export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
 
 export type BaseElementProps = {
   ctx?: AllContext
@@ -187,4 +189,6 @@ export type BaseElementProps = {
 export type PreloadRules = {
   type: "image"|"style"|"script"|"module"|string;
   href: string;
+  defer?: boolean;
+  async?: boolean;
 };

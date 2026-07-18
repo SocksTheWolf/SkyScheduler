@@ -1,6 +1,6 @@
 import { validate as isValid } from 'uuid';
-import { Post } from "../classes/post";
-import { RepostInfo } from "../classes/repost";
+import type { Post } from "../classes/post";
+import type { RepostInfo } from "../classes/repost";
 import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
 import { formatTimeFromHours } from '../utils/helpers';

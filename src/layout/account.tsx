@@ -1,6 +1,6 @@
 import { html } from 'hono/html';
-import { Child } from 'hono/jsx';
-import { HtmlEscapedString } from 'hono/utils/html';
+import type { Child } from 'hono/jsx';
+import type { HtmlEscapedString } from 'hono/utils/html';
 
 type FooterLink = {
   title: string;

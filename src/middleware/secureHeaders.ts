@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 
 export async function secureHeadersMiddleware(c: Context, next: any) {

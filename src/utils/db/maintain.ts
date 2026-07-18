@@ -1,11 +1,10 @@
 import { and, eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
-import { BatchItem } from "drizzle-orm/batch";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
-import { AllContext, BatchQuery, R2BucketObject } from "../../types";
+import type { AllContext, BatchQuery, BatchQueryArray, R2BucketObject } from "../../types";
 import { getAllFilesList } from "../r2Query";
 import { addFileListing, getAllMediaOfUser } from "./file";
 
@@ -30,7 +29,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
   // Run the invalid json fix
   if (jsonFix.length > 0) {
     console.log(`Attempting to clean up/empty old JSON data for ${jsonFix.length} posts`);
-    let invalidJsonFix:string[] = [];
+    let invalidJsonFix: string[] = [];
     jsonFix.forEach(item => { invalidJsonFix.push(item.id)});
     await db.update(posts).set({ embedContent: [] }).where(inArray(posts.uuid, invalidJsonFix));
   }
@@ -48,7 +47,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
   await db.update(posts).set({updatedAt: sql`CURRENT_TIMESTAMP`}).where(isNull(posts.updatedAt));
 
   // populate existing media table with post data
-  const allBucketFiles:R2BucketObject[] = await getAllFilesList(c);
+  const allBucketFiles: R2BucketObject[] = await getAllFilesList(c);
   try {
     for (const bucketFile of allBucketFiles) {
       await addFileListing(c, bucketFile.name, bucketFile.user, bucketFile.date);
@@ -57,7 +56,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
     console.error(`Adding file listings got error ${err}`);
   }
 
-  let batchedQueries:BatchItem<"sqlite">[] = [];
+  let batchedQueries: BatchQueryArray = [];
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {

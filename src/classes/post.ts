@@ -1,7 +1,7 @@
 import type { BlobRef } from "@atproto/api";
 import has from "just-has";
 import isEmpty from "just-is-empty";
-import { EmbedDataType, PostLabel } from "../enums";
+import { PostLabel } from "../enums";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import type { EmbedData } from "../types";
 import type { RepostInfo } from "./repost";
@@ -108,12 +108,6 @@ export class Post {
   }
   hasEmbeds(): boolean {
     return this.embeds !== undefined && this.embeds.length > 0;
-  }
-  getVideoEmbed(): EmbedData|undefined {
-    if (this.hasEmbeds()) {
-      return this.embeds?.find((itm) => itm.type == EmbedDataType.Video);
-    }
-    return undefined;
   }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }

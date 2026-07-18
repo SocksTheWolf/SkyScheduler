@@ -1,4 +1,4 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 
 class NonceInject {
   nonce: string|undefined;
@@ -7,7 +7,8 @@ class NonceInject {
   }
   element(el: Element) {
     if (el.tagName === "meta") {
-      el.replace(`<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${this.nonce}","inlineStyleNonce":"${this.nonce}"}'/>`, {html: true});
+      el.replace(`<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${this.nonce}","inlineStyleNonce":"${this.nonce}"}'/>`,
+        {html: true});
       return;
     }
     el.setAttribute("nonce", this.nonce || "");

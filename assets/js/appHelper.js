@@ -70,7 +70,8 @@ function setPostTimerForNearestHour() {
 }
 
 function refreshPosts() {
-  htmx.trigger("body", "refreshPosts");
+  if (htmx)
+    htmx.trigger("body", "refreshPosts");
 }
 
 function scrollTop() {

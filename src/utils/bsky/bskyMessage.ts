@@ -30,7 +30,7 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
    }).catch(() => null);
 }
 
-// This is very slow, but like probably good to check?
+// This is very slow, but probably good to check?
 export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
   const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
   return await getDMConvo(agent, env, user) !== null;
