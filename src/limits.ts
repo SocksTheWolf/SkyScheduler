@@ -88,6 +88,9 @@ export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
 // Once CSP is good enough, change this to false to have it be enforced.
 export const USE_CSP_REPORT_ONLY: boolean = true;
 
+// if we should try to use SSG rendering for pages vs dynamic rendering
+export const USE_STATIC_HTML: boolean = false;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/
