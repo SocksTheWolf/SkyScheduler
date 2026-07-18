@@ -1,7 +1,7 @@
 import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
 import { EmbedDataType } from "../enums";
-import { BSKY_VIDEO_LENGTH_LIMIT } from "../limits";
+import { BSKY_VIDEO_LENGTH_LIMIT, MAX_ASSOCIATEDREFS_PER_LINK } from "../limits";
 import { FileContentSchema } from "./mediaSchema";
 import { StrongRecordSchema } from "./recordSchema";
 import { atpRecordURI } from "./regexCases";
@@ -58,7 +58,9 @@ export const LinkEmbedSchema = z.object({
   }).trim()
     .nonoptional("link embeds require a url"),
   description: z.string().trim().default(""),
-  associatedRefs: z.array(StrongRecordSchema).max(100, "link has an excessive amount of ref records attached").optional()
+  associatedRefs: z.array(StrongRecordSchema)
+    .max(MAX_ASSOCIATEDREFS_PER_LINK, "link has an excessive amount of ref records attached")
+    .optional()
 });
 
 export const PostRecordSchema = z.object({

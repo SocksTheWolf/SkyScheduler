@@ -174,6 +174,10 @@ export const MAX_METADATA_PER_POST: number = Math.max(MAX_WEBLINKS_PER_POST, MAX
 // max amount of embed data per post object (you can have 1 extra data + the max amount of files)
 export const MAX_EMBEDS_PER_POST: number = MAX_METADATA_PER_POST + MAX_FILES_PER_POST;
 
+// the max number of associatedRefs that a weblink can have.
+// This is very egregious, and is only done to lower down any potential abuse.
+export const MAX_ASSOCIATEDREFS_PER_LINK: number = 100;
+
 // Video limits values via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L184
 export const BSKY_VIDEO_MAX_DURATION: number = 3; // in minutes
