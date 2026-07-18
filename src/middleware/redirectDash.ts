@@ -1,10 +1,13 @@
 import type { Context } from "hono";
 import { every } from "hono/combine";
+import { isSSGContext } from "hono/ssg";
 import { pullAuthData } from "./auth";
 
 export async function goDashIfLogin(c: Context, next: any) {
-  if (c.get("userId") !== null) {
-    return c.redirect("/dashboard");
+  if (!isSSGContext(c)) {
+    if (c.get("userId") !== null) {
+      return c.redirect("/dashboard");
+    }
   }
   await next();
 }
