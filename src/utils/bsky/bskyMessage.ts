@@ -1,4 +1,5 @@
 import { RichText } from '@atproto/api';
+import isEmpty from 'just-is-empty';
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from '../../classes/bskyConvoInfo';
 import { AccountStatus } from "../../enums";
@@ -6,7 +7,6 @@ import { DEFAULT_CHAT_PDS } from '../../limits';
 import type { Bindings } from '../../types';
 import { lookupBskyHandle } from './bskyApi';
 import { loginToBsky } from './bskyLogin';
-import isEmpty from 'just-is-empty';
 
 const chatHeaders = {headers: {
   "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
