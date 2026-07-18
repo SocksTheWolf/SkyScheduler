@@ -29,7 +29,7 @@ export const BSkyAppPasswordSchema = z.object({
   bskyAppPassword: z.string().trim()
     .nonempty("missing bsky app password")
     .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
-    .regex(appPasswordRegex, "please go back and recreate your app password from your bsky settings")
+    .regex(appPasswordRegex, "please go back and recreate a new app password from your bsky settings")
 });
 
 export const AltTextSchema = z.object({

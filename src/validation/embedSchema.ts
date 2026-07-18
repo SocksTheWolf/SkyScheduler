@@ -58,7 +58,7 @@ export const LinkEmbedSchema = z.object({
   }).trim()
     .nonoptional("link embeds require a url"),
   description: z.string().trim().default(""),
-  associatedRefs: z.array(StrongRecordSchema).optional()
+  associatedRefs: z.array(StrongRecordSchema).max(100, "link has an excessive amount of ref records attached").optional()
 });
 
 export const PostRecordSchema = z.object({

@@ -18,7 +18,7 @@ const TextContent = z.object({
   content: z.string().trim()
     .min(MIN_LENGTH,`post is too short, min ${MIN_LENGTH} characters`)
     .max(MAX_LENGTH, `post is over ${MAX_LENGTH} characters`)
-    .nonempty("post cannot be empty"),
+    .nonempty("post content cannot be empty"),
 });
 
 // Schema for post creation

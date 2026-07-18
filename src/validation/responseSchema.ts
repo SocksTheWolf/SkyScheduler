@@ -38,4 +38,4 @@ export const FileUploadSuccessSchema = z.object({
     .describe("the quality level of the processed file (if compressed/resized)"),
   data: z.string().describe("internal file guid name"),
   originalName: z.string().describe("the original file name")
-})
+});
