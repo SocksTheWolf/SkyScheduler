@@ -6,12 +6,17 @@ import { DEFAULT_CHAT_PDS } from '../../limits';
 import type { Bindings } from '../../types';
 import { lookupBskyHandle } from './bskyApi';
 import { loginToBsky } from './bskyLogin';
+import isEmpty from 'just-is-empty';
 
 const chatHeaders = {headers: {
   "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
 }};
 
 async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Promise<BSkyConvoInfo|null> {
+  if (isEmpty(env.RESET_BOT_APP_PASS)) {
+    console.warn("The bot app reset pass is not defined!")
+    return null;
+  }
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
   if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");

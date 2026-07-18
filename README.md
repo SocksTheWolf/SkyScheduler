@@ -57,15 +57,7 @@ cd skyscheduler
 cp .env.example .env
 ```
 
-3. Configure your `.env` file with the following environment variables:
-   - `BETTER_AUTH_SECRET` - the cryptographic hash to use better auth ([you can generate one from this page](https://www.better-auth.com/docs/installation))
-   - `BETTER_AUTH_URL` - the working url of your site (this should be "*" in dev).
-   - `DEFAULT_ADMIN_USER` - the admin bsky handle
-   - `DEFAULT_ADMIN_PASS` - the admin password
-   - `DEFAULT_ADMIN_BSKY_PASS` - the above account's bsky app password
-   - `TURNSTILE_PUBLIC_KEY` - the turnstile public key for captcha
-   - `TURNSTILE_SECRET_KEY` - the turnstile secret key for captcha
-   - `RESIZE_SECRET_HEADER` - a header value that will be included on requests while trying to resize images. Protects the resize bucket while still making it accessible to CF Images.
+3. Configure your `.env` file based off the `.env.example` file. Comments to what each variable needs to be set to can be found in there.
 
 **Note**: When deploying, these variables should also be configured as secrets in your Cloudflare worker dashboard. You can also do this via `npx wrangler secret put <NAME_OF_SECRET>`.
 

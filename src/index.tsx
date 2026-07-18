@@ -16,6 +16,7 @@ import { cspHelper } from "./middleware/cspHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
+import { ssgGenEnvironment } from "./middleware/ssgGen";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
 import Homepage from "./pages/homepage";
@@ -37,6 +38,7 @@ app.use(csrf({origin: SITE_URL}));
 app.use(secureHeadersMiddleware);
 app.use(corsHelperMiddleware);
 app.use(cspHelper);
+app.use(ssgGenEnvironment);
 
 ///// Static Files /////
 app.route("/", staticFiles);

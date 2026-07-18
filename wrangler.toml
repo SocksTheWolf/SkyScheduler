@@ -114,6 +114,9 @@ remote = true
 # our current worse case is about 4s on login
 cpu_ms = 60000
 
+[secrets]
+required=["BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS"]
+
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
