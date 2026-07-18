@@ -72,7 +72,7 @@ app.get('/openapi.json', onlyInDevelopment, async (c) => {
 
 // Start using CSP from here onwards
 app.use(cspHelper);
-app.all("/", (c) => c.render(<Homepage ctx={c} />));
+app.all("/", (c) => c.html(<Homepage ctx={c} />));
 app.get("/tos", (c) => c.html(<TermsOfService ctx={c} />));
 app.get("/privacy", (c) => c.html(<PrivacyPolicy ctx={c} />));
 
