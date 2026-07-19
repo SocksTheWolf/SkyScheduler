@@ -14,9 +14,6 @@ on:
       - "!assets/.well-known/**"
       - "src/pages/**"
       - "src/statics/**"
-      - "src/limits.ts"
-      - "src/siteinfo.ts"
-      - "src/index.tsx"
   workflow_dispatch: {}
 
 concurrency:
