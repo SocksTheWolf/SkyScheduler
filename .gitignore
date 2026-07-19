@@ -40,3 +40,4 @@ src/css.ts
 assets/js/*.min.js
 assets/css/*.min.css
 assets/pages/
+openapi.json

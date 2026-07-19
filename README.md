@@ -134,6 +134,7 @@ SkyScheduler comes with a lot of commands to help manage the service. Documentat
 
 The most important ones to know:
 
+- `build-pages` - builds the static website pages. **Note**: Automatically is called by wrangler builds. If SSG is disabled, this does nothing.
 - `dev` - runs the app in a local environment
 - `generate` - run anytime you modify a file in the `src/db` folder. This will generate SQL migration files
 - `migrate` - commit the SQL migrations to local/prod databases.
@@ -142,6 +143,7 @@ The most important ones to know:
 - `invite:generate` - generates a valid invite key
 - `invite:local/remote` - commits an invite key to the invite store
 - `sitemap` - generates a sitemap.xml file (there's a github action that will do this automatically as well)
+- `openapi` - builds the OpenAPI spec document. This is **not** automatically called by anything in the application, but there is a Github Action (`openapi.yml`) that uploads to artifacts. This can be given to the WAF.
 - `types` - whenever `wrangler.toml` changes or wrangler updates, run this command
 
 ## Project Structure
@@ -157,6 +159,7 @@ skyscheduler/
 │   ├── js/
 │   ├── screenshots/
 │   └── thumbs/
+├── bin/
 ├── src/
 │   ├── auth/
 │   ├── classes/
@@ -177,7 +180,6 @@ skyscheduler/
 ├── .minify.json
 ├── .ssclirc
 ├── auth.config.ts
-├── build.ts
 ├── drizzle.config.ts
 ├── package.json
 ├── tsconfig.json
