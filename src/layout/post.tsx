@@ -26,18 +26,16 @@ type ScheduledPostOptions = BaseElementProps & {
 
 export function PostHTML(props: ScheduledPostOptions) {
   const content: Post = props.post;
-  const oobSwapStr = (props.dynamic) ? `hx-swap-oob="#post-${content.postid}"` : "";
   const hasBeenPosted: boolean = (content.posted === true && content.uri !== undefined);
 
-  const postHTML = html`
-  <article
-    id="post-${content.postid}" ${oobSwapStr}>
-    ${<PostDataHeader content={content} posted={hasBeenPosted} />}
-    <div id="content-${content.postid}">
-      ${<PostContent post={content} />}
+  const postHTML = (<article id={`post-${content.postid}`}
+      hx-swap-oob={(props.dynamic) ? `#post-${content.postid}` : undefined}>
+    <PostDataHeader content={content} posted={hasBeenPosted} />
+    <div id={`content-${content.postid}`}>
+      <PostContent post={content} />
     </div>
-    ${<PostDataFooter content={content} posted={hasBeenPosted} />}
-  </article>`;
+    <PostDataFooter content={content} posted={hasBeenPosted} />
+  </article>);
   // if this is a thread, chain it nicely
   if (content.isChildPost)
     return html`<blockquote>${postHTML}</blockquote>`;
