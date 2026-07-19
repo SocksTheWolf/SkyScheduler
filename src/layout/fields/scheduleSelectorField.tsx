@@ -2,8 +2,7 @@ import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT, REPOSTING_TIME_INTERVAL
 import { formatTime } from "../../utils/helpers";
 
 // These are really not optimal, and they can also run twice. Which is not great.
-// A way to render them once and then cache that would be fantastic, but it's unclear what
-// would be the most performant option.
+// Luckily with SSG these only run once.
 
 export function RepostTimeSelector() {
   const subIntervalLimit: number = 60 / REPOSTING_TIME_INTERVAL;
