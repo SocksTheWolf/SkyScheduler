@@ -17,7 +17,7 @@ export default function SettingsDialog(props: BaseElementProps) {
       <p>Only fill in the textboxes that you want to change.<br />
         <b>NOTE</b>: Fields that contain no data in them will continue to use the old value.
       </p>
-      <br />
+      <hr />
       <section>
         <form id="settingsData" name="settingsData" hx-post="/account/update" hx-target="#accountResponse"
           hx-swap="innerHTML swap:1s" hx-indicator="#spinner"
@@ -38,8 +38,7 @@ export default function SettingsDialog(props: BaseElementProps) {
             <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
           </label>
           <label>
-            BSky PDS (currently <code hx-get="/account/pds" hx-target="this" hx-swap="innerHTML"
-              hx-trigger="revealed once, accountUpdated from:body"></code>):
+            BSky PDS (currently <code id="settingsPDS"></code>):
             <PDSInputField swap={false} />
             <small>If you have not changed your PDS (or do not know what that means), you should leave this blank to use your current value!</small>
           </label>
@@ -65,7 +64,8 @@ export default function SettingsDialog(props: BaseElementProps) {
       </p>
       <form id="delAccountForm" name="delAccountForm" hx-post="/account/delete"
           hx-target="#accountDeleteResponse" hx-disabled-elt="#accountDeleteButtons button, find input"
-          hx-swap="innerHTML swap:1s" hx-indicator="#delSpinner" novalidate>
+          hx-swap="innerHTML swap:1s" hx-confirm="Are you sure you want to delete your account?"
+          hx-indicator="#delSpinner" novalidate>
         <label>
           Dashboard Pass: <input id="deleteAccountPass" type="password" name="password"
             minlength={MIN_DASHBOARD_PASS} maxlength={MAX_DASHBOARD_PASS} />

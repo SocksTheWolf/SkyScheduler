@@ -33,8 +33,8 @@ export default function Dashboard(props: BaseElementProps) {
             </div>
             <div class="sidebar-block">
               <small><i>{DASHBOARD_TAG_LINE}</i>.<br />
-              Account: <b id="currentUser" hx-get="/account/username"
-                hx-trigger="accountUpdated from:body, load once" hx-target="this"></b></small>
+              Account: <b id="currentUser" hx-get="/account/data" hx-target="this"
+                hx-trigger="accountUpdated from:body, load once"></b></small>
             </div>
             <center class="postControls" role="group">
               <RefreshPostsButton />

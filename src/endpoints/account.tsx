@@ -116,10 +116,16 @@ account.get("/username", authMiddleware, async (c) => {
   return c.text(username || "", 200);
 });
 
-// prints the user's current PDS, yes it's that dumb.
-account.get("/pds", authMiddleware, (c) => {
+account.get("/data", authMiddleware, async (c) => {
+  const username: string|null = await getUsernameForUser(c);
   const pds = c.get("pds") || DEFAULT_PDS;
-  return c.html(<><PDSInputField swap={true} pds={pds} />{pds}</>);
+  if (username === null) {
+    return c.text("", 401);
+  }
+  return c.html(<>{username || ""}
+    <PDSInputField swap={true} pds={pds} />
+    <code id="settingsPDS" hx-swap-oob="outerHTML">{pds}</code>
+  </>, 200);
 });
 
 // endpoint that returns any violations
