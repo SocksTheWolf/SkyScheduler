@@ -96,8 +96,8 @@ jobs:
       - name: Cloudflare Cache Cleaner
         uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
         with:
-          zone: ${{ secrets.CLOUDFLARE_ZONE }}
+          zone: ${{ vars.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-          account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          account_id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           URLs: |
             https://skyscheduler.work/sitemap.xml
