@@ -3,7 +3,7 @@
 import { Hono } from "hono";
 import { describeRoute, generateSpecs, resolver, validator } from "hono-openapi";
 import { APP_NAME, SITE_URL } from "../siteinfo";
-import type { BaseContext, HonoBase } from "../types";
+import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
@@ -288,6 +288,7 @@ openapiRoutes.post("/account/update", describeRoute({
 // endpoint that just returns current username
 openapiRoutes.get("/account/username", describeRoute({
   description: "Gets the current username for the user",
+  deprecated: true,
   responses: {
     200: {
       description: "success"
@@ -298,8 +299,8 @@ openapiRoutes.get("/account/username", describeRoute({
   }
 }));
 
-openapiRoutes.get("/account/pds", describeRoute({
-  description: "Returns the user's current PDS with HTMX swap bands",
+openapiRoutes.get("/account/data", describeRoute({
+  description: "Returns the user's current dashboard data with HTMX swap bands",
   responses: {
     200: {
       description: "success",
@@ -472,7 +473,7 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
   }
 }), validator("param", CheckFileSchema));
 
-export async function generateOpenAPI(c: BaseContext) {
+export async function generateOpenAPI() {
   return await generateSpecs(openapiRoutes, {
     documentation: {
       info: {
@@ -489,5 +490,5 @@ export async function generateOpenAPI(c: BaseContext) {
         { url: SITE_URL, description: 'Production Server'}
       ],
     },
-  }, c);
+  });
 };

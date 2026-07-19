@@ -16,7 +16,7 @@ const staticFileMiddleware = every(disableSSG(), cache({ cacheName: 'statics',
   cacheControl: 'max-age=604800, must-revalidate, proxy-revalidate' }));
 
 staticFiles.get('/openapi.json', onlyInDevelopment, async (c) => {
-  return c.json(await generateOpenAPI(c));
+  return c.json(await generateOpenAPI());
 });
 
 // atproto registration route
