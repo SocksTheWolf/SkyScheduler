@@ -3,9 +3,27 @@ import { APP_NAME } from "../siteinfo";
 import type { AllContext, BaseElementProps } from "../types";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
-export async function ViolationNoticeBar(props: BaseElementProps) {
+type ViolationNoticeBarProps = BaseElementProps & {
+  // skip the db query and instead fetch that later
+  forceLoad?: boolean;
+};
+
+function HiddenEmptyViolationsBar(props?: ViolationNoticeBarProps) {
+  let triggerStr = "accountViolations from:body";
+  if (props?.forceLoad)
+    triggerStr += ", load once";
+
+  return (<div hx-trigger={triggerStr} hidden id="hiddenViolations"
+    hx-get="/account/violations" hx-swap="outerHTML" hx-target="this"></div>);
+}
+
+export async function ViolationNoticeBar(props: ViolationNoticeBarProps) {
   if (props.ctx === undefined)
     return (<></>);
+
+  if (props.forceLoad) {
+    return (<HiddenEmptyViolationsBar forceLoad={true} />);
+  }
 
   const ctx: AllContext = props.ctx!;
   const violationData = await getViolationsForCurrentUser(ctx);
@@ -38,6 +56,6 @@ export async function ViolationNoticeBar(props: BaseElementProps) {
       </div>
     );
   }
-  return (<div hx-trigger="accountViolations from:body" hidden id="hiddenViolations"
-    hx-get="/account/violations" hx-swap="outerHTML" hx-target="this"></div>);
+  // Empty violations so that we can refresh if new ones appear
+  return (<HiddenEmptyViolationsBar />);
 };

@@ -298,6 +298,21 @@ openapiRoutes.get("/account/username", describeRoute({
   }
 }));
 
+openapiRoutes.get("/account/pds", describeRoute({
+  description: "Returns the user's current PDS with HTMX swap bands",
+  responses: {
+    200: {
+      description: "success",
+      content: {
+        'text/html': { },
+      }
+    },
+    401: {
+      description: "not logged in"
+    }
+  }
+}));
+
 // endpoint that returns any violations
 openapiRoutes.get("/account/violations", describeRoute({
   description: "Gets the current violations for the user",

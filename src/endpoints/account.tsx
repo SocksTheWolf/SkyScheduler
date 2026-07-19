@@ -2,7 +2,9 @@ import { type Context, Hono } from "hono";
 import isEmpty from "just-is-empty";
 import { ScheduledContext } from "../classes/context";
 import { AccountStatus } from "../enums";
+import PDSInputField from "../layout/fields/pdsInputField";
 import { ViolationNoticeBar } from "../layout/violationsBar";
+import { DEFAULT_PDS } from "../limits";
 import { authMiddleware } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
@@ -112,6 +114,12 @@ account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMI
 account.get("/username", authMiddleware, async (c) => {
   const username = await getUsernameForUser(c);
   return c.text(username || "", 200);
+});
+
+// prints the user's current PDS, yes it's that dumb.
+account.get("/pds", authMiddleware, (c) => {
+  const pds = c.get("pds") || DEFAULT_PDS;
+  return c.html(<><PDSInputField swap={true} pds={pds} />{pds}</>);
 });
 
 // endpoint that returns any violations

@@ -1,18 +1,13 @@
 import { PWAutoCompleteSettings } from "../../enums";
-import { DEFAULT_PDS, MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
+import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../../limits";
 import { APP_NAME } from "../../siteinfo";
 import type { BaseElementProps } from "../../types";
 import BSkyAppPasswordField from "../fields/appPasswordField";
 import DashboardPasswordField from "../fields/dashPasswordField";
+import PDSInputField from "../fields/pdsInputField";
 import UsernameField from "../fields/usernameField";
 
-type SettingsTypeProps = BaseElementProps & {
-  pds?: string;
-};
-
-export default function SettingsDialog(props: SettingsTypeProps) {
-  // attempt to pull the user's current PDS information.
-  const placeholderPDS = props.pds ? props.pds : DEFAULT_PDS;
+export default function SettingsDialog(props: BaseElementProps) {
   return (<>
   <dialog id="changeInfo">
     <article>
@@ -43,8 +38,8 @@ export default function SettingsDialog(props: SettingsTypeProps) {
             <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
           </label>
           <label>
-            BSky PDS:
-            <input type="text" name="bskyUserPDS" placeholder={placeholderPDS} />
+            BSky PDS (currently <code hx-get="/account/pds" hx-target="this" hx-swap="innerHTML" hx-trigger="revealed"></code>):
+            <PDSInputField swap={false} />
             <small>If you have not changed your PDS (or do not know what that means), you should leave this blank to use your current value!</small>
           </label>
         </form>

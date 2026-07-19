@@ -58,7 +58,7 @@ app.use("*", async (c, next) => {
 ///// Application Routes /////
 
 // Dashboard route
-app.get("/dashboard", redirectLoginIfLogout, (c) => c.html(<Dashboard ctx={c} />));
+app.get("/dashboard", redirectLoginIfLogout, disableSSG(), (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
 app.get("/login", redirectToDashIfLogin, ssgServe(), (c) => c.html(<Login ctx={c} />));

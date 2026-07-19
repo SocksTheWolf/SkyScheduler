@@ -10,7 +10,6 @@ import LogoImage from "../layout/helpers/logo";
 import { BaseLayout } from "../layout/main";
 import { PostCreation } from "../layout/makePost";
 import { RepostCreation } from "../layout/makeRepost";
-import { ScheduledPostList } from "../layout/postList";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../siteinfo";
 import { dashboardScriptStr } from "../statics/appScripts";
@@ -46,7 +45,6 @@ export default function Dashboard(props: BaseElementProps) {
             <h5>Post List:</h5>
           </header>
           <div id="posts">
-            <ScheduledPostList ctx={ctx} />
           </div>
           <footer class="sidebarBottom">
             <LogoutButton />
@@ -57,7 +55,7 @@ export default function Dashboard(props: BaseElementProps) {
         </article>
       </section>
       <div class="col-9" id="appView">
-        <ViolationNoticeBar ctx={ctx} />
+        <ViolationNoticeBar ctx={ctx} forceLoad={true} />
         <div role="tablist" name="dashtabs">
           <button id="tabone" class="w-half" role="tab" aria-selected="true" aria-controls="postTab">New Post</button>
           <button id="tabtwo" class="w-half" role="tab" aria-controls="repostTab">New Retweet</button>
@@ -71,7 +69,7 @@ export default function Dashboard(props: BaseElementProps) {
       </div>
     </div>
     <AltTextDialog />
-    <SettingsDialog pds={ctx.get("pds")} />
+    <SettingsDialog />
     <script type="text/javascript" src={dashboardScriptStr} nonce={ctx.get("secureHeadersNonce")}></script>
   </BaseLayout>);
 };
