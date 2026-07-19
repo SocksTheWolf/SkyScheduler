@@ -1,0 +1,42 @@
+name: Build OpenAPI Spec
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "src/endpoints/openapi.tsx"
+      - "bin/openapi.ts"
+  workflow_dispatch: {}
+
+concurrency:
+  group: openapi
+  cancel-in-progress: true
+
+jobs:
+  build_spec:
+    name: Generate Spec
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.0
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          node-version-file: ".node-version"
+          package-manager-cache: true
+      - name: Node Install Packages
+        run: npm install
+      - name: Run OpenAPI Gen
+        run: npm run openapi
+      - name: Upload Spec as Artifact
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: openapi-spec-${{ github.ref }}
+          path: ./openapi.json
+          archive: false
+          if-no-files-found: error

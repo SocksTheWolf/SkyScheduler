@@ -16,6 +16,10 @@ permissions:
   contents: read
   deployments: write
 
+concurrency:
+  group: tangled
+  cancel-in-progress: false
+
 jobs:
   push_tangled:
     name: Update Tangled Mirror

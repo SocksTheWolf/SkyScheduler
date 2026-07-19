@@ -11,6 +11,8 @@ on:
       - "!assets/.assetsignore"
       - "!assets/_redirects"
       - "!assets/_headers"
+      - "!assets/sitemap.xml"
+      - "!assets/dep/original/**"
       - "!assets/.well-known/**"
       - "src/pages/**"
       - "src/statics/**"
