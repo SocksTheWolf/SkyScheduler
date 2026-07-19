@@ -12,7 +12,6 @@ type ImageConfigSettings = {
   enabled: boolean;
   steps?: number[];
   bucket_url?: string;
-  max_width?: number;
 };
 
 type R2ConfigSettings = {

@@ -10,6 +10,7 @@ import {
   BSKY_VIDEO_MIME_TYPES,
   CF_IMAGES_MAX_DIMENSION,
   GIF_UPLOAD_ALLOWED,
+  MAX_IMAGE_WIDTH,
   MB_TO_BYTES
 } from "../limits";
 import type { AllContext, EmbedData, R2BucketObject } from '../types';
@@ -148,8 +149,8 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
 
       // if the application is to also resize the width automatically, do so here.
       // this will preserve aspect ratio
-      if (c.env.IMAGE_SETTINGS.max_width) {
-        imageRules.width = c.env.IMAGE_SETTINGS.max_width;
+      if (MAX_IMAGE_WIDTH > 0) {
+        imageRules.width = MAX_IMAGE_WIDTH;
       }
 
       for (var i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {

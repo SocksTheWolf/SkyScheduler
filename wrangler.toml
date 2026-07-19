@@ -131,7 +131,7 @@ TURNSTILE_PUBLIC_KEY="0x4AAAAAABkTE_9TV_bUnLGK"
 CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 
 # If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
-IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/", max_width=3000}
+IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # queue handling, pushing information.
 QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, pressure_retries=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE"], repost_queues=["REPOST_QUEUE"]}

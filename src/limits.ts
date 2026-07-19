@@ -56,6 +56,11 @@ export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // generation is done on client side using canvas elements, so keep this low for mobile.
 export const MAX_THUMBNAIL_SIZE: number = 15;
 
+// the maximum width of an image in pixels (this is used to clamp when compressing)
+// set to 0 to uncap the limit
+// NOTE: the higher this value, the more likely that the images will fail to compress properly.
+export const MAX_IMAGE_WIDTH: number = 3000;
+
 /** AutoSuggest Settings **/
 /* ---------------------- */
 // max amount of returns from bsky handle search
