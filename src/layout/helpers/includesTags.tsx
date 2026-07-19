@@ -41,6 +41,13 @@ export function PreloadDependencyTags({scripts}: DepTagsType) {
   return (<>{html}</>);
 };
 
+export function getHTMXConfigStr(nonce: string|undefined) {
+  if (nonce === undefined) {
+    return `<meta name="htmx-config" />`;
+  }
+  return `<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${nonce}","inlineStyleNonce":"${nonce}"}' />`;
+};
+
 export function HTMXNonceTag({nonce}: NoncePropType) {
-  return raw(`<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${nonce}","inlineStyleNonce":"${nonce}"}' />`);
-}
+  return raw(getHTMXConfigStr(nonce));
+};

@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { getHTMXConfigStr } from "../layout/helpers/includesTags";
 
 class NonceInject {
   nonce: string|undefined;
@@ -7,9 +8,18 @@ class NonceInject {
   }
   element(el: Element) {
     if (el.tagName === "meta") {
-      el.replace(`<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${this.nonce}","inlineStyleNonce":"${this.nonce}"}'/>`,
-        {html: true});
+      el.replace(getHTMXConfigStr(this.nonce), {html: true});
       return;
+    }
+    if (el.tagName === "script") {
+      const scriptType: string|null = el.getAttribute("type");
+      // skip anything that uses script but does not need the nonce
+      if (scriptType !== null &&
+          scriptType !== "text/javascript" &&
+          scriptType !== "application/javascript" &&
+          scriptType !== "module") {
+        return;
+      }
     }
     el.setAttribute("nonce", this.nonce || "");
   }
