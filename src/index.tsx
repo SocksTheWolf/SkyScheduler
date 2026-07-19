@@ -49,8 +49,9 @@ app.get("/privacy", ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
 app.use("*", async (c, next) => {
-  c.set("auth", createAuth(c.env, (c.req.raw as any).cf || {}));
-  c.set("db", drizzle(c.env.DB));
+  if (c.get("db") == undefined)
+    c.set("db", drizzle(c.env.DB));
+  c.set("auth", createAuth(c, (c.req.raw as any).cf || {}));
   await next();
 });
 
@@ -105,7 +106,6 @@ app.get("/setup", async (c) => await setupAccounts(c));
 
 ///// Internal Application Exports /////
 
-// Default CF exports
 export default {
   scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
     handleSchedule(new ScheduledContext(env, ctx), event.cron);

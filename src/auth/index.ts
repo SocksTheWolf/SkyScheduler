@@ -2,19 +2,22 @@ import { betterAuth, Session } from "better-auth";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
-import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
+import { type DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
-import { schema } from "../db";
-import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH, DEFAULT_PDS } from "../limits";
+import {
+  BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
+  DEFAULT_PDS
+} from "../limits";
 import { APP_NAME } from "../siteinfo";
-import type { Bindings } from "../types";
+import type { AllContext, Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
 // Single auth configuration that handles both CLI and runtime scenarios
-function createAuth(env?: Bindings, cf?: IncomingRequestCfProperties) {
+function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
+  const env: Bindings|undefined = c?.env;
   // Use actual DB for runtime, empty object for CLI
-  const db = env ? drizzle(env.DB, { schema, logger: false }) : ({} as any);
+  const db = c ? c.get("db") : ({} as any);
   return betterAuth({
     disabledPaths: [
       "/sign-in/email",
@@ -156,5 +159,5 @@ type ContextVariables = SecureHeadersVariables & {
 };
 
 // Export for runtime usage
-export { type ContextVariables, createAuth };
+export { createAuth, type ContextVariables };
 

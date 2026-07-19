@@ -141,8 +141,10 @@ export const cleanUpPostsTask = async(c: AllContext) => {
     const deletedItems: number = await deletePosts(c, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
-  if (c.env.R2_SETTINGS.auto_prune === true)
+  if (c.env.R2_SETTINGS.auto_prune === true) {
+    console.log("Cleaning up abandoned files...");
     await cleanupAbandonedFiles(c);
+  }
 };
 
 export const cleanupAbandonedFiles = async(c: AllContext) => {

@@ -1,5 +1,3 @@
-import { schema } from "./schema";
-
 // Re-export the drizzle-orm types and utilities from here for convenience
 export * from "drizzle-orm";
 
@@ -7,4 +5,3 @@ export * from "drizzle-orm";
 export * from "./auth.schema"; // Export individual tables for drizzle-kit
 export * from "./app.schema";
 export * from "./enforcement.schema";
-export * from "./schema";
