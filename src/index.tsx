@@ -4,6 +4,7 @@ import { csrf } from "hono/csrf";
 import { disableSSG } from "hono/ssg";
 import { createAuth } from "./auth";
 import { ScheduledContext } from "./classes/context";
+import { schema } from "./db/schema";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
@@ -49,8 +50,13 @@ app.get("/privacy", ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
 app.use("*", async (c, next) => {
-  if (c.get("db") == undefined)
-    c.set("db", drizzle(c.env.DB));
+  if (c.get("db") === undefined) {
+    // technically this type won't match because we fully define the schema here
+    // but I don't care, it should be fine anyways.
+
+    // @ts-ignore
+    c.set("db", drizzle(c.env.DB, { schema, logger: false  }));
+  }
   c.set("auth", createAuth(c, (c.req.raw as any).cf || {}));
   await next();
 });
