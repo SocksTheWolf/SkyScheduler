@@ -5,11 +5,56 @@ import { isSSGContext } from "hono/ssg";
 import has from "just-has";
 import get from "just-safe-get";
 import * as toml from "toml";
-import { USE_STATIC_HTML } from "../limits";
-import { serveStaticPage } from "../utils/rewriter";
+import { getHTMXConfigStr } from "../layout/helpers/includesTags";
+import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
 
 type SSGServeProps = {
   page: string;
+};
+
+class NonceInject {
+  nonce: string;
+  constructor(inNonce: string|undefined) {
+    this.nonce = inNonce || "";
+  }
+  element(el: Element) {
+    if (el.tagName === "meta") {
+      el.replace(getHTMXConfigStr(this.nonce), {html: true});
+      return;
+    }
+    if (el.tagName === "script") {
+      const scriptType: string|null = el.getAttribute("type");
+      // skip anything that uses script but does not need the nonce
+      if (scriptType !== null &&
+          scriptType !== "text/javascript" &&
+          scriptType !== "application/javascript" &&
+          scriptType !== "module") {
+        return;
+      }
+    }
+    el.setAttribute("nonce", this.nonce);
+  }
+}
+
+
+const serveStaticPage = async (c: Context, page?: string): Promise<Response> => {
+  if (page === undefined)
+    page = new URL(c.req.url).pathname.replace("/", "");
+
+  // domain doesn't matter, so make this whatever
+  const staticFile: Response = await c.env.ASSETS!.fetch(`https://assetfetch.local/pages/${page}.html`);
+  if (staticFile.ok) {
+    if (USE_GRANULAR_CSP_SETTINGS) {
+      // write the nonce into the static page, dynamically. Saves on render paint processing.
+      return new HTMLRewriter()
+        .on("script, link[rel='stylesheet'], meta[name='htmx-config'], style",
+          new NonceInject(c.get("secureHeadersNonce")))
+        .transform(staticFile);
+    } else {
+      return staticFile;
+    }
+  }
+  return c.notFound();
 };
 
 export const ssgServe = (props?: SSGServeProps) => {
