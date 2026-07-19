@@ -38,7 +38,8 @@ export default function SettingsDialog(props: BaseElementProps) {
             <a href="https://bsky.app/settings/app-passwords" target="_blank">get a new one here</a>.</small>
           </label>
           <label>
-            BSky PDS (currently <code hx-get="/account/pds" hx-target="this" hx-swap="innerHTML" hx-trigger="revealed"></code>):
+            BSky PDS (currently <code hx-get="/account/pds" hx-target="this" hx-swap="innerHTML"
+              hx-trigger="revealed once, accountUpdated from:body"></code>):
             <PDSInputField swap={false} />
             <small>If you have not changed your PDS (or do not know what that means), you should leave this blank to use your current value!</small>
           </label>
