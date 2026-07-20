@@ -81,8 +81,10 @@ app.get("/reset", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ResetPasswor
 ///// Endpoint Routes /////
 app.use(disableSSG());
 
-// Handle all BetterAuth routes
-app.all("/api/auth/*", async (c) => processAuthRoute(c));
+// Handle better auth routes manually
+// This makes (nearly) everything run on the server, rather than the client
+//app.all("/api/auth/*", async (c) => processAuthRoute(c));
+app.all("/api/auth/reset-password/*", async (c) => processAuthRoute(c));
 
 // Account routes
 app.route("/account", account);

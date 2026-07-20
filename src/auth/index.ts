@@ -23,10 +23,14 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
   // Use actual DB for runtime, empty object for CLI
   const db = c ? c.get("db") : ({} as any);
   return betterAuth({
+    // pretty much disable everything but the /reset-password
+    // this is just overkill tbh, we hardcode the routes we support in index
     disabledPaths: [
       "/sign-in/email",
       "/sign-in/social",
+      "/callback/",
       "/change-email",
+      "/change-password",
       "/set-password",
       "/link-social-account",
       "/unlink-account",
@@ -34,6 +38,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       "/refresh-token",
       "/get-access-token",
       "/verify-email",
+      "/verify-password",
       "/send-verification-email",
       "/revoke-session",
       "/link-social",
@@ -41,9 +46,20 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       "/list-sessions",
       "/cloudflare/geolocation",
       "/is-username-available",
+      "/delete-user",
       "/delete-user/callback",
-      "/change-password",
-      "/is-username-available"
+      "/is-username-available",
+      "/ok",
+      "/sign-in/username",
+      "/get-session",
+      "/update-user",
+      "/update-session",
+      "/revoke-other-sessions",
+      "/sign-out",
+      "/sign-in",
+      "/sign-up/email",
+      "/request-password-reset",
+      "/revoke-sessions",
     ],
     ...withCloudflare(
       {
