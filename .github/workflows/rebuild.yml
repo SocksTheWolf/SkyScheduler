@@ -11,6 +11,10 @@ concurrency:
   group: static-pages
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   make_a_deploy:
     name: Make A Deploy
