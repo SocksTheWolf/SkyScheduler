@@ -6,6 +6,7 @@ on:
     paths:
       - "src/endpoints/openapi.tsx"
       - "bin/openapi.ts"
+      - ".github/workflows/openapi.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -70,7 +71,7 @@ jobs:
           name: openapi-spec-${{ github.ref }}
       - name: Upload Spec to WAF
         if: success()
-        uses: socksthewolf/upload-cloudflare-spec@6d8c4c1ffd6972c0d1d1f1cf75ead06b6b313a49
+        uses: socksthewolf/cloudflare-upload-spec@6d8c4c1ffd6972c0d1d1f1cf75ead06b6b313a49
         with:
           zone: ${{ vars.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
