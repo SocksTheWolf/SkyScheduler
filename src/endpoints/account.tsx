@@ -115,16 +115,18 @@ account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMI
     } catch (err) {
       console.warn(`failed to update session pds: ${err}`);
       // this is technically not true, but w/e
-      return c.html(<b class="btn-error">Your session has expired, please try again</b>);
+      return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>);
     }
   }
 
-  if (!isEmpty(password)) {
+  // check if we updated our password
+  const updatedPassword = !isEmpty(password);
+  if (updatedPassword) {
     // attempt to rehash the password (ugh slow.)
     const authCtx = await auth.$context;
+    // this is a dumb workaround because all other password update methods
+    // get really upset (bc of emails [we don't use]), which seems to be a bug in better auth
     newObject.password = await authCtx.password.hash(password!);
-    // revoke other sessions that may be active
-    await auth.api.revokeOtherSessions({headers: c.req.raw.headers});
   }
 
   // Check to see if we made any changes at all
@@ -132,8 +134,13 @@ account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMI
     return c.html(<b class="btn-error">No Changes Made</b>, 201);
   }
 
+  // push changes to db
   const userUpdated = await updateUserData(c, newObject);
   if (userUpdated) {
+    // revoke other sessions that may be active
+    if (updatedPassword) {
+      await auth.api.revokeOtherSessions({headers: c.req.raw.headers});
+    }
     c.header("HX-Trigger", "accountUpdated");
     c.header("HX-Trigger-After-Swap", "accountViolations");
     return c.html(<></>, 200);
