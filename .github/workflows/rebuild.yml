@@ -31,15 +31,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: cf-static-builds
           onlyRemoveDeployments: true
-      - name: Force CF Rebuild Using Action
-        if: ${{ vars.USE_HOOK_DEPLOY == 'false' }}
-        uses: socksthewolf/cloudflare-trigger-build@main
-        with:
-          account_id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-          worker_name: ${{ vars.CLOUDFLARE_WORKER_NAME }}
-      - name: Force CF Rebuild Using Deploy Hook
-        if: ${{ vars.USE_HOOK_DEPLOY == 'true' }}
+      - name: Force CF Rebuild
         env:
           DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
         run: curl --no-progress-meter -X POST $DEPLOY_HOOK | jq -r ".success"
