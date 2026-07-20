@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { csrf } from "hono/csrf";
 import { disableSSG } from "hono/ssg";
-import { createAuth } from "./auth";
+import { createAuth, processAuthRoute } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { schema } from "./db/schema";
 import { account } from "./endpoints/account";
@@ -82,10 +82,7 @@ app.get("/reset", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ResetPasswor
 app.use(disableSSG());
 
 // Handle all BetterAuth routes
-app.all("/api/auth/*", async (c) => {
-  const auth = c.get("auth");
-  return auth.handler(c.req.raw);
-});
+app.all("/api/auth/*", async (c) => processAuthRoute(c));
 
 // Account routes
 app.route("/account", account);

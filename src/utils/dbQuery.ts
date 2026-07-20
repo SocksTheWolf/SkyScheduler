@@ -78,8 +78,9 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
       }
 
       // If we have new data about the username, pds, or password
-      if (has(newData, "bskyAppPass") || has(newData, "username") || has(newData, "pds")) {
+      if (has(newData, "updatedSession") || has(newData, "username")) {
         await removeViolationsDB(db, userId, [AccountStatus.InvalidAccount, AccountStatus.Deactivated]);
+        delete newData.updatedSession;
       }
 
       if (!isEmpty(newData)) {

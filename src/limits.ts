@@ -98,6 +98,10 @@ export const USE_CSP_REPORT_ONLY: boolean = true;
 // if we should try to use SSG rendering for pages vs dynamic rendering
 export const USE_STATIC_HTML: boolean = true;
 
+// try to optimize better auth tasks by running the cleanup after the response is sent
+// needs more testing before it's turned on
+export const USE_ASYNC_AUTH_TASK: boolean = false;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/

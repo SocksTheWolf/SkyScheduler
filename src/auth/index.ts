@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "async_hooks";
 import { betterAuth, Session } from "better-auth";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -6,12 +7,15 @@ import { type DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import {
   BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
-  DEFAULT_PDS
+  DEFAULT_PDS, USE_ASYNC_AUTH_TASK
 } from "../limits";
 import { APP_NAME } from "../siteinfo";
-import type { AllContext, Bindings } from "../types";
+import type { AllContext, BaseContext, Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
+
+// try to optimize performance on CF Workers
+const execCtxStorage = USE_ASYNC_AUTH_TASK ? new AsyncLocalStorage<ExecutionContext>() : null;
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
@@ -135,7 +139,10 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
     advanced: {
       ipAddress: {
         ipAddressHeaders: ['cf-connecting-ip']
-      }
+      },
+      backgroundTasks: USE_ASYNC_AUTH_TASK ? {
+        handler: (p) => execCtxStorage!.getStore()?.waitUntil(p),
+      } : undefined
     },
     // Only add database adapter for CLI schema generation
     ...(env ? {} : {
@@ -146,7 +153,15 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       }),
     }),
   });
-}
+};
+
+function processAuthRoute(c: BaseContext) {
+  const authHandle = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.raw);
+  if (USE_ASYNC_AUTH_TASK)
+    return execCtxStorage!.run(c.executionCtx as ExecutionContext, () => authHandle(c))
+  else
+    return authHandle(c);
+};
 
 // Export for variable types
 type ContextVariables = SecureHeadersVariables & {
@@ -159,5 +174,4 @@ type ContextVariables = SecureHeadersVariables & {
 };
 
 // Export for runtime usage
-export { createAuth, type ContextVariables };
-
+export { createAuth, processAuthRoute, type ContextVariables };

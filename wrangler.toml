@@ -107,7 +107,6 @@ max_retries = 3
 # used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"
-remote = true
 
 # this did give us issues in the past...
 [limits]
