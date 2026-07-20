@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cleanup Actions
-        uses: socksthewolf/gh-actions-clean-workflow@main
+        uses: igorjs/gh-actions-clean-workflow@5fa2e3a4fdd40e3e7098645a0b8df08624352e5e
         with:
           token: ${{ secrets.GH_CLEANER_TOKEN }}
           runs_to_keep: 1
