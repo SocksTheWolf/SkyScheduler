@@ -6,7 +6,6 @@ on:
     paths:
       - "src/endpoints/openapi.tsx"
       - "bin/openapi.ts"
-      - ".github/workflows/openapi.yml"
   workflow_dispatch: {}
 
 concurrency:
