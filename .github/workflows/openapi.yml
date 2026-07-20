@@ -49,11 +49,9 @@ jobs:
         run: npm install
       - name: Run OpenAPI Gen
         run: npm run openapi
-      - name: Check Output
-        run: ls -lh
       - name: Upload Spec to API Shield
         if: success()
-        uses: socksthewolf/cloudflare-upload-spec@6d8c4c1ffd6972c0d1d1f1cf75ead06b6b313a49
+        uses: socksthewolf/cloudflare-upload-spec@4aa5efd32ce6fc898dcb794ccd7e3001568cce10
         with:
           zone_id: ${{ vars.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
