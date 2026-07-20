@@ -79,14 +79,45 @@ account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMI
   const auth = c.get("auth");
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
   let newObject: LooseObj = {};
-  if (!isEmpty(username) && username !== c.env.RESET_BOT_USERNAME)
-    newObject.username = username!;
+  if (!isEmpty(username)) {
+    if ((username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) &&
+      !c.get("isAdmin")) {
+        return c.html(<b class="btn-error">Invalid username provided</b>);
+    } else {
+      newObject.username = username!;
+    }
+  }
 
-  if (!isEmpty(bskyAppPassword))
-    newObject.bskyAppPass = bskyAppPassword;
+  // we have to write user data a little differently
+  const hasNewPDS = !isEmpty(bskyUserPDS), newAppPass = !isEmpty(bskyAppPassword);
+  if (hasNewPDS || newAppPass) {
+    const updateUsrObj: LooseObj = {
+      pds: (hasNewPDS) ? bskyUserPDS : null,
+      bskyAppPass: (newAppPass) ? bskyAppPassword : null
+    };
+    // if we didn't update the pds, remove the field from the object
+    if (!hasNewPDS)
+      delete updateUsrObj.pds;
 
-  if (!isEmpty(bskyUserPDS))
-    newObject.pds = bskyUserPDS;
+    // same with the app pass if it has not been updated
+    if (!newAppPass)
+      delete updateUsrObj.bskyAppPass;
+
+    try {
+      const {status} = await auth.api.updateUser({
+        body: updateUsrObj,
+        headers: c.req.raw.headers
+      });
+      if (!status) {
+        return c.html(<b class="btn-error">Failed to update user data, try again</b>);
+      }
+      newObject.updatedSession = true;
+    } catch (err) {
+      console.warn(`failed to update session pds: ${err}`);
+      // this is technically not true, but w/e
+      return c.html(<b class="btn-error">Your session has expired, please try again</b>);
+    }
+  }
 
   if (!isEmpty(password)) {
     // attempt to rehash the password (ugh slow.)
