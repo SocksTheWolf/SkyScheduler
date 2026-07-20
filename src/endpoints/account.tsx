@@ -158,6 +158,7 @@ account.post("/logout", authMiddleware, async (c) => {
   }
 
   // Redirect to home
+  c.header("Clear-Site-Data", "cookies");
   c.header("HX-Redirect", "/?logout");
   return c.text("");
 });
@@ -356,6 +357,7 @@ account.post("/delete", authMiddleware, async (c) => {
         .then(() => auth.api.revokeSessions({headers: c.req.raw.headers}))
         .then(() => authCtx.internalAdapter.deleteUser(userId)));
 
+      c.header("Clear-Site-Data", "cookies");
       c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {
