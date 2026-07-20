@@ -3,6 +3,7 @@ import { NONCE } from "hono/secure-headers";
 import { isSSGContext } from "hono/ssg";
 import isEmpty from "just-is-empty";
 import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../limits";
+import { isInDev } from "../utils/helpers";
 
 export async function cspHelper(c: Context, next: any) {
   const cspReportURL = c.env.CSP_REPORT_URL;
@@ -44,7 +45,7 @@ export async function cspHelper(c: Context, next: any) {
     }
 
     // Manually inject the CSP headers
-    if (USE_CSP_REPORT_ONLY) {
+    if (USE_CSP_REPORT_ONLY || isInDev(c.env)) {
       c.res.headers.set("content-security-policy-report-only", CSPDefinitionHeader);
     } else {
       c.res.headers.set("content-security-policy", CSPDefinitionHeader);

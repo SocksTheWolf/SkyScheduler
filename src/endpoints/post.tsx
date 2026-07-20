@@ -6,7 +6,8 @@ import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
 import { RepostDataPopover } from "../layout/repostEditor";
-import { authMiddleware } from "../middleware/auth";
+import { CAN_EDIT_REPOST_RULES } from "../limits";
+import { authMiddleware, authMiddlewareHTML } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import type {
   CreateObjectResponse, CreatePostQueryResponse,
@@ -24,10 +25,9 @@ import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
 export const post = new Hono<HonoBase>();
-post.use(authMiddleware);
 
 // Create media upload
-post.post("/upload", async (c) => {
+post.post("/upload", authMiddleware, async (c) => {
   const validation = await c.req.parseBody().then((body) => FileUploadSchema.safeParse(body));
   if (!validation.success) {
     return c.json({"success": false, "error": validation.error.toString()}, 400);
@@ -42,7 +42,7 @@ post.post("/upload", async (c) => {
 });
 
 // Delete an upload
-post.delete("/upload", async (c) => {
+post.delete("/upload", authMiddleware, async (c) => {
   const body = await c.req.json();
 
   // Validate that this is a legitimate key
@@ -60,7 +60,7 @@ post.delete("/upload", async (c) => {
 });
 
 // Create post
-post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c) => {
+post.post("/create", authMiddleware, rateLimit({limiter: "POST_LIMITER"}), async (c) => {
   const response: CreatePostQueryResponse = await c.req.json().then((body) => createPost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
@@ -79,7 +79,7 @@ post.post("/create", rateLimit({limiter: "POST_LIMITER"}), async (c) => {
 });
 
 // Create repost
-post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c) => {
+post.post("/create/repost", authMiddleware, rateLimit({limiter: "REPOST_LIMITER"}), async (c) => {
   const response: CreateObjectResponse = await c.req.json().then((body) => createRepost(c, body));
   if (!response.ok) {
     return c.json({ok: false, msg: response.msg}, 400);
@@ -88,13 +88,13 @@ post.post("/create/repost", rateLimit({limiter: "REPOST_LIMITER"}), async (c) =>
 });
 
 // Get all posts
-post.all("/all", async (c) => {
+post.all("/all", authMiddlewareHTML, async (c) => {
   c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons");
   return c.html(<ScheduledPostList ctx={c} />);
 });
 
 // Edit posts
-post.get("/edit/:id", async (c) => {
+post.get("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>);
@@ -107,7 +107,7 @@ post.get("/edit/:id", async (c) => {
   return c.html(<></>);
 });
 
-post.post("/edit/:id", async (c) => {
+post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   if (!isValid(id)) {
@@ -181,7 +181,7 @@ post.post("/edit/:id", async (c) => {
   return c.html(<b class="btn-error">Failed to process edit</b>);
 });
 
-post.get("/edit/:id/cancel", async (c) => {
+post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
     return c.html(<></>);
@@ -199,7 +199,7 @@ post.get("/edit/:id/cancel", async (c) => {
 });
 
 // delete a post
-post.delete("/delete/:id", async (c) => {
+post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
@@ -220,22 +220,26 @@ post.delete("/delete/:id", async (c) => {
 });
 
 // get the repost rule editor
-post.get("/:id/repost", rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true}), async (c) => {
-  const { id } = c.req.param();
-  if (isValid(id)) {
-    c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
-    return c.html(<RepostDataPopover ctx={c} id={id} />);
+post.get("/:id/repost", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true}), async (c) => {
+  if (CAN_EDIT_REPOST_RULES) {
+    const { id } = c.req.param();
+    if (isValid(id)) {
+      c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
+      return c.html(<RepostDataPopover ctx={c} id={id} />);
+    }
   }
   return c.html(<></>);
 });
 
 // delete a post's repost rule
-post.delete("/:id/repost/:scheduleId", rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c) => {
-  const { id, scheduleId } = c.req.param();
-  if (isValid(id) && isValid(scheduleId)) {
-    if (await deleteRepostRule(c, id, scheduleId)) {
-      c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
-      return c.html(<></>);
+post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDIT_LIMITER", html: true, toast: true}), async (c) => {
+  if (CAN_EDIT_REPOST_RULES) {
+    const { id, scheduleId } = c.req.param();
+    if (isValid(id) && isValid(scheduleId)) {
+      if (await deleteRepostRule(c, id, scheduleId)) {
+        c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
+        return c.html(<></>);
+      }
     }
   }
   return c.html(<>Invalid</>);

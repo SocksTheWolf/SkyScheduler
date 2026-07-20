@@ -5,7 +5,7 @@ import { AccountStatus } from "../enums";
 import PDSInputField from "../layout/fields/pdsInputField";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { DEFAULT_PDS } from "../limits";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { HonoBase, LooseObj } from "../types";
@@ -15,6 +15,7 @@ import { getAllMediaOfUser } from "../utils/db/file";
 import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
 import { removeViolations, userHasBan, userHasViolations } from "../utils/db/violations";
 import { updateUserData } from "../utils/dbQuery";
+import { isInDev, logoutAccount } from "../utils/helpers";
 import { consumeInviteKey, doesInviteKeyHaveValues } from "../utils/inviteKeys";
 import { deleteFromR2 } from "../utils/r2Query";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
@@ -69,7 +70,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   }
 });
 
-account.post("/update", authMiddleware, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c) => {
+account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
@@ -154,7 +155,7 @@ account.get("/username", authMiddleware, async (c) => {
   return c.text(username || "", 200);
 });
 
-account.get("/data", authMiddleware, async (c) => {
+account.get("/data", authMiddlewareHTML, async (c) => {
   const username: string|null = await getUsernameForUser(c);
   const pds = c.get("pds") || DEFAULT_PDS;
   if (username === null) {
@@ -167,14 +168,14 @@ account.get("/data", authMiddleware, async (c) => {
 });
 
 // endpoint that returns any violations
-account.get("/violations", authMiddleware, async (c) => {
+account.get("/violations", authMiddlewareHTML, async (c) => {
   c.header("HX-Trigger-After-Swap", "violationOpenSettings");
   return c.html(<ViolationNoticeBar ctx={c} />);
 });
 
 // endpoint that allows the user to resolve conflicts.
 // We'll validate they are actually fixed bsky action is performed
-account.post("/violations/resolve", authMiddleware, async (c) => {
+account.post("/violations/resolve", authMiddlewareHTML, async (c) => {
   const userId = c.get("userId");
   const context = new ScheduledContext(c.env, c.executionCtx);
   if (await userHasViolations(context, userId)) {
@@ -186,19 +187,23 @@ account.post("/violations/resolve", authMiddleware, async (c) => {
   return c.html(<></>);
 });
 
+// HTMX version
 // proxy the logout call because of course this wouldn't work properly anyways
-account.post("/logout", authMiddleware, async (c) => {
-  try {
-    const auth = c.get("auth");
-    await auth.api.signOut({ headers: c.req.raw.headers });
-  } catch(err) {
-    console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
-  }
-
-  // Redirect to home
+account.post("/logout", authMiddlewareHTML, async (c) => {
+  // force logout account
+  await logoutAccount(c);
   c.header("Clear-Site-Data", "cookies");
+  // uses htmx to redirect
   c.header("HX-Redirect", "/?logout");
   return c.text("");
+});
+
+// direct path version
+account.get("/logout", pullAuthData, async (c) => {
+  // force logout account
+  await logoutAccount(c);
+  c.header("Clear-Site-Data", "cookies");
+  return c.redirect("/?logout");
 });
 
 account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
@@ -215,7 +220,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
 
   // Prevent sign ups with these accounts, they are setup using a different method.
   if (username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) {
-    if (c.env.IN_DEV === false)
+    if (!isInDev(c.env))
       return c.json({ok: false, msg: "forbidden account"}, 401);
     else
       console.error("ERROR: An admin account should not be set up this way, please use the /setup route");
@@ -357,7 +362,7 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   return c.json({ok: false, msg: "invalid token/password"}, 401);
 });
 
-account.post("/delete", authMiddleware, async (c) => {
+account.post("/delete", authMiddlewareHTML, async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountDeleteSchema.safeParse(body);
 

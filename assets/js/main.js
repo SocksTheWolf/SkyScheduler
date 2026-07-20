@@ -179,3 +179,8 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
 document.addEventListener("rateLimitNotice", function(ev) {
   pushToast(ev.detail.value, false);
 });
+
+document.addEventListener("accountLoginExpire", function(ev) {
+  pushToast(`Your session has expired, logging out in ${ACCOUNT_EXPIRE_TIMEOUT} seconds...`, false);
+  setTimeout(() => {document.location.href="/account/logout"}, ACCOUNT_EXPIRE_TIMEOUT * 1000);
+});

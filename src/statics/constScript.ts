@@ -1,18 +1,18 @@
 import { EmbedDataType } from "../enums";
 import {
+  ACCOUNT_EXPIRE_FORCE_LOGOUT,
   BSKY_GIF_MIME_TYPES, BSKY_IMG_MIME_TYPES,
   BSKY_NAME_LOOKUP_LIMIT, BSKY_NAME_TYPE_AHEAD_CHARS,
   BSKY_VIDEO_FILE_EXTS,
   BSKY_VIDEO_LENGTH_LIMIT, BSKY_VIDEO_MIME_TYPES,
   GIF_UPLOAD_ALLOWED, MAX_ALT_TEXT, MAX_FILES_PER_POST,
   MAX_GIF_LENGTH_LIMIT, MAX_LENGTH, MAX_THUMBNAIL_SIZE,
-  POSTING_TIME_INTERVAL,
-  R2_FILE_SIZE_LIMIT,
+  POSTING_TIME_INTERVAL, R2_FILE_SIZE_LIMIT,
   REPOSTING_TIME_INTERVAL
 } from "../limits";
 import { postRecordURI } from "../validation/regexCases";
 
-export const CONST_SCRIPT_VERSION: number = 12;
+export const CONST_SCRIPT_VERSION: number = 13;
 
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {
@@ -46,5 +46,6 @@ const REPOSTING_TIME_INTERVAL=${REPOSTING_TIME_INTERVAL};
 const IMAGE_DATA_TYPE=${EmbedDataType.Image};
 const VIDEO_DATA_TYPE=${EmbedDataType.Video};
 const WEBLINK_DATA_TYPE=${EmbedDataType.WebLink};
-const RECORD_DATA_TYPE=${EmbedDataType.Record};`;
+const RECORD_DATA_TYPE=${EmbedDataType.Record};
+const ACCOUNT_EXPIRE_TIMEOUT=${Math.abs(ACCOUNT_EXPIRE_FORCE_LOGOUT)};`;
 }

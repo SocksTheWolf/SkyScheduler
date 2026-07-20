@@ -12,9 +12,11 @@ import {
 import { APP_NAME } from "../siteinfo";
 import type { AllContext, BaseContext, Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
+import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
 // try to optimize performance on CF Workers
+// though, I'm not really holding much hope out for it tbh
 const execCtxStorage = USE_ASYNC_AUTH_TASK ? new AsyncLocalStorage<ExecutionContext>() : null;
 
 // Single auth configuration that handles both CLI and runtime scenarios
@@ -121,7 +123,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
     ),
     appName: APP_NAME,
     secret: env?.BETTER_AUTH_SECRET,
-    baseURL: (env?.IN_DEV === true) ? undefined : env?.BETTER_AUTH_URL,
+    baseURL: (isInDev(env)) ? undefined : env?.BETTER_AUTH_URL,
     user: {
       additionalFields: {
         bskyAppPass: {
@@ -161,6 +163,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       } : undefined
     },
     // Only add database adapter for CLI schema generation
+    // though better-auth-cloudflare just injects this anyways
     ...(env ? {} : {
       database: drizzleAdapter({} as D1Database, {
         provider: "sqlite",

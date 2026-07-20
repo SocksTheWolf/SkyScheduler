@@ -5,6 +5,7 @@ import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
 import type { AllContext, Bindings, QueueTaskData } from "../../types";
+import { isInDev } from '../helpers';
 
 // picks a random queue to publish data to
 const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
@@ -32,8 +33,8 @@ async function pushToQueue(queueConsumer: Queue|null, data: Post|Repost|null, ta
   }
 };
 
-const hasPostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && env.IN_DEV == false;
-const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && env.IN_DEV == false;
+const hasPostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && !isInDev(env);
+const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && !isInDev(env);
 export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
 export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.repostsEnabled && hasRepostQueue(env);
 export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);

@@ -2,10 +2,11 @@ import {
   formatDuration, type FormatDurationOptions,
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
+import type { Context } from "hono";
 import has from "just-has";
 import { EmbedDataType, TimeIntervalSettings } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
-import type { AllContext, LooseObj } from "../types";
+import type { AllContext, Bindings, LooseObj } from "../types";
 
 export function floorCurrentTime(forRepost: boolean=false): Date {
   return floorGivenTime(new Date(), forRepost);
@@ -59,6 +60,13 @@ export function daysAgo(days: number): Date {
   return subDays(new Date(), days);
 }
 
+export function isInDev(env?: Bindings) {
+  if (env === undefined)
+    return false;
+
+  return env?.IN_DEV === "true";
+}
+
 export function useCFTurnstile(ctx: AllContext|undefined): boolean {
   if (ctx?.env?.IN_DEV)
     return false;
@@ -73,3 +81,14 @@ export function isPost(data: any): boolean {
 export function isAltEditableType(type: EmbedDataType) {
   return type === EmbedDataType.Image || type === EmbedDataType.Video;
 }
+
+export const logoutAccount = async (c: Context): Promise<boolean> => {
+  try {
+    const auth = c.get("auth");
+    await auth.api.signOut({ headers: c.req.raw.headers });
+    return true;
+  } catch (err) {
+    console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
+  }
+  return false;
+};

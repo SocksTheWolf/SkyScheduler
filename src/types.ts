@@ -68,7 +68,7 @@ export interface Bindings {
   RESIZE_SECRET_HEADER: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
-  IN_DEV: boolean;
+  IN_DEV: string|undefined;
   CSP_REPORT_URL: string;
 };
 
@@ -87,6 +87,13 @@ export type EmbedData = {
 
 export type WebAssociatedRef = BskyRecordWrapper & {
   $type: "com.atproto.repo.strongRef";
+};
+
+export type RequireAuthMiddlewareProps = {
+  returnHTML?: boolean;
+  // if specified: logs out immediately
+  // if not: logs out after 5 seconds
+  forceLogout?: boolean;
 };
 
 export type Violation = {

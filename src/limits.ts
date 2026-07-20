@@ -42,6 +42,11 @@ export const USE_CAPTCHA: boolean = true;
 // set up the link to the invite keys in SITE_INVITE_URL in siteinfo
 export const USE_INVITE_KEYS: boolean = false;
 
+// How long between when we detect an account session is no longer valid
+// and when we force the user to log back in
+// (this is in seconds)
+export const ACCOUNT_EXPIRE_FORCE_LOGOUT: number = 5;
+
 /** Media content **/
 /* --------------- */
 // if gifs should be allowed to upload
@@ -76,24 +81,28 @@ export const DEFAULT_PDS: string = "https://bsky.social";
 // What is the default chat endpoint (probably needs to match with wherever your bot account is)
 export const DEFAULT_CHAT_PDS: string = "https://bsky.social";
 
-/** Feature Flags **/
-/* --------------- */
+/** Security Settings **/
+/* ------------------- */
+// controls if we inject granular content security policy headers into requests
+// or use the basic values from hono
+export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
+// the above must be on, otherwise this will do nothing. This will only report CSP failures
+// Once CSP is good enough, change this to false to have it be enforced.
+export const USE_CSP_REPORT_ONLY: boolean = false;
+
+/** Feature Settings **/
+/* ------------------ */
 // if the user can edit the repost rules for their posts
 export const CAN_EDIT_REPOST_RULES: boolean = true;
 
 // if users can repost scheduled posts before they are posted
 export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
 
+/** Experimental Feature Flags **/
+/* ---------------------------- */
 // allow for deprecated image size parsing.
 // NOTE: All new applications should set this to false.
 export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
-
-// controls if we inject granular content security policy headers into requests
-// or use the basic values from hono
-export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
-// the above must be on, otherwise this will do nothing. This will only report CSP failures
-// Once CSP is good enough, change this to false to have it be enforced.
-export const USE_CSP_REPORT_ONLY: boolean = true;
 
 // if we should try to use SSG rendering for pages vs dynamic rendering
 export const USE_STATIC_HTML: boolean = true;
@@ -224,7 +233,7 @@ export const BSKY_VIDEO_SIZE_LIMIT_IN_MB: number = Math.min(R2_FILE_SIZE_LIMIT_I
 export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;
 export const MAX_GIF_LENGTH_LIMIT: number = MAX_GIF_LENGTH * TO_SEC;
-// Max size of Cloudflare Images files
+// Limits for Cloudflare Images
 export const CF_IMAGES_FILE_SIZE_LIMIT_IN_MB: number = 70;
 export const CF_IMAGES_FILE_SIZE_LIMIT: number = CF_IMAGES_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const CF_IMAGES_MAX_DIMENSION: number = 10000;

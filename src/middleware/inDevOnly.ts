@@ -1,9 +1,10 @@
 import type { Context } from "hono";
 import { every } from "hono/combine";
 import { disableSSG } from "hono/ssg";
+import { isInDev } from "../utils/helpers";
 
 async function devOnlyMiddleware(c: Context, next: any) {
-  if (c.env.IN_DEV === false) {
+  if (!isInDev(c.env)) {
     return c.notFound();
   }
   await next();

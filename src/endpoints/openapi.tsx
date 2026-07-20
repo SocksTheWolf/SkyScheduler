@@ -342,13 +342,22 @@ openapiRoutes.post("/account/violations/resolve", describeRoute({
 
 // proxy the logout call because of course this wouldn't work properly anyways
 openapiRoutes.post("/account/logout", describeRoute({
-  description: "Logs out the user",
+  description: "Logs out the user via HTMX",
   responses: {
     200: {
       description: "logged out"
     },
     401: {
       description: "not logged in"
+    }
+  }
+}));
+
+openapiRoutes.get("/account/logout", describeRoute({
+  description: "Logs out the user",
+  responses: {
+    200: {
+      description: "log out"
     }
   }
 }));
