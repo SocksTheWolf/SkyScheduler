@@ -55,7 +55,6 @@ jobs:
         with:
           zone_id: ${{ vars.CLOUDFLARE_ZONE }}
           api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-          file_name: openapi.json
           delete_others: true
       - name: Upload Spec as Artifact
         if: success()
