@@ -32,6 +32,7 @@ jobs:
     name: Generate Spec
     runs-on: ubuntu-latest
     needs: clean_deploys
+    environment: openapi
     permissions:
       contents: read
       actions: write
@@ -48,6 +49,14 @@ jobs:
         run: npm install
       - name: Run OpenAPI Gen
         run: npm run openapi
+      - name: Upload Spec to API Shield
+        if: success()
+        uses: socksthewolf/cloudflare-upload-spec@6d8c4c1ffd6972c0d1d1f1cf75ead06b6b313a49
+        with:
+          zone: ${{ vars.CLOUDFLARE_ZONE }}
+          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+          file_name: openapi.json
+          delete_others: true
       - name: Upload Spec as Artifact
         if: success()
         uses: actions/upload-artifact@v7
@@ -56,24 +65,3 @@ jobs:
           path: ./openapi.json
           archive: false
           if-no-files-found: error
-
-  upload_spec:
-    name: Upload Spec
-    needs: build_spec
-    runs-on: ubuntu-latest
-    environment: openapi
-    permissions:
-      actions: read
-    steps:
-      - name: Download OpenAPI Spec
-        uses: actions/download-artifact@v8
-        with:
-          name: openapi-spec-${{ github.ref }}
-      - name: Upload Spec to WAF
-        if: success()
-        uses: socksthewolf/cloudflare-upload-spec@6d8c4c1ffd6972c0d1d1f1cf75ead06b6b313a49
-        with:
-          zone: ${{ vars.CLOUDFLARE_ZONE }}
-          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-          file_name: openapi.json
-          delete_others: true
