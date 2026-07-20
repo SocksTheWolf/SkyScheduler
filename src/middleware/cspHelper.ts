@@ -9,7 +9,7 @@ export async function cspHelper(c: Context, next: any) {
   const hasReportURL = !isEmpty(cspReportURL);
 
   if (USE_GRANULAR_CSP_SETTINGS && !isSSGContext(c)) {
-    // directive parameter is not actually used.
+    // note: the directive parameter is not actually used.
     const nonceVal = NONCE(c, "");
 
     const secPolicy = {
@@ -22,8 +22,8 @@ export async function cspHelper(c: Context, next: any) {
       "frame-src": ["'self'", "https://challenges.cloudflare.com"],
       "script-src": ['https:', nonceVal, "'strict-dynamic'"],
       "script-src-attr": ["'none'"],
-      "script-src-elem": ["'self'", "https://challenges.cloudflare.com", nonceVal],
-      "style-src-elem": ["'self'", nonceVal],
+      "script-src-elem": ["'self'", "https://challenges.cloudflare.com", nonceVal, "'report-sample'"],
+      "style-src-elem": ["'self'", nonceVal, "'report-sample'"],
       "style-src-attr": ["'none'"],
       "form-action": ["'self'"],
       "frame-ancestors": ["'none'"],
