@@ -1,18 +1,18 @@
 # SkyScheduler
 
 [![Deploy Cloudflare Workers](https://img.shields.io/badge/cloudflare_workers-deploy-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
-[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support%20Development&color=orange)](https://wolf.stream/tip)
+[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support&color=orange&logoColor=white)](https://wolf.stream/tip)
 [![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![NodeJS Version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2FSocksTheWolf%2FSkyScheduler%2Frefs%2Fheads%2Fmain%2F.node-version&search=(.*)&replace=v%241&style=flat&logo=nodedotjs&logoColor=5FA04E&label=NodeJS%20Version&color=5FA04E)](https://github.com/nodejs/node/blob/main/doc/changelogs/CHANGELOG_V24.md)
+[![NodeJS Version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2FSocksTheWolf%2FSkyScheduler%2Frefs%2Fheads%2Fmain%2F.node-version&search=(.*)&replace=v%241&style=flat&logo=nodedotjs&logoColor=5FA04E&label=NodeJS%20Version&color=5FA04E)](https://endoflife.date/nodejs)
 [![Website](https://img.shields.io/website?logo=cloudflare&color=teal&cacheSeconds=7200&down_color=red&url=https%3A%2F%2Fskyscheduler.work)](https://skyscheduler.work)
 [![Mozilla HTTP Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)](https://developer.mozilla.org/en-US/observatory/analyze?host=skyscheduler.work)
 
 [![GitHub Runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)](https://github.com/SocksTheWolf/SkyScheduler/actions)
-[![GitHub code size](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)]()
-[![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)]()
+[![GitHub code size](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)](/)
+[![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](/)
 
 ![SkyScheduler Dashboard](https://raw.githubusercontent.com/SocksTheWolf/SkyScheduler/refs/heads/main/assets/screenshots/dashboard.png)
 
