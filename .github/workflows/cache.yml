@@ -29,15 +29,9 @@ jobs:
     secrets: inherit
     with:
       environment: cloudflare
-  clear_cache:
-    name: Clear Cloudflare Cache
-    runs-on: ubuntu-latest
-    environment: cloudflare
-    steps:
-      - name: Cloudflare Cache Cleaner
-        uses: Cyb3r-Jak3/action-cloudflare-cache@6ebf798ade84e7ab7da249404e0c3b9aecf54f88
-        with:
-          zone: ${{ vars.CLOUDFLARE_ZONE }}
-          api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-          account_id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+  cache_clear:
+    name: Clear Cache
+    uses: socksthewolf/workflows/.github/workflows/cache.yml@main
+    secrets: inherit
+
 
