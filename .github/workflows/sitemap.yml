@@ -21,6 +21,10 @@ concurrency:
   group: sitemap
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  deployments: write
+
 jobs:
   run:
     uses: socksthewolf/workflows/.github/workflows/sitemap.yml@main
