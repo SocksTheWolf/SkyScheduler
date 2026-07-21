@@ -1,7 +1,7 @@
 # SkyScheduler
 
 [![Deploy Cloudflare Workers](https://img.shields.io/badge/cloudflare_workers-deploy-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
-[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support&color=orange&logoColor=white)](https://wolf.stream/tip)
+[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support&color=orange&logoColor=white)](https://skyscheduler.work/tip)
 [![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
 
 
