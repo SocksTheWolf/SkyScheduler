@@ -11,26 +11,25 @@ concurrency:
   group: static-pages
   cancel-in-progress: true
 
+permissions:
+  deployments: write
+
 defaults:
   run:
     shell: bash
 
 jobs:
+  clean_deployments:
+    name: Clean Previous Deploys
+    uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
+    secrets: inherit
+    with:
+      environment: cf-static-builds
   make_a_deploy:
     name: Make A Deploy
     runs-on: ubuntu-latest
-    permissions:
-      deployments: write
     environment: cf-static-builds
     steps:
-      # remove Github deployments
-      - name: Cleanup Previous Deploys
-        continue-on-error: true
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: cf-static-builds
-          onlyRemoveDeployments: true
       - name: Force CF Rebuild
         env:
           DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}

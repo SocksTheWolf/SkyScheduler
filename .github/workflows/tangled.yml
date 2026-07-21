@@ -21,19 +21,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  clean_deployments:
+    name: Clean Previous Deploys
+    uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
+    secrets: inherit
+    with:
+      environment: tangled
+
   push_tangled:
     name: Update Tangled Mirror
     runs-on: ubuntu-latest
-    environment:
-      name: tangled
+    environment: tangled
     steps:
-      - name: Cleanup Previous Deploys
-        continue-on-error: true
-        uses: strumwolf/delete-deployment-environment@035f6d27c8b8951729f4d71b2d3d6a7975139476
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: tangled
-          onlyRemoveDeployments: true
       - name: Push to Tangled
         uses: gwennlbh/to-tangled@50f70a6910307e6fffa632e6d7cfec6b9e9f94ec
         with:
