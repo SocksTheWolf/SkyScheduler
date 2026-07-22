@@ -4,7 +4,8 @@ name: Tangled Bangled
 on:
   workflow_call:
   push:
-    branches: ["main"]
+    branches: "main"
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -15,21 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  clean_deployments:
-    name: Clean Previous Deploys
-    uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
+  push:
+    name: Tangled
+    uses: socksthewolf/workflows/.github/workflows/tangled.yml@main
     secrets: inherit
-    with:
-      environment: tangled
-
-  push_tangled:
-    name: Update Tangled Mirror
-    runs-on: ubuntu-latest
-    environment: tangled
-    steps:
-      - name: Push to Tangled
-        uses: gwennlbh/to-tangled@50f70a6910307e6fffa632e6d7cfec6b9e9f94ec
-        with:
-          repo: ${{ vars.MIRROR_REPO }}
-          ssh-key: ${{ secrets.KEY }}
-
