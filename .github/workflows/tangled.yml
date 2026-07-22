@@ -4,13 +4,6 @@ name: Tangled Bangled
 on:
   push:
     branches: ["main"]
-  workflow_run:
-    # Sitemap has the ability to modify the current repo
-    # we should make sure that we also update any mirrors
-    workflows: "Build & Update Sitemap"
-    types:
-      - completed
-    branches: ["main"]
 
 permissions:
   contents: read
