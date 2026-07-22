@@ -33,3 +33,10 @@ jobs:
       clean_deploys: true
       live_url: https://skyscheduler.work/sitemap.xml
       path: "assets/sitemap.xml"
+
+  call_tangled:
+    needs: run
+    name: Update Tangled Mirror
+    if: ${{ needs.run.outputs.had_changes == 'true' }}
+    uses: ./.github/workflows/tangled.yml
+    secrets: inherit
