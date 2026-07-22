@@ -18,5 +18,5 @@ concurrency:
 jobs:
   push:
     name: Tangled
-    uses: socksthewolf/workflows/.github/workflows/tangled.yml@main
+    uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml@main
     secrets: inherit

@@ -19,7 +19,7 @@ on:
 
 concurrency:
   group: sitemap
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -27,7 +27,8 @@ permissions:
 
 jobs:
   run:
-    uses: socksthewolf/workflows/.github/workflows/sitemap.yml@main
+    name: Sitemap Builder
+    uses: socksthewolf/workflows/.github/workflows/build_sitemap.yml@main
     secrets: inherit
     with:
       clean_deploys: true
@@ -38,5 +39,5 @@ jobs:
     needs: run
     name: Update Tangled Mirror
     if: ${{ needs.run.outputs.had_changes == 'true' }}
-    uses: ./.github/workflows/tangled.yml
+    uses: ./.github/workflows/deploy_tangled.yml
     secrets: inherit

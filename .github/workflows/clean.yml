@@ -15,6 +15,4 @@ jobs:
   # Clean up github job
   run:
     name: Cleanup
-    uses: socksthewolf/workflows/.github/workflows/clean.yml@main
-    secrets:
-      CLEAN_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: socksthewolf/workflows/.github/workflows/clean_actions.yml@main

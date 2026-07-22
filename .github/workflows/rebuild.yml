@@ -22,7 +22,6 @@ jobs:
   clean_deployments:
     name: Clean Previous Deploys
     uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
-    secrets: inherit
     with:
       environment: cf-static-builds
   make_a_deploy:

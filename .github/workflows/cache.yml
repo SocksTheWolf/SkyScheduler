@@ -26,12 +26,11 @@ jobs:
   clean_deployments:
     name: Clean Previous Deploys
     uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
-    secrets: inherit
     with:
       environment: cloudflare
   cache_clear:
     name: Clear Cache
-    uses: socksthewolf/workflows/.github/workflows/cache.yml@main
+    uses: socksthewolf/workflows/.github/workflows/clear_cache.yml@main
     secrets: inherit
 
 

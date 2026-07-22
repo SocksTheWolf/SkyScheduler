@@ -21,7 +21,7 @@ permissions:
 jobs:
   build_spec:
     name: Update OpenAPI Data
-    uses: socksthewolf/workflows/.github/workflows/openapi.yml@main
+    uses: socksthewolf/workflows/.github/workflows/build_openapi.yml@main
     secrets: inherit
     with:
       ref: ${{ github.ref }}
