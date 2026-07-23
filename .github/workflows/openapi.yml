@@ -1,5 +1,4 @@
 name: Build OpenAPI Spec
-
 on:
   push:
     branches: ["main"]
@@ -16,7 +15,6 @@ permissions:
 
 jobs:
   build_spec:
-    name: Update OpenAPI Data
     uses: socksthewolf/workflows/.github/workflows/build_openapi.yml@main
     secrets: inherit
     with:

@@ -1,5 +1,4 @@
 name: Force Rebuild Static Pages
-
 on:
   # run every year (this will refresh the copyright date)
   schedule:
@@ -20,11 +19,11 @@ defaults:
 
 jobs:
   clean_deployments:
-    name: Clean Previous Deploys
     uses: socksthewolf/workflows/.github/workflows/clean_deploys.yml@main
     with:
       environment: cf-static-builds
   make_a_deploy:
+    needs: clean_deployments
     name: Make A Deploy
     runs-on: ubuntu-latest
     environment: cf-static-builds
@@ -32,4 +31,6 @@ jobs:
       - name: Force CF Rebuild
         env:
           DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
-        run: curl --no-progress-meter -X POST $DEPLOY_HOOK | jq -r ".success"
+        run: |
+          echo "Hitting Deploy Hook..."
+          curl --no-progress-meter -X POST $DEPLOY_HOOK | jq -r ".success"

@@ -1,5 +1,4 @@
 name: Build & Update Sitemap
-
 on:
   # check if the sitemap is up to date every sunday
   schedule:
@@ -22,8 +21,7 @@ permissions:
   deployments: write
 
 jobs:
-  run:
-    name: Sitemap Builder
+  build_sitemap:
     uses: socksthewolf/workflows/.github/workflows/build_sitemap.yml@main
     secrets: inherit
     with:
@@ -31,9 +29,8 @@ jobs:
       live_url: https://skyscheduler.work/sitemap.xml
       path: "assets/sitemap.xml"
 
-  call_tangled:
-    needs: run
-    name: Update Tangled Mirror
-    if: ${{ needs.run.outputs.had_changes == 'true' }}
+  update_tangled:
+    needs: build_sitemap
+    if: ${{ needs.build_sitemap.outputs.had_changes == 'true' }}
     uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml@main
     secrets: inherit

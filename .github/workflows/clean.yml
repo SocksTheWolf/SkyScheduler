@@ -8,7 +8,5 @@ permissions:
   actions: write
 
 jobs:
-  # Clean up github job
   run:
-    name: Cleanup
     uses: socksthewolf/workflows/.github/workflows/clean_actions.yml@main
