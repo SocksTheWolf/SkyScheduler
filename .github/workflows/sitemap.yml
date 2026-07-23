@@ -39,5 +39,5 @@ jobs:
     needs: run
     name: Update Tangled Mirror
     if: ${{ needs.run.outputs.had_changes == 'true' }}
-    uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml
+    uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml@main
     secrets: inherit
