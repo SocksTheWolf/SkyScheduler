@@ -9,10 +9,6 @@ on:
       - ".github/workflows/openapi.yml"
   workflow_dispatch: {}
 
-concurrency:
-  group: openapi
-  cancel-in-progress: false
-
 permissions:
   contents: read
   actions: write

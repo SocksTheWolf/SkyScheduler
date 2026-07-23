@@ -15,10 +15,6 @@ on:
       - "src/statics/**"
   workflow_dispatch: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   deployments: write
 

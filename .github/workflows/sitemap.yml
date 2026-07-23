@@ -17,10 +17,6 @@ on:
       - "!assets/sitemap.xml"
   workflow_dispatch: {}
 
-concurrency:
-  group: sitemap
-  cancel-in-progress: false
-
 permissions:
   contents: write
   deployments: write
