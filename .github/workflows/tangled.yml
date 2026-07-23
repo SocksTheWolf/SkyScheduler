@@ -11,10 +11,6 @@ permissions:
   contents: read
   deployments: write
 
-concurrency:
-  group: tangled
-  cancel-in-progress: false
-
 jobs:
   push:
     name: Tangled
