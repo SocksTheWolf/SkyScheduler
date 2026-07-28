@@ -54,7 +54,7 @@ function updateUsername(val) {
   // from the bsky website, why the fuck did they do this?
   let inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
   // prevent the did:plc: logic from appearing in the field
-  if (inputData.includes("did:plc:")) {
+  if (inputData.includes("did:plc:") || inputData.includes("did:web:")) {
     pushToast("Invalid link posted, does not have handle in it", false);
     return "";
   }

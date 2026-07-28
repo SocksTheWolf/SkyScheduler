@@ -18,7 +18,7 @@ export async function cspHelper(c: Context, next: any) {
       "default-src": ["'none'"],
       "connect-src": ["'self'", cspReportURL,
         "https://challenges.cloudflare.com", "https://cardyb.bsky.app",
-        "https://bsky.social", "https://public.api.bsky.app"],
+        "https://bsky.social", "https://public.api.bsky.app", "https://public.bsky.social"],
       "img-src": ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
       "media-src": ["'self'", 'data:', 'blob:'],
       "frame-src": ["'self'", "https://challenges.cloudflare.com"],

@@ -11,7 +11,7 @@ async function getAccountHandle(account) {
   if (account.match(/did\:plc\:/i)) {
     return account;
   }
-  return await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`)
+  return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`)
   .then((resp) => {
     if (resp.ok) {
       return resp.json().then((lookup) => {

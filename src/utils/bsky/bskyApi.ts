@@ -36,7 +36,7 @@ export const doesHandleExist = async (user: string) => {
 };
 
 export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
-  return await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
+  return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
     cf: {
       cacheTtlByStatus: {"200-299": 600, 404: 1, "500-599": 0},
       cacheEverything: true,
