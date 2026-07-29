@@ -1,4 +1,4 @@
-import { APP_NAME, SITE_URL } from "../../siteInfo";
+import { APP_NAME, SITE_URL } from "../../appInfo";
 
 export function createPasswordResetMessage(url: string, token: string) {
   return `Your ${APP_NAME} password reset url is:

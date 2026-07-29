@@ -1,7 +1,7 @@
 import {
   APP_NAME, APP_REPO, PROGRESS_MADE, PROGRESS_TOTAL,
   PROJECT_AUTHOR, PROJECT_AUTHOR_SITE
-} from "../../siteInfo";
+} from "../../appInfo";
 import { CURRENT_SCRIPT_VERSION } from "../../statics/appScripts";
 import { CONST_SCRIPT_VERSION } from "../../statics/constScript";
 import type { BaseElementProps } from "../../types";

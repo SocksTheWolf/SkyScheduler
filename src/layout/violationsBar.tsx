@@ -1,5 +1,5 @@
 import { raw } from "hono/html";
-import { APP_NAME } from "../siteInfo";
+import { APP_NAME } from "../appInfo";
 import type { AllContext, BaseElementProps } from "../types";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 

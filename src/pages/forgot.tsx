@@ -4,7 +4,7 @@ import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
-import { APP_NAME } from "../siteInfo";
+import { APP_NAME } from "../appInfo";
 import type { AllContext, BaseElementProps } from "../types";
 
 export default function ForgotPassword(props: BaseElementProps) {

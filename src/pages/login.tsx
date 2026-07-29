@@ -4,7 +4,7 @@ import DashboardPasswordField from "../layout/fields/dashPasswordField";
 import UsernameField from "../layout/fields/usernameField";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
-import { APP_NAME } from "../siteInfo";
+import { APP_NAME } from "../appInfo";
 import type { BaseElementProps } from "../types";
 
 export default function Login(props?: BaseElementProps) {

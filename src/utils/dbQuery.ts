@@ -9,7 +9,7 @@ import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { AccountStatus, PostLabel, RepostType } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
-import { APP_NAME } from "../siteInfo";
+import { APP_NAME } from "../appInfo";
 import type {
   AllContext, BatchQuery,
   BatchQueryArray,

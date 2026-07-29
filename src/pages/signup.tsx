@@ -9,7 +9,7 @@ import NavTags from "../layout/helpers/navTags";
 import { TurnstileCaptcha, TurnstileCaptchaPreloads } from "../layout/helpers/turnstile";
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { APP_NAME, SITE_INVITE_URL } from "../siteInfo";
+import { APP_NAME, SITE_INVITE_URL } from "../appInfo";
 import type { AllContext, BaseElementProps } from "../types";
 import { isUsingInviteKeys } from "../utils/inviteKeys";
 

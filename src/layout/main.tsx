@@ -1,7 +1,7 @@
 import { raw } from 'hono/html';
 import type { Child } from 'hono/jsx';
 import { ScriptInclusionLevel } from '../enums';
-import { APP_NAME } from "../siteInfo";
+import { APP_NAME } from "../appInfo";
 import type { BaseElementProps, PreloadRules } from "../types";
 import { getScriptsForInteractivity } from './helpers/includesList';
 import { HTMXNonceTag, IncludeDependencyTags, PreloadDependencyTags } from "./helpers/includesTags";

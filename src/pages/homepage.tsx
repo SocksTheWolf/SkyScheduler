@@ -5,7 +5,7 @@ import {
   MAX_POSTS_PER_THREAD, MAX_REPOST_DAYS, MAX_REPOST_IN_HOURS,
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
-import { APP_NAME, APP_REPO } from "../siteInfo";
+import { APP_NAME, APP_REPO } from "../appInfo";
 import type { BaseElementProps } from "../types";
 import { explainPostingTimeInterval } from "../utils/helpers";
 
