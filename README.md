@@ -18,7 +18,7 @@
 
 ## Overview
 
-[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](https://github.com/socksthewolf/skyscheduler)
+[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](/)
 
 SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
@@ -135,17 +135,23 @@ SkyScheduler comes with a lot of commands to help manage the service. Documentat
 
 The most important ones to know:
 
-- `build-pages` - builds the static website pages. **Note**: Automatically is called by wrangler builds. If SSG is disabled, this does nothing.
-- `dev` - runs the app in a local environment
-- `generate` - run anytime you modify a file in the `src/db` folder. This will generate SQL migration files
+- `build-pages` - builds the static website pages.
+  - **Note**: Automatically is called by wrangler builds. If SSG is disabled, this does nothing.
+- `dev` - runs the app in a local environment.
+- `generate` - run anytime you modify a file in the `src/db` folder.
+  - This will generate SQL migration files.
 - `migrate` - commit the SQL migrations to local/prod databases.
-- `migrate:local` - migrates the SQL changes to your local dev instance
-- `migrate:prod` - does the same but commits remotely. **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute)
-- `invite:generate` - generates a valid invite key
-- `invite:local/remote` - commits an invite key to the invite store
-- `sitemap` - generates a sitemap.xml file (there's a github action that will do this automatically as well)
-- `openapi` - builds the OpenAPI spec document. This is **not** automatically called by anything in the application, but there is a Github Action (`openapi.yml`) that uploads to artifacts. This can be given to the WAF.
-- `types` - whenever `wrangler.toml` changes or wrangler updates, run this command
+- `migrate:local` - migrates the SQL changes to your local dev instance.
+- `migrate:prod` - does the same but commits remotely.
+  - **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute).
+- `invite:generate` - generates a valid invite key.
+- `invite:local/remote` - commits an invite key to the invite store.
+- `sitemap` - generates the sitemap.xml file.
+  - There's a github action that will do this automatically as well).
+- `openapi` - builds the OpenAPI spec.
+  - This is **not** automatically called by anything in the application, but there is a Github Action (`openapi.yml`) that uploads to artifacts.
+  - Give the output file to the WAF.
+- `types` - whenever `wrangler.toml` changes or wrangler updates, run this command.
 
 ## Project Structure
 
