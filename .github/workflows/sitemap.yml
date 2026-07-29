@@ -26,8 +26,17 @@ jobs:
     secrets: inherit
     with:
       clean_deploys: true
-      live_url: https://skyscheduler.work/sitemap.xml
       path: "assets/sitemap.xml"
+
+  clear_sitemap_cache:
+    name: Clear Sitemap Cache
+    needs: build_sitemap
+    secrets: inherit
+    if: ${{ needs.build_sitemap.outputs.had_changes == 'true' }}
+    uses: socksthewolf/workflows/.github/workflows/clear_cache.yml@main
+    with:
+      paths: |
+        https://skyscheduler.work/sitemap.xml
 
   update_tangled:
     needs: build_sitemap
