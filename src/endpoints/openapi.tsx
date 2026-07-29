@@ -2,7 +2,7 @@
 // Cloudflare WAF to protect/log against abuse
 import { Hono } from "hono";
 import { describeRoute, generateSpecs, resolver, validator } from "hono-openapi";
-import { APP_NAME, SITE_URL } from "../siteinfo";
+import { APP_NAME, SITE_URL } from "../siteInfo";
 import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";

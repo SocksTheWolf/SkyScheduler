@@ -9,7 +9,7 @@ import {
   BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
   DEFAULT_PDS, USE_ASYNC_AUTH_TASK
 } from "../limits";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME } from "../siteInfo";
 import type { AllContext, BaseContext, Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";

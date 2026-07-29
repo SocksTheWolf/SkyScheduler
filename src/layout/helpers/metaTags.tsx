@@ -2,7 +2,7 @@ import { raw } from "hono/html";
 import {
   APP_NAME, PROJECT_AUTHOR, PROJECT_AUTHOR_SITE, SITE_DESCRIPTION,
   SITE_URL, SOCIAL_CARD_IMAGE
-} from "../../siteinfo";
+} from "../../siteInfo";
 
 export function MetaTags() {
   return (<>

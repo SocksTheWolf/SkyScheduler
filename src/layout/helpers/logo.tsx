@@ -1,4 +1,4 @@
-import { APP_NAME, LOGO_ENABLED } from "../../siteinfo";
+import { APP_NAME, LOGO_ENABLED } from "../../siteInfo";
 
 type LogoImageProps = {
   width: number;

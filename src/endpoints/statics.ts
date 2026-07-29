@@ -4,7 +4,7 @@ import { disableSSG } from "hono/ssg";
 import isEmpty from "just-is-empty";
 import { cacheStaticFileMiddleware } from "../middleware/cacheControl";
 import { onlyInDevelopment } from "../middleware/inDevOnly";
-import { ATPROTO_DID, SITE_URL } from "../siteinfo";
+import { ATPROTO_DID, SITE_URL } from "../siteInfo";
 import { appManifestGenerate } from "../statics/appManifest";
 import { makeConstScript } from "../statics/constScript";
 import type { HonoBase } from "../types";

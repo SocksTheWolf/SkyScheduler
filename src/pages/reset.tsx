@@ -2,7 +2,7 @@ import AccountHandler from "../layout/account";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
 import { MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS } from "../limits";
-import { APP_NAME } from "../siteinfo";
+import { APP_NAME } from "../siteInfo";
 import type { BaseElementProps } from "../types";
 
 export default function ResetPassword(props?: BaseElementProps) {

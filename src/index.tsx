@@ -27,7 +27,7 @@ import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
-import { SITE_URL } from "./siteinfo";
+import { SITE_URL } from "./siteInfo";
 import type { Bindings, HonoBase, QueueTaskData } from "./types";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";

@@ -1,4 +1,4 @@
-import { APP_NAME } from "../../siteinfo";
+import { APP_NAME } from "../../siteInfo";
 import LogoImage from "./logo";
 import type { BaseElementProps } from "../../types";
 

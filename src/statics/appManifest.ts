@@ -3,7 +3,7 @@ import {
   APP_MANIFEST_GUID,
   APP_MANIFEST_THEME_COLOR, APP_NAME,
   SITE_DESCRIPTION, SITE_URL
-} from "../siteinfo";
+} from "../siteInfo";
 
 export function appManifestGenerate() {
   return {

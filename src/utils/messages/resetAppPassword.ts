@@ -1,4 +1,4 @@
-import { APP_NAME } from "../../siteinfo";
+import { APP_NAME } from "../../siteInfo";
 
 export function resetAppPasswordMessage() {
   return `Hey there! This is an automated message to let you know that your ${APP_NAME} account is no longer automatically posting.
