@@ -203,7 +203,6 @@ skyscheduler/
 - uuid - id generation
 - zod - data validation
 - image-dimensions - image data validation
-- toml - reading configs during SSG generation (if enabled)
 - date-fns - date processing helpers
 - drizzle - database orm/schemas
 - just - js helper library
@@ -218,6 +217,7 @@ skyscheduler/
 - [tribute](https://github.com/redmine-ui/tribute) - client autocomplete library
 - [pico](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
 - [mingcute](https://github.com/mingcute-design/mingcute-icons) - most icons
+- [just-has](https://github.com/angus-c/just#just-has) - parsing bsky data
 
 ## Contributions
 

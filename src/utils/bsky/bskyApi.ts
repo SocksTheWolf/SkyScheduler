@@ -1,7 +1,6 @@
 import { type AppBskyFeedPost, type BlobRef, RichText } from '@atproto/api';
 import { ResponseType, XRPCError } from '@atproto/xrpc';
 import { imageDimensionsFromStream } from 'image-dimensions';
-import has from 'just-has';
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
@@ -24,6 +23,7 @@ import {
 } from '../db/data';
 import { getUsernameForUserId } from '../db/userinfo';
 import { createViolationForUser } from '../db/violations';
+import { has } from '../helpers';
 import { deleteEmbedsFromR2 } from '../r2Query';
 
 export const doesHandleExist = async (user: string) => {

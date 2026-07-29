@@ -3,7 +3,6 @@ import {
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
 import type { Context } from "hono";
-import has from "just-has";
 import { EmbedDataType, TimeIntervalSettings } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
 import type { AllContext, Bindings, LooseObj } from "../types";
@@ -80,6 +79,16 @@ export function isPost(data: any): boolean {
 
 export function isAltEditableType(type: EmbedDataType) {
   return type === EmbedDataType.Image || type === EmbedDataType.Video;
+}
+
+export function has(obj: any, property: string): boolean {
+  if (!obj)
+    return false;
+
+  if (Object.hasOwn(obj, property)) {
+    return obj[property] !== undefined && obj[property] !== null;
+  }
+  return false;
 }
 
 export const logoutAccount = async (c: Context): Promise<boolean> => {

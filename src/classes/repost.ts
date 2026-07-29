@@ -1,4 +1,4 @@
-import has from "just-has";
+import { has } from "../utils/helpers";
 
 export class Repost {
   postid: string;

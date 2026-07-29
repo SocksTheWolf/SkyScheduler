@@ -1,7 +1,6 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import has from "just-has";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { Post } from "../classes/post";
@@ -27,7 +26,7 @@ import {
   getViolationsForUser,
   removeViolationsDB
 } from "./db/violations";
-import { floorGivenTime, isAltEditableType } from "./helpers";
+import { floorGivenTime, has, isAltEditableType } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
 export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {

@@ -1,6 +1,6 @@
-import has from "just-has";
 import { USE_INVITE_KEYS } from "../limits";
 import type { AllContext } from "../types";
+import { has } from "./helpers";
 
 export const isUsingInviteKeys = (c: AllContext): boolean => {
   return has(c.env, "INVITE_POOL") && USE_INVITE_KEYS;

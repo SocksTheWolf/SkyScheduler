@@ -2,11 +2,9 @@ import { readFile } from "fs/promises";
 import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
-import has from "just-has";
-import get from "just-safe-get";
-import * as toml from "toml";
 import { getHTMXConfigStr } from "../layout/helpers/includesTags";
 import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
+import { has } from "../utils/helpers";
 
 type SSGServeProps = {
   page: string;
@@ -42,7 +40,7 @@ const serveStaticPage = async (c: Context, page?: string): Promise<Response> => 
     page = new URL(c.req.url).pathname.replace("/", "");
 
   // domain doesn't matter, so make this whatever
-  const staticFile: Response = await c.env.ASSETS!.fetch(`https://assetfetch.local/pages/${page}.html`);
+  const staticFile: Response = await c.env.ASSETS!.fetch(`https://1.1.1.1/pages/${page}.html`);
   if (staticFile.ok) {
     if (USE_GRANULAR_CSP_SETTINGS) {
       // write the nonce into the static page, dynamically. Saves on render paint processing.
@@ -81,6 +79,7 @@ export async function ssgGenMiddleware(c: Context, next: any) {
     // If we need to build up missing flags, do so.
     if (needsEnvFlags) {
       // Load up toml
+      const toml = await import("toml");
       const wranglerFile = (await readFile("wrangler.toml")).toString();
       const wranglerSettings = toml.parse(wranglerFile);
       // Set the various vars that are needed
@@ -88,7 +87,7 @@ export async function ssgGenMiddleware(c: Context, next: any) {
         if (flag === "IN_DEV")
           continue;
 
-        c.env[flag] = get(wranglerSettings.vars, flag);
+        c.env[flag] = wranglerSettings.vars[flag] || "";
       }
 
       // laziest way to load a single flag from a .env
