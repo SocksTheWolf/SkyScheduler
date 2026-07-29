@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
+import { every } from "hono/combine";
 import { csrf } from "hono/csrf";
 import { disableSSG } from "hono/ssg";
 import { createAuth, processAuthRoute } from "./auth";
@@ -11,6 +12,7 @@ import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
 import { staticFiles } from "./endpoints/statics";
 import { blankAuthEnv } from "./middleware/auth";
+import { cachePrivateMiddleware, cachePublicMiddleware } from "./middleware/cacheControl";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { cspHelper } from "./middleware/cspHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
@@ -43,9 +45,9 @@ app.use(ssgGenMiddleware);
 app.route("/", staticFiles);
 
 ///// Static Pages /////
-app.all("/", ssgServe({page: "index"}), (c) => c.html(<Homepage ctx={c} />));
-app.get("/tos", ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
-app.get("/privacy", ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
+app.all("/", cachePublicMiddleware, ssgServe({page: "index"}), (c) => c.html(<Homepage ctx={c} />));
+app.get("/tos", cachePublicMiddleware, ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
 
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
@@ -63,25 +65,30 @@ app.use("*", async (c, next) => {
 
 ///// Application Routes /////
 
+// combined app route middleware
+const staticLoginCheckMiddleware = every(redirectToDashIfLogin, cachePublicMiddleware, ssgServe());
+const ssgServePrivate = every(cachePrivateMiddleware, ssgServe());
+
 // Dashboard route
-app.get("/dashboard", redirectLoginIfLogout, ssgServe(), (c) => c.html(<Dashboard ctx={c} />));
+app.get("/dashboard", redirectLoginIfLogout, ssgServePrivate, (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
-app.get("/login", redirectToDashIfLogin, ssgServe(), (c) => c.html(<Login ctx={c} />));
+app.get("/login", staticLoginCheckMiddleware, (c) => c.html(<Login ctx={c} />));
 
 // Signup route
-app.get("/signup", redirectToDashIfLogin, ssgServe(), (c) => c.html(<Signup ctx={c} />));
+app.get("/signup", staticLoginCheckMiddleware, (c) => c.html(<Signup ctx={c} />));
 
 // Forgot Password route
-app.get("/forgot", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ForgotPassword ctx={c} />));
+app.get("/forgot", staticLoginCheckMiddleware, (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
-app.get("/reset", redirectToDashIfLogin, ssgServe(), (c) => c.html(<ResetPassword ctx={c} />));
+app.get("/reset", redirectToDashIfLogin, ssgServePrivate, (c) => c.html(<ResetPassword ctx={c} />));
 
 ///// Endpoint Routes /////
+app.use(cachePrivateMiddleware);
 app.use(disableSSG());
 
-// Handle better auth routes manually
+// Handle better-auth routes manually
 // This makes (nearly) everything run on the server, rather than the client
 //app.all("/api/auth/*", async (c) => processAuthRoute(c));
 app.all("/api/auth/reset-password/*", async (c) => processAuthRoute(c));

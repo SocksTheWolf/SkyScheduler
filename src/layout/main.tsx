@@ -1,6 +1,6 @@
 import { raw } from 'hono/html';
 import type { Child } from 'hono/jsx';
-import type { ScriptInclusionLevel } from '../enums';
+import { ScriptInclusionLevel } from '../enums';
 import { APP_NAME } from "../siteinfo";
 import type { BaseElementProps, PreloadRules } from "../types";
 import { getScriptsForInteractivity } from './helpers/includesList';
@@ -34,7 +34,6 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <title>{APP_NAME} - {props.title}</title>
       <MetaTags />
       <PreloadDependencyTags scripts={preloadList} />
-      <PersonaTags />
       {props.noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
@@ -44,6 +43,8 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
       <HTMXNonceTag nonce={props.nonce} />
       <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
+      <PersonaTags />
+      {props.interactivity === ScriptInclusionLevel.NonInteractive ? <script type="text/javascript">let FF_FOUC_FIX;</script> : null}
     </head>
     <body>
       <container class="pico">

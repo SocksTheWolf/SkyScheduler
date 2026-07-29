@@ -85,7 +85,6 @@ npm install
    - `siteinfo.ts` - site information such as name, description, domain, etc
    - `.ssclirc` - sitemap domain
    - `/assets/_redirects` - redirect configuration
-   - `/assets/robots.txt` - change the url to your sitemap
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
 
