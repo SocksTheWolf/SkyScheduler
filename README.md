@@ -83,7 +83,7 @@ npm install
 
    - `.ssclirc` - sitemap domain
    - `/src/limits.ts` - site configuration and application limits
-   - `/src/siteInfo.ts` - site information such as name, description, domain, etc
+   - `/src/appInfo.ts` - site information such as name, description, domain, etc
    - `/assets/_redirects` - redirect configuration
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
