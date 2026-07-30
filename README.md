@@ -146,7 +146,7 @@ The most important ones to know:
 - `invite:generate` - generates a valid invite key.
 - `invite:local/remote` - commits an invite key to the invite store.
 - `sitemap` - generates the sitemap.xml file.
-  - There's a github action that will do this automatically as well).
+  - There's a github action that will do this automatically as well.
 - `openapi` - builds the OpenAPI spec.
   - This is **not** automatically called by anything in the application, but there is a Github Action (`openapi.yml`) that uploads to artifacts.
   - Give the output file to the WAF.
