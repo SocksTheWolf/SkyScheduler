@@ -85,6 +85,7 @@ export type EmbedData = {
   associatedRefs?: WebAssociatedRef[];
 };
 
+/// BSKY RECORDS & TYPES
 export type WebAssociatedRef = BskyRecordWrapper & {
   $type: "com.atproto.repo.strongRef";
 };
@@ -146,17 +147,7 @@ export type BskyWebLinkRecordData = {
   thumb?: BlobRef;
 };
 
-export type Violation = {
-  userId: string;
-  tosViolation: boolean;
-  userPassInvalid: boolean;
-  accountSuspended: boolean;
-  accountGone: boolean;
-  takenDown: boolean;
-  mediaTooBig: boolean;
-  createdAt: string;
-};
-
+// These are bsky responses to making posts
 export type PostResponseObject = {
   uri: string;
   cid: string;
@@ -167,6 +158,7 @@ export type PostRecordResponse = PostResponseObject & {
   embeds?: EmbedData[];
 };
 
+// Keeping track of the statuses of the posts that we made during a task operation
 export type PostStatus = {
   records: PostRecordResponse[];
   // number of expected successes
@@ -175,23 +167,7 @@ export type PostStatus = {
   got: number;
 };
 
-export type DeleteResponse = {
-  success: boolean;
-  isRepost: boolean;
-  needsRefresh?: boolean;
-};
-
-export type RequireAuthMiddlewareProps = {
-  returnHTML?: boolean;
-  // if specified: logs out immediately
-  // if not: logs out after 5 seconds
-  forceLogout?: boolean;
-};
-
-export interface LooseObj {
-  [key: string]: any;
-};
-
+/// APP RESPONSES
 export type CreateObjectResponse = {
   ok: boolean;
   msg: string;
@@ -203,10 +179,52 @@ export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
 };
 
-export type QueueTaskData = {
-  type: TaskType;
-  data: Post|Repost|null;
+export type DeleteResponse = {
+  success: boolean;
+  isRepost: boolean;
+  needsRefresh?: boolean;
 };
+
+/// MIDDLEWARES
+export type RequireAuthMiddlewareProps = {
+  returnHTML?: boolean;
+  // if specified: logs out immediately
+  // if not: logs out after 5 seconds
+  forceLogout?: boolean;
+};
+
+/// USER WRAPPED DATA
+export type EditPostChanges = {
+  content: string;
+  embedContent?: EmbedData[];
+};
+
+/// R2
+export type R2BucketObject = {
+  name: string;
+  user: string|null;
+  date: Date
+};
+
+/// VIOLATIONS
+export type ViolationRecordChange = {
+  userPassInvalid?: boolean;
+  accountSuspended?: boolean;
+  mediaTooBig?: boolean;
+  tosViolation?: boolean;
+  takenDown?: boolean;
+  accountGone?: boolean;
+};
+
+export type Violation = ViolationRecordChange & {
+  userId: string;
+  createdAt: string;
+};
+
+/// DATABASE
+export type BatchQueryItem = BatchItem<"sqlite">;
+export type BatchQueryArray = BatchQueryItem[];
+export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
 
 // Used for the pruning and database operations
 export type GetAllPostedBatch = {
@@ -214,20 +232,25 @@ export type GetAllPostedBatch = {
   uri: string|null;
 };
 
-export type R2BucketObject = {
-  name: string;
-  user: string|null;
-  date: Date
-}
+// Used for the file upload table so we can keep track of
+// abandoned files from partial records
+export type FileListingRecord = {
+  createdAt?: Date;
+  userId?: string;
+};
 
 /// RUNNERS
+export type QueueTaskData = {
+  type: TaskType;
+  data: Post|Repost|null;
+};
+
+/// Contexts & Rendering
 export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
 
 export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
-export type BatchQueryItem = BatchItem<"sqlite">;
-export type BatchQueryArray = BatchQueryItem[];
-export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
+
 
 export type BaseElementProps = {
   ctx?: AllContext
@@ -238,4 +261,10 @@ export type PreloadRules = {
   href: string;
   defer?: boolean;
   async?: boolean;
+};
+
+/// MISC
+
+export interface LooseObj {
+  [key: string]: any;
 };

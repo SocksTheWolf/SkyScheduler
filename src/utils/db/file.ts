@@ -2,7 +2,7 @@ import { and, eq, inArray, lte } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
-import type { AllContext, LooseObj } from "../../types";
+import type { AllContext, FileListingRecord } from "../../types";
 import { daysAgo, isAltEditableType } from "../helpers";
 
 export const isMediaOwnedByUser = async (c: AllContext, file: string): Promise<boolean> => {
@@ -29,7 +29,7 @@ export const addFileListing = async (c: AllContext, file: string, user: string|n
     console.error(`unable to create file listing for file ${file}, db was null`);
     return;
   }
-  let insertData:LooseObj = {};
+  let insertData: FileListingRecord = {};
   if (createDate !== null) {
     insertData.createdAt = createDate;
   }

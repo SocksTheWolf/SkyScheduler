@@ -11,7 +11,7 @@ import { authMiddleware, authMiddlewareHTML } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import type {
   CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse, HonoBase, LooseObj
+  DeleteResponse, EditPostChanges, HonoBase
 } from "../types";
 import {
   createPost, createRepost, deletePost, deleteRepostRule, getPostById,
@@ -165,7 +165,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
       }
     }
   }
-  const payload: LooseObj = { content: content };
+  const payload: EditPostChanges = { content: content };
   // push edited embedContent.
   if (hasEmbedEdits)
     payload.embedContent = originalPost.embeds;

@@ -4,7 +4,7 @@ import flatten from "just-flatten-it";
 import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus } from "../../enums";
-import type { AllContext, LooseObj, Violation } from "../../types";
+import type { AllContext, Violation, ViolationRecordChange } from "../../types";
 import { lookupBskyHandle } from "../bsky/bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
@@ -49,7 +49,7 @@ export const userHasViolations = async(c: AllContext, userId: string): Promise<b
 };
 
 function createObjForValuesChange(violationType: AccountStatus[], value: boolean) {
-  let valuesUpdate: LooseObj = {};
+  let valuesUpdate: ViolationRecordChange = {};
   violationType.forEach((itm) => {
     switch(itm) {
       case AccountStatus.InvalidAccount:
@@ -100,7 +100,7 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
   let violationsArray = [];
   violationsArray.push(violationType);
   violationsArray = flatten(violationsArray);
-  const valuesUpdate: LooseObj = createObjForValuesChange(violationsArray, true);
+  const valuesUpdate: ViolationRecordChange = createObjForValuesChange(violationsArray, true);
 
   // handle auto-bans
   if (violationType === AccountStatus.TOSViolation) {
@@ -145,7 +145,7 @@ export const removeViolationsDB = async(db: DrizzleD1Database, userId: string, v
   }
 
   // Create the update query
-  const valuesUpdate: LooseObj = createObjForValuesChange(violationType, false);
+  const valuesUpdate: ViolationRecordChange = createObjForValuesChange(violationType, false);
   await db.update(violations).set({...valuesUpdate}).where(eq(violations.userId, userId))
     .then(() => db.delete(violations).where(and(eq(violations.userId, userId),
       and(
