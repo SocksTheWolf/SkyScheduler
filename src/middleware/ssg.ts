@@ -36,6 +36,7 @@ class NonceInject {
 
 
 const serveStaticPage = async (c: Context, page?: string): Promise<Response> => {
+  // if we're explicitly not given a page, then take the current path name replacing the first slash
   if (page === undefined)
     page = new URL(c.req.url).pathname.replace("/", "");
 
@@ -104,3 +105,8 @@ export async function ssgGenMiddleware(c: Context, next: any) {
   }
   await next();
 };
+
+export async function ssgFlagMiddleware(c: Context, next: any) {
+  c.set("ssg", isSSGContext(c));
+  await next();
+}

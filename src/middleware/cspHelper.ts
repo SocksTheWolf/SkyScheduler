@@ -1,6 +1,5 @@
 import type { Context } from "hono";
 import { NONCE } from "hono/secure-headers";
-import { isSSGContext } from "hono/ssg";
 import isEmpty from "just-is-empty";
 import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../limits";
 import { isInDev } from "../utils/helpers";
@@ -9,7 +8,7 @@ export async function cspHelper(c: Context, next: any) {
   const cspReportURL = c.env.CSP_REPORT_URL;
   const hasReportURL = !isEmpty(cspReportURL);
 
-  if (USE_GRANULAR_CSP_SETTINGS && !isSSGContext(c)) {
+  if (USE_GRANULAR_CSP_SETTINGS && c.get("ssg") == false) {
     // note: the directive parameter is not actually used.
     const nonceVal = NONCE(c, "");
 

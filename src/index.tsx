@@ -18,7 +18,7 @@ import { cspHelper } from "./middleware/cspHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
-import { ssgGenMiddleware, ssgServe } from "./middleware/ssg";
+import { ssgGenMiddleware, ssgServe, ssgFlagMiddleware } from "./middleware/ssg";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
 import Homepage from "./pages/homepage";
@@ -35,6 +35,7 @@ import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
 app.use(blankAuthEnv);
+app.use(ssgFlagMiddleware);
 app.use(csrf({origin: SITE_URL}));
 app.use(secureHeadersMiddleware);
 app.use(corsHelperMiddleware);
