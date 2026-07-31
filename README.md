@@ -118,7 +118,7 @@ Both files are heavily commented to explain what the options control.
 
 ### Site Variables
 
-Modifying key values such as meta tag data, the application name and any descriptions is fully controlled via `src/siteinfo.ts`.
+Modifying key values such as meta tag data, the application name and any descriptions is fully controlled via `src/appInfo.ts`.
 
 Changing the values in that file will modify the visual display of the application's web output.
 
