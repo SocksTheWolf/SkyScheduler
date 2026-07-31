@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { cors } from "hono/cors";
 
 export const corsHelperMiddleware = async (c: Context, next: any) => {
-  if (c.get("ssg") == true) {
+  if (c.get("ssg") === true) {
     await next();
     return;
   }

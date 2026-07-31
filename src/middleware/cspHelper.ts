@@ -8,7 +8,7 @@ export async function cspHelper(c: Context, next: any) {
   const cspReportURL = c.env.CSP_REPORT_URL;
   const hasReportURL = !isEmpty(cspReportURL);
 
-  if (USE_GRANULAR_CSP_SETTINGS && c.get("ssg") == false) {
+  if (USE_GRANULAR_CSP_SETTINGS && c.get("ssg") === false) {
     // note: the directive parameter is not actually used.
     const nonceVal = NONCE(c, "");
 
