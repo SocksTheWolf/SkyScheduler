@@ -35,10 +35,7 @@ import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
 app.use(blankAuthEnv);
-app.use(csrf({origin: SITE_URL}));
-app.use(secureHeadersMiddleware);
-app.use(corsHelperMiddleware);
-app.use(cspHelper);
+app.use(csrf({origin: SITE_URL}), secureHeadersMiddleware, corsHelperMiddleware, cspHelper);
 app.use(ssgGenMiddleware);
 
 ///// Static Files /////
@@ -85,8 +82,7 @@ app.get("/forgot", staticLoginCheckMiddleware, (c) => c.html(<ForgotPassword ctx
 app.get("/reset", redirectToDashIfLogin, ssgServePrivate, (c) => c.html(<ResetPassword ctx={c} />));
 
 ///// Endpoint Routes /////
-app.use(cachePrivateMiddleware);
-app.use(disableSSG());
+app.use(cachePrivateMiddleware, disableSSG());
 
 // Handle better-auth routes manually
 // This makes (nearly) everything run on the server, rather than the client
