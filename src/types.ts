@@ -199,6 +199,11 @@ export type EditPostChanges = {
   embedContent?: EmbedData[];
 };
 
+export type RepostIntakeData = {
+  hours: number;
+  times: number;
+} | undefined;
+
 /// R2
 export type R2BucketObject = {
   name: string;

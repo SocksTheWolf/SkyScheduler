@@ -388,26 +388,29 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
 
     // Add repost info object to existing array
-    let newRepostInfo: RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
-    if (newRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
+    let updatedRepostInfo: RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
+    if (updatedRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
       return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
     }
 
-    const repostInfoTimeStr = repostInfo.time.toISOString();
+    // Cache a quick representation of the ISO string so we can check Date/str differences
+    const repostInfoTimeStr = scheduleDate.toISOString();
     // Check to see if we have an exact repost match.
     // If we do, do not update the repostInfo, as repost table will drop the duplicates for us anyways.
-    const isNewInfoNotDuped = (el: any) => {
-      if (el.time == repostInfoTimeStr) {
+    const isNewInfoNotDuped = (el: RepostInfo) => {
+      if (el.time === repostInfoTimeStr || el.time === repostInfo.time) {
         if (el.count == repostInfo.count) {
           return el.hours != repostInfo.hours;
         }
       }
       return true;
     };
-    if (newRepostInfo.every(isNewInfoNotDuped)) {
-      newRepostInfo.push(repostInfo);
+    // Check to see if existing data matches with our new data
+    if (updatedRepostInfo.every(isNewInfoNotDuped)) {
+      // it does not, so we can add it to the DB
+      updatedRepostInfo.push(repostInfo);
 
-      let repostInfoUpdateQuery = db.update(posts).set({repostInfo: newRepostInfo});
+      let repostInfoUpdateQuery = db.update(posts).set({repostInfo: updatedRepostInfo});
       // push record update to add to json array
       if (!isScheduledPost) {
         dbOperations.push(repostInfoUpdateQuery.where(and(

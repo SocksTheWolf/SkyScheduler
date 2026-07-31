@@ -14,6 +14,7 @@ import type {
   AllContext,
   BatchQuery,
   BatchQueryArray,
+  EditPostChanges,
   GetAllPostedBatch,
   PostRecordResponse
 } from "../../types";
@@ -162,7 +163,7 @@ export const setPostNowOffForPost = async (c: AllContext, id: string) => {
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
-export const updatePostForGivenUser = async (c: AllContext, userId: string, id: string, newData: Object) => {
+export const updatePostForGivenUser = async (c: AllContext, userId: string, id: string, newData: EditPostChanges) => {
   const db: DrizzleD1Database = c.get("db");
   if (isEmpty(userId) || !uuidValid(id))
     return false;

@@ -1,3 +1,4 @@
+import type { RepostIntakeData } from "../types";
 import { has } from "../utils/helpers";
 
 export class Repost {
@@ -30,15 +31,15 @@ export class Repost {
 // Contains the repost info for a post
 export class RepostInfo {
   guid: string;
-  time: Date;
+  time: Date|string;
   hours: number;
   count: number;
-  constructor(id: string, time: Date, isRepost: boolean, repostData: any) {
+  constructor(id: string, time: string|Date, isRepost: boolean, repostData: RepostIntakeData) {
     this.time = time;
     this.guid = id;
     if (has(repostData, "hours") && has(repostData, "times")) {
-      this.hours = repostData.hours;
-      this.count = repostData.times;
+      this.hours = repostData!.hours;
+      this.count = repostData!.times;
     } else {
       this.count = (isRepost) ? 1 : 0;
       this.hours = 0;

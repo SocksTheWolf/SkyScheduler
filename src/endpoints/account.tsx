@@ -93,8 +93,8 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   const hasNewPDS = !isEmpty(bskyUserPDS), newAppPass = !isEmpty(bskyAppPassword);
   if (hasNewPDS || newAppPass) {
     const updateUsrObj: LooseObj = {
-      pds: (hasNewPDS) ? bskyUserPDS : null,
-      bskyAppPass: (newAppPass) ? bskyAppPassword : null
+      pds: (hasNewPDS) ? bskyUserPDS : undefined,
+      bskyAppPass: (newAppPass) ? bskyAppPassword : undefined
     };
     // if we didn't update the pds, remove the field from the object
     if (!hasNewPDS)
