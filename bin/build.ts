@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import type { Hono } from "hono";
 import { toSSG, type ToSSGResult } from "hono/ssg";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import * as app from "../src/index";
 import { USE_STATIC_HTML } from '../src/limits';
@@ -26,22 +27,26 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   if (!USE_STATIC_HTML)
     return;
 
-  console.log("Removing existing files...");
-  // Go through the file list in the pages directory,
-  // remove everything, but do not get rid of the pages folder.
-  for (const file of await fs.readdir(outputDirectory)) {
-    const fileLoc: string = path.join(outputDirectory, file);
-    // Check if directory
-    if (!(await fs.stat(fileLoc)).isDirectory()) {
-      // it's a file
-      console.log(`Removed ${fileLoc}`);
-      await fs.unlink(fileLoc);
-    } else {
-      // it's a directory
-      console.log(`Removed directory ${fileLoc}`);
-      await fs.rm(fileLoc, {force: true, recursive: true});
+  // clean up the existing directory if it exists already
+  if (existsSync(outputDirectory)) {
+    console.log("Removing existing files...");
+    // Go through the file list in the pages directory,
+    // remove everything, but do not get rid of the pages folder.
+    for (const file of await fs.readdir(outputDirectory)) {
+      const fileLoc: string = path.join(outputDirectory, file);
+      // Check if directory
+      if (!(await fs.stat(fileLoc)).isDirectory()) {
+        // it's a file
+        console.log(`Removed ${fileLoc}`);
+        await fs.unlink(fileLoc);
+      } else {
+        // it's a directory
+        console.log(`Removed directory ${fileLoc}`);
+        await fs.rm(fileLoc, {force: true, recursive: true});
+      }
     }
   }
+
 
   console.log("\nBuilding SSG app...");
   const response: ToSSGResult = await toSSG(app, fs, {
