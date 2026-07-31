@@ -11,14 +11,14 @@
 [![Mozilla HTTP Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)](https://developer.mozilla.org/en-US/observatory/analyze?host=skyscheduler.work)
 
 [![GitHub Runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)](https://github.com/SocksTheWolf/SkyScheduler/actions)
-[![GitHub code size](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)](/)
-[![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](/)
+[![GitHub code size](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)](./)
+[![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](./)
 
 ![SkyScheduler Dashboard](https://raw.githubusercontent.com/SocksTheWolf/SkyScheduler/refs/heads/main/assets/screenshots/dashboard.png)
 
 ## Overview
 
-[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](/)
+[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](./)
 
 SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
 
