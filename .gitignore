@@ -2,15 +2,10 @@
 dist/
 
 # dev
-.yarn/
-!.yarn/releases
 .vscode/*
 !.vscode/settings.json
 !.vscode/launch.json
 !.vscode/*.code-snippets
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/shelf
 
 # deps
 node_modules/
