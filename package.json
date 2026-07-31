@@ -98,6 +98,9 @@
   "overrides": {
     "better-auth-cloudflare": {
       "@cloudflare/workers-types": "latest"
+    },
+    "hono-openapi": {
+      "@hono/standard-validator": "latest"
     }
   },
   "engines": {
