@@ -12,30 +12,29 @@ import { generateOpenAPI } from "./openapi";
 
 export const staticFiles = new Hono<HonoBase>();
 
-const staticFileMiddleware = every(disableSSG(), cacheStaticFileMiddleware);
-
-staticFiles.get('/openapi.json', onlyInDevelopment, async (c) => {
+staticFiles.get('/openapi.json', disableSSG(), onlyInDevelopment, async (c) => {
   return c.json(await generateOpenAPI());
 });
 
+const staticMiddleware = every(disableSSG(), cacheStaticFileMiddleware);
+
 // atproto registration route
 if (!isEmpty(ATPROTO_DID)) {
-  staticFiles.get("/.well-known/atproto-did", staticFileMiddleware,
-    (c) => c.text(ATPROTO_DID, 200));
+  staticFiles.get("/.well-known/atproto-did", staticMiddleware, (c) => c.text(ATPROTO_DID, 200));
 }
 
 // JS injection of const variables
-staticFiles.get("/js/consts.js", staticFileMiddleware, (c) => {
+staticFiles.get("/js/consts.js", staticMiddleware, (c) => {
   return c.body(makeConstScript(), 200, {'Content-Type': 'text/javascript'});
 });
 
-staticFiles.get("/robots.txt", staticFileMiddleware, async (c) => {
+staticFiles.get("/robots.txt", staticMiddleware, async (c) => {
   const robotsFile = await (await c.env.ASSETS!.fetch(new URL("https://1.1.1.1/robots.txt"))).text();
-  return c.body(`${robotsFile}\n\nSitemap: ${SITE_URL}/sitemap.xml`, 200, {'Content-Type': 'text/plain'});
+  return c.text(`${robotsFile}\n\nSitemap: ${SITE_URL}/sitemap.xml`, 200);
 });
 
 // Write site.webmanifest dynamically
-staticFiles.get("/site.webmanifest", staticFileMiddleware, (c) => {
+staticFiles.get("/site.webmanifest", staticMiddleware, (c) => {
   return c.json(appManifestGenerate());
 });
 

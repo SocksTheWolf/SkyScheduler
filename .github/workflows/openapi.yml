@@ -5,6 +5,7 @@ on:
     paths:
       - "src/endpoints/openapi.tsx"
       - "bin/openapi.ts"
+      - "package.json"
       - ".github/workflows/openapi.yml"
   workflow_dispatch: {}
 

@@ -487,8 +487,9 @@ export async function generateOpenAPI() {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.2',
-        description: 'API Routes',
+        version: '1.2.3',
+        description: `The API Routes for ${APP_NAME} that can be used for providing API access
+          or for the API Shield feature of Cloudflare`,
         termsOfService: `${SITE_URL}/tos`,
         license: {
           name: "MIT",
