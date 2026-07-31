@@ -105,8 +105,3 @@ export async function ssgGenMiddleware(c: Context, next: any) {
   }
   await next();
 };
-
-export async function ssgFlagMiddleware(c: Context, next: any) {
-  c.set("ssg", isSSGContext(c));
-  await next();
-}

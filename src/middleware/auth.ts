@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { every } from "hono/combine";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
+import { isSSGContext } from "hono/ssg";
 import type { RequireAuthMiddlewareProps } from "../types";
 import { logoutAccount } from "../utils/helpers";
 
@@ -10,6 +11,7 @@ function clearContext(c: Context) {
   c.set("pds", "");
   c.set("isAdmin", false);
   c.set("session", null);
+  c.set("ssg", isSSGContext(c));
 }
 
 // Resets all environment variables to a blank state
