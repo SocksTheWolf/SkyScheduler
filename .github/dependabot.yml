@@ -6,14 +6,6 @@ registries:
     token: ${{secrets.GH_DUMMY}}
     replaces-base: true
 updates:
-  # GH Actions updates
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    open-pull-requests-limit: 3
-    schedule:
-      interval: "weekly"
-    cooldown:
-      default-days: 14
   # node updates
   - package-ecosystem: "npm"
     registries:
