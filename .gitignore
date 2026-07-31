@@ -21,7 +21,7 @@ node_modules/
 .env.*
 !.env.example
 !.env.build
-.dev.vars
+.dev.vars*
 .dev
 
 # logs
@@ -34,8 +34,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # generated files
-assets/pages/
 openapi.json
+assets/pages/
+assets/robots.txt
 assets/site.webmanifest
 assets/js/consts.js
 assets/.well-known/atproto-did

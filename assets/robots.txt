@@ -1,7 +1,0 @@
-User-agent: *
-Disallow: *.js$
-Disallow: *.css$
-Disallow: /admin
-Disallow: /thumbs
-Disallow: /icons
-Disallow: /openapi.json
