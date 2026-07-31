@@ -19,7 +19,8 @@ const outputDirectory: string = "./assets/pages";
 const moveMap: MoveMapRule[] = [
   {file: "consts.js", destFolder: "../js"},
   {file: "atproto-did", destFolder: "../.well-known"},
-  {file: "site.webmanifest", destFolder: "../"}
+  {file: "site.webmanifest", destFolder: "../"},
+  {file: "robots.txt", destFolder: "../"}
 ];
 
 async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {

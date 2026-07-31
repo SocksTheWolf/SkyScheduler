@@ -1,8 +1,12 @@
+# Don't upload the original dependencies, they're only there for license purposes
 dep/original
+
+# Don't share the base CSS files either, as these are smashed together
 css/dashboard.css
 css/stylesheet.css
 css/*Mods.css
 
+# Don't share the base js files, these are also smashed together
 js/*Helper.js
 js/main.js
 js/settings.js
