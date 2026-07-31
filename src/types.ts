@@ -1,11 +1,11 @@
 import type { BatchItem } from "drizzle-orm/batch";
 import type { Context } from "hono";
 import type { ContextVariables } from "./auth";
-import type { AtProtoAgent } from "./classes/bskyAgents";
 import type { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
-import type { EmbedDataType, TaskType } from "./enums";
+import { EmbedDataType, TaskType } from "./enums";
+import type { BlobRef } from "@atproto/api";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -57,7 +57,6 @@ export interface Bindings {
   ACCOUNT_LIMITER: RateLimit;
   REPOST_EDIT_LIMITER: RateLimit;
   REPOST_EDITOR_OPEN_LIMITER: RateLimit;
-  VIDEO_WORKFLOW: Workflow<VideoWorkflowPayload>;
   DEFAULT_ADMIN_USER: string;
   DEFAULT_ADMIN_PASS: string;
   DEFAULT_ADMIN_BSKY_PASS: string;
@@ -68,8 +67,9 @@ export interface Bindings {
   RESIZE_SECRET_HEADER: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
-  IN_DEV: string|undefined;
+  IN_DEV: "true"|"false"|undefined;
   CSP_REPORT_URL: string;
+  IS_SSG: "true"|"false"|undefined;
 };
 
 export type EmbedData = {
@@ -89,11 +89,61 @@ export type WebAssociatedRef = BskyRecordWrapper & {
   $type: "com.atproto.repo.strongRef";
 };
 
-export type RequireAuthMiddlewareProps = {
-  returnHTML?: boolean;
-  // if specified: logs out immediately
-  // if not: logs out after 5 seconds
-  forceLogout?: boolean;
+export type BskyEmbedRecord = {
+  "$type": "app.bsky.embed.record";
+  record: BskyRecordWrapper
+};
+
+export type BskyEmbedWrapper = BskyEmptyEmbed|BskyVideoEmbed|BskyImgEmbed|BskyWebEmbed;
+
+export type BskyEmptyEmbed = {
+  type: EmbedDataType.None|EmbedDataType.Record;
+  data?: undefined;
+};
+
+export type BskyVideoEmbed = {
+  type: EmbedDataType.Video;
+  data: BskyVideoRecordData
+};
+
+export type BskyImgEmbed = {
+  type: EmbedDataType.Image;
+  data?: BskyImageRecordData[];
+};
+
+export type BskyWebEmbed = {
+  type: EmbedDataType.WebLink;
+  data: BskyWebLinkRecordData;
+};
+
+export type BskyRecordWrapper = {
+  cid?: string;
+  uri?: string;
+};
+
+export type BskyMediaAspectRatio = {
+  width: number;
+  height: number;
+};
+
+export type BskyImageRecordData = {
+  alt?: string;
+  image: BlobRef;
+  aspectRatio?: BskyMediaAspectRatio;
+};
+
+export type BskyVideoRecordData = {
+  blob: BlobRef;
+  ar: BskyMediaAspectRatio;
+  alt?: string;
+};
+
+export type BskyWebLinkRecordData = {
+  uri: string;
+  title?: string;
+  description?: string;
+  associatedRefs?: WebAssociatedRef[];
+  thumb?: BlobRef;
 };
 
 export type Violation = {
@@ -129,20 +179,17 @@ export type DeleteResponse = {
   success: boolean;
   isRepost: boolean;
   needsRefresh?: boolean;
-}
+};
+
+export type RequireAuthMiddlewareProps = {
+  returnHTML?: boolean;
+  // if specified: logs out immediately
+  // if not: logs out after 5 seconds
+  forceLogout?: boolean;
+};
 
 export interface LooseObj {
   [key: string]: any;
-};
-
-export type BskyEmbedWrapper = {
-  type: EmbedDataType;
-  data?: any;
-};
-
-export type BskyRecordWrapper = {
-  cid?: string;
-  uri?: string;
 };
 
 export type CreateObjectResponse = {
@@ -161,13 +208,6 @@ export type QueueTaskData = {
   data: Post|Repost|null;
 };
 
-// Workflow types
-export type VideoWorkflowPayload = {
-  agent: AtProtoAgent;
-  post: Post;
-};
-
-
 // Used for the pruning and database operations
 export type GetAllPostedBatch = {
   id: string;
@@ -180,6 +220,7 @@ export type R2BucketObject = {
   date: Date
 }
 
+/// RUNNERS
 export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
 
 export type BaseContext = Context<HonoBase>;

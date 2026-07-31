@@ -11,7 +11,7 @@
     "base:db:optimize": "wrangler d1 execute skyposts --command \"PRAGMA optimize\"",
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
     "base:addinvitekey": "wrangler kv key put --binding INVITE_POOL",
-    "build-pages": "npx tsx ./bin/build.ts",
+    "build-pages": "npx tsx --env-file=.env --env-file=bin/.env.build ./bin/build.ts",
     "build": "npm run build-pages && npm run minify",
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",

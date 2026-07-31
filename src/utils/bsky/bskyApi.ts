@@ -12,11 +12,12 @@ import {
   USE_DEPRECATED_SIZE_PARSE
 } from '../../limits';
 import type {
-  AllContext, BskyEmbedWrapper, BskyRecordWrapper,
-  LooseObj, PostRecordResponse, PostStatus,
-  WebAssociatedRef
+  AllContext, BskyEmbedRecord, BskyEmbedWrapper,
+  BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
+  BskyVideoRecordData, BskyWebLinkRecordData, PostRecordResponse,
+  PostStatus, WebAssociatedRef
 } from '../../types';
-import { atpRecordURI } from '../../validation/regexCases';
+import { atpRecordURI, type atpRecordURICaptures } from '../../validation/regexCases';
 import {
   bulkUpdatePostedData, getChildPostsOfThread,
   isPostAlreadyPosted, setPostNowOffForPost
@@ -177,12 +178,15 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
     // Upload any embeds to this post
     if (postData.embeds?.length) {
       let mediaEmbeds: BskyEmbedWrapper = { type: EmbedDataType.None };
-      let imagesArray = [];
+      // an outside image array holding object, because embeds could be technically in any order
+      // and we don't want to lose any data
+      let imagesArray: BskyImageRecordData[] = [];
+      // for any replies/quote-posts/list embeds/etc
       let bskyRecordInfo: BskyRecordWrapper = {};
       let embedsProcessed: number = 0;
-      const isRecordViolation = (attemptToWrite: EmbedDataType) => {
+      const isRecordViolation = (attemptToWrite: EmbedDataType): boolean => {
         return mediaEmbeds.type != EmbedDataType.None && mediaEmbeds.type != attemptToWrite
-        && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
+          && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
       }
       for (const currentEmbed of postData.embeds) {
         const currentEmbedType: EmbedDataType = currentEmbed.type;
@@ -195,14 +199,14 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
         // If we have encountered a record violation (illegal mixed media types), then we should stop processing further.
         if (isRecordViolation(currentEmbedType)) {
-          console.error(`${postData.postid} had a mixed media types of ${mediaEmbeds.type} trying to write ${currentEmbedType}`);
+          console.error(`${postData.postid} had a mixed media type of ${mediaEmbeds.type}. trying to write ${currentEmbedType}`);
           break;
         }
 
         // Handle weblinks
         if (currentEmbedType == EmbedDataType.WebLink) {
-          let externalData: LooseObj = {
-            uri: currentEmbed.uri,
+          let externalData: BskyWebLinkRecordData = {
+            uri: currentEmbed.uri!,
             title: currentEmbed.title,
             description: currentEmbed.description
           };
@@ -212,7 +216,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             externalData.associatedRefs = [];
             currentEmbed.associatedRefs!.forEach((itm) => {
               const extraData: WebAssociatedRef = itm;
-              externalData.associatedRefs.push(extraData);
+              externalData.associatedRefs!.push(extraData);
             });
           }
 
@@ -262,7 +266,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             continue;
           }
 
-          const {account, type, postid} = atpRecordURI.exec(currentEmbed.content)?.groups as {account?: string, type?: string, postid?: string};
+          const {account, type, postid} = atpRecordURI.exec(currentEmbed.content)?.groups as atpRecordURICaptures;
           if (account === undefined || type === undefined || postid === undefined) {
             console.error(`Unable to get account, type or post id from ${currentEmbed.content}`);
             // Change the record back.
@@ -408,26 +412,26 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         // Handle images
         if (currentEmbedType == EmbedDataType.Image) {
           // Image aspect ratio data
-          let aspectRatio: LooseObj|undefined = {"width": 0, "height": 0};
+          let aspectRatio: BskyMediaAspectRatio|undefined = {"width": 0, "height": 0};
           if (customMetadata && customMetadata.width !== undefined && customMetadata.height !== undefined) {
-            aspectRatio["width"] = Number(customMetadata.width);
-            aspectRatio["height"] = Number(customMetadata.height);
+            aspectRatio.width = Number(customMetadata.width);
+            aspectRatio.height = Number(customMetadata.height);
           } else if (USE_DEPRECATED_SIZE_PARSE) {
             // TODO: Remove this code as it is currently DEPRECATED (R2 Service holds the stream sizes)
             const sizeResult = await imageDimensionsFromStream(await rawFile!.stream());
             if (sizeResult) {
-              aspectRatio["width"] = sizeResult.width;
-              aspectRatio["height"] = sizeResult.height;
+              aspectRatio.width = sizeResult.width;
+              aspectRatio.height = sizeResult.height;
             } else {
               aspectRatio = undefined;
             }
           } else {
-            console.warn(`Unable to get file dimensions for file ${currentEmbed.content}, custom metadata is missing :(`);
+            console.warn(`No file dimensions for file ${currentEmbed.content}, custom metadata is missing :(`);
             aspectRatio = undefined;
           }
 
           // Create the record data for this image
-          const imageRecordData: LooseObj = {
+          const imageRecordData: BskyImageRecordData = {
             image: blobRef,
             alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT),
             aspectRatio: aspectRatio
@@ -438,11 +442,11 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
           // Handle videos
         } else if (currentEmbedType == EmbedDataType.Video) {
-          const bskyMetadata: LooseObj = {
+          const bskyMetadata: BskyVideoRecordData = {
             blob: blobRef,
             ar: {
-              width: currentEmbed.width,
-              height: currentEmbed.height
+              width: currentEmbed.width!,
+              height: currentEmbed.height!
             },
             alt: truncate(currentEmbed.alt || "", MAX_ALT_TEXT),
           }
@@ -454,7 +458,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       if (imagesArray.length > 0 && mediaEmbeds.type == EmbedDataType.Image)
         mediaEmbeds.data = imagesArray;
 
-      const writeRecord = () => {
+      const writeRecord = (): BskyEmbedRecord => {
         return {
           "$type": "app.bsky.embed.record",
           "record": {

@@ -1,23 +1,31 @@
-import { AsyncLocalStorage } from "async_hooks";
-import { betterAuth, Session } from "better-auth";
 import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
+import type { Session } from "better-auth/types";
 import { type DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
+import { APP_NAME } from "../appInfo";
 import {
   BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
-  DEFAULT_PDS, USE_ASYNC_AUTH_TASK
+  DEFAULT_PDS
 } from "../limits";
-import { APP_NAME } from "../appInfo";
 import type { AllContext, BaseContext, Bindings } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
-// try to optimize performance on CF Workers
-// though, I'm not really holding much hope out for it tbh
-const execCtxStorage = USE_ASYNC_AUTH_TASK ? new AsyncLocalStorage<ExecutionContext>() : null;
+// Dynamic import to handle the SSG import on "cloudflare:workers"
+// as node won't know how to import it outside of the cloudflare runtime
+// as such, we dynamically import and then set the appropriate function signature from there
+type waitUntilCallback = (_: Promise<unknown>) => void;
+let waitUntil: waitUntilCallback;
+if (process.env["IS_SSG"] == "true") {
+  waitUntil = (await import("../workerShim")).waitUntilShim;
+  console.log("SSG Shim Installed");
+} else {
+  waitUntil = (await import("cloudflare:workers")).waitUntil;
+}
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
@@ -158,9 +166,9 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       ipAddress: {
         ipAddressHeaders: ['cf-connecting-ip']
       },
-      backgroundTasks: USE_ASYNC_AUTH_TASK ? {
-        handler: (p) => execCtxStorage!.getStore()?.waitUntil(p),
-      } : undefined
+      backgroundTasks: {
+        handler: waitUntil,
+      },
     },
     // Only add database adapter for CLI schema generation
     // though better-auth-cloudflare just injects this anyways
@@ -174,13 +182,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
   });
 };
 
-function processAuthRoute(c: BaseContext) {
-  const authHandle = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.raw);
-  if (USE_ASYNC_AUTH_TASK)
-    return execCtxStorage!.run(c.executionCtx as ExecutionContext, () => authHandle(c))
-  else
-    return authHandle(c);
-};
+const processAuthRoute = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.raw);
 
 // Export for variable types
 type ContextVariables = SecureHeadersVariables & {
@@ -190,6 +192,7 @@ type ContextVariables = SecureHeadersVariables & {
   session: Session;
   db: DrizzleD1Database;
   pds: string;
+  ssg: boolean;
 };
 
 // Export for runtime usage

@@ -13,6 +13,7 @@ export class ScheduledContext {
     this.env = env;
     this.executionCtx = executionCtx;
     this.set("db", drizzle(env.DB));
+    this.set("ssg", false);
   }
   get(name: string) {
     if (this.#map.has(name))

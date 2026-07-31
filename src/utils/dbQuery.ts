@@ -3,18 +3,19 @@ import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-o
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
+import { APP_NAME } from "../appInfo";
 import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { AccountStatus, PostLabel, RepostType } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
-import { APP_NAME } from "../appInfo";
 import type {
   AllContext, BatchQuery,
   BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
-  DeleteResponse
+  DeleteResponse,
+  EditPostChanges
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
@@ -483,7 +484,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   return { ok: success, msg: success ? "success" : "fail", postId: postUUID };
 };
 
-export const updatePostForUser = async (c: AllContext, id: string, newData: Object): Promise<boolean> => {
+export const updatePostForUser = async (c: AllContext, id: string, newData: EditPostChanges): Promise<boolean> => {
   const userId = c.get("userId");
   return await updatePostForGivenUser(c, userId, id, newData);
 };
