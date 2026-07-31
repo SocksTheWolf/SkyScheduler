@@ -6,12 +6,27 @@ import * as app from "../src/index";
 import { USE_STATIC_HTML } from '../src/limits';
 import type { HonoBase } from "../src/types";
 
-async function buildStaticSite(app: Hono<HonoBase>) {
+type MoveMapRule = {
+  file: string;
+  destFolder: string;
+};
+
+const outputDirectory: string = "./assets/pages";
+
+// list of static files that need to be moved to various locations
+// pathed from the outputDirectory
+const moveMap: MoveMapRule[] = [
+  {file: "consts.js", destFolder: "../js"},
+  {file: "atproto-did", destFolder: "../.well-known"},
+  {file: "site.webmanifest", destFolder: "../"}
+];
+
+async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   // If we do not build static html, then do not generate anything.
   if (!USE_STATIC_HTML)
     return;
 
-  const outputDirectory: string = "./assets/pages";
+  console.log("Removing existing files...");
   // Go through the file list in the pages directory,
   // remove everything, but do not get rid of the pages folder.
   for (const file of await fs.readdir(outputDirectory)) {
@@ -28,11 +43,30 @@ async function buildStaticSite(app: Hono<HonoBase>) {
     }
   }
 
+  console.log("\nBuilding SSG app...");
   const response: ToSSGResult = await toSSG(app, fs, {
-    dir: outputDirectory
+    dir: outputDirectory,
+    extensionMap: {
+      "text/html": "html",
+      "text/no-ext": "",
+      // we want the file to output as .js., so we can bulk program a move map
+      "text/javascript": ""
+    }
   });
-  console.log(response);
-  return `Built Files:\n${response.files.join("\n")}`;
+  if (response.success) {
+    console.log(`\nBuilt Files:\n${response.files.join("\n")}`);
+    console.log("Executing move map...");
+    // execute our move map
+    for (const mv of moveMap) {
+      const moveTo = path.join(outputDirectory, mv.destFolder, mv.file);
+      await fs.rename(path.join(outputDirectory, mv.file) + ".", moveTo);
+      console.log(`Moved ${mv.file} to ${moveTo}`);
+    }
+    console.log("\nDone!");
+  } else {
+    console.error("Encountered error when trying to SSG site");
+    console.log(response);
+  }
 }
 
 await buildStaticSite(app.default.getApp());

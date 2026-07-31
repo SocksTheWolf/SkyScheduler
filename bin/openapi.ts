@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import { generateOpenAPI } from "../src/endpoints/openapi";
 
-async function buildOpenAPISpec() {
+async function buildOpenAPISpec(): Promise<void> {
   const openapiPath: string = "./openapi.json";
   try {
     const spec = JSON.stringify(await generateOpenAPI());
