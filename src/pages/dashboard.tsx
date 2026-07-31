@@ -1,3 +1,4 @@
+import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../appInfo";
 import { ScriptInclusionLevel } from "../enums";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
@@ -11,7 +12,6 @@ import { BaseLayout } from "../layout/main";
 import { PostCreation } from "../layout/makePost";
 import { RepostCreation } from "../layout/makeRepost";
 import { ViolationNoticeBar } from "../layout/violationsBar";
-import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../appInfo";
 import { dashboardScriptStr } from "../statics/appScripts";
 import type { AllContext, BaseElementProps } from "../types";
 

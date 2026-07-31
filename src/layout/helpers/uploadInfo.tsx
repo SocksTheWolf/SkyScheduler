@@ -1,3 +1,4 @@
+import { APP_NAME } from "../../appInfo";
 import {
   BSKY_IMG_FILE_EXTS_STR,
   BSKY_IMG_SIZE_LIMIT_IN_MB,
@@ -9,7 +10,6 @@ import {
   MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT_IN_MB
 } from "../../limits";
-import { APP_NAME } from "../../appInfo";
 import type { BaseElementProps } from "../../types";
 
 export default function UploadInfo(props: BaseElementProps) {

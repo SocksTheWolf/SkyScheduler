@@ -1,6 +1,6 @@
 import { APP_NAME } from "../../appInfo";
-import LogoImage from "./logo";
 import type { BaseElementProps } from "../../types";
+import LogoImage from "./logo";
 
 export default function NavTags(props?: BaseElementProps) {
   return (

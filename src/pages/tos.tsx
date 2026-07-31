@@ -1,8 +1,8 @@
+import { APP_NAME } from "../appInfo";
 import { ScriptInclusionLevel } from "../enums";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
-import { APP_NAME } from "../appInfo";
 import type { BaseElementProps } from "../types";
 
 export default function TermsOfService(props?: BaseElementProps) {
