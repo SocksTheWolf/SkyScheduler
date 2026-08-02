@@ -14,7 +14,7 @@ import type { BaseElementProps } from "../../types";
 
 export default function UploadInfo(props: BaseElementProps) {
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
-  return (<details class="uploadGuidelines noselect clicker hide-arrow" open>
+  return (<details class="uploadGuidelines noselect clicker" open>
     <summary tabindex={-1}>View Upload Limits & Guidelines</summary>
     <small><ul>
       <li><span data-tooltip={BSKY_IMG_FILE_EXTS_STR}>Images</span>:
@@ -23,7 +23,7 @@ export default function UploadInfo(props: BaseElementProps) {
           <li>must have a file size smaller than {CF_IMAGES_FILE_SIZE_LIMIT_IN_MB}MB ({APP_NAME} will attempt to compress images to fit <span data-tooltip={bskyImageLimits}>BlueSky's requirements</span>)
           {MAX_IMAGE_WIDTH > 0?
             <ol>
-              <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{MAX_IMAGE_WIDTH}px</b> will also <u data-tooltip="will preserve aspect ratio">be resized</u> in addition to being compressed</li>
+              <li>images over {BSKY_IMG_SIZE_LIMIT_IN_MB}MB with a width greater than <b>{MAX_IMAGE_WIDTH}px</b> will <u data-tooltip="will preserve aspect ratio">also be resized</u> in addition to being compressed</li>
             </ol> : null}
           </li>
           <li>thumbnails will only be shown here for images that are smaller than {MAX_THUMBNAIL_SIZE}MB</li>
@@ -34,7 +34,7 @@ export default function UploadInfo(props: BaseElementProps) {
         <ul>
           <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
           <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-          <li>are more likely to succeed if they are in h.264 (mp4) or qt format (mov)</li>
+          <li>are more likely to succeed if they are in h.264 (mp4) or webm format</li>
           <li>will be processed on your PDS after they're posted. This may show a temporary <i>"Video not Found"</i> message for a bit after posting.</li>
         </ul>
       </li>

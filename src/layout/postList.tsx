@@ -4,13 +4,15 @@ import type { AllContext, BaseElementProps } from "../types";
 import { getPostsForUser } from "../utils/dbQuery";
 import { PostHTML } from "./post";
 
+const HiddenAnchor = () => (<a hidden tabindex={-1} class="invalidateTab hidden"></a>);
+
 export const ScheduledPostList = async (props: BaseElementProps) => {
   const ctx: AllContext|undefined = props.ctx;
   if (ctx !== undefined) {
     const response: Post[]|null = await getPostsForUser(ctx);
     if (!isEmpty(response)) {
       return (<>
-        <a hidden tabindex={-1} class="invalidateTab hidden"></a>
+        <HiddenAnchor />
         {response!.map((data: Post) => {
           return <PostHTML post={data} />;
         })}
@@ -19,7 +21,7 @@ export const ScheduledPostList = async (props: BaseElementProps) => {
   }
 
   return (<article>
-    <a hidden tabindex={-1} class="invalidateTab hidden"></a>
+    <HiddenAnchor />
     <p>No posts scheduled</p>
   </article>);
 };

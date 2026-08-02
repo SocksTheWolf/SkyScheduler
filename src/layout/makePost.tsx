@@ -53,12 +53,12 @@ export function PostCreation(props: BaseElementProps) {
             </section>
           </details>
           <details>
-            <summary title="click to toggle section" role="button" class="outline secondary">Add Record (Quote Post)</summary>
+            <summary title="click to toggle section" role="button" class="outline secondary">Add Record (Quote Post/Feed/List)</summary>
             <section>
               <article>
-                <header><label for="recordBox">Insert Post/Feed/List Link</label></header>
+                <header><label for="recordBox">Link to existing post, feed or list</label></header>
                 <input id="recordBox" placeholder="https://" title="Must be a link to a ATProto based record" />
-                <small>Posts must be quotable and all record types must be resolvable (exist) upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
+                <small>Posts <u>must be quotable</u> and all record types must be resolvable (exist) upon the scheduled time. If it does not exist, it will not be attached to your post.</small>
               </article>
             </section>
           </details>

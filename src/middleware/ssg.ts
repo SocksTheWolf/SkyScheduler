@@ -36,9 +36,9 @@ class NonceInject {
 
 
 const serveStaticPage = async (c: Context, page?: string): Promise<Response> => {
-  // if we're explicitly not given a page, then take the current path name replacing the first slash
+  // if we're explicitly not given a page, then take the current path name removing the slash
   if (page === undefined)
-    page = new URL(c.req.url).pathname.replace("/", "");
+    page = new URL(c.req.url).pathname.replace(/^\//, "");
 
   // domain doesn't matter, so make this whatever
   const staticFile: Response = await c.env.ASSETS!.fetch(`https://1.1.1.1/pages/${page}.html`);
