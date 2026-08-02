@@ -5,9 +5,9 @@
       "mangle": {
         "toplevel": true,
         "reserved": ["pushToast", "addKeyboardListener",
-        "addClickKeyboardListener", "easySetup",
-        "addUsernameFieldWatchers", "translateErrorObject",
-        "openAltText", "openPostAltEditor"]
+          "addClickKeyboardListener", "easySetup",
+          "addUsernameFieldWatchers", "translateErrorObject",
+          "openAltText", "openPostAltEditor", "updateUsername"]
       }
     },
     "putout": {

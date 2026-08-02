@@ -415,7 +415,7 @@ postForm.addEventListener('submit', async (e) => {
           type: WEBLINK_DATA_TYPE
         };
         // Going to rondezoop this from bsky as I don't want to write my own tbh
-        const extractResponse = await fetch(`https://cardyb.bsky.app/v1/extract?url=${encodeURI(linkCardURL)}`);
+        const extractResponse = await fetch(`https://cardyb.bsky.app/v1/extract?url=${encodeURIComponent(linkCardURL)}`);
         if (extractResponse.ok) {
           const extractData = await extractResponse.json();
           if (extractData.error === "") {

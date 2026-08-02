@@ -93,6 +93,7 @@
 /** POSTS **/
 #posts {
   max-height: 55dvh;
+  min-height: 40dvh;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -215,6 +216,10 @@ textarea {
   margin-bottom: 0px !important;
   summary:focus {
     color: var(--pico-accordion-close-summary-color) !important;
+  }
+  /* Because we modify margin-bottom, we need to also recalculate the top offset */
+  summary:after {
+    top: calc(var(--pico-block-spacing-vertical) * .15) !important;
   }
 }
 

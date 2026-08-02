@@ -7,6 +7,8 @@ function pushToast(msg, isSuccess) {
     avatar: !isSuccess ? "/icons/warning.svg" : "/icons/success.svg",
     duration: !isSuccess ? 10000 : Toastify.defaults.duration,
     className: `toast-notification ${isSuccess ? "toast-green" : "toast-red"}`,
+    // Either give us the top most, or within certain blur fields
+    selector: document.querySelectorAll("article[popover]:last-child")[0] || undefined,
     close: false,
     onClick: () => {
       newToast.hideToast();
