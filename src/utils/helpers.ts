@@ -101,3 +101,12 @@ export const logoutAccount = async (c: Context): Promise<boolean> => {
   }
   return false;
 };
+
+export const checkValidDateStr = (date: string): boolean => {
+  try {
+    const parsed = new Date(date);
+    return !isNaN(parsed.getTime());
+  } catch {
+    return false;
+  }
+};

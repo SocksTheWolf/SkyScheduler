@@ -6,6 +6,7 @@ import {
   MAX_ALT_TEXT,
   MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
 } from "../limits";
+import { checkValidDateStr } from "../utils/helpers";
 import { appPasswordRegex } from "./regexCases";
 
 export const UsernameSchema = z.object({
@@ -36,4 +37,11 @@ export const AltTextSchema = z.object({
   alt: z.string().trim()
     .max(MAX_ALT_TEXT, "alt text is too long")
     .prefault("")
+});
+
+export const ScheduledDateSchema = z.object({
+  scheduledDate: z.string().trim()
+    .nonempty("scheduled date is malformed")
+    .nonoptional("scheduled date must be provided")
+    .refine((date) => checkValidDateStr(date), {error: "invalid date, please use ISO 8601 format", abort: true, path: ["scheduledDate"]}),
 });

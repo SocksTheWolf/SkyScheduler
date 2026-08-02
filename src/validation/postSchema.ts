@@ -12,13 +12,14 @@ import {
 } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { RepostDataSchema } from "./repostDataSchema";
-import { AltTextSchema } from "./sharedValidations";
+import { AltTextSchema, ScheduledDateSchema } from "./sharedValidations";
 
 const TextContent = z.object({
   content: z.string().trim()
     .min(MIN_LENGTH,`post is too short, min ${MIN_LENGTH} characters`)
     .max(MAX_LENGTH, `post is over ${MAX_LENGTH} characters`)
-    .nonempty("post content cannot be empty"),
+    .nonempty("post content cannot be empty")
+    .nonoptional("post content must be provided"),
 });
 
 // Schema for post creation
@@ -35,14 +36,7 @@ export const PostSchema = z.object({
   rootPost: z.uuidv4("root post id is invalid").optional(),
   parentPost: z.uuidv4("parent post id is invalid").optional(),
   ...RepostDataSchema.shape,
-  scheduledDate: z.string().trim().refine((date) => {
-    try {
-      const parsed = new Date(date);
-      return !isNaN(parsed.getTime());
-    } catch {
-      return false;
-    }
-  }, "Invalid date format. Please use ISO 8601 format (e.g. 2024-12-14T07:17:05+01:00)"),
+  ...ScheduledDateSchema.shape,
 }).superRefine(({embeds, label, makePostNow, repostData, rootPost, parentPost}, ctx) => {
   // check that root and parentpost are unset if makePostNow is set
   if (rootPost !== undefined && parentPost !== undefined) {

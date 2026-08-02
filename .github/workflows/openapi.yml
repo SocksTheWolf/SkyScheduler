@@ -4,6 +4,7 @@ on:
     branches: ["main"]
     paths:
       - "src/endpoints/openapi.tsx"
+      - "src/validation/**"
       - "bin/openapi.ts"
       - "package.json"
       - ".github/workflows/openapi.yml"

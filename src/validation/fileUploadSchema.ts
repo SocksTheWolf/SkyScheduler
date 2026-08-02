@@ -13,7 +13,7 @@ export const FileUploadSchema = z.object({
     .min(1, "invalid file size")
     .max(R2_FILE_SIZE_LIMIT, `max file size is ${R2_FILE_SIZE_LIMIT_IN_MB}MB`)
     .mime([...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES,
-      ... GIF_UPLOAD_ALLOWED ? BSKY_GIF_MIME_TYPES : []], "type not allowed")
+      ... GIF_UPLOAD_ALLOWED ? BSKY_GIF_MIME_TYPES : []], "file type not allowed")
     .superRefine((file, ctx) => {
       const fileType: string = file.type.toLowerCase();
       // Check image file restrictions

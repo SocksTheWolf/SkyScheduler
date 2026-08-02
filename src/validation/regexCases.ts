@@ -1,5 +1,7 @@
 // passwords are 4 groups of 4 char separated by dashes
 export const appPasswordRegex = /(?:[0-9a-z]{4}-){3}[0-9a-z]{4}/i;
+// protocols to check links against
+export const httpProtoRecord = /^https?$/;
 // GUID + file extensions
 export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|webp|heic|svg|mp4|gif|webm|mpeg|mov)$/i;
 // Given a link to a post/feed/list/profile record

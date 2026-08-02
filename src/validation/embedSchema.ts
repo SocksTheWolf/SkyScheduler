@@ -4,7 +4,7 @@ import { EmbedDataType } from "../enums";
 import { BSKY_VIDEO_LENGTH_LIMIT, MAX_ASSOCIATEDREFS_PER_LINK } from "../limits";
 import { FileContentSchema } from "./mediaSchema";
 import { StrongRecordSchema } from "./recordSchema";
-import { atpRecordURI } from "./regexCases";
+import { atpRecordURI, httpProtoRecord } from "./regexCases";
 import { AltTextSchema } from "./sharedValidations";
 
 export const ImageEmbedSchema = z.object({
@@ -38,7 +38,7 @@ export const LinkEmbedSchema = z.object({
     // then you just fail out the string.
     try {
       const urlWrap = new URL(value);
-      return urlWrap.protocol === "https:" || urlWrap.protocol === "http:";
+      return (urlWrap.protocol === "https:" || urlWrap.protocol === "http:");
     } catch (err) {
       return false;
     }
@@ -52,21 +52,21 @@ export const LinkEmbedSchema = z.object({
     content is used as the thumbnail */
   uri: z.url({
     normalize: true,
-    protocol: /^https?$/,
+    protocol: httpProtoRecord,
     hostname: z.regexes.domain,
     error: "provided link is not an URL, please check the value and try again"
   }).trim()
     .nonoptional("link embeds require a url"),
   description: z.string().trim().default(""),
   associatedRefs: z.array(StrongRecordSchema)
-    .max(MAX_ASSOCIATEDREFS_PER_LINK, "link has an excessive amount of ref records attached")
+    .max(MAX_ASSOCIATEDREFS_PER_LINK, `too many ref records attached, max of ${MAX_ASSOCIATEDREFS_PER_LINK}`)
     .optional()
 });
 
 export const PostRecordSchema = z.object({
   content: z.url({
     normalize: true,
-    protocol: /^https?$/,
+    protocol: httpProtoRecord,
     hostname: z.regexes.domain,
     error: "post/feed/list record url is invalid"
   }).trim()

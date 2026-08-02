@@ -7,7 +7,7 @@ import { fileKeyRegex } from "./regexCases";
 
 // Our json response objects
 export const GenericResponseSchema = z.object({
-  ok: z.boolean(),
+  ok: z.boolean().describe("success/failure status check"),
   msg: z.string().describe("success/error message, could also be formatted as json")
 });
 
@@ -33,7 +33,7 @@ export const FileUploadFailSchema = z.object({
 
 export const FileUploadSuccessSchema = z.object({
   success: z.literal(true),
-  fileSize: z.number().min(1),
+  fileSize: z.number().min(1).describe("the size of the uploaded file"),
   qualityLevel: z.number().min(1).max(100)
     .describe("the quality level of the processed file (if compressed/resized)"),
   data: z.string().describe("internal file guid name"),

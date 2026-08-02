@@ -7,10 +7,10 @@ export const AccountResetSchema = z.object({
     .min(MIN_DASHBOARD_PASS, "password too short")
     .max(MAX_DASHBOARD_PASS, "password too long")
     .nonempty("password cannot be empty")
-    .nonoptional(),
+    .nonoptional("new password must be provided"),
   confirmPassword: z.string().trim()
     .min(MIN_DASHBOARD_PASS, "confirm password too short")
     .max(MAX_DASHBOARD_PASS, "confirm password too long")
     .nonempty("confirm password cannot be empty")
-    .nonoptional(),
-}).refine((schema) => schema.confirmPassword === schema.password, "Passwords do not match");
+    .nonoptional("confirm password must be provided"),
+}).refine((schema) => schema.confirmPassword === schema.password, {error: "Passwords do not match", abort: true});
