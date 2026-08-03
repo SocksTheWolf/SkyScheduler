@@ -101,6 +101,9 @@
     },
     "hono-openapi": {
       "@hono/standard-validator": "latest"
+    },
+    "wrangler": {
+      "undici": "latest"
     }
   },
   "engines": {
