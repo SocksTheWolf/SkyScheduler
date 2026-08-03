@@ -149,12 +149,6 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   return c.html(<b class="btn-error">Unknown error occurred</b>);
 });
 
-// endpoint that just returns current username
-account.get("/username", authMiddleware, async (c) => {
-  const username = await getUsernameForUser(c);
-  return c.text(username || "", 200);
-});
-
 account.get("/data", authMiddlewareHTML, async (c) => {
   const username: string|null = await getUsernameForUser(c);
   const pds = c.get("pds") || DEFAULT_PDS;

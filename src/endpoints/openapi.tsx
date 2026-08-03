@@ -92,10 +92,19 @@ openapiRoutes.all("/post/all", describeRoute({
 
 // Edit posts
 openapiRoutes.get("/post/edit/:id", describeRoute({
-  description: 'Gets all posts for the current account',
+  description: 'Get the post editor for the given post',
   responses: {
     200: {
       description: 'post list',
+      content: {
+        'text/html': {}
+      }
+    },
+    203: {
+      description: "post invalid or missing",
+      content: {
+        'text/html': {}
+      }
     },
     400: {
       description: "empty body"
@@ -107,12 +116,13 @@ openapiRoutes.get("/post/edit/:id", describeRoute({
 }), validator('param', CheckGUIDSchema));
 
 openapiRoutes.post("/post/edit/:id", describeRoute({
-  description: "Edits the given post",
+  description: "Pushes edits to the given post",
   responses: {
     200: {
-      description: "Edit successfully made",
+      description: "Edit gotten, check return for valid response",
       content: {
         'application/json': { schema: resolver(GenericResponseSchema) },
+        'text/html': {}
       }
     },
     400: {
@@ -128,7 +138,10 @@ openapiRoutes.get("/post/edit/:id/cancel", describeRoute({
   description: "Cancel editing a post",
   responses: {
     200: {
-      description: "Cancelation processed successfully"
+      description: "Cancelation processed",
+      content: {
+        'text/html': {}
+      }
     },
     400: {
       description: "Invalid data passed"
@@ -156,10 +169,13 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
 }), validator("param", CheckGUIDSchema));
 
 openapiRoutes.get("/post/:id/repost", describeRoute({
-  description: "Get the given post's repost info modal",
+  description: "Get the repost editor for the given post",
   responses: {
     200: {
-      description: "modal returned"
+      description: "request accepted",
+      content: {
+        'text/html': {}
+      }
     },
     400: {
       description: "an error occurred"
@@ -174,7 +190,10 @@ openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
   description: "Delete the given schedule for the given post",
   responses: {
     200: {
-      description: "command processed"
+      description: "request processed",
+      content: {
+        'text/html': {}
+      }
     },
     400: {
       description: "an error occurred"
@@ -270,7 +289,7 @@ openapiRoutes.post("/account/update", describeRoute({
   description: "Updates account settings",
   responses: {
     200: {
-      description: "Success"
+      description: "operation return"
     },
     201: {
       description: "no changes"
@@ -284,20 +303,6 @@ openapiRoutes.post("/account/update", describeRoute({
   }
 }), validator("form", AccountUpdateSchema, undefined,
   { media: "application/x-www-form-urlencoded" }));
-
-// endpoint that just returns current username
-openapiRoutes.get("/account/username", describeRoute({
-  description: "Gets the current username for the user",
-  deprecated: true,
-  responses: {
-    200: {
-      description: "success"
-    },
-    401: {
-      description: "not logged in"
-    }
-  }
-}));
 
 openapiRoutes.get("/account/data", describeRoute({
   description: "Returns the user's current dashboard data with HTMX swap bands",
@@ -476,6 +481,15 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
     200: {
       description: "displays file"
     },
+    301: {
+      description: "file not found"
+    },
+    303: {
+      description: "auth cannot be verified"
+    },
+    307: {
+      description: "preview cannot be displayed due to site settings"
+    },
     401: {
       description: "not logged in"
     }
@@ -487,7 +501,7 @@ export async function generateOpenAPI() {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.3',
+        version: '1.2.4',
         description: `The API Routes for ${APP_NAME} that can be used for providing API access
           or for the API Shield feature of Cloudflare`,
         termsOfService: `${SITE_URL}/tos`,
