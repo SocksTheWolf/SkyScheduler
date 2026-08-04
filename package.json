@@ -104,6 +104,12 @@
     },
     "wrangler": {
       "undici": "^7.29.0"
+    },
+    "@actions/github": {
+      "undici": "^7.29.0"
+    },
+    "@actions/http-client": {
+      "undici": "^7.29.0"
     }
   },
   "engines": {
