@@ -103,7 +103,7 @@
       "@hono/standard-validator": "latest"
     },
     "wrangler": {
-      "undici": "latest"
+      "undici": "^7.29.0"
     }
   },
   "engines": {
