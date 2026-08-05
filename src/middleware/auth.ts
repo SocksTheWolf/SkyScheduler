@@ -57,7 +57,7 @@ export function requireAuthEx(props: RequireAuthMiddlewareProps) {
       }
 
       if (props.returnHTML)
-        return c.html(html`<b class="btn-error">Session Invalid, please sign in again</b>`);
+        return c.html(html`<b class="btn-error">Session Invalid, please sign in again</b>`, 401);
       else
         return c.json({ ok: false, msg: "Unauthorized" }, 401);
     }

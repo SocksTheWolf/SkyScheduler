@@ -1,11 +1,12 @@
 import { type Context, Hono } from "hono";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import isEmpty from "just-is-empty";
 import { ScheduledContext } from "../classes/context";
 import { AccountStatus } from "../enums";
 import PDSInputField from "../layout/fields/pdsInputField";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { DEFAULT_PDS } from "../limits";
-import { authMiddleware, authMiddlewareHTML, pullAuthData } from "../middleware/auth";
+import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { HonoBase, LooseObj } from "../types";
@@ -26,7 +27,7 @@ import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<HonoBase>();
 
-const serverParseValidationErr = (c: Context, errorJson: string) => {
+const serverParseValidationErr = (c: Context, errorJson: string, errCode: ContentfulStatusCode=200) => {
   try {
     const errorMsgs = JSON.parse(errorJson);
     return c.html(<div class="validation-error btn-error">
@@ -36,9 +37,9 @@ const serverParseValidationErr = (c: Context, errorJson: string) => {
             return <li>{el.message}</li>;
           })}
         </ul>
-      </div>);
+      </div>, errCode);
   } catch {
-    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>);
+    return c.html(<div class="validation-error btn-error"><b>Internal Error</b>: Please try again</div>, errCode);
   }
 }
 
@@ -66,7 +67,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
     }
     return c.json({ok: false, msg: "could not login user"}, 403);
   } catch (err: any) {
-    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 401);
+    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 403);
   }
 });
 
@@ -74,7 +75,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
-    return serverParseValidationErr(c, validation.error.message);
+    return serverParseValidationErr(c, validation.error.message, 403);
   }
 
   const auth = c.get("auth");
@@ -83,7 +84,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   if (!isEmpty(username)) {
     if ((username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) &&
       !c.get("isAdmin")) {
-        return c.html(<b class="btn-error">Invalid username provided</b>);
+        return c.html(<b class="btn-error">Invalid username provided</b>, 422);
     } else {
       newObject.username = username!;
     }
@@ -110,13 +111,13 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
         headers: c.req.raw.headers
       });
       if (!status) {
-        return c.html(<b class="btn-error">Failed to update user data, try again</b>);
+        return c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
       }
       newObject.updatedSession = true;
     } catch (err) {
       console.warn(`failed to update session pds: ${err}`);
       // this is technically not true, but w/e
-      return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>);
+      return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>, 401);
     }
   }
 
@@ -146,14 +147,14 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
     c.header("HX-Trigger-After-Swap", "accountViolations");
     return c.html(<></>, 200);
   }
-  return c.html(<b class="btn-error">Unknown error occurred</b>);
+  return c.html(<b class="btn-error">Unknown error occurred</b>, 409);
 });
 
 account.get("/data", authMiddlewareHTML, async (c) => {
   const username: string|null = await getUsernameForUser(c);
   const pds = c.get("pds") || DEFAULT_PDS;
   if (username === null) {
-    return c.text("", 401);
+    return c.text("", 403);
   }
   return c.html(<>{username || ""}
     <PDSInputField swap={true} pds={pds} />
@@ -242,7 +243,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   // grab our auth object
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
   }
 
   console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
@@ -275,7 +276,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     console.error(`unable to create user, got error ${err}`);
   }
 
-  return c.json({ok: false, msg: "unknown error occurred, please try again"}, 501);
+  return c.json({ok: false, msg: "unknown error occurred, please try again"}, 500);
 });
 
 account.post("/forgot", verifyTurnstile, async (c) => {
@@ -298,7 +299,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
 
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
   }
 
   // Look up handle
@@ -337,7 +338,7 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const { resetToken, password } = validation.data;
   const auth = c.get("auth");
   if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 501);
+    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
   }
 
   try {
@@ -361,7 +362,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
   const validation = AccountDeleteSchema.safeParse(body);
 
   if (!validation.success) {
-    return serverParseValidationErr(c, validation.error.message);
+    return serverParseValidationErr(c, validation.error.message, 403);
   }
 
   const { password } = validation.data;
@@ -379,7 +380,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
 
     // Make sure we still have data
     if (!usrAccount || !usrAccount.password) {
-      return c.html(<b class="btn-error">Failed: User Data Missing...</b>);
+      return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 403);
     }
 
     // Do a hash verification on the user's input to see if the passwords match
@@ -398,10 +399,10 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
       c.header("HX-Redirect", "/?deleted");
       return c.html(<></>);
     } else {
-      return c.html(<b class="btn-error">Failed: Invalid Password</b>);
+      return c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
     }
   } catch (err: any) {
     console.error(`failed to delete user ${userId} had error ${err.message || err.msg || 'no code'}`);
-    return c.html(<b class="btn-error">Failed: Server Error</b>);
+    return c.html(<b class="btn-error">Failed: Server Error</b>, 500);
   }
 });

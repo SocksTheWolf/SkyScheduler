@@ -97,14 +97,14 @@ post.all("/all", authMiddlewareHTML, async (c) => {
 post.get("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
-    return c.html(<></>);
+    return c.html(<></>, 404);
 
   const postInfo = await getPostById(c, id);
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
     return c.html(<PostEdit post={postInfo} />);
   }
-  return c.html(<></>);
+  return c.html(<></>, 404);
 });
 
 post.post("/edit/:id", authMiddlewareHTML, async (c) => {
@@ -112,13 +112,13 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   if (!isValid(id)) {
     c.header("HX-Trigger-After-Swap", swapErrEvents);
-    return c.html(<b class="btn-error">Post was invalid</b>);
+    return c.html(<b class="btn-error">Post was invalid</b>, 403);
   }
 
   const body = await c.req.json();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
-    return c.html(<b class="btn-error">New post had invalid data</b>);
+    return c.html(<b class="btn-error">New post had invalid data</b>, 403);
   }
 
   const { content, altEdits } = validation.data;
@@ -126,13 +126,13 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
     c.header("HX-Trigger-After-Settle", swapErrEvents);
-    return c.html(<b class="btn-error">Could not find post to edit</b>);
+    return c.html(<b class="btn-error">Could not find post to edit</b>, 404);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
     c.header("HX-Trigger-After-Settle", "scrollTop");
-    return c.html(<b class="btn-error">This post has already been posted</b>);
+    return c.html(<b class="btn-error">This post has already been posted</b>, 403);
   }
 
   // Handle alt text and stuffs
@@ -140,7 +140,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
     // Check to see if this post had editable data
     if (originalPost.embeds === undefined) {
       c.header("HX-Trigger-After-Settle", swapErrEvents);
-      return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
+      return c.html(<b class="btn-error">Post did not have media content that was editable</b>, 403);
     }
 
     // Create an easy map to match content with quickly
@@ -178,13 +178,13 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
-  return c.html(<b class="btn-error">Failed to process edit</b>);
+  return c.html(<b class="btn-error">Failed to process edit</b>, 500);
 });
 
 post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
-    return c.html(<></>);
+    return c.html(<></>, 403);
 
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
@@ -195,7 +195,7 @@ post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
 
   // Refresh sidebar otherwise
   c.header("HX-Trigger-After-Swap", "refreshPosts, updateTimestamps, sidebarButtons, scrollListTop, scrollTop");
-  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
+  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>, 500);
 });
 
 // delete a post
@@ -212,11 +212,11 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
       const triggerEvents = `resetIfThreading, accountViolations${postRefreshEvent}`;
       c.header("HX-Trigger-After-Swap", triggerEvents);
       c.header("HX-Trigger-After-Settle", `{"postDeleted": ${response.isRepost}}`);
-      return c.html(<></>);
+      return c.html(<></>, 200);
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
-  return c.html(<></>);
+  return c.html(<></>, 500);
 });
 
 // get the repost rule editor
@@ -228,7 +228,7 @@ post.get("/:id/repost", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDITOR_O
       return c.html(<RepostDataPopover ctx={c} id={id} />);
     }
   }
-  return c.html(<></>);
+  return c.html(<></>, 404);
 });
 
 // delete a post's repost rule
@@ -238,9 +238,9 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
     if (isValid(id) && isValid(scheduleId)) {
       if (await deleteRepostRule(c, id, scheduleId)) {
         c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
-        return c.html(<></>);
+        return c.html(<></>, 200);
       }
     }
   }
-  return c.html(<>Invalid</>);
+  return c.html(<>Invalid</>, 403);
 });

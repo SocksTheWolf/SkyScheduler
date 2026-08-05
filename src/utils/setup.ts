@@ -4,7 +4,7 @@ import { has } from "./helpers";
 
 export const setupAccounts = async(c: Context) => {
   if (await doesAdminExist(c))
-    return c.html("already created", 501);
+    return c.html("already created", 500);
 
   const settingsToCheck: string[] =
     ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS"];
@@ -29,5 +29,5 @@ export const setupAccounts = async(c: Context) => {
   if (data.token !== null)
     return c.redirect("/");
   else
-    return c.html("failure", 401);
+    return c.html("failure", 403);
 }
