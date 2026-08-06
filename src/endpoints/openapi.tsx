@@ -68,7 +68,10 @@ openapiRoutes.post("/post/create/repost", describeRoute({
       }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
     }
   },
 }),
@@ -85,7 +88,10 @@ openapiRoutes.all("/post/all", describeRoute({
       }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }));
@@ -95,7 +101,7 @@ openapiRoutes.get("/post/edit/:id", describeRoute({
   description: 'Get the post editor for the given post',
   responses: {
     200: {
-      description: 'post list',
+      description: 'the post editor component',
       content: {
         'text/html': {}
       }
@@ -106,11 +112,17 @@ openapiRoutes.get("/post/edit/:id", describeRoute({
         'text/html': {}
       }
     },
-    400: {
-      description: "empty body"
-    },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    },
+    404: {
+      description: "post doesn't exist for your account",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator('param', CheckGUIDSchema));
@@ -121,15 +133,32 @@ openapiRoutes.post("/post/edit/:id", describeRoute({
     200: {
       description: "Edit gotten, check return for valid response",
       content: {
-        'application/json': { schema: resolver(GenericResponseSchema) },
         'text/html': {}
       }
     },
-    400: {
-      description: "Invalid data passed"
+    403: {
+      description: "Invalid data provided, or already posted",
+      content: {
+        'text/html': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    },
+    404: {
+      description: "post does not exist on your account",
+      content: {
+        'text/html': {}
+      }
+    },
+    500: {
+      description: "internal error occurred",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator("param", CheckGUIDSchema), validator("json", EditSchema));
@@ -143,11 +172,23 @@ openapiRoutes.get("/post/edit/:id/cancel", describeRoute({
         'text/html': {}
       }
     },
-    400: {
-      description: "Invalid data passed"
+    403: {
+      description: "Invalid data passed",
+      content: {
+        'text/html': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    },
+    500: {
+      description: "internal error",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator("param", CheckGUIDSchema));
@@ -157,13 +198,22 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
   description: "Delete the given post",
   responses: {
     200: {
-      description: "command processed"
+      description: "command processed",
+      content: {
+        'text/html': {}
+      }
     },
-    400: {
-      description: "an error occurred"
+    403: {
+      description: "an error occurred or the post doesn't exist",
+      content: {
+        'text/html': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator("param", CheckGUIDSchema));
@@ -177,11 +227,23 @@ openapiRoutes.get("/post/:id/repost", describeRoute({
         'text/html': {}
       }
     },
-    400: {
-      description: "an error occurred"
+    404: {
+      description: "an error occurred",
+      content: {
+        'text/html': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    },
+    429: {
+      description: "rate limited",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator("param", CheckGUIDSchema));
@@ -195,11 +257,23 @@ openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
         'text/html': {}
       }
     },
-    400: {
-      description: "an error occurred"
+    403: {
+      description: "an error occurred",
+      content: {
+        'text/html': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    },
+    429: {
+      description: "rate limited",
+      content: {
+        'text/html': {}
+      }
     }
   }
 }), validator("param", CheckGUIDSchema));
@@ -221,7 +295,10 @@ openapiRoutes.post("/post/upload", describeRoute({
       }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        "application/json": { schema: resolver(GenericResponseSchema)}
+      }
     }
   }
 }), validator("form", FileUploadSchema));
@@ -243,7 +320,10 @@ openapiRoutes.delete("/post/upload", describeRoute({
       }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        "application/json": { schema: resolver(GenericResponseSchema)}
+      }
     },
     402: {
       description: "Invalid operation performed",
@@ -276,12 +356,12 @@ openapiRoutes.post("/account/login", describeRoute({
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
     },
-    401: {
-      description: "Unknown error",
+    429: {
+      description: "rate limited",
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
-    },
+    }
   }
 }), validator("json", LoginSchema));
 
@@ -289,16 +369,46 @@ openapiRoutes.post("/account/update", describeRoute({
   description: "Updates account settings",
   responses: {
     200: {
-      description: "operation return"
+      description: "operation return",
+      content: {
+        'text/html': { },
+      }
     },
     201: {
-      description: "no changes"
-    },
-    400: {
-      description: "failed"
+      description: "no changes made",
+      content: {
+        'text/html': { },
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
+    },
+    403: {
+      description: "invalid data",
+      content: {
+        'text/html': { },
+      }
+    },
+    409: {
+      description: "failed to update, try again",
+      content: {
+        'text/html': { },
+      }
+    },
+    422: {
+      description: "invalid username",
+      content: {
+        'text/html': { },
+      }
+    },
+    429: {
+      description: "rate limited",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }), validator("form", AccountUpdateSchema, undefined,
@@ -314,7 +424,16 @@ openapiRoutes.get("/account/data", describeRoute({
       }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
+    },
+    403: {
+      description: "invalid user data",
+      content: {
+        'text/plain': { },
+      }
     }
   }
 }));
@@ -324,10 +443,16 @@ openapiRoutes.get("/account/violations", describeRoute({
   description: "Gets the current violations for the user",
   responses: {
     200: {
-      description: "success"
+      description: "success",
+      content: {
+        'text/html': { },
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }));
@@ -337,10 +462,16 @@ openapiRoutes.post("/account/violations/resolve", describeRoute({
   description: "Clears any BSky account violations that the user might have",
   responses: {
     200: {
-      description: "success"
+      description: "success",
+      content: {
+        'text/html': { },
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }));
@@ -350,19 +481,34 @@ openapiRoutes.post("/account/logout", describeRoute({
   description: "Logs out the user via HTMX",
   responses: {
     200: {
-      description: "logged out"
+      description: "logged out",
+      content: {
+        'text/plain': {}
+      }
     },
     401: {
-      description: "not logged in"
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }));
 
 openapiRoutes.get("/account/logout", describeRoute({
-  description: "Logs out the user",
+  description: "Logs out the user (redirects)",
   responses: {
     200: {
-      description: "log out"
+      description: "log out",
+      content: {
+        'text/html': { },
+      }
+    },
+    401: {
+      description: "not logged in",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }));
@@ -448,6 +594,12 @@ openapiRoutes.post("/account/reset", describeRoute({
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
     },
+    429: {
+      description: "rate limited",
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
     500: {
       description: "internal error",
       content: {
@@ -462,15 +614,27 @@ openapiRoutes.post("/account/delete", describeRoute({
   responses: {
     200: {
       description: "account deleted",
-    },
-    400: {
-      description: "invalid data",
+      content: {
+        'text/html': { },
+      }
     },
     401: {
       description: "incorrect user/pw",
+      content: {
+        'text/html': { },
+      }
     },
-    501: {
+    403: {
+      description: "invalid data",
+      content: {
+        'text/html': { },
+      }
+    },
+    500: {
       description: "internal error",
+      content: {
+        'text/html': { },
+      }
     }
   }
 }), validator("form", AccountDeleteSchema, undefined, { media: "application/x-www-form-urlencoded" }));
@@ -501,7 +665,7 @@ export async function generateOpenAPI() {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.4',
+        version: '1.2.6',
         description: `The API Routes for ${APP_NAME} that can be used for providing API access
           or for the API Shield feature of Cloudflare`,
         termsOfService: `${SITE_URL}/tos`,

@@ -1,5 +1,6 @@
+import type { FormatDurationOptions } from "date-fns";
 import {
-  formatDuration, type FormatDurationOptions,
+  formatDuration,
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
 import type { Context } from "hono";
@@ -12,7 +13,7 @@ export function floorCurrentTime(forRepost: boolean=false): Date {
 }
 
 export function floorGivenTime(given: Date, forRepost: boolean=false): Date {
-  let roundingSettings: LooseObj = { roundingMethod: 'floor' };
+  const roundingSettings: LooseObj = { roundingMethod: 'floor' };
   const check: TimeIntervalSettings = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
   switch (check) {
     default:
@@ -63,11 +64,11 @@ export function isInDev(env?: Bindings) {
   if (env === undefined)
     return false;
 
-  return env?.IN_DEV === "true";
+  return env.IN_DEV === "true";
 }
 
 export function useCFTurnstile(ctx: AllContext|undefined): boolean {
-  if (ctx?.env?.IN_DEV)
+  if (ctx?.env.IN_DEV)
     return false;
 
   return USE_CAPTCHA;

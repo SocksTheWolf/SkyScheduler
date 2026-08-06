@@ -1,10 +1,10 @@
-import type { Context } from "hono";
+import type { BaseContext } from "../types";
 import { doesAdminExist } from "./db/userinfo";
 import { has } from "./helpers";
 
-export const setupAccounts = async(c: Context) => {
+export const setupAccounts = async(c: BaseContext) => {
   if (await doesAdminExist(c))
-    return c.html("already created", 501);
+    return c.html("already created", 500);
 
   const settingsToCheck: string[] =
     ["DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS"];
@@ -23,11 +23,11 @@ export const setupAccounts = async(c: Context) => {
       // @ts-ignore: Property does not exist (it does via an extension)
       username: c.env.DEFAULT_ADMIN_USER,
       password: c.env.DEFAULT_ADMIN_PASS,
-      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS || ""
+      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS
     }
   });
   if (data.token !== null)
     return c.redirect("/");
   else
-    return c.html("failure", 401);
+    return c.html("failure", 403);
 }

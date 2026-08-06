@@ -3,7 +3,7 @@ import type { BaseElementProps } from "../types";
 import RepostOptions from "./options/repostOptions";
 import ScheduleOptions from "./options/scheduleOptions";
 
-export function RepostCreation(props?: BaseElementProps) {
+export function RepostCreation(_props?: BaseElementProps) {
   return (<article>
     <header>
       <h4>Schedule New Retweet</h4>

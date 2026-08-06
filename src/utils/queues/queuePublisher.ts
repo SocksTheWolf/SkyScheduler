@@ -4,7 +4,7 @@ import get from 'just-safe-get';
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
-import type { AllContext, Bindings, QueueTaskData } from "../../types";
+import type { AllContext, Bindings } from "../../types";
 import { isInDev } from '../helpers';
 
 // picks a random queue to publish data to
@@ -27,7 +27,7 @@ async function pushToQueue(queueConsumer: Queue|null, data: Post|Repost|null, ta
     if (delay > -1)
       options.delaySeconds = delay;
 
-    await queueConsumer.send({type: taskType, data: data} as QueueTaskData, options);
+    await queueConsumer.send({type: taskType, data: data}, options);
   } else {
     console.warn(`could not push data to empty queue, was type ${taskType}`);
   }
@@ -47,7 +47,7 @@ export async function enqueuePost(c: AllContext, data: Post, delay: number = -1)
   } else if (!isQueueEnabled(c.env))
     return;
 
-  let postType = TaskType.Post, postQueue = "post_queues";
+  const postType = TaskType.Post, postQueue = "post_queues";
   // Pick a random consumer to handle this post
   const queueConsumer: Queue|null = getRandomQueue(c.env, postQueue);
   await pushToQueue(queueConsumer, data, postType, delay);

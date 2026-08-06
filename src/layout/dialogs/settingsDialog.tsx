@@ -7,7 +7,7 @@ import DashboardPasswordField from "../fields/dashPasswordField";
 import PDSInputField from "../fields/pdsInputField";
 import UsernameField from "../fields/usernameField";
 
-export default function SettingsDialog(props: BaseElementProps) {
+export default function SettingsDialog(_props: BaseElementProps) {
   return (<>
   <dialog id="changeInfo">
     <article>

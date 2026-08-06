@@ -7,14 +7,14 @@ import { formatTime } from "../../utils/helpers";
 export function RepostTimeSelector() {
   const subIntervalLimit: number = 60 / REPOSTING_TIME_INTERVAL;
   return (<select disabled>
-    {[...Array(MAX_REPOST_IN_HOURS)].map((x, i) => {
+    {[...Array(MAX_REPOST_IN_HOURS)].map((_x, i) => {
       if (i == 0) return;
       const dayField = Math.floor(i/24);
       const hourField = i % 24;
       // This array is pure evil and ugly and horrible
-      let evilArray = [];
+      const evilArray = [];
       for (let t = 0; t < subIntervalLimit; ++t) {
-        const minutesValue = t * (REPOSTING_TIME_INTERVAL as number);
+        const minutesValue: number = t * (REPOSTING_TIME_INTERVAL);
         evilArray.push(<option value={i + minutesValue/60}>{formatTime(dayField, hourField, minutesValue)}</option>);
         // When at limit, we should not add sub options, so break out.
         if (i == MAX_REPOST_IN_HOURS-1)
@@ -27,7 +27,7 @@ export function RepostTimeSelector() {
 
 export function RepostAmountSelector() {
   return (<select disabled>
-    {[...Array(MAX_REPOST_INTERVAL_LIMIT)].map((x, i) => {
+    {[...Array(MAX_REPOST_INTERVAL_LIMIT)].map((_x, i) => {
       if (i == 0) return;
       return (<option value={i}>{i} times</option>);
     })}

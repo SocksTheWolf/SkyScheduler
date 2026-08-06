@@ -14,6 +14,7 @@ import type {
   AllContext,
   BatchQuery,
   BatchQueryArray,
+  DBProcessor,
   EditPostChanges,
   GetAllPostedBatch,
   PostRecordResponse
@@ -22,7 +23,7 @@ import { floorCurrentTime } from "../helpers";
 
 export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("Could not get all posts for current time, db was null");
     return [];
@@ -51,7 +52,7 @@ export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: bo
 
 export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date): Promise<Repost[]> => {
   // Get all scheduled posts for the given time
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("could not get all reposts for given timeframe, db was null");
     return [];
@@ -72,7 +73,7 @@ export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost
 };
 
 export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to delete all reposts before current time, db was null");
     return;
@@ -83,7 +84,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
 
   // This is really stupid and I hate it, but someone has to update repost counts once posted
   if (deletedPosts.length > 0) {
-    let batchedQueries: BatchQueryArray = [];
+    const batchedQueries: BatchQueryArray = [];
     for (const deleted of deletedPosts) {
       // Update counts
       const newCount = db.$count(reposts, eq(reposts.uuid, deleted.id));
@@ -124,12 +125,12 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
 };
 
 export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordResponse[], allPosted: boolean) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to bulk update posted data, db was null");
     return;
   }
-  let dbOperations: BatchQueryArray = [];
+  const dbOperations: BatchQueryArray = [];
 
   for (let i = 0; i < records.length; ++i) {
     const record = records[i];
@@ -137,7 +138,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
     if (record.postID === null)
       continue;
 
-    let wasPosted = (i == 0 && !allPosted) ? false : true;
+    const wasPosted = (i == 0 && !allPosted) ? false : true;
     dbOperations.push(db.update(posts).set(
       {content: TRUNCATE_POSTED_CONTENT ? sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})` : posts.content,
         posted: wasPosted, uri: record.uri, cid: record.cid, embedContent: []})
@@ -149,7 +150,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
 };
 
 export const setPostNowOffForPost = async (c: AllContext, id: string) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!uuidValid(id))
     return false;
 
@@ -164,7 +165,7 @@ export const setPostNowOffForPost = async (c: AllContext, id: string) => {
 };
 
 export const updatePostForGivenUser = async (c: AllContext, userId: string, id: string, newData: EditPostChanges) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (isEmpty(userId) || !uuidValid(id))
     return false;
 
@@ -179,7 +180,7 @@ export const updatePostForGivenUser = async (c: AllContext, userId: string, id: 
 };
 
 export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Promise<GetAllPostedBatch[]> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (isEmpty(userId))
     return [];
 
@@ -195,7 +196,7 @@ export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Pro
 };
 
 export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatch[]> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to get all posted posts, db was null");
     return [];
@@ -207,7 +208,7 @@ export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatc
 };
 
 export const isPostAlreadyPosted = async (c: AllContext, postId: string): Promise<boolean> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!uuidValid(postId))
     return true;
 
@@ -225,7 +226,7 @@ export const isPostAlreadyPosted = async (c: AllContext, postId: string): Promis
 };
 
 export const getChildPostsOfThread = async (c: AllContext, rootId: string): Promise<Post[]|null> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!uuidValid(rootId))
     return null;
 
@@ -259,12 +260,12 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
   if (isEmpty(postsToDelete))
     return 0;
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error(`could not delete posts ${postsToDelete}, db was null`);
+    console.error(`could not delete posts ${postsToDelete.toString()}, db was null`);
     return 0;
   }
-  let deleteQueries: BatchQueryArray = [];
+  const deleteQueries: BatchQueryArray = [];
   postsToDelete.forEach((itm) => {
     // this will wipe out any posts and their children if they are marked for delete
     deleteQueries.push(db.delete(posts).where(
@@ -283,7 +284,7 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
 };
 
 export const purgePostedPosts = async (c: AllContext): Promise<number> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("could not purge posted posts, got error");
     return 0;

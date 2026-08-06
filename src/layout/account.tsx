@@ -34,8 +34,8 @@ export default function AccountHandler(props: AccountFormProps) {
       <form id="loginForm">
         {props.children}
         <center>
-          <button type="submit" disabled={props.disabledByDefault || false}>
-            {props.submitText || props.title}
+          <button type="submit" disabled={props.disabledByDefault ?? false}>
+            {props.submitText ?? props.title}
           </button>
         </center>
       </form>
@@ -45,14 +45,14 @@ export default function AccountHandler(props: AccountFormProps) {
       <footer>
         <center>
           <span id="footerLinks">
-            {props.footerLinks ? <small>{footerLinkHTML}</small> : (props.footerHTML || "")}
+            {props.footerLinks ? <small>{footerLinkHTML}</small> : (props.footerHTML ?? "")}
           </span>
         </center>
       </footer>
     </article>
     <script type="text/javascript" nonce={props.nonce}>
     {html`
-      easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay || 0});
+      easySetup("${props.endpoint}", "${props.successText}", "${props.redirect}", ${props.customRedirectDelay ?? 0});
     `}
     </script>
   </section>);

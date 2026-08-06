@@ -1,9 +1,9 @@
-import type { Context } from "hono";
 import { every } from "hono/combine";
+import type { BaseContext } from "../types";
 import { pullAuthData } from "./auth";
 
-async function goDashIfLogin(c: Context, next: any) {
-  if (c.get("ssg") === false) {
+async function goDashIfLogin(c: BaseContext, next: any) {
+  if (!c.get("ssg")) {
     if (c.get("userId") !== null) {
       return c.redirect("/dashboard");
     }

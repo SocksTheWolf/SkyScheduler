@@ -25,7 +25,7 @@ export async function ViolationNoticeBar(props: ViolationNoticeBarProps) {
     return (<HiddenEmptyViolationsBar forceLoad={true} />);
   }
 
-  const ctx: AllContext = props.ctx!;
+  const ctx: AllContext = props.ctx;
   const violationData = await getViolationsForCurrentUser(ctx);
   if (violationData !== null) {
     let errorStr = "";

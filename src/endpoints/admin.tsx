@@ -31,7 +31,7 @@ admin.get("/abandoned", async (c) => {
   for (const file of abandonedFiles) {
     returnHTML += `${file}\n`;
   }
-  if (c.env.R2_SETTINGS.auto_prune == true) {
+  if (c.env.R2_SETTINGS.auto_prune) {
     console.log("pruning abandoned files...");
     await cleanupAbandonedFiles(c);
   }

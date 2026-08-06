@@ -14,9 +14,9 @@ export default function UsernameField(props?: UsernameFieldProps) {
      <br />Profile/post links will attempt to be converted into the correct format.
      </span>);
   // default required true.
-  const inputRequired = (props) ? (props?.required || false) : true;
+  const inputRequired = (props) ? (props.required ?? false) : true;
   return (<label>
-    {props?.title || "Bluesky Handle"}
+    {props?.title ?? "Bluesky Handle"}
     <input type="text" id="username" name="username" autocomplete="username"
       minlength={BSKY_MIN_USERNAME_LENGTH} required={inputRequired} />
     <small>{hintText}</small>

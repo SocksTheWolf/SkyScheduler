@@ -1,9 +1,9 @@
-import type { Context } from "hono";
 import { every } from "hono/combine";
+import type { BaseContext } from "../types";
 import { hasAuth, pullAuthData } from "./auth";
 
-async function goHomeIfLogout(c: Context, next: any) {
-  if (c.get("ssg") === false) {
+async function goHomeIfLogout(c: BaseContext, next: any) {
+  if (!c.get("ssg")) {
     if (!hasAuth(c)) {
       return c.redirect("/");
     }

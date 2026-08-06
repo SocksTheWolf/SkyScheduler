@@ -183,6 +183,10 @@ document.addEventListener("repostScheduleDeleted", function() {
   pushToast("Schedule deleted", true);
 });
 
+document.addEventListener("postMissing", function() {
+  pushToast("Error: Post is missing, already been posted or has been deleted", false);
+});
+
 document.addEventListener("postUpdatedNotice", function() {
   pushToast("Post updated successfully!", true);
 })

@@ -1,5 +1,6 @@
 import isEmpty from 'just-is-empty';
-import { AgentMap, type AtProtoAgent } from '../classes/bskyAgents';
+import type { AtProtoAgent } from '../classes/bskyAgents';
+import { AgentMap } from '../classes/bskyAgents';
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
 import { TaskType } from "../enums";
@@ -36,7 +37,7 @@ export const handlePostTask = async(runtime: AllContext, postData: Post, agent: 
 };
 
 export const handlePostNowTask = async(c: AllContext, postData: Post) => {
-  let postStatus = false;
+  let postStatus;
   if (shouldPostNowQueue(c.env)) {
     try {
       c.executionCtx.waitUntil(enqueuePost(c, postData));
@@ -54,7 +55,7 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       postStatus = await makePost(c, postData, agent);
     }
   }
-  if (postStatus === false)
+  if (!postStatus)
     c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.postid));
 
   return postStatus;
@@ -93,7 +94,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(c);
   const queueEnabled: boolean = isQueueEnabled(c.env);
   const threadQueueEnabled: boolean = shouldPostThreadQueue(c.env);
-  const agency = (withAgency) ? withAgency : new AgentMap(c.env.TASK_SETTINGS);
+  const agency = (withAgency) ?? new AgentMap(c.env.TASK_SETTINGS);
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
@@ -102,7 +103,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
       if (queueEnabled || (post.isThreadRoot && threadQueueEnabled)) {
         await enqueuePost(c, post);
       } else {
-        let agent = await agency.getOrAddAgent(c, post.user, TaskType.Post);
+        const agent = await agency.getOrAddAgent(c, post.user, TaskType.Post);
         c.executionCtx.waitUntil(handlePostTask(c, post, agent));
       }
     }
@@ -112,7 +113,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
 };
 
 export const scheduleRepostTask = async (c: AllContext, withAgency?: AgentMap) => {
-  const agency = (withAgency) ? withAgency : new AgentMap(c.env.TASK_SETTINGS);
+  const agency = (withAgency) ?? new AgentMap(c.env.TASK_SETTINGS);
   const repostQueueEnabled: boolean = isRepostQueueEnabled(c.env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(c);
   // Push any reposts
@@ -120,7 +121,7 @@ export const scheduleRepostTask = async (c: AllContext, withAgency?: AgentMap) =
     console.log(`handling ${scheduledReposts.length} reposts`);
     for (const repost of scheduledReposts) {
       if (!repostQueueEnabled) {
-        let agent = await agency.getOrAddAgent(c, repost.userId, TaskType.Repost);
+        const agent = await agency.getOrAddAgent(c, repost.userId, TaskType.Repost);
         c.executionCtx.waitUntil(handleRepostTask(c, repost, agent));
       } else {
         await enqueueRepost(c, repost);
@@ -141,7 +142,7 @@ export const cleanUpPostsTask = async(c: AllContext) => {
     const deletedItems: number = await deletePosts(c, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
-  if (c.env.R2_SETTINGS.auto_prune === true) {
+  if (c.env.R2_SETTINGS.auto_prune) {
     console.log("Cleaning up abandoned files...");
     await cleanupAbandonedFiles(c);
   }

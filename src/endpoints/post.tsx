@@ -35,7 +35,7 @@ post.post("/upload", authMiddleware, async (c) => {
 
   const { file } = validation.data;
   const fileUploadResponse = await uploadFileR2(c, file as File, c.get("userId"));
-  if (fileUploadResponse.success === false)
+  if (!fileUploadResponse.success)
     return c.json(fileUploadResponse, 400);
   else
     return c.json(fileUploadResponse, 200);
@@ -68,7 +68,7 @@ post.post("/create", authMiddleware, rateLimit({limiter: "POST_LIMITER"}), async
     // Handling posting right now.
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
-      if (await handlePostNowTask(c, postInfo!) === false)
+      if (!(await handlePostNowTask(c, postInfo!)))
         return c.json({ok: false, msg: "Unable to post now, will try again during next nearest posting time"}, 406);
       return c.json({ok: true, msg: "Created Post!", id: response.postId});
     } else {
@@ -96,43 +96,44 @@ post.all("/all", authMiddlewareHTML, async (c) => {
 // Edit posts
 post.get("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
-  if (!isValid(id))
-    return c.html(<></>);
-
-  const postInfo = await getPostById(c, id);
-  if (postInfo !== null) {
-    c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
-    return c.html(<PostEdit post={postInfo} />);
+  if (isValid(id)) {
+    const postInfo = await getPostById(c, id);
+    if (postInfo !== null) {
+      c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
+      return c.html(<PostEdit post={postInfo} />);
+    }
   }
-  return c.html(<></>);
+  c.header("HX-Trigger-After-Swap", "postMissing");
+  return c.html(<></>, 404);
 });
 
 post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
+  const postMissingEvent: string = swapErrEvents + ", postMissing";
   if (!isValid(id)) {
-    c.header("HX-Trigger-After-Swap", swapErrEvents);
-    return c.html(<b class="btn-error">Post was invalid</b>);
+    c.header("HX-Trigger-After-Swap", postMissingEvent);
+    return c.html(<b class="btn-error">Post was invalid</b>, 403);
   }
 
   const body = await c.req.json();
   const validation = EditSchema.safeParse(body);
   if (!validation.success) {
-    return c.html(<b class="btn-error">New post had invalid data</b>);
+    return c.html(<b class="btn-error">New post had invalid data</b>, 403);
   }
 
   const { content, altEdits } = validation.data;
   const originalPost = await getPostByIdWithReposts(c, id);
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
-    c.header("HX-Trigger-After-Settle", swapErrEvents);
-    return c.html(<b class="btn-error">Could not find post to edit</b>);
+    c.header("HX-Trigger-After-Settle", postMissingEvent);
+    return c.html(<b class="btn-error">Could not find post to edit</b>, 404);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
-    c.header("HX-Trigger-After-Settle", "scrollTop");
-    return c.html(<b class="btn-error">This post has already been posted</b>);
+    c.header("HX-Trigger-After-Settle", "scrollTop, postMissing");
+    return c.html(<b class="btn-error">This post has already been posted</b>, 403);
   }
 
   // Handle alt text and stuffs
@@ -140,18 +141,18 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
     // Check to see if this post had editable data
     if (originalPost.embeds === undefined) {
       c.header("HX-Trigger-After-Settle", swapErrEvents);
-      return c.html(<b class="btn-error">Post did not have media content that was editable</b>);
+      return c.html(<b class="btn-error">Post did not have media content that was editable</b>, 403);
     }
 
     // Create an easy map to match content with quickly
-    let editsMap: Map<string, string> = new Map();
+    const editsMap = new Map<string, string>();
     altEdits.forEach((item) => {
       editsMap.set(item.content, item.alt);
     });
 
     // process and match up all of the alt text properly
-    for (let i = 0; i < originalPost.embeds?.length; ++i) {
-      let embedData = originalPost.embeds[i];
+    for (let i = 0; i < originalPost.embeds.length; ++i) {
+      const embedData = originalPost.embeds[i];
       // if we have anything other than an image or video, skip it
       if (!isAltEditableType(embedData.type)) {
         continue;
@@ -178,13 +179,13 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
-  return c.html(<b class="btn-error">Failed to process edit</b>);
+  return c.html(<b class="btn-error">Failed to process edit</b>, 500);
 });
 
 post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (!isValid(id))
-    return c.html(<></>);
+    return c.html(<></>, 403);
 
   const postInfo = await getPostByIdWithReposts(c, id);
   // Get the original post to replace with
@@ -195,7 +196,7 @@ post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
 
   // Refresh sidebar otherwise
   c.header("HX-Trigger-After-Swap", "refreshPosts, updateTimestamps, sidebarButtons, scrollListTop, scrollTop");
-  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>);
+  return c.html(<b class="btn-error">Internal error occurred, reloading...</b>, 500);
 });
 
 // delete a post
@@ -203,7 +204,7 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
-    if (response.success === true) {
+    if (response.success) {
       let postRefreshEvent = "";
       // This is true if this was the root of a thread chain
       if (response.needsRefresh) {
@@ -212,11 +213,11 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
       const triggerEvents = `resetIfThreading, accountViolations${postRefreshEvent}`;
       c.header("HX-Trigger-After-Swap", triggerEvents);
       c.header("HX-Trigger-After-Settle", `{"postDeleted": ${response.isRepost}}`);
-      return c.html(<></>);
+      return c.html(<></>, 200);
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
-  return c.html(<></>);
+  return c.html(<></>, 403);
 });
 
 // get the repost rule editor
@@ -227,8 +228,10 @@ post.get("/:id/repost", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDITOR_O
       c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
       return c.html(<RepostDataPopover ctx={c} id={id} />);
     }
+
+    c.header("HX-Trigger-After-Swap", "postMissingEvent");
   }
-  return c.html(<></>);
+  return c.html(<></>, 404);
 });
 
 // delete a post's repost rule
@@ -238,9 +241,9 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
     if (isValid(id) && isValid(scheduleId)) {
       if (await deleteRepostRule(c, id, scheduleId)) {
         c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
-        return c.html(<></>);
+        return c.html(<></>, 200);
       }
     }
   }
-  return c.html(<>Invalid</>);
+  return c.html(<b class="btn-error">Internal error occurred</b>, 403);
 });

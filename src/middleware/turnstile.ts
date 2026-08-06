@@ -1,14 +1,14 @@
-import type { Context } from "hono";
+import type { BaseContext } from "../types";
 import { useCFTurnstile } from "../utils/helpers";
 
 // Middleware that handles turnstile verification.
-export async function verifyTurnstile(c: Context, next: any) {
+export async function verifyTurnstile(c: BaseContext, next: any) {
   if (useCFTurnstile(c)) {
     const body = await c.req.json();
     const userIP: string|undefined = c.req.header("CF-Connecting-IP");
-    const token = body["cf-turnstile-response"];
+    const token: string = body["cf-turnstile-response"];
 
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
     formData.append("response", token);
     if (userIP)

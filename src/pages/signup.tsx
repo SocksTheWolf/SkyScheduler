@@ -17,13 +17,13 @@ export default function Signup(props: BaseElementProps) {
   if (props.ctx === undefined)
     return (<b class="btn-error">Failed: Server Error</b>);
 
-  const ctx: AllContext = props.ctx!;
+  const ctx: AllContext = props.ctx;
   const linkToInvites = !isEmpty(SITE_INVITE_URL) ?
     (<a href={SITE_INVITE_URL} target="_blank">Invite codes can be found here</a>) :
     "You can ask for the maintainer for it";
 
   return (<BaseLayout title="Signup" nonce={ctx.get("secureHeadersNonce")}
-    preloads={[...TurnstileCaptchaPreloads(ctx)]}>
+    preloads={TurnstileCaptchaPreloads(ctx)}>
       <NavTags />
       <AccountHandler title="Create Account"
         submitText="Sign Up!"

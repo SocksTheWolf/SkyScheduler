@@ -55,7 +55,7 @@ export const consumeInviteKey = async(c: AllContext, inviteKey: string|undefined
     if (amount === -1)
       return;
 
-    let newValue: number = amount - 1;
+    const newValue: number = amount - 1;
     // Delete any keys that fall to 0, they should be removed from the db
     if (newValue <= 0) {
       await c.env.INVITE_POOL!.delete(inviteKey);

@@ -11,8 +11,8 @@ import { getAgentPostRecords } from './bskyApi';
 // cron job.
 export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
   const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(c, userId) : await getAllPostedPosts(c);
-  let removePostIds: string[] = [];
-  let postedGroups = split(allPostedPosts, 25);
+  const removePostIds: string[] = [];
+  const postedGroups = split(allPostedPosts, 25);
   // Bluesky public API
   const agent = new AtProtoAgent('https://public.api.bsky.app');
   while (!isEmpty(postedGroups)) {
@@ -25,8 +25,8 @@ export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
 
     // Create a map and an array so we can do lookups for reconciliation later
     // to figure out what posts can be removed.
-    let urisOnly: string[] = [];
-    const postMap: Map<string, string> = new Map();
+    const urisOnly: string[] = [];
+    const postMap = new Map<string, string>();
     currentGroup.forEach((itm) => {
       if (itm.uri === null) {
         console.log(`Skipping a "posted" post that does not have an uri: ${itm.id}`);
@@ -54,7 +54,7 @@ export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
             postMap.delete(currentRecord.uri);
           }
           // Add all the deleted keys to the main array.
-          postMap.forEach((value, key) => {
+          postMap.forEach((value, _key) => {
             removePostIds.push(value);
           });
         }

@@ -4,7 +4,7 @@ import flatten from "just-flatten-it";
 import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus } from "../../enums";
-import type { AllContext, Violation, ViolationRecordChange } from "../../types";
+import type { AllContext, DBProcessor, UserIdType, Violation, ViolationRecordChange } from "../../types";
 import { lookupBskyHandle } from "../bsky/bskyApi";
 import { getUsernameForUserId } from "./userinfo";
 
@@ -24,7 +24,7 @@ export const userHasBan = async(c: AllContext, userDid: string|null): Promise<bo
   if (userDid === null)
     return false;
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to check if user has ban, db was null");
     return false;
@@ -33,19 +33,19 @@ export const userHasBan = async(c: AllContext, userDid: string|null): Promise<bo
   return (usersBanned > 0);
 };
 
-export const userHandleHasBan = async(c: AllContext, userName: string) => {
+export const userHandleHasBan = async(c: AllContext, userName: string|null) => {
   if (userName !== null) {
     return await lookupBskyHandle(userName).then((didHandle) => userHasBan(c, didHandle));
   }
   return false;
 };
 
-export const userHasViolationsDB = async(db: DrizzleD1Database, userId: string): Promise<boolean> => {
+export const userHasViolationsDB = async(db: DBProcessor, userId: string): Promise<boolean> => {
   return (await getViolationsForUser(db, userId)) != null;
 };
 
 export const userHasViolations = async(c: AllContext, userId: string): Promise<boolean> => {
-  return await userHasViolationsDB(c.get("db"), userId);
+  return await userHasViolationsDB(c.get("db") as DBProcessor, userId);
 };
 
 function createObjForValuesChange(violationType: AccountStatus[], value: boolean) {
@@ -130,17 +130,20 @@ export const removeViolation = async(c: AllContext, userId: string, violationTyp
 };
 
 export const removeViolations = async(c: AllContext, userId: string, violationType: AccountStatus[]) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.warn(`unable to remove violations for user ${userId}, db was null`);
     return;
   }
-  return await removeViolationsDB(db, userId, violationType);
+  await removeViolationsDB(db, userId, violationType);
 };
 
-export const removeViolationsDB = async(db: DrizzleD1Database, userId: string, violationType: AccountStatus[]) => {
+export const removeViolationsDB = async(db: DBProcessor, userId: string, violationType: AccountStatus[]) => {
+  if (!db)
+    return;
+
   // Check if they have a violation first
-  if ((await userHasViolationsDB(db, userId)) == false) {
+  if (!(await userHasViolationsDB(db, userId))) {
     return;
   }
 
@@ -157,7 +160,10 @@ export const removeViolationsDB = async(db: DrizzleD1Database, userId: string, v
     )))));
 };
 
-export const getViolationsForUser = async(db: DrizzleD1Database, userId: string) => {
+export const getViolationsForUser = async(db: DBProcessor, userId: string) => {
+  if (!db)
+    return null;
+
   const {results} = await db.select().from(violations)
     .where(eq(violations.userId, userId)).limit(1).run();
   if (results.length > 0)
@@ -166,8 +172,8 @@ export const getViolationsForUser = async(db: DrizzleD1Database, userId: string)
 };
 
 export const getViolationsForCurrentUser = async(c: AllContext): Promise<Violation|null> => {
-  const userId = c.get("userId");
-  const db: DrizzleD1Database = c.get("db");
+  const userId: UserIdType = c.get("userId");
+  const db: DBProcessor = c.get("db");
   if (userId && db) {
     return await getViolationsForUser(db, userId);
   }
@@ -175,7 +181,7 @@ export const getViolationsForCurrentUser = async(c: AllContext): Promise<Violati
 };
 
 export const getAllViolationsAfterTime = async(c: AllContext): Promise<string[]|null> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (db) {
     const results = await db.select({id: violations.userId}).from(violations).where(
       lte(violations.createdAt, sql`datetime('now', '-12 weeks')`)).all();

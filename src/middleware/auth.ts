@@ -1,29 +1,29 @@
-import type { Context } from "hono";
 import { every } from "hono/combine";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
 import { isSSGContext } from "hono/ssg";
-import type { RequireAuthMiddlewareProps } from "../types";
+import type { BaseContext, RequireAuthMiddlewareProps } from "../types";
 import { logoutAccount } from "../utils/helpers";
 
-function clearContext(c: Context) {
+function clearContext(c: BaseContext) {
   c.set("userId", null);
   c.set("pds", "");
   c.set("isAdmin", false);
   c.set("session", null);
+  c.set("db", null);
   c.set("ssg", isSSGContext(c));
 }
 
 // Resets all environment variables to a blank state
 // this is so that they have default values, makes it easier to
 // query things like in the ratelimit middleware
-export async function blankAuthEnv(c: Context, next: any) {
+export async function blankAuthEnv(c: BaseContext, next: any) {
   clearContext(c);
   await next();
 };
 
 // Middleware to verify authentication
-export async function pullAuthData(c: Context, next: any) {
+export async function pullAuthData(c: BaseContext, next: any) {
   const auth = c.get("auth");
   try {
     const session = await auth.api.getSession({
@@ -46,7 +46,7 @@ export async function pullAuthData(c: Context, next: any) {
 };
 
 export function requireAuthEx(props: RequireAuthMiddlewareProps) {
-  return createMiddleware(async (c: Context, next: any) => {
+  return createMiddleware(async (c: BaseContext, next: any) => {
     if (!hasAuth(c)) {
       if (props.forceLogout) {
         await logoutAccount(c);
@@ -57,7 +57,7 @@ export function requireAuthEx(props: RequireAuthMiddlewareProps) {
       }
 
       if (props.returnHTML)
-        return c.html(html`<b class="btn-error">Session Invalid, please sign in again</b>`);
+        return c.html(html`<b class="btn-error">Session Invalid, please sign in again</b>`, 401);
       else
         return c.json({ ok: false, msg: "Unauthorized" }, 401);
     }
@@ -65,14 +65,14 @@ export function requireAuthEx(props: RequireAuthMiddlewareProps) {
   });
 }
 
-export async function requireAuth(c: Context, next: any) {
+export async function requireAuth(c: BaseContext, next: any) {
   if (!hasAuth(c)) {
     return c.json({ ok: false, msg: "Unauthorized" }, 401);
   }
   await next();
 };
 
-export function hasAuth(c: Context) {
+export function hasAuth(c: BaseContext) {
   return (c.get("session") !== null && c.get("userId") !== null);
 };
 

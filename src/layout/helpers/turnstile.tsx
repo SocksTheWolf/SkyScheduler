@@ -1,11 +1,11 @@
-import type { AllContext, BaseElementProps } from "../../types";
+import type { AllContext, BaseElementProps, PreloadRules } from "../../types";
 import { useCFTurnstile } from "../../utils/helpers";
 
-export function TurnstileCaptchaPreloads(ctx: AllContext) {
+export function TurnstileCaptchaPreloads(ctx: AllContext): PreloadRules[]|undefined {
   if (useCFTurnstile(ctx)) {
     return [{type: "script", href: "https://challenges.cloudflare.com/turnstile/v0/api.js"}];
   }
-  return [];
+  return undefined;
 }
 
 export function TurnstileCaptcha(props: BaseElementProps) {

@@ -20,7 +20,7 @@ export function makeConstScript() {
     return typeMap.map((type) => `"${type}"`).join()
   };
 
-  let fileTypeArray = [...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES];
+  const fileTypeArray = [...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES];
   if (GIF_UPLOAD_ALLOWED) {
     fileTypeArray.push(...BSKY_GIF_MIME_TYPES);
   }

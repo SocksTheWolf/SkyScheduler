@@ -39,7 +39,7 @@ export const LinkEmbedSchema = z.object({
     try {
       const urlWrap = new URL(value);
       return (urlWrap.protocol === "https:" || urlWrap.protocol === "http:");
-    } catch (err) {
+    } catch (_err) {
       return false;
     }
   }, {

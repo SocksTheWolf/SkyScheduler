@@ -62,7 +62,7 @@ export async function RepostDataPopover(props: RepostDataPopoverProps) {
     </header>
     <p>Here are the current repost rules for the given post.</p>
     <p><b>NOTE</b>: If a schedule rule overlaps with another, then only the first rule has a registered action, and any duplicate scheduled action is not created.</p>
-    <RepostEditorTable id={props.id} data={repostInfoData?.repostInfo} />
+    <RepostEditorTable id={props.id} data={repostInfoData.repostInfo} />
     <progress id="repostDataPopoverProgress" class="htmx-indicator" />
     <footer>
       <small><a role="button" id="click-close" class="clicker" tabindex={0}>Close this editor</a></small>

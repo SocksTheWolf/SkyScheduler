@@ -1,5 +1,5 @@
 import { raw } from "hono/html";
-import type { PreloadRules } from "../../types";
+import type { LooseObj, PreloadRules } from "../../types";
 
 type NoncePropType = {
   nonce?: string
@@ -18,9 +18,9 @@ export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
   const html = scripts.map((itm) => {
     switch (itm.type) {
       case "script":
-        return (<script type="text/javascript" src={itm.href} nonce={nonce} async={itm.async || undefined} defer={itm.defer||undefined}></script>);
+        return (<script type="text/javascript" src={itm.href} nonce={nonce} async={itm.async ?? undefined} defer={itm.defer??undefined}></script>);
       case "module":
-        return (<script type="module" src={itm.href} nonce={nonce} async={itm.async || undefined} defer={itm.defer||undefined}></script>);
+        return (<script type="module" src={itm.href} nonce={nonce} async={itm.async ?? undefined} defer={itm.defer??undefined}></script>);
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" nonce={nonce} />);
       default:
@@ -42,10 +42,23 @@ export function PreloadDependencyTags({scripts}: DepTagsType) {
 };
 
 export function getHTMXConfigStr(nonce: string|undefined) {
-  if (nonce === undefined) {
-    return `<meta name="htmx-config" />`;
+  const HTMXConfigObj: LooseObj = {
+    responseHandling: [
+      {code:"204", swap:false},
+      {code:"400", swap:false, error:true},
+      {code:"404", swap:true, error:true},
+      {code:"[234]..", swap:true, error:false},
+      {code:"500", swap:true, error:true},
+      {code:"[5]..", swap:false, error:true},
+      {code:"...", swap:true}
+    ]
+  };
+  if (nonce !== undefined) {
+    HTMXConfigObj.allowEval = false;
+    HTMXConfigObj.inlineScriptNonce = HTMXConfigObj.inlineStyleNonce = nonce;
   }
-  return `<meta name="htmx-config" content='{"allowEval":false,"inlineScriptNonce":"${nonce}","inlineStyleNonce":"${nonce}"}' />`;
+
+  return `<meta name="htmx-config" content='${JSON.stringify(HTMXConfigObj)}' />`;
 };
 
 export function HTMXNonceTag({nonce}: NoncePropType) {

@@ -1,16 +1,15 @@
 import { and, eq, getTableColumns, gt, inArray, isNull, sql } from "drizzle-orm";
-import type { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
-import type { AllContext, BatchQuery, BatchQueryArray, R2BucketObject } from "../../types";
+import type { AllContext, BatchQuery, BatchQueryArray, DBProcessor, R2BucketObject } from "../../types";
 import { getAllFilesList } from "../r2Query";
 import { addFileListing, getAllMediaOfUser } from "./file";
 
 /** Maintenance operations **/
 export const runMaintenanceUpdates = async (c: AllContext) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to get database to run maintenance");
     return;
@@ -29,7 +28,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
   // Run the invalid json fix
   if (jsonFix.length > 0) {
     console.log(`Attempting to clean up/empty old JSON data for ${jsonFix.length} posts`);
-    let invalidJsonFix: string[] = [];
+    const invalidJsonFix: string[] = [];
     jsonFix.forEach(item => { invalidJsonFix.push(item.id)});
     await db.update(posts).set({ embedContent: [] }).where(inArray(posts.uuid, invalidJsonFix));
   }
@@ -56,7 +55,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
     console.error(`Adding file listings got error ${err}`);
   }
 
-  let batchedQueries: BatchQueryArray = [];
+  const batchedQueries: BatchQueryArray = [];
   // Flag if the media file has embed data
   const allUsers = await db.select({id: users.id}).from(users).all();
   for (const user of allUsers) {

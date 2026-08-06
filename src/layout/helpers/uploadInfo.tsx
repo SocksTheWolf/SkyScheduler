@@ -12,7 +12,7 @@ import {
 } from "../../limits";
 import type { BaseElementProps } from "../../types";
 
-export default function UploadInfo(props: BaseElementProps) {
+export default function UploadInfo(_props: BaseElementProps) {
   const bskyImageLimits = `Max file size of ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB`;
   return (<details class="uploadGuidelines noselect clicker" open>
     <summary tabindex={-1}>View Upload Limits & Guidelines</summary>
