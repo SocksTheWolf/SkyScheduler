@@ -15,6 +15,6 @@ export async function cacheStaticFileMiddleware(c: Context, next: any) {
 
 export async function cachePrivateMiddleware(c: Context, next: any) {
   c.res.headers.set("Cache-Tag", "private");
-  c.res.headers.set("Cache-Control", "private, max-age=200, must-revalidate");
+  c.res.headers.set("Cache-Control", "private, max-age=20, stale-while-revalidate=10, must-revalidate");
   await next();
 };
