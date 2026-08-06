@@ -203,8 +203,8 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
         'text/html': {}
       }
     },
-    400: {
-      description: "an error occurred",
+    403: {
+      description: "an error occurred or the post doesn't exist",
       content: {
         'text/html': {}
       }
@@ -665,7 +665,7 @@ export async function generateOpenAPI() {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.5',
+        version: '1.2.6',
         description: `The API Routes for ${APP_NAME} that can be used for providing API access
           or for the API Shield feature of Cloudflare`,
         termsOfService: `${SITE_URL}/tos`,

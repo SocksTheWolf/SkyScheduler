@@ -216,7 +216,7 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");
-  return c.html(<></>, 500);
+  return c.html(<></>, 403);
 });
 
 // get the repost rule editor
