@@ -13,7 +13,7 @@ import {
   MAX_IMAGE_WIDTH,
   MB_TO_BYTES
 } from "../limits";
-import type { AllContext, EmbedData, R2BucketObject } from '../types';
+import type { AllContext, EmbedData, R2BucketObject, UserIdType } from '../types';
 import { addFileListing, deleteFileListings, isMediaOwnedByUser } from './db/file';
 import { isAltEditableType } from './helpers';
 
@@ -262,16 +262,18 @@ const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
   return await rawUploadToR2(c, await file.stream(), fileMetaData);
 };
 
-export const uploadFileR2 = async (c: AllContext, file: File, userId: string) => {
+export const uploadFileR2 = async (c: AllContext, file: File, userId: UserIdType) => {
   const fileType: string = file.type.toLowerCase();
-  if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
-    return await uploadImageToR2(c, file, userId);
-  } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
-    return await uploadVideoToR2(c, file, userId);
-  } else if (GIF_UPLOAD_ALLOWED && BSKY_GIF_MIME_TYPES.includes(fileType)) {
-    // TODO: modify this in the future to transform the image to a webm
-    // then push to uploadVideo
-    return await uploadVideoToR2(c, file, userId);
+  if (userId !== null) {
+    if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
+      return await uploadImageToR2(c, file, userId);
+    } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
+      return await uploadVideoToR2(c, file, userId);
+    } else if (GIF_UPLOAD_ALLOWED && BSKY_GIF_MIME_TYPES.includes(fileType)) {
+      // TODO: modify this in the future to transform the image to a webm
+      // then push to uploadVideo
+      return await uploadVideoToR2(c, file, userId);
+    }
   }
   return {"success": false, "error": "unable to push to R2"};
 };

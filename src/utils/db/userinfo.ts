@@ -1,12 +1,11 @@
 import { eq } from "drizzle-orm";
-import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { BskyAPILoginCreds } from "../../classes/bskyLogin";
 import { users } from "../../db/auth.schema";
-import type { AllContext } from "../../types";
+import type { AllContext, DBProcessor, UserIdType } from "../../types";
 
 export const doesUserExist = async (c: AllContext, username: string): Promise<boolean> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("Unable to check database for user existence");
     return true;
@@ -18,7 +17,7 @@ export const doesUserExist = async (c: AllContext, username: string): Promise<bo
 };
 
 export const doesAdminExist = async (c: AllContext) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to check database for admin account");
     return false;
@@ -30,9 +29,9 @@ export const doesAdminExist = async (c: AllContext) => {
   return result.length > 0;
 };
 
-export const getBskyUserPassForId = async (c: AllContext, userid: string): Promise<BskyAPILoginCreds> => {
-  const db: DrizzleD1Database = c.get("db");
-  if (!db)
+export const getBskyUserPassForId = async (c: AllContext, userid: UserIdType): Promise<BskyAPILoginCreds> => {
+  const db: DBProcessor = c.get("db");
+  if (!db || !userid)
     return new BskyAPILoginCreds(null);
 
   const response = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
@@ -42,9 +41,9 @@ export const getBskyUserPassForId = async (c: AllContext, userid: string): Promi
   return new BskyAPILoginCreds(response[0] || null);
 };
 
-export const getUsernameForUserId = async (c: AllContext, userId: string): Promise<string|null> => {
-  const db: DrizzleD1Database = c.get("db");
-  if (!db)
+export const getUsernameForUserId = async (c: AllContext, userId: UserIdType): Promise<string|null> => {
+  const db: DBProcessor = c.get("db");
+  if (!db || !userId)
     return null;
 
   const result = await db.select({username: users.username}).from(users)
@@ -55,7 +54,7 @@ export const getUsernameForUserId = async (c: AllContext, userId: string): Promi
 };
 
 export const getUsernameForUser = async (c: AllContext): Promise<string|null> => {
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   if (!userId)
     return null;
 
@@ -67,7 +66,7 @@ export const getUsernameForUser = async (c: AllContext): Promise<string|null> =>
 // but we never update the email past the original time you first signed up, so instead
 // we use big brain tactics to spoof the email
 export const getUserEmailForHandle = async (c: AllContext, userhandle: string): Promise<string|null> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db)
     return null;
 

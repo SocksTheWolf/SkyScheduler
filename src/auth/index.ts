@@ -3,14 +3,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
 import type { Session } from "better-auth/types";
-import { type DrizzleD1Database } from "drizzle-orm/d1";
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import { APP_NAME } from "../appInfo";
 import {
   BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
   DEFAULT_PDS
 } from "../limits";
-import type { AllContext, BaseContext, Bindings } from "../types";
+import type { AllContext, BaseContext, Bindings, DBProcessor, UserIdType } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
@@ -187,10 +186,10 @@ const processAuthRoute = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.r
 // Export for variable types
 type ContextVariables = SecureHeadersVariables & {
   auth: ReturnType<typeof createAuth>;
-  userId: string|null;
+  userId: UserIdType;
   isAdmin: boolean;
   session: Session|null;
-  db: DrizzleD1Database|null;
+  db: DBProcessor;
   pds: string;
   ssg: boolean;
 };

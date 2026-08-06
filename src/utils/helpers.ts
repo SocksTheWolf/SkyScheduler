@@ -1,5 +1,6 @@
+import type { FormatDurationOptions } from "date-fns";
 import {
-  formatDuration, type FormatDurationOptions,
+  formatDuration,
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
 import type { Context } from "hono";

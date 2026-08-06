@@ -1,11 +1,12 @@
+import type { BlobRef } from "@atproto/api";
 import type { BatchItem } from "drizzle-orm/batch";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { Context } from "hono";
 import type { ContextVariables } from "./auth";
 import type { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
 import { EmbedDataType, TaskType } from "./enums";
-import type { BlobRef } from "@atproto/api";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -227,6 +228,7 @@ export type Violation = ViolationRecordChange & {
 };
 
 /// DATABASE
+export type DBProcessor = DrizzleD1Database|null;
 export type BatchQueryItem = BatchItem<"sqlite">;
 export type BatchQueryArray = BatchQueryItem[];
 export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
@@ -262,14 +264,12 @@ export type BaseElementProps = {
 };
 // handling preloading and injection of dependencies into the layout
 export type PreloadRules = {
-  type: "image"|"style"|"script"|"module"|string;
+  type: "image"|"style"|"script"|"module";
   href: string;
   defer?: boolean;
   async?: boolean;
 };
 
 /// MISC
-
-export interface LooseObj {
-  [key: string]: any;
-};
+export type UserIdType = string|null;
+export type LooseObj = Record<string, any>;

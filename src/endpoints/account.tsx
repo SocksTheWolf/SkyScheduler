@@ -10,7 +10,7 @@ import { DEFAULT_PDS } from "../limits";
 import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
-import type { HonoBase, LooseObj } from "../types";
+import type { BaseContext, HonoBase, LooseObj, UserIdType } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyApi";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
 import { getAllMediaOfUser } from "../utils/db/file";
@@ -68,11 +68,11 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
     }
     return c.json({ok: false, msg: "could not login user"}, 403);
   } catch (err: any) {
-    return c.json({ok: false, msg: ((err.message ?? err.msg) ?? "Unknown Error")}, 403);
+    return c.json({ok: false, msg: (err.message ?? err.msg ?? "Unknown Error")}, 403);
   }
 });
 
-account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c) => {
+account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c: BaseContext) => {
   const body = await c.req.parseBody();
   const validation = AccountUpdateSchema.safeParse(body);
   if (!validation.success) {
@@ -171,13 +171,15 @@ account.get("/violations", authMiddlewareHTML, async (c) => {
 
 // endpoint that allows the user to resolve conflicts.
 // We'll validate they are actually fixed bsky action is performed
-account.post("/violations/resolve", authMiddlewareHTML, async (c) => {
+account.post("/violations/resolve", authMiddlewareHTML, async (c: BaseContext) => {
   const userId = c.get("userId");
-  const context = new ScheduledContext(c.env, c.executionCtx);
-  if (await userHasViolations(context, userId)) {
-    // they do, so clear them out
-    await removeViolations(context, userId, [AccountStatus.TakenDown,
-      AccountStatus.Suspended, AccountStatus.Deactivated]);
+  if (userId !== null) {
+    const context = new ScheduledContext(c.env, c.executionCtx);
+    if (await userHasViolations(context, userId)) {
+      // they do, so clear them out
+      await removeViolations(context, userId, [AccountStatus.TakenDown,
+        AccountStatus.Suspended, AccountStatus.Deactivated]);
+    }
   }
   c.header("HX-Trigger-After-Swap", "accountViolations");
   return c.html(<></>);
@@ -223,7 +225,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   }
 
   // Check to see if we're using invite keys, and if so, check em.
-  if (await doesInviteKeyHaveValues(c, signupToken) === false) {
+  if (!(await doesInviteKeyHaveValues(c, signupToken))) {
     return c.json({ok: false, msg: "invalid signup token value"}, 400);
   }
 
@@ -254,7 +256,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
       body: {
         name: username,
         email: `${username}@skyscheduler.tld`,
-        // @ts-expect-error: username lookup
+        // @ts-ignore: username lookup
         username: username,
         password: password,
         bskyAppPass: bskyAppPassword,
@@ -329,7 +331,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   return c.json({ok: true, msg: "request processed"});
 });
 
-account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
+account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseContext) => {
   const body = await c.req.json();
 
   const validation = AccountResetSchema.safeParse(body);
@@ -366,9 +368,13 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
     return serverParseValidationErr(c, validation.error.message, 403);
   }
 
+  const userId = c.get("userId");
+  if (userId === null) {
+    return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 403);
+  }
+
   const { password } = validation.data;
   const auth = c.get("auth");
-  const userId = c.get("userId");
   const authCtx = await auth.$context;
   try {
     // I don't know why this is so broken in better auth, but
@@ -380,7 +386,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
     );
 
     // Make sure we still have data
-    if (!usrAccount || !usrAccount.password) {
+    if (!usrAccount?.password) {
       return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 403);
     }
 

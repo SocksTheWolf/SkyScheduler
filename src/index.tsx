@@ -49,7 +49,7 @@ app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPol
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
 app.use("*", async (c, next) => {
-  if (c.get("db") === undefined) {
+  if (c.get("db") === undefined || c.get("db") === null) {
     // technically this type won't match because we fully define the schema here
     // but I don't care, it should be fine anyways.
 

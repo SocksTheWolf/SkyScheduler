@@ -4,7 +4,7 @@ import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from '../../classes/bskyConvoInfo';
 import { AccountStatus } from "../../enums";
 import { DEFAULT_CHAT_PDS } from '../../limits';
-import type { Bindings } from '../../types';
+import type { Bindings, UserIdType } from '../../types';
 import { lookupBskyHandle } from './bskyApi';
 import { loginToBsky } from './bskyLogin';
 
@@ -40,7 +40,7 @@ export const createDMWithUsername = async (env: Bindings, username: string, msg:
   return await lookupBskyHandle(username).then(resp => createDMWithUser(env, resp, msg));
 };
 
-export const createDMWithUser = async (env: Bindings, user: string|null, msg: string): Promise<boolean> => {
+export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
   if (user === null)
     return false;
 

@@ -14,8 +14,10 @@ import type {
   AllContext, BatchQuery,
   BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
+  DBProcessor,
   DeleteResponse,
-  EditPostChanges
+  EditPostChanges,
+  UserIdType
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
@@ -32,8 +34,8 @@ import { deleteEmbedsFromR2 } from "./r2Query";
 
 export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
   try {
-    const userId = c.get("userId");
-    const db: DrizzleD1Database = c.get("db");
+    const userId: UserIdType = c.get("userId");
+    const db: DBProcessor = c.get("db");
     if (userId && db) {
       const results = await db.select({
           ...getTableColumns(posts),
@@ -55,15 +57,15 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
 };
 
 export const updateUserData = async (c: AllContext, newData: any): Promise<boolean> => {
-  const userId = c.get("userId");
-  const db: DrizzleD1Database = c.get("db");
+  const userId: UserIdType = c.get("userId");
+  const db: DBProcessor = c.get("db");
   try {
     if (!db) {
       console.error("Unable to update user data, no database object");
       return false;
     }
     if (userId) {
-      let queriesToExecute: BatchQueryArray = [];
+      const queriesToExecute: BatchQueryArray = [];
 
       if (has(newData, "password")) {
         // cache out the new hash
@@ -99,13 +101,13 @@ export const updateUserData = async (c: AllContext, newData: any): Promise<boole
 };
 
 export const deletePost = async (c: AllContext, id: string): Promise<DeleteResponse> => {
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   const returnObj: DeleteResponse = {success: false, isRepost: false};
   if (!userId) {
     return returnObj;
   }
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to delete post ${id}, db was null`);
     return returnObj;
@@ -113,13 +115,13 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 
   const postObj = await getPostById(c, id);
   if (postObj !== null) {
-    let queriesToExecute: BatchQueryArray = [];
+    const queriesToExecute: BatchQueryArray = [];
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postObj.posted) {
       await deleteEmbedsFromR2(c, postObj.embeds).then(() => removeViolationsDB(db, userId, [AccountStatus.MediaTooBig]));
     }
-    returnObj.isRepost = postObj.isRepost || false;
+    returnObj.isRepost = postObj.isRepost ?? false;
 
     // If the parent post is not null, then attempt to find and update the post chain
     const parentPost = postObj.parentPost;
@@ -156,7 +158,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 
     // delete post
     queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, id)));
-    await c.executionCtx.waitUntil(db.batch(queriesToExecute as BatchQuery));
+    c.executionCtx.waitUntil(db.batch(queriesToExecute as BatchQuery));
     returnObj.success = true;
     returnObj.needsRefresh = postObj.isThreadRoot;
   }
@@ -164,8 +166,8 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 };
 
 export const createPost = async (c: AllContext, body: any): Promise<CreatePostQueryResponse> => {
-  const db: DrizzleD1Database = c.get("db");
-  const userId = c.get("userId");
+  const db: DBProcessor = c.get("db");
+  const userId: UserIdType = c.get("userId");
   if (!userId)
     return { ok: false, msg: "Your user session has expired, please login again"};
 
@@ -219,7 +221,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
       if (rootPostData.isRepost) {
         return {ok: false, msg: "Threads cannot be made of repost actions"};
       }
-      rootPostID = rootPostData.rootPost || rootPostData.postid;
+      rootPostID = rootPostData.rootPost ?? rootPostData.postid;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
         if (uuidValid(parentPost)) {
@@ -257,7 +259,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
 
   // Create the posts
   const postUUID = uuidv4();
-  let dbOperations: BatchQueryArray = [];
+  const dbOperations: BatchQueryArray = [];
 
   // if we're threaded, insert our post before the given parent
   if (isThreadedPost) {
@@ -272,7 +274,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
     )));
 
     // Update the root post so that it has the correct flags set on it as well.
-    if (rootPostData!.isThreadRoot == false) {
+    if (!rootPostData!.isThreadRoot) {
       dbOperations.push(db.update(posts).set({threadOrder: 0, rootPost: rootPostData!.postid})
         .where(eq(posts.uuid, rootPostData!.postid)));
     }
@@ -291,7 +293,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
       repostInfo: (!isThreadedPost && repostInfo !== undefined) ? [repostInfo] : [],
       threadOrder: (!isThreadedPost) ? undefined : parentPostOrder,
       embedContent: embeds,
-      contentLabel: label || PostLabel.None,
+      contentLabel: label ?? PostLabel.None,
       userId: userId
     }));
 
@@ -307,7 +309,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
 
   // Add repost data to the table
   if (repostData && !isThreadedPost) {
-    for (var i = 1; i <= repostData.times; ++i) {
+    for (let i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,
         scheduleGuid: scheduleGUID,
@@ -326,9 +328,9 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
 };
 
 export const createRepost = async (c: AllContext, body: any): Promise<CreateObjectResponse> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
 
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   if (!userId)
     return { ok: false, msg: "Your user session has expired, please login again"};
 
@@ -361,7 +363,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
   }
   let postUUID;
-  let dbOperations: BatchQueryArray = [];
+  const dbOperations: BatchQueryArray = [];
   const scheduleGUID = uuidv4();
   const repostInfo: RepostInfo = new RepostInfo(scheduleGUID, scheduleDate, true, repostData);
 
@@ -388,7 +390,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
     }
 
     // Add repost info object to existing array
-    let updatedRepostInfo: RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
+    const updatedRepostInfo: RepostInfo[] = isEmpty(existingPost.repostInfo) ? [] : existingPost.repostInfo!;
     if (updatedRepostInfo.length >= MAX_REPOST_RULES_PER_POST) {
       return {ok: false, msg: `Num of reposts rules for this post has exceeded the limit of ${MAX_REPOST_RULES_PER_POST} rules`};
     }
@@ -410,7 +412,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
       // it does not, so we can add it to the DB
       updatedRepostInfo.push(repostInfo);
 
-      let repostInfoUpdateQuery = db.update(posts).set({repostInfo: updatedRepostInfo});
+      const repostInfoUpdateQuery = db.update(posts).set({repostInfo: updatedRepostInfo});
       // push record update to add to json array
       if (!isScheduledPost) {
         dbOperations.push(repostInfoUpdateQuery.where(and(
@@ -457,7 +459,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
 
   // Push other repost times if we have them
   if (repostData) {
-    for (var i = 1; i <= repostData.times; ++i) {
+    for (let i = 1; i <= repostData.times; ++i) {
       dbOperations.push(db.insert(reposts).values({
         uuid: postUUID,
         scheduleGuid: scheduleGUID,
@@ -488,7 +490,9 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
 };
 
 export const updatePostForUser = async (c: AllContext, id: string, newData: EditPostChanges): Promise<boolean> => {
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
+  if (!userId)
+    return false;
   return await updatePostForGivenUser(c, userId, id, newData);
 };
 
@@ -496,11 +500,11 @@ export const getPostById = async(c: AllContext|undefined, id: string): Promise<P
   if (c === undefined)
     return null;
 
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   if (!userId || !uuidValid(id))
     return null;
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to get post ${id}, db was null`);
     return null;
@@ -517,11 +521,11 @@ export const getPostById = async(c: AllContext|undefined, id: string): Promise<P
 
 // used for post editing, acts very similar to getPostsForUser
 export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<Post|null> => {
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   if (!userId || !uuidValid(id))
     return null;
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to get post ${id} with reposts, db was null`);
     return null;
@@ -541,7 +545,7 @@ export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<
 };
 
 export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: string) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to delete schedule id ${scheduleId} from post ${id}, db was null`);
     return false;
@@ -552,10 +556,10 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
 
   // Get the post to make sure it's valid and update post json
   const currentPost = await getPostByIdWithReposts(c, id);
-  if (currentPost != null && currentPost.repostInfo !== undefined) {
-    const originalRuleLength: number = currentPost.repostInfo!.length;
+  if (currentPost?.repostInfo !== undefined) {
+    const originalRuleLength: number = currentPost.repostInfo.length;
     // remove the schedule from the current json object set
-    let newRepostInfo: RepostInfo[] = currentPost.repostInfo!.filter((itm) => {
+    const newRepostInfo: RepostInfo[] = currentPost.repostInfo.filter((itm) => {
       return itm.guid !== scheduleId;
     });
 
@@ -565,7 +569,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
       return false;
     }
 
-    let queriesToExecute: BatchQueryArray = [];
+    const queriesToExecute: BatchQueryArray = [];
     // modify the current repost info
     queriesToExecute.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
         eq(posts.userId, currentPost.user), eq(posts.uuid, currentPost.postid))));

@@ -1,18 +1,17 @@
 import { and, eq, inArray, lte } from "drizzle-orm";
-import type { DrizzleD1Database } from "drizzle-orm/d1";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
-import type { AllContext, FileListingRecord } from "../../types";
+import type { AllContext, DBProcessor, FileListingRecord, UserIdType } from "../../types";
 import { daysAgo, isAltEditableType } from "../helpers";
 
 export const isMediaOwnedByUser = async (c: AllContext, file: string): Promise<boolean> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to check ownership of file ${file}, db was null`);
     return false;
   }
 
-  const userId = c.get("userId");
+  const userId: UserIdType = c.get("userId");
   if (userId == null) {
     return false;
   }
@@ -23,13 +22,13 @@ export const isMediaOwnedByUser = async (c: AllContext, file: string): Promise<b
   return result.length > 0;
 };
 
-export const addFileListing = async (c: AllContext, file: string, user: string|null, createDate: Date|null=null) => {
-  const db: DrizzleD1Database = c.get("db");
+export const addFileListing = async (c: AllContext, file: string, user: UserIdType, createDate: Date|null=null) => {
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to create file listing for file ${file}, db was null`);
     return;
   }
-  let insertData: FileListingRecord = {};
+  const insertData: FileListingRecord = {};
   if (createDate !== null) {
     insertData.createdAt = createDate;
   }
@@ -41,19 +40,19 @@ export const addFileListing = async (c: AllContext, file: string, user: string|n
 };
 
 export const deleteFileListings = async (c: AllContext, files: string|string[]) => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error(`unable to delete file listings ${files}, db was null`);
+    console.error(`unable to delete file listings ${files.toString()}, db was null`);
     return;
   }
-  let filesToDelete = [];
+  const filesToDelete = [];
   filesToDelete.push(files);
   const filesToWorkOn = flatten(filesToDelete);
   await db.delete(mediaFiles).where(inArray(mediaFiles.fileName, filesToWorkOn));
 };
 
 export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("could not get all abandoned media, db was null");
     return [];
@@ -71,16 +70,16 @@ export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
   return results.map((item) => item.fileName);
 };
 
-export const getAllMediaOfUser = async (c: AllContext, userId: string): Promise<string[]> => {
-  const db: DrizzleD1Database = c.get("db");
-  if (!db) {
+export const getAllMediaOfUser = async (c: AllContext, userId: UserIdType): Promise<string[]> => {
+  const db: DBProcessor = c.get("db");
+  if (!db || !userId) {
     console.warn(`could not get all media of user ${userId}, db was null`);
     return [];
   }
   const mediaList = await db.select({embeds: posts.embedContent}).from(posts)
     .where(and(eq(posts.posted, false), eq(posts.userId, userId))).all();
 
-  let messyArray: string[][] = [];
+  const messyArray: string[][] = [];
   mediaList.forEach(obj => {
     const postMedia = obj.embeds;
     messyArray.push(postMedia

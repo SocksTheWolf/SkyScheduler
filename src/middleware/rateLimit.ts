@@ -19,7 +19,7 @@ export const rateLimit = (prop: RateLimitProps) => {
     }
 
     // by default use the userId key, but this may be blank...
-    let rateLimitKey: string|null = c.get("userId");
+    let rateLimitKey = c.get("userId");
 
     // if there's no rate limit key (because no auth, pull down the connecting ip address)
     rateLimitKey ??= c.req.header("cf-connecting-ip") ?? "";
