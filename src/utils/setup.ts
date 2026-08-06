@@ -23,7 +23,7 @@ export const setupAccounts = async(c: Context) => {
       // @ts-ignore: Property does not exist (it does via an extension)
       username: c.env.DEFAULT_ADMIN_USER,
       password: c.env.DEFAULT_ADMIN_PASS,
-      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS || ""
+      bskyAppPass: c.env.DEFAULT_ADMIN_BSKY_PASS ?? ""
     }
   });
   if (data.token !== null)

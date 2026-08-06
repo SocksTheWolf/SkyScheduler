@@ -1,8 +1,8 @@
-import type { Context } from "hono";
 import { cors } from "hono/cors";
+import type { BaseContext } from "../types";
 
-export const corsHelperMiddleware = async (c: Context, next: any) => {
-  if (c.get("ssg") === true) {
+export const corsHelperMiddleware = async (c: BaseContext, next: any) => {
+  if (c.get("ssg")) {
     await next();
     return;
   }

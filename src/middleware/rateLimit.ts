@@ -1,7 +1,7 @@
-import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
 import get from 'just-safe-get';
+import type { BaseContext } from "../types";
 
 type RateLimitProps = {
   limiter: string;
@@ -11,7 +11,7 @@ type RateLimitProps = {
 };
 
 export const rateLimit = (prop: RateLimitProps) => {
-  return createMiddleware(async (c: Context, next: any) => {
+  return createMiddleware(async (c: BaseContext, next: any) => {
     const rateLimitObj: RateLimit|null = get(c.env, prop.limiter, null);
     if (rateLimitObj === null) {
       await next();
@@ -22,17 +22,15 @@ export const rateLimit = (prop: RateLimitProps) => {
     let rateLimitKey: string|null = c.get("userId");
 
     // if there's no rate limit key (because no auth, pull down the connecting ip address)
-    if (rateLimitKey === null) {
-      rateLimitKey = c.req.header("cf-connecting-ip") || "";
-    }
+    rateLimitKey ??= c.req.header("cf-connecting-ip") ?? "";
 
-    const { success } = await rateLimitObj.limit({ key: rateLimitKey! });
+    const { success } = await rateLimitObj.limit({ key: rateLimitKey });
     if (success) {
       // not rate limited, continue.
       await next();
     } else {
       // rate limited.
-      const str: string = prop.message || "You are currently rate limited, try again later";
+      const str: string = prop.message ?? "You are currently rate limited, try again later";
       if (prop.toast) {
         c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
         if (!prop.html) {

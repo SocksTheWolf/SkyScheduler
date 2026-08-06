@@ -1,7 +1,7 @@
-import { readFile } from "fs/promises";
 import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
+import { readFile } from "fs/promises";
 import { getHTMXConfigStr } from "../layout/helpers/includesTags";
 import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
 import { has } from "../utils/helpers";
@@ -13,7 +13,7 @@ type SSGServeProps = {
 class NonceInject {
   nonce: string;
   constructor(inNonce: string|undefined) {
-    this.nonce = inNonce || "";
+    this.nonce = inNonce ?? "";
   }
   element(el: Element) {
     if (el.tagName === "meta") {
@@ -37,8 +37,7 @@ class NonceInject {
 
 const serveStaticPage = async (c: Context, page?: string): Promise<Response> => {
   // if we're explicitly not given a page, then take the current path name removing the slash
-  if (page === undefined)
-    page = new URL(c.req.url).pathname.replace(/^\//, "");
+  page ??= new URL(c.req.url).pathname.replace(/^\//, "");
 
   // domain doesn't matter, so make this whatever
   const staticFile: Response = await c.env.ASSETS!.fetch(`https://1.1.1.1/pages/${page}.html`);
@@ -88,7 +87,7 @@ export async function ssgGenMiddleware(c: Context, next: any) {
         if (flag === "IN_DEV")
           continue;
 
-        c.env[flag] = wranglerSettings.vars[flag] || "";
+        c.env[flag] = wranglerSettings.vars[flag] ?? "";
       }
 
       // laziest way to load a single flag from a .env
@@ -97,7 +96,7 @@ export async function ssgGenMiddleware(c: Context, next: any) {
         const envFile = (await readFile(".env")).toString();
         const inDev: boolean = envFile.search("IN_DEV=true") >= 0;
         c.env["IN_DEV"] = inDev;
-      } catch (err) {
+      } catch (_err) {
         // file doesn't exist, but drop this anyways.
         c.env["IN_DEV"] = false;
       }

@@ -1,10 +1,10 @@
-import type { Context } from "hono";
 import { every } from "hono/combine";
+import type { BaseContext } from "../types";
 import { authMiddleware } from "./auth";
 
 // This requires that the user is an admin, it must pipe through
 // the auth middleware first.
-async function adminOnlyMiddleware(c: Context, next: any) {
+async function adminOnlyMiddleware(c: BaseContext, next: any) {
   if (c.get("isAdmin")) {
     await next();
     return;
