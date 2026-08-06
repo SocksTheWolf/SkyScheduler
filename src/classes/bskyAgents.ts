@@ -1,7 +1,8 @@
 // this file is used to handle atpagents and their reuse during cron/queues
 // this is done because logging into PDSes across tasks can be extremely
 // expensive time wise.
-import { Agent, ComAtprotoServerCreateSession, CredentialSession } from "@atproto/api";
+import type { ComAtprotoServerCreateSession } from "@atproto/api";
+import { Agent, CredentialSession } from "@atproto/api";
 import { AccountStatus, TaskType } from "../enums";
 import type { AgentConfigSettings, AllContext } from "../types";
 import { loginToBsky } from "../utils/bsky/bskyLogin";
@@ -44,7 +45,7 @@ export class AgentMap {
   };
   static async getAgentDirect(c: AllContext, userId: string, messageOnViolation: boolean): Promise<AgentLoginResponse> {
     const loginCreds = await getBskyUserPassForId(c, userId);
-    if (loginCreds.valid === false) {
+    if (!loginCreds.valid) {
       console.error(`credentials for user ${userId} were invalid`);
       return {agent: null, violation: false};
     }

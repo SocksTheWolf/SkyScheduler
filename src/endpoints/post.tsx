@@ -35,7 +35,7 @@ post.post("/upload", authMiddleware, async (c) => {
 
   const { file } = validation.data;
   const fileUploadResponse = await uploadFileR2(c, file as File, c.get("userId"));
-  if (fileUploadResponse.success === false)
+  if (!fileUploadResponse.success)
     return c.json(fileUploadResponse, 400);
   else
     return c.json(fileUploadResponse, 200);
@@ -68,7 +68,7 @@ post.post("/create", authMiddleware, rateLimit({limiter: "POST_LIMITER"}), async
     // Handling posting right now.
     const postInfo: Post|null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
-      if (await handlePostNowTask(c, postInfo!) === false)
+      if (!(await handlePostNowTask(c, postInfo!)))
         return c.json({ok: false, msg: "Unable to post now, will try again during next nearest posting time"}, 406);
       return c.json({ok: true, msg: "Created Post!", id: response.postId});
     } else {
@@ -145,14 +145,14 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
     }
 
     // Create an easy map to match content with quickly
-    let editsMap: Map<string, string> = new Map();
+    const editsMap = new Map<string, string>();
     altEdits.forEach((item) => {
       editsMap.set(item.content, item.alt);
     });
 
     // process and match up all of the alt text properly
-    for (let i = 0; i < originalPost.embeds?.length; ++i) {
-      let embedData = originalPost.embeds[i];
+    for (let i = 0; i < originalPost.embeds.length; ++i) {
+      const embedData = originalPost.embeds[i];
       // if we have anything other than an image or video, skip it
       if (!isAltEditableType(embedData.type)) {
         continue;
@@ -204,7 +204,7 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
-    if (response.success === true) {
+    if (response.success) {
       let postRefreshEvent = "";
       // This is true if this was the root of a thread chain
       if (response.needsRefresh) {

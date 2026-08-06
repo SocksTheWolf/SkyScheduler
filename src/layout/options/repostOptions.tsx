@@ -18,7 +18,7 @@ export default function RepostOptions(props: RepostOptionsProps) {
     <input class="autoRepostBox" type="checkbox" id={props.id} hidden={props.hidden} startchecked={props.checked} />
     <label hidden={props.hidden} class="noselect checkboxLine" for={props.id}>{checkboxLabel}</label>
     <fieldset class="repostScheduleSimple" role="group">
-      <span class="noselect">Automatically repost this {props.contentType || "content"} every</span>
+      <span class="noselect">Automatically repost this {props.contentType ?? "content"} every</span>
       <RepostTimeSelector />
       <RepostAmountSelector />
       <span class="noselect">from {repostedFrom}.</span>

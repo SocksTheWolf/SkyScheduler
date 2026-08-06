@@ -1,4 +1,5 @@
-import { type Context, Hono } from "hono";
+import type { Context } from "hono";
+import { Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import isEmpty from "just-is-empty";
 import { ScheduledContext } from "../classes/context";
@@ -67,7 +68,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
     }
     return c.json({ok: false, msg: "could not login user"}, 403);
   } catch (err: any) {
-    return c.json({ok: false, msg: err.message || err.msg || "Unknown Error"}, 403);
+    return c.json({ok: false, msg: ((err.message ?? err.msg) ?? "Unknown Error")}, 403);
   }
 });
 
@@ -80,7 +81,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
 
   const auth = c.get("auth");
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
-  let newObject: LooseObj = {};
+  const newObject: LooseObj = {};
   if (!isEmpty(username)) {
     if ((username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) &&
       !c.get("isAdmin")) {
@@ -253,7 +254,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
       body: {
         name: username,
         email: `${username}@skyscheduler.tld`,
-        // @ts-ignore
+        // @ts-expect-error: username lookup
         username: username,
         password: password,
         bskyAppPass: bskyAppPassword,
@@ -288,7 +289,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   }
 
   const { username } = validation.data;
-  if (await doesUserExist(c, username) === false) {
+  if (!(await doesUserExist(c, username))) {
     return c.json({ok: false, msg: "user doesn't exist"}, 401);
   }
 
@@ -310,7 +311,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
 
   // There has to be a better method for this tbh.
   const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
-  if (canMessageUser === false) {
+  if (!canMessageUser) {
     return c.json({ok: false, msg:
       `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
   }
@@ -402,7 +403,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
     }
   } catch (err: any) {
-    console.error(`failed to delete user ${userId} had error ${err.message || err.msg || 'no code'}`);
+    console.error(`failed to delete user ${userId} had error ${(err.message ?? err.msg) ?? 'no code'}`);
     return c.html(<b class="btn-error">Failed: Server Error</b>, 500);
   }
 });

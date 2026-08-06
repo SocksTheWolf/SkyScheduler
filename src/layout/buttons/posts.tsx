@@ -1,7 +1,7 @@
 import type { BaseElementProps } from "../../types";
 
 // Buttons for post header tags
-export function AddPostToThreadButton(props?: BaseElementProps) {
+export function AddPostToThreadButton(_props?: BaseElementProps) {
   return (<button class="addThreadPost header-btn btn-sm primary outline" listen="false"
     title="Add a post underneath this one">
     <span data-tooltip="Add a post to thread" data-placement="right">
@@ -10,7 +10,7 @@ export function AddPostToThreadButton(props?: BaseElementProps) {
   </button>);
 }
 
-export function AddRepostsButton(props?: BaseElementProps) {
+export function AddRepostsButton(_props?: BaseElementProps) {
   return (<button class="addRepostsButton header-btn btn-sm primary outline" listen="false"
     title="Add additional reposts to this post">
     <span data-placement="right" data-tooltip="Add reposts">

@@ -14,11 +14,11 @@ export default function PostDataFooter(props: PostDataFooterOptions) {
   return (<footer><small>
     <a class="secondary postLink" hidden={!hasPosted} tabindex={hasPosted ? undefined : -1}
       data-uri={content.uri}
-      href={content.getURI() || undefined}
+      href={content.getURI() ?? undefined}
       target="_blank" title="link to post">{content.isRepost ? "Repost on" : "Posted on"}</a>
     <span hidden={hasPosted}>Scheduled for</span>:
     &nbsp;<span class="timestamp" repost={content.isRepost ? true : undefined}>{raw(content.scheduledDate!)}</span>
-    {content.hasEmbeds() ? ' | Embeds: ' + content.embeds!.length : null}
+    {content.hasEmbeds() ? ` | Embeds: ${content.embeds!.length}` : null}
     <RepostCountElement id={content.postid} count={content.repostCount} repostInfo={content.repostInfo} />
   </small></footer>);
 };

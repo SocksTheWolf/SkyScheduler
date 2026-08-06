@@ -36,7 +36,7 @@ staticFiles.get(USE_STATIC_HTML ? "/consts.js" : "/js/consts.js", runMiddlewareU
 
 // We have to not overwrite robots.txt as that is already in the assets directory
 // so make sure to serve that one dynamically.
-staticFiles.get("/robots.txt", runMiddlewareUnlessStatic, async (c) => {
+staticFiles.get("/robots.txt", runMiddlewareUnlessStatic, (c) => {
   return c.body(generateRobotsTxt(), 200, {
     "Content-Type" : USE_STATIC_HTML ? "text/no-ext" : "text/plain"
   });

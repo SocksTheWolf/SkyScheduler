@@ -75,7 +75,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       {
         autoDetectIpAddress: false,
         geolocationTracking: false,
-        cf: cf || {},
+        cf: cf ?? {},
         d1: env
           ? {
               db,
@@ -92,11 +92,11 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,
-        sendResetPassword: async ({user, url, token}, request) => {
-          const userName = (user as any).username;
+        sendResetPassword: async ({user, url, token}, _request) => {
+          const userName: string = (user as any).username;
           await createDMWithUsername(env!, userName, createPasswordResetMessage(url, token))
             .then((resp) => {
-              if (resp === false)
+              if (!resp)
                 throw new Error("FAILED_MESSAGE");
             });
           },
@@ -105,10 +105,10 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
           username({
             // We validate all of our usernames ahead of time
             // do not use the validator in betterauth but instead our own ZOD system
-            usernameValidator: (username) => {
+            usernameValidator: (_username) => {
               return true;
             },
-            displayUsernameValidator: (displayUsername) => {
+            displayUsernameValidator: (_displayUsername) => {
               return true;
             },
             /* we do our own normalization in the zod schemas */
@@ -173,7 +173,7 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
     // Only add database adapter for CLI schema generation
     // though better-auth-cloudflare just injects this anyways
     ...(env ? {} : {
-      database: drizzleAdapter({} as D1Database, {
+      database: drizzleAdapter({}, {
         provider: "sqlite",
         usePlural: true,
         debugLogs: false,
@@ -187,10 +187,10 @@ const processAuthRoute = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.r
 // Export for variable types
 type ContextVariables = SecureHeadersVariables & {
   auth: ReturnType<typeof createAuth>;
-  userId: string;
+  userId: string|null;
   isAdmin: boolean;
-  session: Session;
-  db: DrizzleD1Database;
+  session: Session|null;
+  db: DrizzleD1Database|null;
   pds: string;
   ssg: boolean;
 };

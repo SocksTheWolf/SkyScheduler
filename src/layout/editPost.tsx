@@ -31,7 +31,7 @@ export function PostAltTextEdit(props: EditedPostProps) {
   });
 
   const altEditBlock = embedAltTextEdit;
-  if (altEditBlock === undefined || altEditBlock?.at(0) === undefined || altEditBlock.length <= 0) {
+  if (altEditBlock?.at(0) === undefined || altEditBlock.length <= 0) {
     return null;
   }
 
