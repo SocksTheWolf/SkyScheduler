@@ -23,7 +23,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
   // Retry settings
   const delay: number = env.QUEUE_SETTINGS.delay_val;
   const maxRetries: number = env.QUEUE_SETTINGS.max_retries;
-  const bufferRetries: boolean = env.QUEUE_SETTINGS.pressure_retries || false;
+  const bufferRetries: boolean = env.QUEUE_SETTINGS.pressure_retries ?? false;
   let bufferBlasts: BufferBlast[] = [];
 
   for (const message of batch.messages) {

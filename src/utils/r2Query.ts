@@ -28,7 +28,7 @@ type FileMetaData = {
 };
 
 export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
-  let itemsToDelete: string[] = [];
+  const itemsToDelete: string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
     embeds.forEach((data) => {
@@ -56,7 +56,7 @@ export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQue
   if (embeds.length <= 0)
     return;
 
-  console.log(`Deleting ${embeds}`);
+  console.log(`Deleting ${embeds.toString()}`);
   const killFilesPromise: Promise<void> = c.env.R2.delete(embeds);
   const deleteFileListingPromise = deleteFileListings(c, embeds);
   const deleteFilePromises = Promise.all([killFilesPromise, deleteFileListingPromise]);
@@ -116,7 +116,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   }
 
   // our process data once handled.
-  let fileProcessData = {qualityLevel: 100, type: file.type, size: file.size,
+  const fileProcessData = {qualityLevel: 100, type: file.type, size: file.size,
     width: imageMetaData.width, height: imageMetaData.height };
 
   // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
@@ -153,9 +153,10 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
         imageRules.width = MAX_IMAGE_WIDTH;
       }
 
-      for (var i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {
+      // eslint-disable-next-line @typescript-eslint/prefer-for-of
+      for (let i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {
         const qualityLevel: number = c.env.IMAGE_SETTINGS.steps[i];
-        const response = await fetch(new URL(resizeFilename, c.env.IMAGE_SETTINGS.bucket_url!), {
+        const response = await fetch(new URL(resizeFilename, c.env.IMAGE_SETTINGS.bucket_url), {
           headers: {
             "x-skyscheduler-helper": c.env.RESIZE_SECRET_HEADER
           },
@@ -168,10 +169,10 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
         });
         if (response.ok) {
           const resizedHeader = response.headers.get("Cf-Resized");
-          const returnType = response.headers.get("Content-Type") || "";
+          const returnType = response.headers.get("Content-Type") ?? "";
           const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
           const hasResizeHeader: boolean = (resizedHeader !== null);
-          const resizeHadError: boolean = (!hasResizeHeader || resizedHeader!.indexOf("err=") !== -1);
+          const resizeHadError: boolean = (!hasResizeHeader || resizedHeader!.includes("err="));
 
           if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
             console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
@@ -189,8 +190,8 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
               fileToProcess = streams[0];
               // attempt to pull the image dimensions
               const optimizedData = await imageDimensionsFromStream(streams[1]);
-              fileProcessData.width = optimizedData?.width || 0;
-              fileProcessData.height = optimizedData?.height || 0;
+              fileProcessData.width = optimizedData?.width ?? 0;
+              fileProcessData.height = optimizedData?.height ?? 0;
               // dispose.
               await streams[1].cancel();
               break;
@@ -206,7 +207,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
             console.warn(`File ${file.name} was not handled ${response.statusText}`);
             if (hasResizeHeader) {
               // figure out if we have exhausted image transformations
-              const errCode = resizedHeader!.match(/err=(\d+)/);
+              const errCode = /err=(\d+)/.exec((resizedHeader!));
               if (errCode && parseInt(errCode[1]) === 9422) {
                 resizeResult = ImageResizeResult.ExhaustedResources;
                 break;
@@ -222,16 +223,16 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
     }
 
     if (resizeResult != ImageResizeResult.Success) {
-      let errorString: string = "";
+      let errorString: string;
       switch (resizeResult) {
         case ImageResizeResult.ExhaustedResources:
           errorString = `Image resize service is exhausted, please manually resize the image to be under ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB.`;
         break;
         default:
         case ImageResizeResult.TooLarge:
-          const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
+          { const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
           errorString = `Image is too large to post, the file size is over by ${fileSizeOverAmount}MB`;
-        break;
+        break; }
       }
       return {"success": false, "originalName": originalName, "error": errorString };
     }
@@ -247,8 +248,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
     height: fileProcessData.height > 0 ? fileProcessData.height : undefined,
   };
 
-  if (fileToProcess === null)
-    fileToProcess = await file.arrayBuffer();
+  fileToProcess ??= await file.arrayBuffer();
   return await rawUploadToR2(c, fileToProcess, fileMetaData);
 };
 
@@ -277,18 +277,18 @@ export const uploadFileR2 = async (c: AllContext, file: File, userId: string) =>
 };
 
 export const getAllFilesList = async (c: AllContext) => {
-  let options: R2ListOptions = {
+  const options: R2ListOptions = {
     limit: 1000,
     include: ["customMetadata"]
   };
-  let values: R2BucketObject[] = [];
+  const values: R2BucketObject[] = [];
 
   while (true) {
     const response = await c.env.R2.list(options);
     for (const file of response.objects) {
       values.push({
         name: file.key,
-        user: file.customMetadata?.user || null,
+        user: file.customMetadata?.user ?? null,
         date: file.uploaded
       });
     }
