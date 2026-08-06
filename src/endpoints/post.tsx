@@ -96,22 +96,23 @@ post.all("/all", authMiddlewareHTML, async (c) => {
 // Edit posts
 post.get("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
-  if (!isValid(id))
-    return c.html(<></>, 404);
-
-  const postInfo = await getPostById(c, id);
-  if (postInfo !== null) {
-    c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
-    return c.html(<PostEdit post={postInfo} />);
+  if (isValid(id)) {
+    const postInfo = await getPostById(c, id);
+    if (postInfo !== null) {
+      c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
+      return c.html(<PostEdit post={postInfo} />);
+    }
   }
+  c.header("HX-Trigger-After-Swap", "postMissing");
   return c.html(<></>, 404);
 });
 
 post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
+  const postMissingEvent: string = swapErrEvents + ", postMissing";
   if (!isValid(id)) {
-    c.header("HX-Trigger-After-Swap", swapErrEvents);
+    c.header("HX-Trigger-After-Swap", postMissingEvent);
     return c.html(<b class="btn-error">Post was invalid</b>, 403);
   }
 
@@ -125,13 +126,13 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const originalPost = await getPostByIdWithReposts(c, id);
   // get the original data for the post so that we can just inline edit it via a push
   if (originalPost === null) {
-    c.header("HX-Trigger-After-Settle", swapErrEvents);
+    c.header("HX-Trigger-After-Settle", postMissingEvent);
     return c.html(<b class="btn-error">Could not find post to edit</b>, 404);
   }
 
   let hasEmbedEdits = false;
   if (originalPost.posted === true) {
-    c.header("HX-Trigger-After-Settle", "scrollTop");
+    c.header("HX-Trigger-After-Settle", "scrollTop, postMissing");
     return c.html(<b class="btn-error">This post has already been posted</b>, 403);
   }
 
@@ -227,6 +228,8 @@ post.get("/:id/repost", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDITOR_O
       c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
       return c.html(<RepostDataPopover ctx={c} id={id} />);
     }
+
+    c.header("HX-Trigger-After-Swap", "postMissingEvent");
   }
   return c.html(<></>, 404);
 });
@@ -242,5 +245,5 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
       }
     }
   }
-  return c.html(<>Invalid</>, 403);
+  return c.html(<b class="btn-error">Internal error occurred</b>, 403);
 });
