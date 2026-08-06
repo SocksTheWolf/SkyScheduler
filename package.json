@@ -66,7 +66,7 @@
   "dependencies": {
     "@atproto/api": "^0.20.32",
     "@hono/standard-validator": "^0.3.0",
-    "better-auth": "^1.6.23",
+    "better-auth": "^1.6.25",
     "better-auth-cloudflare": "^0.3.0",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
