@@ -421,7 +421,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             aspectRatio.height = Number(customMetadata.height);
           } else if (USE_DEPRECATED_SIZE_PARSE) {
             // TODO: Remove this code as it is currently DEPRECATED (R2 Service holds the stream sizes)
-            const sizeResult = await imageDimensionsFromStream(await rawFile!.stream());
+            const sizeResult = await imageDimensionsFromStream(rawFile!.stream());
             if (sizeResult) {
               aspectRatio.width = sizeResult.width;
               aspectRatio.height = sizeResult.height;

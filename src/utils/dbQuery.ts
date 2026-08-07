@@ -166,7 +166,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
   return returnObj;
 };
 
-export const createPost = async (c: AllContext, body: any): Promise<CreatePostQueryResponse> => {
+export const createPost = async (c: AllContext, body: unknown): Promise<CreatePostQueryResponse> => {
   const db: DBProcessor = c.get("db");
   const userId: UserIdType = c.get("userId");
   if (!userId)
@@ -328,7 +328,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
   return { ok: success, postNow: makePostNow, postId: postUUID, msg: success ? "success" : "fail" };
 };
 
-export const createRepost = async (c: AllContext, body: any): Promise<CreateObjectResponse> => {
+export const createRepost = async (c: AllContext, body: unknown): Promise<CreateObjectResponse> => {
   const db: DBProcessor = c.get("db");
 
   const userId: UserIdType = c.get("userId");
