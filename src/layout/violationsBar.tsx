@@ -35,24 +35,28 @@ export async function ViolationNoticeBar(props: ViolationNoticeBarProps) {
       Resolve Conflicts
       </a>
     </span>);
+    let canResolve = false;
     if (violationData.tosViolation) {
       errorStr = `Your account is in violation of ${APP_NAME} usage. You are blocked from using services at this time.`;
     } else if(violationData.userPassInvalid) {
       const updateSettingsButton = (<a role="button" class="secondary" id="violationSettingsLink">Update Settings</a>);
-      errorStr = `Your Bluesky handle or application password is invalid. ${updateSettingsButton}`;
+      errorStr = `Your Bluesky handle or application password is invalid. ${raw(updateSettingsButton)}`;
     } else if (violationData.accountGone) {
-      errorStr = `Your Bluesky account is currently deactivated. Features will not work until reactivation. ${resolveConflictsButton}`;
+      errorStr = `Your Bluesky account is currently deactivated. Features will not work until reactivation.`;
+      canResolve = true;
     } else if (violationData.accountSuspended) {
-      errorStr = `Your account has been suspended by Bluesky. Some features may not work at this time. ${resolveConflictsButton}`;
+      errorStr = `Your account has been suspended by Bluesky. Some features may not work at this time.`;
+      canResolve = true;
     } else if (violationData.takenDown) {
-      errorStr = `Your account has been taken down by Bluesky. ${resolveConflictsButton}`;
+      errorStr = `Your account has been taken down by Bluesky.`;
+      canResolve = true;
     } else if (violationData.mediaTooBig) {
       errorStr = "You currently have media that's too large for Bluesky (like a video), please delete those posts";
     }
     return (
       <div id="violationBar" class="warning-box" hx-trigger="accountViolations from:body"
         hx-swap="outerHTML" hx-get="/account/violations" hx-target="this">
-        <span class="warning"><b>WARNING</b>: Account error found! {raw(errorStr)}</span>
+        <span class="warning"><b>WARNING</b>: Account error found! {raw(errorStr)}{canResolve ? resolveConflictsButton : undefined}</span>
       </div>
     );
   }

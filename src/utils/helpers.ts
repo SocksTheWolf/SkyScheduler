@@ -85,6 +85,7 @@ export function has(obj: unknown, property: string): boolean {
   if (!obj)
     return false;
 
+  // eslint-disable-next-line n/no-unsupported-features/es-builtins
   if (Object.hasOwn(obj, property)) {
     return obj[property] !== undefined && obj[property] !== null;
   }

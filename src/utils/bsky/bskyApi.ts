@@ -415,6 +415,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         if (currentEmbedType == EmbedDataType.Image) {
           // Image aspect ratio data
           let aspectRatio: BskyMediaAspectRatio|undefined = {"width": 0, "height": 0};
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (customMetadata?.width !== undefined && customMetadata?.height !== undefined) {
             aspectRatio.width = Number(customMetadata.width);
             aspectRatio.height = Number(customMetadata.height);

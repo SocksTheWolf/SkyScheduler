@@ -22,10 +22,10 @@ export function generateRobotsTxt(): string {
     outputStr += `User-agent: ${rule.agent}\n`;
 
     if (rule.allow !== undefined)
-      outputStr += rule.allow!.map((itm) => `Allow: ${itm}`).join("\n");
+      outputStr += rule.allow.map((itm) => `Allow: ${itm}`).join("\n");
 
     if (rule.disallow !== undefined)
-      outputStr += rule.disallow!.map((itm) => `Disallow: ${itm}`).join("\n");
+      outputStr += rule.disallow.map((itm) => `Disallow: ${itm}`).join("\n");
 
     outputStr += "\n";
   }
