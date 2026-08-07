@@ -27,7 +27,7 @@ if (process.env.IS_SSG == "true") {
 }
 
 // Single auth configuration that handles both CLI and runtime scenarios
-function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
+function createAuth(c?: AllContext) {
   const env: Bindings|undefined = c?.env;
   // Use actual DB for runtime, empty object for CLI
   const db = c ? c.get("db") : ({} as DBProcessor);
@@ -74,7 +74,6 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
       {
         autoDetectIpAddress: false,
         geolocationTracking: false,
-        cf: cf ?? {},
         d1: env
           ? {
               db,
@@ -92,7 +91,8 @@ function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
         enabled: true,
         requireEmailVerification: false,
         sendResetPassword: async ({user, url, token}, _request) => {
-          const userName: string = (user as any).username;
+          // @ts-ignore
+          const userName: string = user.username;
           await createDMWithUsername(env!, userName, createPasswordResetMessage(url, token))
             .then((resp) => {
               if (!resp)

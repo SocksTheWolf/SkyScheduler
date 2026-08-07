@@ -105,7 +105,7 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
 const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
   const originalName = file.name;
   // We need to double check this image for various size information.
-  const imageMetaData = await imageDimensionsFromStream(file.stream());
+  const imageMetaData = await imageDimensionsFromStream(file.stream() as ReadableStream<Uint8Array>);
   if (imageMetaData === undefined) {
     return {"success": false, "error": "image data could not be processed"};
   }
@@ -189,7 +189,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
               const streams = response.body!.tee();
               fileToProcess = streams[0];
               // attempt to pull the image dimensions
-              const optimizedData = await imageDimensionsFromStream(streams[1]);
+              const optimizedData = await imageDimensionsFromStream(streams[1] as ReadableStream<Uint8Array>);
               fileProcessData.width = optimizedData?.width ?? 0;
               fileProcessData.height = optimizedData?.height ?? 0;
               // dispose.

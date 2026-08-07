@@ -87,13 +87,17 @@ export type EmbedData = {
 };
 
 /// BSKY RECORDS & TYPES
-export type WebAssociatedRef = BskyRecordWrapper & {
+export type StrongRecordObject = {
+  uri: string;
+  cid: string;
+};
+export type WebAssociatedRef = StrongRecordObject & {
   $type: "com.atproto.repo.strongRef";
 };
 
 export type BskyEmbedRecord = {
   "$type": "app.bsky.embed.record";
-  record: BskyRecordWrapper
+  record: StrongRecordObject
 };
 
 export type BskyEmbedWrapper = BskyEmptyEmbed|BskyVideoEmbed|BskyImgEmbed|BskyWebEmbed;
@@ -129,7 +133,7 @@ export type BskyMediaAspectRatio = {
 };
 
 export type BskyImageRecordData = {
-  alt?: string;
+  alt: string;
   image: BlobRef;
   aspectRatio?: BskyMediaAspectRatio;
 };
@@ -142,8 +146,8 @@ export type BskyVideoRecordData = {
 
 export type BskyWebLinkRecordData = {
   uri: string;
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
   associatedRefs?: WebAssociatedRef[];
   thumb?: BlobRef;
 };
@@ -162,10 +166,7 @@ export type PLCDirectoryResponse = {
 };
 
 // These are bsky responses to making posts
-export type PostResponseObject = {
-  uri: string;
-  cid: string;
-};
+export type PostResponseObject = StrongRecordObject;
 
 export type PostRecordResponse = PostResponseObject & {
   postID: string|null;
