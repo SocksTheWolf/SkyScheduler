@@ -73,7 +73,7 @@ export function useCFTurnstile(ctx: AllContext|undefined): boolean {
   return USE_CAPTCHA;
 }
 
-export function isPost(data: any): boolean {
+export function isPost(data: unknown): boolean {
   return has(data, "user");
 }
 

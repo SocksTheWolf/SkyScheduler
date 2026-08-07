@@ -1,10 +1,34 @@
 import type { BlobRef } from "@atproto/api";
 import isEmpty from "just-is-empty";
-import { PostLabel } from "../enums";
+import type { PostLabel } from "../enums";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import type { EmbedData } from "../types";
 import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";
+
+type DBPost = Omit<Post, "postid"|"embeds"|"label"|"text"|"user"> & {
+  uuid: string;
+  content: string;
+  embedContent?: EmbedData[],
+  contentLabel: PostLabel;
+  userId: string;
+
+  postid: never;
+  embeds: never;
+  label: never;
+  text: never;
+  user: never;
+}
+
+type RawPost = Post & {
+  userId: never;
+  embedContent: never;
+  contentLabel: never;
+  content: never;
+  uuid: never;
+}
+
+export type PostIntakeType = RawPost|DBPost;
 
 // Basically a copy of the schema
 export class Post {
@@ -34,7 +58,7 @@ export class Post {
   // blob override data
   blobOverride?: null|BlobRef;
 
-  constructor(data: any) {
+  constructor(data: PostIntakeType) {
     if (has(data, "userId"))
       this.user = data.userId;
     else

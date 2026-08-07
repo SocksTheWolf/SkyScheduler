@@ -55,18 +55,15 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const { username, password } = validation.data;
   try {
     // @ts-ignore: Property does not exist (the username field, which does via an extension)
-    const { headers, response } = await auth.api.signInUsername({
+    const { headers } = await auth.api.signInUsername({
       body: {
         username: username,
         password: password,
       },
       returnHeaders: true
     });
-    if (response) {
-      c.res.headers.set("set-cookie", headers.get("set-cookie")!);
-      return c.json({ok: true, msg: "logged in!"});
-    }
-    return c.json({ok: false, msg: "could not login user"}, 403);
+    c.res.headers.set("set-cookie", headers.get("set-cookie")!);
+    return c.json({ok: true, msg: "logged in!"});
   } catch (err: unknown) {
     // @ts-ignore
     return c.json({ok: false, msg: (err.message ?? err.msg ?? "Unknown Error")}, 403);

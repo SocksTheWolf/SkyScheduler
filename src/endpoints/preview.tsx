@@ -24,12 +24,12 @@ preview.get("/file/:id", pullAuthData, async (c) => {
   }
 
   const customData = fetchedFile.customMetadata !== undefined;
-  const contentType = fetchedFile.httpMetadata?.contentType || customData ? fetchedFile.customMetadata!["type"] : "";
+  const contentType = fetchedFile.httpMetadata?.contentType || customData ? fetchedFile.customMetadata!.type : "";
   if (PREVENT_NON_IMAGE_PREVIEWS && !BSKY_IMG_MIME_TYPES.includes(contentType)) {
     return c.redirect("/thumbs/missing.png", 307);
   }
 
-  const uploaderId = customData ? fetchedFile.customMetadata["user"] : "";
+  const uploaderId = customData ? fetchedFile.customMetadata.user : "";
   if (isEmpty(uploaderId) || c.get("userId") !== uploaderId) {
     return c.redirect("/thumbs/image.png", 303);
   }

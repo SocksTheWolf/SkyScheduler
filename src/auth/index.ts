@@ -19,7 +19,7 @@ import { createPasswordResetMessage } from "../utils/messages/accountReset";
 // as such, we dynamically import and then set the appropriate function signature from there
 type waitUntilCallback = (_: Promise<unknown>) => void;
 let waitUntil: waitUntilCallback;
-if (process.env["IS_SSG"] == "true") {
+if (process.env.IS_SSG == "true") {
   waitUntil = (await import("../workerShim")).waitUntilShim;
   console.log("SSG Shim Installed");
 } else {
@@ -30,7 +30,7 @@ if (process.env["IS_SSG"] == "true") {
 function createAuth(c?: AllContext, cf?: IncomingRequestCfProperties) {
   const env: Bindings|undefined = c?.env;
   // Use actual DB for runtime, empty object for CLI
-  const db = c ? c.get("db") : ({} as any);
+  const db = c ? c.get("db") : ({} as DBProcessor);
   return betterAuth({
     // pretty much disable everything but the /reset-password
     // this is just overkill tbh, we hardcode the routes we support in index

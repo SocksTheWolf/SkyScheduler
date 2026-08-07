@@ -1,6 +1,17 @@
 import type { RepostIntakeData } from "../types";
 import { has } from "../utils/helpers";
 
+type DBRepost = Omit<Repost, "postid"> & {
+  postid: never;
+  uuid: string;
+}
+
+type RawRepost = Repost & {
+  uuid: never;
+}
+
+export type RepostIntakeType = RawRepost|DBRepost;
+
 export class Repost {
   postid: string;
   uri: string;
@@ -8,7 +19,7 @@ export class Repost {
   userId: string;
   scheduleGuid?: string;
   content?: string;
-  constructor(data: any) {
+  constructor(data: RepostIntakeType) {
     if (has(data, "uuid"))
       this.postid = data.uuid;
     else

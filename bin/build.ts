@@ -1,7 +1,7 @@
-import fs from "fs/promises";
 import type { Hono } from "hono";
 import type { ToSSGResult } from "hono/ssg";
 import { toSSG } from "hono/ssg";
+import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import * as app from "../src/index";

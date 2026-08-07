@@ -187,6 +187,7 @@ skyscheduler/
 ├── .ssclirc
 ├── auth.config.ts
 ├── drizzle.config.ts
+├── eslint.config.ts
 ├── package.json
 ├── tsconfig.json
 └── wrangler.toml
