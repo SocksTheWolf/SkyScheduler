@@ -148,6 +148,19 @@ export type BskyWebLinkRecordData = {
   thumb?: BlobRef;
 };
 
+export type PDSService = {
+  type: string;
+  serviceEndpoint: string;
+};
+
+export interface ProperD1Result extends Omit<D1Result, "success"> {
+  success: boolean;
+};
+
+export type PLCDirectoryResponse = {
+  service?: PDSService[]
+};
+
 // These are bsky responses to making posts
 export type PostResponseObject = {
   uri: string;
@@ -243,6 +256,12 @@ export type GetAllPostedBatch = {
   id: string;
   uri: string|null;
 };
+
+export type DBServiceLogin = {
+  user: string|null;
+  pass: string;
+  pds: string;
+}
 
 // Used for the file upload table so we can keep track of
 // abandoned files from partial records

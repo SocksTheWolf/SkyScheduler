@@ -15,7 +15,7 @@ import {
 import type {
   AllContext, BskyEmbedRecord, BskyEmbedWrapper,
   BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
-  BskyVideoRecordData, BskyWebLinkRecordData, PostRecordResponse,
+  BskyVideoRecordData, BskyWebLinkRecordData, PLCDirectoryResponse, PostRecordResponse,
   PostStatus, WebAssociatedRef
 } from "../../types";
 import type { atpRecordURICaptures } from "../../validation/regexCases";
@@ -46,9 +46,9 @@ export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
     }
   }).then((resp) => {
     if (resp.ok) {
-      return resp.json().then((jsonData: unknown) => {
+      return resp.json<{did?: string}>().then((jsonData) => {
         if (has(jsonData, "did")) {
-          return jsonData.did as string;
+          return jsonData.did!;
         }
         return null;
       });
@@ -59,11 +59,11 @@ export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
 
 export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
   return await fetch(`https://plc.directory/${userDID}`).then((resp) => {
-    return resp.json().then((data) => {
+    return (resp.json<PLCDirectoryResponse>()).then((data) => {
       if (has(data, "service")) {
-        for (const service of data.service) {
+        for (const service of data.service!) {
           if (service.type === "AtprotoPersonalDataServer") {
-            return service.serviceEndpoint as string;
+            return service.serviceEndpoint;
           }
         }
       }

@@ -17,7 +17,8 @@ import type {
   DBProcessor,
   EditPostChanges,
   GetAllPostedBatch,
-  PostRecordResponse
+  PostRecordResponse,
+  ProperD1Result
 } from "../../types";
 import { floorCurrentTime } from "../helpers";
 
@@ -276,13 +277,9 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
 
   // Batching this should improve db times
   if (deleteQueries.length > 0) {
-    const batchResponse: D1Result[] = await db.batch(deleteQueries as BatchQuery);
+    const batchResponse: ProperD1Result[] = await db.batch(deleteQueries as BatchQuery);
     // Return the number of items that have been deleted
-    //
-    // wrangler has the success flag typed to always be true, which is incorrect. so we need to ignore
-    // the ts statement
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    return batchResponse.reduce((val: number, item: D1Result) => val + (item.success ? 1 : 0), 0);
+    return batchResponse.reduce((val: number, item: ProperD1Result) => val + (item.success ? 1 : 0), 0);
   }
   return 0;
 };

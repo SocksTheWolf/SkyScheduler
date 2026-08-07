@@ -151,6 +151,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
     });
 
     // process and match up all of the alt text properly
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
     for (let i = 0; i < originalPost.embeds.length; ++i) {
       const embedData = originalPost.embeds[i];
       // if we have anything other than an image or video, skip it

@@ -30,7 +30,7 @@ export const uploadVideoToBlob = async (ctx: AllContext, agent: AtProtoAgent, fi
     body: await fileData.blob(),
   });
   if (uploadResponse.ok)
-    return ((await uploadResponse.json()) as AppBskyVideoDefs.JobStatus);
+    return ((await uploadResponse.json<AppBskyVideoDefs.JobStatus>()));
 
   throw new Error("Failed to upload!");
 };

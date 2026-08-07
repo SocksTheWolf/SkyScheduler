@@ -1,6 +1,6 @@
-import { readFile } from "fs/promises";
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
+import { readFile } from "fs/promises";
 import { getHTMXConfigStr } from "../layout/helpers/includesTags";
 import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
 import type { BaseContext } from "../types";

@@ -17,6 +17,7 @@ import type {
   DBProcessor,
   DeleteResponse,
   EditPostChanges,
+  ProperD1Result,
   UserIdType
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
@@ -322,7 +323,7 @@ export const createPost = async (c: AllContext, body: any): Promise<CreatePostQu
   }
 
   // Batch the query
-  const batchResponse = await db.batch(dbOperations as BatchQuery);
+  const batchResponse: ProperD1Result[] = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
   return { ok: success, postNow: makePostNow, postId: postUUID, msg: success ? "success" : "fail" };
 };
@@ -484,7 +485,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
   // pushing any value under zero causes a full recount
   dbOperations.push(getRepostCountQuery(db, postUUID, totalRepostCount));
 
-  const batchResponse = await db.batch(dbOperations as BatchQuery);
+  const batchResponse: ProperD1Result[] = await db.batch(dbOperations as BatchQuery);
   const success = batchResponse.every((el) => el.success);
   return { ok: success, msg: success ? "success" : "fail", postId: postUUID };
 };
@@ -588,7 +589,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     }
 
     // Batch push up everything
-    const batchResponse = await db.batch(queriesToExecute as BatchQuery);
+    const batchResponse: ProperD1Result[] = await db.batch(queriesToExecute as BatchQuery);
     return batchResponse.every((el) => el.success);
   }
   return false;

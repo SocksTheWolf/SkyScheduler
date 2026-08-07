@@ -68,6 +68,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
     }
     return c.json({ok: false, msg: "could not login user"}, 403);
   } catch (err: unknown) {
+    // @ts-ignore
     return c.json({ok: false, msg: (err.message ?? err.msg ?? "Unknown Error")}, 403);
   }
 });
@@ -397,6 +398,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
     }
   } catch (err: unknown) {
+    // @ts-ignore
     console.error(`failed to delete user ${userId} had error %s`, (err.message ?? err.msg) ?? 'no code');
     return c.html(<b class="btn-error">Failed: Server Error</b>, 500);
   }

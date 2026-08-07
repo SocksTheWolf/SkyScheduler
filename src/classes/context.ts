@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { drizzle } from "drizzle-orm/d1";
 import type { ExecutionContext } from "hono";
 import type { Bindings } from "../types";
