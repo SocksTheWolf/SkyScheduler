@@ -218,7 +218,7 @@ export const BSKY_GIF_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const BSKY_VIDEO_FILES_STR: string = ((GIF_UPLOAD_ALLOWED) ?
   [...BSKY_VIDEO_FILE_EXTS, "animated gif"] : BSKY_VIDEO_FILE_EXTS).join(", ");
 
