@@ -1,9 +1,14 @@
 import type { RepostIntakeData } from "../types";
 import { has } from "../utils/helpers";
 
-type DBRepost = Omit<Repost, "postid"> & {
-  postid: never;
+type DBRepost = {
+  postid?: never;
   uuid: string;
+  uri: string|null;
+  cid: string|null;
+  userId: string;
+  scheduleGuid?: string|null;
+  content?: string|null;
 }
 
 type RawRepost = Repost & {
@@ -23,16 +28,17 @@ export class Repost {
     if (has(data, "uuid"))
       this.postid = data.uuid;
     else
-      this.postid = data.postid;
+      this.postid = data.postid ?? "";
 
-    this.cid = data.cid;
-    this.uri = data.uri;
+    this.cid = data.cid ?? "";
+    this.uri = data.uri ?? "";
     this.userId = data.userId;
 
-    if (data.content)
-      this.content = data.content;
-    if (data.scheduleGuid)
-      this.scheduleGuid = data.scheduleGuid;
+    if (has(data, "content"))
+      this.content = data.content!;
+
+    if (has(data, "scheduleGuid"))
+      this.scheduleGuid = data.scheduleGuid!;
   }
   getUser(): string {
     return this.userId;

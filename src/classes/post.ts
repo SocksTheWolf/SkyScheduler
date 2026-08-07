@@ -6,21 +6,43 @@ import type { EmbedData } from "../types";
 import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";
 
-type DBPost = Omit<Post, "postid"|"embeds"|"label"|"text"|"user"> & {
+// This is a real copy of the schema
+type DBPost = {
   uuid: string;
   content: string;
   embedContent?: EmbedData[],
   contentLabel: PostLabel;
   userId: string;
+  cid?: string|null;
+  uri?: string|null;
+  scheduledDate?: Date|string;
+  postNow: boolean|null;
+  threadOrder: number|null;
+  repostInfo: RepostInfo[]|null,
+  isRepost: boolean|null;
+  posted: boolean|null;
+  rootPost: string|null;
+  parentPost: string|null;
+  repostCount?: number|null;
 
-  postid: never;
-  embeds: never;
-  label: never;
-  text: never;
-  user: never;
+  user?: never;
+  postid?: never;
+  text?: never;
+  embeds?: never;
+  label?: never;
 }
 
+// And this is just Post type
+// which really should just have copied the schema actually
+// but we can fix it in the future
+// TODO: Clean up Post type
 type RawPost = Post & {
+  postid: string;
+  text: string;
+  embeds?: EmbedData[];
+  label: PostLabel;
+  user: string;
+
   userId: never;
   embedContent: never;
   contentLabel: never;
@@ -62,12 +84,12 @@ export class Post {
     if (has(data, "userId"))
       this.user = data.userId;
     else
-      this.user = data.user;
+      this.user = data.user!;
 
     if (has(data, "uuid"))
       this.postid = data.uuid;
     else
-      this.postid = data.postid;
+      this.postid = data.postid!;
 
     if (has(data, "embedContent"))
       this.embeds = data.embedContent;
@@ -77,21 +99,21 @@ export class Post {
     if (has(data, "contentLabel"))
       this.label = data.contentLabel;
     else
-      this.label = data.label;
+      this.label = data.label!;
 
     if (has(data, "content"))
       this.text = data.content;
     else
-      this.text = data.text;
+      this.text = data.text!;
 
-    this.postNow = data.postNow;
-    this.threadOrder = data.threadOrder;
+    this.postNow = data.postNow ?? false;
+    this.threadOrder = data.threadOrder ?? -1;
 
     if (has(data, "repostCount"))
-      this.repostCount = data.repostCount;
+      this.repostCount = data.repostCount!;
 
-    if (data.scheduledDate)
-      this.scheduledDate = data.scheduledDate;
+    if (has(data, "scheduledDate"))
+      this.scheduledDate = data.scheduledDate instanceof Date ? data.scheduledDate.toISOString() : data.scheduledDate;
 
     if (data.repostInfo)
       this.repostInfo = data.repostInfo;
@@ -99,8 +121,8 @@ export class Post {
     if (data.rootPost)
       this.rootPost = data.rootPost;
 
-    if (data.parentPost)
-      this.parentPost = data.parentPost;
+    if (has(data, "parentPost"))
+      this.parentPost = data.parentPost!;
 
     // ATProto data
     if (data.uri)
@@ -109,10 +131,10 @@ export class Post {
       this.cid = data.cid;
 
     if (has(data, "isRepost"))
-      this.isRepost = data.isRepost;
+      this.isRepost = data.isRepost!;
 
     if (has(data, "posted"))
-      this.posted = data.posted;
+      this.posted = data.posted!;
 
     // if a cid flag appears for the object and it's a thread root, then the post (if marked not posted) is posted.
     if (this.posted == false && !isEmpty(data.cid) && this.isThreadRoot)
