@@ -5,9 +5,9 @@ import type { BaseElementProps } from "../types";
 import PostDataFooter from "./posts/footer";
 import PostDataHeader from "./posts/header";
 
-type PostContentProps = {
+interface PostContentProps {
   post: Post;
-};
+}
 
 export function PostContent(props: PostContentProps) {
   const post: Post = props.post;

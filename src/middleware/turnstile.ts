@@ -1,11 +1,11 @@
 import type { BaseContext, NextMiddleware } from "../types";
 import { useCFTurnstile } from "../utils/helpers";
 
-type TurnstileResponse = {
+interface TurnstileResponse {
   success: boolean;
-};
+}
 
-type TurnstileRequestData = {
+interface TurnstileRequestData {
   "cf-turnstile-response": string
 }
 

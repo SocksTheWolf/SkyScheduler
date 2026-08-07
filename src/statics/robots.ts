@@ -1,10 +1,10 @@
 import { SITE_URL } from "../appInfo";
 
-type RobotRule = {
+interface RobotRule {
   agent: string;
   allow?: string[];
   disallow?: string[];
-};
+}
 
 // Put robots.txt rules in here.
 const defaultRules: RobotRule[] = [

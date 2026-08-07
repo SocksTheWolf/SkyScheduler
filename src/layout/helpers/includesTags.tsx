@@ -1,9 +1,9 @@
 import { raw } from "hono/html";
 import type { LooseObj, PreloadRules } from "../../types";
 
-type NoncePropType = {
+interface NoncePropType {
   nonce?: string
-};
+}
 
 type DepTagsType = NoncePropType & {
   scripts?: PreloadRules[]

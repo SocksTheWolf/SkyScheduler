@@ -10,10 +10,10 @@ import { isPost } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
 import { enqueueEmptyWork } from "./queuePublisher";
 
-type BufferBlast = {
+interface BufferBlast {
   type: TaskType,
   time: number
-};
+}
 
 export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
   // runtime overhead

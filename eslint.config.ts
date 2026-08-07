@@ -19,10 +19,12 @@ export default defineConfig([
     },
     rules: {
       "curly": "off",
+      // hono gets
       "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/consistent-type-definitions": "off",
+      // necessary for valid, uuidValid, has, isEmpty, etc
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unnecessary-condition": "error",
+      // ts ignore annoyances
       "@typescript-eslint/ban-ts-comment": "off"
     }
   }

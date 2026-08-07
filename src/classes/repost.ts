@@ -1,7 +1,7 @@
 import type { RepostIntakeData } from "../types";
 import { has } from "../utils/helpers";
 
-type DBRepost = {
+interface DBRepost {
   postid?: never;
   uuid: string;
   uri: string|null;

@@ -5,7 +5,7 @@ export const httpProtoRecord = /^https?$/;
 // GUID + file extensions
 export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|webp|heic|svg|mp4|gif|webm|mpeg|mov)$/i;
 // Given a link to a post/feed/list/profile record
-export type atpRecordURICaptures = {
+export interface atpRecordURICaptures {
   account?: string;
   type?: string;
   postid?: string;

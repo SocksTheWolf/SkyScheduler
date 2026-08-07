@@ -1,9 +1,9 @@
 import { APP_NAME, LOGO_ENABLED } from "../../appInfo";
 
-type LogoImageProps = {
+interface LogoImageProps {
   width: number;
   height: number;
-};
+}
 
 export default function LogoImage(props: LogoImageProps) {
   if (!LOGO_ENABLED)

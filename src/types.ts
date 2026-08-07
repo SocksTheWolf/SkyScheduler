@@ -9,18 +9,18 @@ import type { Repost } from "./classes/repost";
 import type { EmbedDataType, TaskType } from "./enums";
 
 /*** Settings config wrappers for bindings ***/
-type ImageConfigSettings = {
+interface ImageConfigSettings {
   enabled: boolean;
   steps?: number[];
   bucket_url?: string;
-};
+}
 
-type R2ConfigSettings = {
+interface R2ConfigSettings {
   auto_prune: boolean;
   prune_days?: number;
 }
 
-type QueueConfigSettings = {
+interface QueueConfigSettings {
   enabled: boolean;
   repostsEnabled: boolean;
   threadEnabled: boolean;
@@ -32,7 +32,7 @@ type QueueConfigSettings = {
   repost_queues: string[];
 }
 
-export type AgentConfigSettings = {
+export interface AgentConfigSettings {
   use_posts: boolean;
   use_reposts: boolean;
 }
@@ -73,7 +73,7 @@ export interface Bindings {
   IS_SSG: "true"|"false"|undefined;
 };
 
-export type EmbedData = {
+export interface EmbedData {
   content: string;
   alt?: string;
   title?: string;
@@ -84,86 +84,86 @@ export type EmbedData = {
   height?: number;
   duration?: number;
   associatedRefs?: WebAssociatedRef[];
-};
+}
 
 /// BSKY RECORDS & TYPES
-export type StrongRecordObject = {
+export interface StrongRecordObject {
   uri: string;
   cid: string;
-};
+}
 export type WebAssociatedRef = StrongRecordObject & {
   $type: "com.atproto.repo.strongRef";
 };
 
-export type BskyEmbedRecord = {
+export interface BskyEmbedRecord {
   "$type": "app.bsky.embed.record";
   record: StrongRecordObject
-};
+}
 
 export type BskyEmbedWrapper = BskyEmptyEmbed|BskyVideoEmbed|BskyImgEmbed|BskyWebEmbed;
 
-export type BskyEmptyEmbed = {
+export interface BskyEmptyEmbed {
   type: EmbedDataType.None|EmbedDataType.Record;
   data?: undefined;
-};
+}
 
-export type BskyVideoEmbed = {
+export interface BskyVideoEmbed {
   type: EmbedDataType.Video;
   data: BskyVideoRecordData
-};
+}
 
-export type BskyImgEmbed = {
+export interface BskyImgEmbed {
   type: EmbedDataType.Image;
   data?: BskyImageRecordData[];
-};
+}
 
-export type BskyWebEmbed = {
+export interface BskyWebEmbed {
   type: EmbedDataType.WebLink;
   data: BskyWebLinkRecordData;
-};
+}
 
-export type BskyRecordWrapper = {
+export interface BskyRecordWrapper {
   cid?: string;
   uri?: string;
-};
+}
 
-export type BskyMediaAspectRatio = {
+export interface BskyMediaAspectRatio {
   width: number;
   height: number;
-};
+}
 
-export type BskyImageRecordData = {
+export interface BskyImageRecordData {
   alt: string;
   image: BlobRef;
   aspectRatio?: BskyMediaAspectRatio;
-};
+}
 
-export type BskyVideoRecordData = {
+export interface BskyVideoRecordData {
   blob: BlobRef;
   ar: BskyMediaAspectRatio;
   alt?: string;
-};
+}
 
-export type BskyWebLinkRecordData = {
+export interface BskyWebLinkRecordData {
   uri: string;
   title: string;
   description: string;
   associatedRefs?: WebAssociatedRef[];
   thumb?: BlobRef;
-};
+}
 
-export type PDSService = {
+export interface PDSService {
   type: string;
   serviceEndpoint: string;
-};
+}
 
 export interface ProperD1Result extends Omit<D1Result, "success"> {
   success: boolean;
 };
 
-export type PLCDirectoryResponse = {
+export interface PLCDirectoryResponse {
   service?: PDSService[]
-};
+}
 
 // These are bsky responses to making posts
 export type PostResponseObject = StrongRecordObject;
@@ -174,50 +174,50 @@ export type PostRecordResponse = PostResponseObject & {
 };
 
 // Keeping track of the statuses of the posts that we made during a task operation
-export type PostStatus = {
+export interface PostStatus {
   records: PostRecordResponse[];
   // number of expected successes
   expected: number;
   // number of successes we got
   got: number;
-};
+}
 
 /// APP RESPONSES
-export type CreateObjectResponse = {
+export interface CreateObjectResponse {
   ok: boolean;
   msg: string;
   postId?: string;
   rate_limited?: boolean;
-};
+}
 
 export type CreatePostQueryResponse = CreateObjectResponse & {
   postNow?: boolean;
 };
 
-export type DeleteResponse = {
+export interface DeleteResponse {
   success: boolean;
   isRepost: boolean;
   needsRefresh?: boolean;
-};
+}
 
 /// MIDDLEWARES
-export type RequireAuthMiddlewareProps = {
+export interface RequireAuthMiddlewareProps {
   returnHTML?: boolean;
   // if specified: logs out immediately
   // if not: logs out after 5 seconds
   forceLogout?: boolean;
-};
+}
 
 /// USER WRAPPED DATA
-export type AccountUpdatePayload = {
+export interface AccountUpdatePayload {
   username?: string;
   updatedSession?: boolean;
   password?: string;
-};
-export type EditPostChanges = {
+}
+export interface EditPostChanges {
   content: string;
   embedContent?: EmbedData[];
-};
+}
 
 export type RepostIntakeData = {
   hours: number;
@@ -225,21 +225,21 @@ export type RepostIntakeData = {
 } | undefined;
 
 /// R2
-export type R2BucketObject = {
+export interface R2BucketObject {
   name: string;
   user: string|null;
   date: Date
-};
+}
 
 /// VIOLATIONS
-export type ViolationRecordChange = {
+export interface ViolationRecordChange {
   userPassInvalid?: boolean;
   accountSuspended?: boolean;
   mediaTooBig?: boolean;
   tosViolation?: boolean;
   takenDown?: boolean;
   accountGone?: boolean;
-};
+}
 
 export type Violation = ViolationRecordChange & {
   userId: string;
@@ -253,12 +253,12 @@ export type BatchQueryArray = BatchQueryItem[];
 export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
 
 // Used for the pruning and database operations
-export type GetAllPostedBatch = {
+export interface GetAllPostedBatch {
   id: string;
   uri: string|null;
-};
+}
 
-export type DBServiceLogin = {
+export interface DBServiceLogin {
   user: string|null;
   pass: string;
   pds: string;
@@ -266,35 +266,38 @@ export type DBServiceLogin = {
 
 // Used for the file upload table so we can keep track of
 // abandoned files from partial records
-export type FileListingRecord = {
+export interface FileListingRecord {
   createdAt?: Date;
   userId?: string;
-};
+}
 
 /// RUNNERS
-export type QueueTaskData = {
+export interface QueueTaskData {
   type: TaskType;
   data: Post|Repost|null;
-};
+}
 
 /// Contexts & Rendering
 export type NextMiddleware = () => Promise<void>;
-export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
+export interface HonoBase {
+  Bindings: Bindings,
+  Variables: ContextVariables
+}
 
 export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
 
 
-export type BaseElementProps = {
+export interface BaseElementProps {
   ctx?: AllContext
-};
+}
 // handling preloading and injection of dependencies into the layout
-export type PreloadRules = {
+export interface PreloadRules {
   type: "image"|"style"|"script"|"module";
   href: string;
   defer?: boolean;
   async?: boolean;
-};
+}
 
 /// MISC
 export type UserIdType = string|null;

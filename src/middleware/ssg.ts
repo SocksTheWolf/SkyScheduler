@@ -6,9 +6,9 @@ import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
 import type { BaseContext, NextMiddleware } from "../types";
 import { has } from "../utils/helpers";
 
-type SSGServeProps = {
+interface SSGServeProps {
   page: string;
-};
+}
 
 class NonceInject {
   nonce: string;

@@ -27,9 +27,9 @@ import { LoginSchema } from "../validation/loginSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<HonoBase>();
-type ServerValidationError = {
+interface ServerValidationError {
   message: string;
-};
+}
 const serverParseValidationErr = (c: Context, errorJson: string, errCode: ContentfulStatusCode=200) => {
   try {
     const errorMsgs: ServerValidationError[] = JSON.parse(errorJson);

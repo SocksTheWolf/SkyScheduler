@@ -2,12 +2,12 @@ import { html } from 'hono/html';
 import type { Child } from 'hono/jsx';
 import type { HtmlEscapedString } from 'hono/utils/html';
 
-type FooterLink = {
+interface FooterLink {
   title: string;
   url: string;
-};
+}
 
-type AccountFormProps = {
+interface AccountFormProps {
   children: Child;
   title: string;
   submitText?: string;
@@ -20,7 +20,7 @@ type AccountFormProps = {
   footerLinks?: FooterLink[]
   footerHTML?: string | Promise<HtmlEscapedString>;
   nonce?: string
-};
+}
 
 export default function AccountHandler(props: AccountFormProps) {
   const footerLinkHTML = props.footerLinks?.map((el: FooterLink) => {

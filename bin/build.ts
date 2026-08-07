@@ -8,10 +8,10 @@ import * as app from "../src/index";
 import { USE_STATIC_HTML } from '../src/limits';
 import type { HonoBase } from "../src/types";
 
-type MoveMapRule = {
+interface MoveMapRule {
   file: string;
   destFolder: string;
-};
+}
 
 const outputDirectory: string = "./assets/pages";
 

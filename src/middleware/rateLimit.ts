@@ -3,12 +3,12 @@ import { html } from "hono/html";
 import get from 'just-safe-get';
 import type { BaseContext, NextMiddleware } from "../types";
 
-type RateLimitProps = {
+interface RateLimitProps {
   limiter: string;
   html?: boolean;
   toast?: boolean;
   message?: string;
-};
+}
 
 export const rateLimit = (prop: RateLimitProps) => {
   return createMiddleware(async (c: BaseContext, next: NextMiddleware) => {

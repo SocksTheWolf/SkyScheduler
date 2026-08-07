@@ -111,7 +111,7 @@ export class AtProtoAgent extends Agent {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-export type AgentLoginResponse = {
+export interface AgentLoginResponse {
   agent: AtProtoAgent | null;
   violation: boolean;
   violationType?: AccountStatus;

@@ -17,7 +17,7 @@ import type { AllContext, EmbedData, R2BucketObject, UserIdType } from '../types
 import { addFileListing, deleteFileListings, isMediaOwnedByUser } from './db/file';
 import { isAltEditableType } from './helpers';
 
-type FileMetaData = {
+interface FileMetaData {
   name: string,
   size: number,
   user: string,
@@ -25,7 +25,7 @@ type FileMetaData = {
   qualityLevel?: number;
   height?: number;
   width?: number;
-};
+}
 
 export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
   const itemsToDelete: string[] = [];
