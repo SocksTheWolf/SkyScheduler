@@ -22,16 +22,16 @@ export default function PostDataHeader(props: PostDataHeaderOptions) {
   // show the header if any of the above cases is true
   const canSeeHeader = canBeEdited || canBeDeleted || canAddReposts;
   return (<header class="postItemHeader"
-    data-item={content.postid}
-    data-root={content.rootPost ?? content.postid}
+    data-item={content.uuid}
+    data-root={content.rootPost ?? content.uuid}
     data-parent={content.isChildPost ? content.parentPost : undefined}
     data-repost={content.isRepost ?? undefined}
     data-scheduled={!props.posted || undefined}
     hidden={canSeeHeader ? undefined : true}>
     <RepostStatusIcon isRepost={content.isRepost} />
-    {canBeEdited ? <EditPostButton id={content.postid} /> : null}
+    {canBeEdited ? <EditPostButton id={content.uuid} /> : null}
     {canBeEdited ? <AddPostToThreadButton /> : null}
     {canAddReposts ? <AddRepostsButton /> : null}
-    {canBeDeleted ? <DeletePostButton id={content.postid} isRepost={content.isRepost} child={content.isChildPost} /> : null}
+    {canBeDeleted ? <DeletePostButton id={content.uuid} isRepost={content.isRepost} child={content.isChildPost} /> : null}
   </header>);
 }

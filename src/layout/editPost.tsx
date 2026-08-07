@@ -12,7 +12,7 @@ type EditedPostProps = BaseElementProps & {
 export function PostAltTextEdit(props: EditedPostProps) {
   const post: Post = props.post;
   let num = -1;
-  const embedAltTextEdit = post.embeds?.map((embedData) => {
+  const embedAltTextEdit = post.embedContent?.map((embedData) => {
     ++num;
     if (!isAltEditableType(embedData.type))
       return;
@@ -53,19 +53,19 @@ export function PostEdit(props: EditedPostProps) {
   }
 
   // yeah these are kind egregious...
-  const editSpinner: string = `editSpinner-${post.postid}`;
-  const editResponse: string = `editResponse-${post.postid}`;
-  const editPostField: string = `edit-${post.postid}`;
-  const editCountId: string = `editCount-${post.postid}`;
-  const postFormId: string = `editPost-${post.postid}`;
+  const editSpinner: string = `editSpinner-${post.uuid}`;
+  const editResponse: string = `editResponse-${post.uuid}`;
+  const editPostField: string = `edit-${post.uuid}`;
+  const editCountId: string = `editCount-${post.uuid}`;
+  const postFormId: string = `editPost-${post.uuid}`;
 
   return (<form id={postFormId}
-    hx-ext="form-json" hx-post={`/post/edit/${post.postid}`} hx-target={`#${editResponse}`}
+    hx-ext="form-json" hx-post={`/post/edit/${post.uuid}`} hx-target={`#${editResponse}`}
     hx-swap="innerHTML swap:0.2s" hx-indicator={`#${editSpinner}`}>
 
     <section>
       <textarea autofocus name="content" id={editPostField} rows={6} tabindex={0} required>
-        {post.text}
+        {post.content}
       </textarea>
       <small>Character Count: <span id={editCountId}>0/{MAX_LENGTH}</span></small>
     </section>
@@ -77,7 +77,7 @@ export function PostEdit(props: EditedPostProps) {
       </div>
       <button tabindex={0}>Update Post</button>
       <a tabindex={0} role="button" class="secondary cancelEditButton"
-      hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.postid}/cancel`}
+      hx-swap="innerHTML swap:0.2s" hx-get={`/post/edit/${post.uuid}/cancel`}
       hx-confirm="Are you sure you want to cancel editing?">Cancel</a>
     </center>
   </form>);

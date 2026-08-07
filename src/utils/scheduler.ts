@@ -24,14 +24,14 @@ import { deleteFromR2 } from './r2Query';
 
 export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtProtoAgent|null) => {
   if (agent === null) {
-    console.error(`Unable to make agent to post ${postData.postid}`);
+    console.error(`Unable to make agent to post ${postData.uuid}`);
     return false;
   }
   const madePost = await makePost(runtime, postData, agent);
   if (madePost) {
-    console.log(`Made post ${postData.postid} successfully`);
+    console.log(`Made post ${postData.uuid} successfully`);
   } else {
-    console.error(`Failed to post id ${postData.postid}`);
+    console.error(`Failed to post id ${postData.uuid}`);
   }
   return madePost;
 };
@@ -43,27 +43,27 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       c.executionCtx.waitUntil(enqueuePost(c, postData));
       postStatus = true;
     } catch(err: unknown) {
-      console.error(`Post now queue for ${postData.postid} got error: %s`, err);
+      console.error(`Post now queue for ${postData.uuid} got error: %s`, err);
       postStatus = false;
     }
   } else {
-    const {agent} = await AgentMap.getAgentDirect(c, postData.user, false);
+    const {agent} = await AgentMap.getAgentDirect(c, postData.userId, false);
     if (agent === null) {
-      console.error(`unable to get agent for user ${postData.user} to post now`);
+      console.error(`unable to get agent for user ${postData.userId} to post now`);
       postStatus = false;
     } else {
       postStatus = await makePost(c, postData, agent);
     }
   }
   if (!postStatus)
-    c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.postid));
+    c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.uuid));
 
   return postStatus;
 };
 
 export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtProtoAgent|null) => {
   if (agent === null) {
-    console.error(`Unable to make agent to repost ${postData.postid}`);
+    console.error(`Unable to make agent to repost ${postData.uuid}`);
     return false;
   }
   const madeRepost = await makeRepost(c, postData, agent);
@@ -103,7 +103,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
       if (queueEnabled || (post.isThreadRoot && threadQueueEnabled)) {
         await enqueuePost(c, post);
       } else {
-        const agent = await agency.getOrAddAgent(c, post.user, TaskType.Post);
+        const agent = await agency.getOrAddAgent(c, post.userId, TaskType.Post);
         c.executionCtx.waitUntil(handlePostTask(c, post, agent));
       }
     }

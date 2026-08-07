@@ -86,6 +86,16 @@ export interface EmbedData {
   associatedRefs?: WebAssociatedRef[];
 }
 
+export interface BaseContent {
+  userId: string;
+  content: string;
+  uuid: string;
+  uri: string;
+  cid: string;
+
+  getUser(): string;
+}
+
 /// BSKY RECORDS & TYPES
 export interface StrongRecordObject {
   uri: string;

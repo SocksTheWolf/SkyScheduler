@@ -139,7 +139,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   // Handle alt text and stuffs
   if (altEdits !== undefined && !isEmpty(altEdits)) {
     // Check to see if this post had editable data
-    if (originalPost.embeds === undefined) {
+    if (!originalPost.hasEmbeds()) {
       c.header("HX-Trigger-After-Settle", swapErrEvents);
       return c.html(<b class="btn-error">Post did not have media content that was editable</b>, 403);
     }
@@ -152,8 +152,8 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
 
     // process and match up all of the alt text properly
     // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    for (let i = 0; i < originalPost.embeds.length; ++i) {
-      const embedData = originalPost.embeds[i];
+    for (let i = 0; i < originalPost.embedContent!.length; ++i) {
+      const embedData = originalPost.embedContent![i];
       // if we have anything other than an image or video, skip it
       if (!isAltEditableType(embedData.type)) {
         continue;
@@ -162,7 +162,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
       const newAltText = editsMap.get(embedData.content);
       if (newAltText !== undefined) {
         // it was
-        originalPost.embeds[i].alt = newAltText;
+        originalPost.embedContent![i].alt = newAltText;
         hasEmbedEdits = true;
       }
     }
@@ -170,10 +170,10 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
   const payload: EditPostChanges = { content: content };
   // push edited embedContent.
   if (hasEmbedEdits)
-    payload.embedContent = originalPost.embeds;
+    payload.embedContent = originalPost.embedContent;
 
   if (await updatePostForUser(c, id, payload)) {
-    originalPost.text = content;
+    originalPost.content = content;
     c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
     c.header("HX-Trigger-After-Swap", "postUpdatedNotice, updateTimestamps, sidebarButtons, scrollTop");
     return c.html(<PostHTML post={originalPost} dynamic={true} />);

@@ -2,12 +2,12 @@ import type { BlobRef } from "@atproto/api";
 import isEmpty from "just-is-empty";
 import type { PostLabel } from "../enums";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
-import type { EmbedData } from "../types";
+import type { BaseContent, EmbedData } from "../types";
 import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";
 
 // This is a real copy of the schema
-type DBPost = {
+interface DBPost {
   uuid: string;
   content: string;
   embedContent?: EmbedData[],
@@ -24,44 +24,20 @@ type DBPost = {
   rootPost: string|null;
   parentPost: string|null;
   repostCount?: number|null;
-
-  user?: never;
-  postid?: never;
-  text?: never;
-  embeds?: never;
-  label?: never;
 }
 
-// And this is just Post type
-// which really should just have copied the schema actually
-// but we can fix it in the future
-// TODO: Clean up Post type
-type RawPost = Post & {
-  postid: string;
-  text: string;
-  embeds?: EmbedData[];
-  label: PostLabel;
-  user: string;
-
-  userId: never;
-  embedContent: never;
-  contentLabel: never;
-  content: never;
-  uuid: never;
-}
-
-export type PostIntakeType = RawPost|DBPost;
+export type PostIntakeType = Post|DBPost;
 
 // Basically a copy of the schema
-export class Post {
+export class Post implements BaseContent {
   // guid for post
-  postid: string;
+  uuid: string;
   // SkyScheduler User Id
-  user: string;
+  userId: string;
   // post data
-  text: string;
-  embeds?: EmbedData[];
-  label: PostLabel;
+  content: string;
+  embedContent?: EmbedData[];
+  contentLabel: PostLabel;
   // post flags
   postNow: boolean;
   posted?: boolean;
@@ -71,8 +47,8 @@ export class Post {
   scheduledDate?: string;
   repostCount?: number;
   // atproto data
-  cid?: string;
-  uri?: string;
+  cid: string;
+  uri: string;
   // thread data
   threadOrder: number;
   rootPost?: string;
@@ -81,31 +57,12 @@ export class Post {
   blobOverride?: null|BlobRef;
 
   constructor(data: PostIntakeType) {
-    if (has(data, "userId"))
-      this.user = data.userId;
-    else
-      this.user = data.user!;
+    this.userId = data.userId;
+    this.uuid = data.uuid;
+    this.embedContent = data.embedContent;
 
-    if (has(data, "uuid"))
-      this.postid = data.uuid;
-    else
-      this.postid = data.postid!;
-
-    if (has(data, "embedContent"))
-      this.embeds = data.embedContent;
-    else if (has(data, "embeds"))
-      this.embeds = data.embeds;
-
-    if (has(data, "contentLabel"))
-      this.label = data.contentLabel;
-    else
-      this.label = data.label!;
-
-    if (has(data, "content"))
-      this.text = data.content;
-    else
-      this.text = data.text!;
-
+    this.contentLabel = data.contentLabel;
+    this.content = data.content;
     this.postNow = data.postNow ?? false;
     this.threadOrder = data.threadOrder ?? -1;
 
@@ -125,10 +82,8 @@ export class Post {
       this.parentPost = data.parentPost!;
 
     // ATProto data
-    if (data.uri)
-      this.uri = data.uri;
-    if (data.cid)
-      this.cid = data.cid;
+    this.uri = data.uri ?? "";
+    this.cid = data.cid ?? "";
 
     if (has(data, "isRepost"))
       this.isRepost = data.isRepost!;
@@ -144,7 +99,7 @@ export class Post {
     return this.uri ? "https://bsky.app/profile/" + this.uri.replace("at://","").replace("app.bsky.feed.","") : null;
   }
   getUser(): string {
-    return this.user;
+    return this.userId;
   }
   canAddMoreRepostRules(): boolean {
     if (!this.posted && !CAN_REPOST_SCHEDULED_POSTS)
@@ -153,7 +108,7 @@ export class Post {
     return !this.isChildPost && (this.repostInfo === undefined || this.repostInfo.length < MAX_REPOST_RULES_PER_POST);
   }
   hasEmbeds(): boolean {
-    return this.embeds !== undefined && this.embeds.length > 0;
+    return this.embedContent !== undefined && this.embedContent.length > 0;
   }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }

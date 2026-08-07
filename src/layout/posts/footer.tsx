@@ -18,7 +18,7 @@ export default function PostDataFooter(props: PostDataFooterOptions) {
       target="_blank" title="link to post">{content.isRepost ? "Repost on" : "Posted on"}</a>
     <span hidden={hasPosted}>Scheduled for</span>:
     &nbsp;<span class="timestamp" repost={content.isRepost ? true : undefined}>{raw(content.scheduledDate!)}</span>
-    {content.hasEmbeds() ? ` | Embeds: ${content.embeds!.length}` : null}
-    <RepostCountElement id={content.postid} count={content.repostCount} repostInfo={content.repostInfo} />
+    {content.hasEmbeds() ? ` | Embeds: ${content.embedContent!.length}` : null}
+    <RepostCountElement id={content.uuid} count={content.repostCount} repostInfo={content.repostInfo} />
   </small></footer>);
 };

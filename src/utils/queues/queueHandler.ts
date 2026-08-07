@@ -63,7 +63,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
             wasSuccess = await handlePostTask(runtimeWrapper, postDataObj as Post, agent);
           break;
           case TaskType.Repost:
-            wasSuccess = await handleRepostTask(runtimeWrapper, postDataObj as Repost, agent);
+            wasSuccess = await handleRepostTask(runtimeWrapper, postDataObj, agent);
           break;
         }
       }

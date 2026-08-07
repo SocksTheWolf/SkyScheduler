@@ -120,7 +120,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
     // If the post has not been posted, that means we still have files for it, so
     // delete the files from R2
     if (!postObj.posted) {
-      await deleteEmbedsFromR2(c, postObj.embeds).then(() => removeViolationsDB(db, userId, [AccountStatus.MediaTooBig]));
+      await deleteEmbedsFromR2(c, postObj.embedContent).then(() => removeViolationsDB(db, userId, [AccountStatus.MediaTooBig]));
     }
     returnObj.isRepost = postObj.isRepost ?? false;
 
@@ -129,7 +129,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
     if (parentPost !== undefined) {
       // set anyone who had this as their parent to this post chain
       queriesToExecute.push(db.update(posts).set({parentPost: parentPost, threadOrder: postObj.threadOrder})
-        .where(and(eq(posts.parentPost, postObj.postid), eq(posts.rootPost, postObj.rootPost!))));
+        .where(and(eq(posts.parentPost, postObj.uuid), eq(posts.rootPost, postObj.rootPost!))));
 
       // Update the post order past here
       queriesToExecute.push(db.update(posts).set({threadOrder: sql`threadOrder - 1`})
@@ -140,18 +140,18 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
 
     // We'll need to delete all of the child embeds then, a costly, annoying experience.
     if (postObj.isThreadRoot) {
-      const childPosts = await getChildPostsOfThread(c, postObj.postid);
+      const childPosts = await getChildPostsOfThread(c, postObj.uuid);
       if (childPosts !== null) {
         for (const childPost of childPosts) {
-          c.executionCtx.waitUntil(deleteEmbedsFromR2(c, childPost.embeds));
-          queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, childPost.postid)));
+          c.executionCtx.waitUntil(deleteEmbedsFromR2(c, childPost.embedContent));
+          queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, childPost.uuid)));
         }
       } else {
-        console.warn(`could not get child posts of thread ${postObj.postid} during delete`);
+        console.warn(`could not get child posts of thread ${postObj.uuid} during delete`);
       }
     } else if (postObj.isChildPost) {
       // this is not a thread root, so we should figure out how many children are left.
-      const childPostCount = (await getPostThreadCount(db, postObj.user, postObj.rootPost!)) - 1;
+      const childPostCount = (await getPostThreadCount(db, postObj.userId, postObj.rootPost!)) - 1;
       if (childPostCount <= 0) {
         queriesToExecute.push(db.update(posts).set({threadOrder: -1}).where(eq(posts.uuid, postObj.rootPost!)));
       }
@@ -222,7 +222,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
       if (rootPostData.isRepost) {
         return {ok: false, msg: "Threads cannot be made of repost actions"};
       }
-      rootPostID = rootPostData.rootPost ?? rootPostData.postid;
+      rootPostID = rootPostData.rootPost ?? rootPostData.uuid;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
         if (uuidValid(parentPost)) {
@@ -237,7 +237,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
           return { ok: false, msg: "The given parent post is invalid"};
         }
       } else {
-        parentPostID = rootPostData.postid;
+        parentPostID = rootPostData.uuid;
         parentPostOrder = 1; // Root will always be 0, so if this is root, go 1 up.
       }
     } else {
@@ -276,8 +276,8 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
 
     // Update the root post so that it has the correct flags set on it as well.
     if (!rootPostData!.isThreadRoot) {
-      dbOperations.push(db.update(posts).set({threadOrder: 0, rootPost: rootPostData!.postid})
-        .where(eq(posts.uuid, rootPostData!.postid)));
+      dbOperations.push(db.update(posts).set({threadOrder: 0, rootPost: rootPostData!.uuid})
+        .where(eq(posts.uuid, rootPostData!.uuid)));
     }
   } else {
     rootPostID = postUUID;
@@ -378,7 +378,7 @@ export const createRepost = async (c: AllContext, body: unknown): Promise<Create
     return { ok: false, msg: "Invalid post id"};
   }
   if (existingPost !== null) {
-    postUUID = existingPost.postid;
+    postUUID = existingPost.uuid;
     const existingPostDate = existingPost.scheduledDate!;
     // Ensure the date asked for is after what the post's schedule date is
     if (!isAfter(scheduleDate, existingPostDate) && !isEqual(scheduledDate, existingPostDate)) {
@@ -573,7 +573,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     const queriesToExecute: BatchQueryArray = [];
     // modify the current repost info
     queriesToExecute.push(db.update(posts).set({repostInfo: newRepostInfo}).where(and(
-        eq(posts.userId, currentPost.user), eq(posts.uuid, currentPost.postid))));
+        eq(posts.userId, currentPost.userId), eq(posts.uuid, currentPost.uuid))));
 
     // Delete batch schedule items
     // we don't bundle this one because we want to get a count to make the operation below it, better
@@ -582,7 +582,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     // did we delete anything at all?
     if (deletedItems.length <= 0) {
       // Log this out, but allow for the bad data to be deleted anyways
-      console.warn(`When trying to delete reposts for ${currentPost.postid}, schedule id ${scheduleId} had empty items`);
+      console.warn(`When trying to delete reposts for ${currentPost.uuid}, schedule id ${scheduleId} had empty items`);
     } else {
       // Force update the repost count :)
       queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));

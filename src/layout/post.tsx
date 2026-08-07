@@ -1,4 +1,5 @@
 import { html } from "hono/html";
+import isEmpty from "just-is-empty";
 import type { Post } from "../classes/post";
 import { MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../limits";
 import type { BaseElementProps } from "../types";
@@ -12,9 +13,9 @@ interface PostContentProps {
 export function PostContent(props: PostContentProps) {
   const post: Post = props.post;
   const ellipses: string = post.isPosted && !post.isARepost && ((TRUNCATE_POSTED_CONTENT &&
-    post.text.length >= (MAX_POSTED_LENGTH-1)) || post.isChildPost) ? "..." : "";
+    post.content.length >= (MAX_POSTED_LENGTH-1)) || post.isChildPost) ? "..." : "";
 
-  return (<p class="postText">{post.text}{ellipses}</p>);
+  return (<p class="postText">{post.content}{ellipses}</p>);
 };
 
 type ScheduledPostOptions = BaseElementProps & {
@@ -26,12 +27,12 @@ type ScheduledPostOptions = BaseElementProps & {
 
 export function PostHTML(props: ScheduledPostOptions) {
   const content: Post = props.post;
-  const hasBeenPosted: boolean = (content.posted === true && content.uri !== undefined);
+  const hasBeenPosted: boolean = (content.posted === true && !isEmpty(content.uri));
 
-  const postHTML = (<article id={`post-${content.postid}`}
-      hx-swap-oob={(props.dynamic) ? `#post-${content.postid}` : undefined}>
+  const postHTML = (<article id={`post-${content.uuid}`}
+      hx-swap-oob={(props.dynamic) ? `#post-${content.uuid}` : undefined}>
     <PostDataHeader content={content} posted={hasBeenPosted} />
-    <div id={`content-${content.postid}`}>
+    <div id={`content-${content.uuid}`}>
       <PostContent post={content} />
     </div>
     <PostDataFooter content={content} posted={hasBeenPosted} />

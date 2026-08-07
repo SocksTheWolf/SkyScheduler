@@ -86,8 +86,8 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
 
   // make a check to see if the post has already been posted onto bsky
   // skip over this check if we are a threaded post, as we could have had a child post that didn't make it.
-  if (!content.isThreadRoot && await isPostAlreadyPosted(c, content.postid)) {
-    console.log(`Dropped handling make post for post ${content.postid}, already posted.`);
+  if (!content.isThreadRoot && await isPostAlreadyPosted(c, content.uuid)) {
+    console.log(`Dropped handling make post for post ${content.uuid}, already posted.`);
     return true;
   }
 
@@ -106,12 +106,12 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
     // if we had a total success, return true.
     return newPostRecords.expected == newPostRecords.got;
   } else if (!content.postNow) {
-    console.warn(`Post records for ${content.postid} was null, the schedule post failed`);
+    console.warn(`Post records for ${content.uuid} was null, the schedule post failed`);
   }
 
   // Turn off the post now flag if we failed.
   if (content.postNow) {
-    c.executionCtx.waitUntil(setPostNowOffForPost(c, content.postid));
+    c.executionCtx.waitUntil(setPostNowOffForPost(c, content.uuid));
   }
   return false;
 };
@@ -133,10 +133,10 @@ export const makeRepost = async (_: AllContext, content: Repost, usingAgent: AtP
 };
 
 const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): Promise<PostStatus|null> => {
-  const username = await getUsernameForUserId(c, content.user);
+  const username = await getUsernameForUserId(c, content.userId);
   // incredibly unlikely but we'll handle it
   if (username === null) {
-    console.warn(`username for post ${content.postid} was invalid`);
+    console.warn(`username for post ${content.uuid} was invalid`);
     return null;
   }
 
@@ -146,7 +146,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
   // Lambda that handles making a post record and submitting it to bsky
   const postSegment = async (postData: Post) => {
     const rt = new RichText({
-      text: postData.text,
+      text: postData.content,
     });
 
     await rt.detectFacets(agent);
@@ -156,9 +156,9 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       facets: rt.facets,
       createdAt: new Date().toISOString(),
     };
-    if (postData.label !== PostLabel.None) {
+    if (postData.contentLabel !== PostLabel.None) {
       const contentValues = [];
-      switch (postData.label) {
+      switch (postData.contentLabel) {
         case PostLabel.Adult:
           contentValues.push({"val": "porn"});
         break;
@@ -183,7 +183,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
     }
 
     // Upload any embeds to this post
-    if (postData.embeds?.length) {
+    if (postData.hasEmbeds()) {
       let mediaEmbeds: BskyEmbedWrapper = { type: EmbedDataType.None };
       // an outside image array holding object, because embeds could be technically in any order
       // and we don't want to lose any data
@@ -195,7 +195,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         return mediaEmbeds.type != EmbedDataType.None && mediaEmbeds.type != attemptToWrite
           && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
       }
-      for (const currentEmbed of postData.embeds) {
+      for (const currentEmbed of postData.embedContent!) {
         const currentEmbedType: EmbedDataType = currentEmbed.type;
         ++embedsProcessed;
 
@@ -206,7 +206,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
         // If we have encountered a record violation (illegal mixed media types), then we should stop processing further.
         if (isRecordViolation(currentEmbedType)) {
-          console.error(`${postData.postid} had a mixed media type of ${mediaEmbeds.type}. trying to write ${currentEmbedType}`);
+          console.error(`${postData.uuid} had a mixed media type of ${mediaEmbeds.type}. trying to write ${currentEmbedType}`);
           break;
         }
 
@@ -269,7 +269,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           }
 
           if (!isEmpty(bskyRecordInfo)) {
-            console.warn(`${postData.postid} attempted to write two record info objects`);
+            console.warn(`${postData.uuid} attempted to write two record info objects`);
             continue;
           }
 
@@ -321,7 +321,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
               const uriResolve: string[] = [ uri ];
               const resolvePost = await getAgentPostRecords(agent, uriResolve);
               if (resolvePost === null) {
-                console.error(`Unable to resolve record information for ${postData.postid} with ${uri}`);
+                console.error(`Unable to resolve record information for ${postData.uuid} with ${uri}`);
                 // Change the record back.
                 if (changedRecord)
                     mediaEmbeds.type = EmbedDataType.None;
@@ -394,15 +394,15 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             if (err instanceof XRPCError) {
               if (err.status === ResponseType.InternalServerError || err.status === ResponseType.UpstreamFailure
                 || err.status === ResponseType.UpstreamTimeout) {
-                console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.postid}`);
+                console.warn(`Encountered internal server error on ${currentEmbed.content} for post ${postData.uuid}`);
                 return false;
               } else if (err.status === ResponseType.PayloadTooLarge || err.status === ResponseType.UnsupportedMediaType) {
                 // give the MediaTooBig if we get one of these errors
-                await createViolationForUser(c, postData.user, AccountStatus.MediaTooBig);
+                await createViolationForUser(c, postData.userId, AccountStatus.MediaTooBig);
                 return false;
               }
             }
-            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err %s`, err);
+            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.uuid} with err %s`, err);
             return false;
           }
 
@@ -551,16 +551,16 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
     try {
       const response = await agent.post(postRecord);
-      postMap.set(postData.postid,
+      postMap.set(postData.uuid,
         { ...response,
-          embeds: postData.embeds,
-          postID: postData.postid
+          embeds: postData.embedContent,
+          postID: postData.uuid
         });
       console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
     } catch(err: unknown) {
       // This will try again in the future, next roundabout.
-      console.error(`encountered error while trying to push post ${postData.postid} up to bsky %s`, err);
+      console.error(`encountered error while trying to push post ${postData.uuid} up to bsky %s`, err);
     }
     return false;
   };
@@ -584,11 +584,11 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
     // so it can be referred to by other child posts.
     //
     // Only do this for thread roots, no one else.
-    postMap.set(content.postid,
+    postMap.set(content.uuid,
       { uri: content.uri,
         cid: content.cid,
-        postID: content.postid
-      } as PostRecordResponse);
+        postID: content.uuid
+      });
   }
 
   // Assume that we succeeded here (failure returns null)
@@ -597,19 +597,19 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
   // If this is a post thread root
   if (content.isThreadRoot) {
-    const childPosts = await getChildPostsOfThread(c, content.postid) ?? [];
+    const childPosts = await getChildPostsOfThread(c, content.uuid) ?? [];
     expected += childPosts.length;
     // get the thread children.
     for (const child of childPosts) {
       // If this post is already posted, we might be trying to restore from a failed state
       if (child.posted) {
-        postMap.set(child.postid, {postID: null, uri: child.uri!, cid: child.cid!});
+        postMap.set(child.uuid, {postID: null, uri: child.uri, cid: child.cid});
         ++successes;
         continue;
       }
       // This is the first child post we haven't handled yet, oof.
       if (!(await postSegment(child))) {
-        console.error(`We encountered errors attempting to post child ${child.postid}, returning what did get posted`);
+        console.error(`We encountered errors attempting to post child ${child.uuid}, returning what did get posted`);
         break;
       }
       ++successes;

@@ -1,8 +1,7 @@
-import type { RepostIntakeData } from "../types";
+import type { BaseContent, RepostIntakeData } from "../types";
 import { has } from "../utils/helpers";
 
 interface DBRepost {
-  postid?: never;
   uuid: string;
   uri: string|null;
   cid: string|null;
@@ -11,31 +10,23 @@ interface DBRepost {
   content?: string|null;
 }
 
-type RawRepost = Repost & {
-  uuid: never;
-}
+export type RepostIntakeType = Repost|DBRepost;
 
-export type RepostIntakeType = RawRepost|DBRepost;
-
-export class Repost {
-  postid: string;
+export class Repost implements BaseContent {
+  uuid: string;
   uri: string;
   cid: string;
   userId: string;
   scheduleGuid?: string;
-  content?: string;
+  content: string;
   constructor(data: RepostIntakeType) {
-    if (has(data, "uuid"))
-      this.postid = data.uuid;
-    else
-      this.postid = data.postid ?? "";
+    this.uuid = data.uuid;
 
     this.cid = data.cid ?? "";
     this.uri = data.uri ?? "";
     this.userId = data.userId;
 
-    if (has(data, "content"))
-      this.content = data.content!;
+    this.content = data.content ?? "";
 
     if (has(data, "scheduleGuid"))
       this.scheduleGuid = data.scheduleGuid!;
