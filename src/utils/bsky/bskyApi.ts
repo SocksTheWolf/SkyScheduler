@@ -1,4 +1,9 @@
-import type { AppBskyFeedPost, BlobRef } from "@atproto/api";
+import type {
+  $Typed, AppBskyEmbedExternal,
+  AppBskyEmbedGallery, AppBskyEmbedImages,
+  AppBskyEmbedRecord, AppBskyEmbedVideo,
+  AppBskyFeedPost, BlobRef
+} from "@atproto/api";
 import { RichText } from "@atproto/api";
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { imageDimensionsFromStream } from 'image-dimensions';
@@ -209,8 +214,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         if (currentEmbedType == EmbedDataType.WebLink) {
           const externalData: BskyWebLinkRecordData = {
             uri: currentEmbed.uri!,
-            title: currentEmbed.title,
-            description: currentEmbed.description
+            title: currentEmbed.title ?? "",
+            description: currentEmbed.description ?? ""
           };
 
           // support standard.site formats
@@ -233,7 +238,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
                   // Resize the thumbnail because while the blob service will accept
                   // embed thumbnails of any size it will fail when you try to make the post record
                   // with the error that the post record is invalid.
-                  const imgTransform = (await c.env.IMAGES.input(imageBlob.stream())
+                  const imgTransform = (await c.env.IMAGES.input(imageBlob.stream() as ReadableStream<Uint8Array>)
                     .transform({width: 1280, height: 720, fit: "scale-down"})
                     .output({ format: "image/jpeg", quality: 85 })).response();
                   if (imgTransform.ok) {
@@ -421,7 +426,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             aspectRatio.height = Number(customMetadata.height);
           } else if (USE_DEPRECATED_SIZE_PARSE) {
             // TODO: Remove this code as it is currently DEPRECATED (R2 Service holds the stream sizes)
-            const sizeResult = await imageDimensionsFromStream(rawFile!.stream());
+            const sizeResult = await imageDimensionsFromStream(rawFile!.stream() as ReadableStream<Uint8Array>);
             if (sizeResult) {
               aspectRatio.width = sizeResult.width;
               aspectRatio.height = sizeResult.height;
@@ -465,18 +470,35 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         return {
           "$type": "app.bsky.embed.record",
           "record": {
-            "cid": bskyRecordInfo.cid,
-            "uri": bskyRecordInfo.uri
+            "cid": bskyRecordInfo.cid!,
+            "uri": bskyRecordInfo.uri!
           }
         }
       };
 
-      const getMediaRecord = () => {
+      const getMediaRecord = (): $Typed<AppBskyEmbedImages.Main> | $Typed<AppBskyEmbedVideo.Main> | $Typed<AppBskyEmbedGallery.Main> | $Typed<AppBskyEmbedExternal.Main> | $Typed<AppBskyEmbedRecord.Main> | undefined => {
         switch (mediaEmbeds.type) {
           case EmbedDataType.Image:
-          return {
-            "$type": "app.bsky.embed.images",
-            "images": mediaEmbeds.data
+          if (imagesArray.length < 4) {
+            return {
+              "$type": "app.bsky.embed.images",
+              "images": mediaEmbeds.data!
+            }
+          } else {
+            // multi image galleries
+            return {
+              "$type": "app.bsky.embed.gallery",
+              "items": mediaEmbeds.data!.map((itm) => {
+                return {
+                  "$type": 'app.bsky.embed.gallery#image',
+                  image: itm.image,
+                  alt: itm.alt,
+                  aspectRatio: itm.aspectRatio ?? {
+                    width: 0, height: 0
+                  }
+                }
+              })
+            }
           }
           case EmbedDataType.WebLink:
           return {
@@ -498,14 +520,14 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       // Write a record with media if we have some record info
       const isRecordWithMedia = !isEmpty(bskyRecordInfo) && mediaEmbeds.type != EmbedDataType.Record;
       if (isRecordWithMedia) {
-        (postRecord as any).embed = {
+        postRecord.embed = {
           "$type": "app.bsky.embed.recordWithMedia",
-          "media": {...getMediaRecord()},
-          "record": {...writeRecord()}
+          "media": getMediaRecord(),
+          "record": writeRecord()
         }
       } else if (mediaEmbeds.type != EmbedDataType.None) {
         // Otherwise, write media regularly.
-        (postRecord as any).embed = {...getMediaRecord()}
+        postRecord.embed = getMediaRecord()
       }
     }
 
