@@ -87,6 +87,8 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
         if (flag === "IN_DEV")
           continue;
 
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         c.env[flag] = wranglerSettings.vars[flag] ?? "";
       }
 

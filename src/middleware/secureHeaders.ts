@@ -14,5 +14,6 @@ export async function secureHeadersMiddleware(c: BaseContext, next: NextMiddlewa
     xFrameOptions: "DENY"
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return middleware(c, next);
 };

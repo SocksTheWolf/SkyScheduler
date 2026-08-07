@@ -27,10 +27,12 @@ import { LoginSchema } from "../validation/loginSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<HonoBase>();
-
+type ServerValidationError = {
+  message: string;
+};
 const serverParseValidationErr = (c: Context, errorJson: string, errCode: ContentfulStatusCode=200) => {
   try {
-    const errorMsgs = JSON.parse(errorJson);
+    const errorMsgs: ServerValidationError[] = JSON.parse(errorJson);
     return c.html(<div class="validation-error btn-error">
       <b>Failed Validation</b>:
         <ul>
@@ -110,7 +112,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
         headers: c.req.raw.headers
       });
       if (!status) {
-        return c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
+        return await c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
       }
       newObject.updatedSession = true;
     } catch (err: unknown) {
@@ -373,7 +375,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
 
     // Make sure we still have data
     if (!usrAccount?.password) {
-      return c.html(<b class="btn-error">Failed: User Data Missing...</b>, 403);
+      return await c.html(<b class="btn-error">Failed: User Data Missing...</b>, 403);
     }
 
     // Do a hash verification on the user's input to see if the passwords match
@@ -390,9 +392,9 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
 
       c.header("Clear-Site-Data", "cookies");
       c.header("HX-Redirect", "/?deleted");
-      return c.html(<></>);
+      return await c.html(<></>);
     } else {
-      return c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
+      return await c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
     }
   } catch (err: unknown) {
     // @ts-ignore

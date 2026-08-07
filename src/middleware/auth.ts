@@ -29,7 +29,7 @@ export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
     const session = await auth.api.getSession({
       headers: c.req.raw.headers
     });
-    if (session?.session && session?.user) {
+    if (session?.session) {
       c.set("userId", session.user.id);
       c.set("pds", session.user.pds);
       // This can't be changed by anyone specifically because it's not a domain
