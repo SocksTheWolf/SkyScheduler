@@ -91,7 +91,7 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
   });
 
   // successfully uploaded file
-  if (R2UploadRes) {
+  if (R2UploadRes.size > 0) {
     // push file listing
     await addFileListing(c, fileName, metaData.user);
 
@@ -135,7 +135,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
         httpMetadata: { contentType: file.type }
       });
 
-      if (!resizeBucketPush) {
+      if (resizeBucketPush.size <= 0) {
         console.error(`Failed to push ${file.name} to the resizing bucket`);
         return {"success": false, "error": "resize process ran out of disk space, you'll need to resize the image or try again"};
       }
@@ -285,7 +285,8 @@ export const getAllFilesList = async (c: AllContext) => {
   };
   const values: R2BucketObject[] = [];
 
-  while (true) {
+  let hasHitEnd = false;
+  while (!hasHitEnd) {
     const response = await c.env.R2.list(options);
     for (const file of response.objects) {
       values.push({
@@ -298,7 +299,7 @@ export const getAllFilesList = async (c: AllContext) => {
     if (response.truncated)
       options.cursor = response.cursor;
     else
-      break;
+      hasHitEnd = true;
   }
   return values;
 };

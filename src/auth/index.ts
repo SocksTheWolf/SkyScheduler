@@ -1,8 +1,8 @@
-import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
 import type { Session } from "better-auth/types";
+import { withCloudflare } from "better-auth-cloudflare";
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import { APP_NAME } from "../appInfo";
 import {
@@ -189,7 +189,7 @@ type ContextVariables = SecureHeadersVariables & {
   userId: UserIdType;
   isAdmin: boolean;
   session: Session|null;
-  db: DBProcessor;
+  db?: DBProcessor;
   pds: string;
   ssg: boolean;
 };

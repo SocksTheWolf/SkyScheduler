@@ -22,7 +22,7 @@ export function floorGivenTime(given: Date, forRepost: boolean=false): Date {
     case TimeIntervalSettings.QuarterHour:
     case TimeIntervalSettings.TenMinutes:
     case TimeIntervalSettings.FiveMinutes:
-      roundingSettings.nearestTo = check as number;
+      roundingSettings.nearestTo = check;
     break;
   }
   return roundToNearestMinutes(given, roundingSettings);
@@ -81,7 +81,7 @@ export function isAltEditableType(type: EmbedDataType) {
   return type === EmbedDataType.Image || type === EmbedDataType.Video;
 }
 
-export function has(obj: any, property: string): boolean {
+export function has(obj: unknown, property: string): boolean {
   if (!obj)
     return false;
 
@@ -96,8 +96,8 @@ export const logoutAccount = async (c: BaseContext): Promise<boolean> => {
     const auth = c.get("auth");
     await auth.api.signOut({ headers: c.req.raw.headers });
     return true;
-  } catch (err) {
-    console.error(`Unable to handle logout properly, redirecting anyways. ${err}`);
+  } catch (err: unknown) {
+    console.error(`Unable to handle logout properly, redirecting anyways. %s`, err);
   }
   return false;
 };

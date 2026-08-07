@@ -38,8 +38,8 @@ export async function pullAuthData(c: BaseContext, next: any) {
       // We can probably drop this too
       c.set("session", session.session);
     }
-  } catch (err) {
-    console.error(`Failed to process authentication, got err: ${err}`);
+  } catch (err: unknown) {
+    console.error(`Failed to process authentication, got err: %s`, err);
     clearContext(c);
   }
   await next();

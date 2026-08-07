@@ -159,8 +159,8 @@ export const setPostNowOffForPost = async (c: AllContext, id: string) => {
     return false;
   }
 
-  const {success} = await db.update(posts).set({postNow: false}).where(eq(posts.uuid, id));
-  if (!success)
+  const result = await db.update(posts).set({postNow: false}).where(eq(posts.uuid, id)).limit(1).returning({updated_id: posts.uuid});
+  if (!uuidValid(result[0].updated_id))
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
@@ -276,9 +276,13 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
 
   // Batching this should improve db times
   if (deleteQueries.length > 0) {
-    const batchResponse = await db.batch(deleteQueries as BatchQuery);
+    const batchResponse: D1Result[] = await db.batch(deleteQueries as BatchQuery);
     // Return the number of items that have been deleted
-    return batchResponse.reduce((val, item) => val + item.success, 0);
+    //
+    // wrangler has the success flag typed to always be true, which is incorrect. so we need to ignore
+    // the ts statement
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return batchResponse.reduce((val: number, item: D1Result) => val + (item.success ? 1 : 0), 0);
   }
   return 0;
 };

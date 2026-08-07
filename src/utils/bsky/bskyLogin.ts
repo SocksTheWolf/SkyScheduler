@@ -38,13 +38,13 @@ export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: strin
     }
     // check account status if we succeed, because we could get a valid return-code but account disabled
     return checkAccountStatus(loginResponse.data);
-  } catch (err) {
+  } catch (err: unknown) {
     // Apparently login can rethrow as an XRPCError and completely eat the original throw.
     // so errors don't get handled gracefully.
     const errWrap: LooseObj = err as LooseObj;
     const errorName = errWrap.constructor.name;
     if (errorName === "XRPCError") {
-      const errCode = errWrap.status;
+      const errCode: number = errWrap.status as number;
       if (errCode == 401) {
         // app password is bad
         return AccountStatus.InvalidAccount;
@@ -55,7 +55,7 @@ export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: strin
       // handle is bad
       return AccountStatus.InvalidAccount;
     }
-    console.error(`encountered exception on login for user ${user}, err ${err}`);
+    console.error(`encountered exception on login for user ${user}, err %s`, err);
   }
   return AccountStatus.UnhandledError;
 };

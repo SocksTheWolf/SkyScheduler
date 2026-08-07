@@ -67,7 +67,7 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
       return c.json({ok: true, msg: "logged in!"});
     }
     return c.json({ok: false, msg: "could not login user"}, 403);
-  } catch (err: any) {
+  } catch (err: unknown) {
     return c.json({ok: false, msg: (err.message ?? err.msg ?? "Unknown Error")}, 403);
   }
 });
@@ -115,8 +115,8 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
         return c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
       }
       newObject.updatedSession = true;
-    } catch (err) {
-      console.warn(`failed to update session pds: ${err}`);
+    } catch (err: unknown) {
+      console.warn(`failed to update session pds: %s`, err);
       // this is technically not true, but w/e
       return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>, 401);
     }
@@ -245,10 +245,6 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
 
   // grab our auth object
   const auth = c.get("auth");
-  if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
-  }
-
   console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
   // create the user
   try {
@@ -276,7 +272,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     // of this case
     console.error(`could not sign up user ${username}, no token was returned`);
   } catch(err) {
-    console.error(`unable to create user, got error ${err}`);
+    console.error(`unable to create user, got error %s`, err);
   }
 
   return c.json({ok: false, msg: "unknown error occurred, please try again"}, 500);
@@ -301,10 +297,6 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   }
 
   const auth = c.get("auth");
-  if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
-  }
-
   // Look up handle
   const bskyUserId = await lookupBskyHandle(username);
   if (bskyUserId === null) {
@@ -340,21 +332,17 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseCo
   }
   const { resetToken, password } = validation.data;
   const auth = c.get("auth");
-  if (!auth) {
-    return c.json({ok: false, msg: "invalid operation occurred, please retry again"}, 500);
-  }
-
   try {
-    const status = await auth.api.resetPassword({body: {
+    const { status } = await auth.api.resetPassword({body: {
       newPassword: password,
       token: resetToken,
     }});
     if (status) {
-      return c.json({ ok: true, msg: "successfully updated password" });
+      return c.json({ ok: true, msg: "successfully reset password" });
     }
-  } catch (err) {
+  } catch (err: unknown) {
     // we know this failed.
-    console.warn(`failed to reset password with error: ${err}`);
+    console.warn(`failed to reset password with error: %s`, err);
   }
 
   return c.json({ok: false, msg: "invalid token/password"}, 401);
@@ -408,8 +396,8 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
     } else {
       return c.html(<b class="btn-error">Failed: Invalid Password</b>, 401);
     }
-  } catch (err: any) {
-    console.error(`failed to delete user ${userId} had error ${(err.message ?? err.msg) ?? 'no code'}`);
+  } catch (err: unknown) {
+    console.error(`failed to delete user ${userId} had error %s`, (err.message ?? err.msg) ?? 'no code');
     return c.html(<b class="btn-error">Failed: Server Error</b>, 500);
   }
 });

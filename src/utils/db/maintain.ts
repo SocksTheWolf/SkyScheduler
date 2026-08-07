@@ -51,8 +51,8 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
     for (const bucketFile of allBucketFiles) {
       await addFileListing(c, bucketFile.name, bucketFile.user, bucketFile.date);
     }
-  } catch(err) {
-    console.error(`Adding file listings got error ${err}`);
+  } catch(err: unknown) {
+    console.error(`Adding file listings got error %s`, err);
   }
 
   const batchedQueries: BatchQueryArray = [];

@@ -42,8 +42,8 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
     try {
       c.executionCtx.waitUntil(enqueuePost(c, postData));
       postStatus = true;
-    } catch(err) {
-      console.error(`Post now queue for ${postData.postid} got error: ${err}`);
+    } catch(err: unknown) {
+      console.error(`Post now queue for ${postData.postid} got error: %s`, err);
       postStatus = false;
     }
   } else {

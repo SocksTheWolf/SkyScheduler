@@ -48,7 +48,7 @@ export const getUsernameForUserId = async (c: AllContext, userId: UserIdType): P
 
   const result = await db.select({username: users.username}).from(users)
     .where(eq(users.id, userId)).limit(1);
-  if (result !== null && result.length > 0)
+  if (result.length > 0)
     return result[0].username;
   return null;
 };

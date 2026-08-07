@@ -59,7 +59,7 @@ export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
 
 export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
   return await fetch(`https://plc.directory/${userDID}`).then((resp) => {
-    return resp.json().then((data: unknown) => {
+    return resp.json().then((data) => {
       if (has(data, "service")) {
         for (const service of data.service) {
           if (service.type === "AtprotoPersonalDataServer") {
@@ -121,8 +121,8 @@ export const makeRepost = async (_: AllContext, content: Repost, usingAgent: AtP
   try {
     await usingAgent.repost(content.uri, content.cid);
     return true;
-  } catch(err) {
-    console.error(`Failed to repost ${content.uri}, got error ${err}`);
+  } catch(err: unknown) {
+    console.error(`Failed to repost ${content.uri}, got error %s`, err);
     return false;
   }
 };
@@ -248,8 +248,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
               } else {
                 console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
               }
-            } catch(err) {
-              console.warn(`Failed to fetch thumbnail ${err} for embed ${currentEmbed.content}, removing thumb`);
+            } catch(err: unknown) {
+              console.warn(`Failed to fetch thumbnail %s for embed ${currentEmbed.content}, removing thumb`, err);
             }
           }
           mediaEmbeds = {type: EmbedDataType.WebLink, data: externalData};
@@ -397,7 +397,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
                 return false;
               }
             }
-            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err ${err}`);
+            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.postid} with err %s`, err);
             return false;
           }
 
@@ -415,7 +415,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         if (currentEmbedType == EmbedDataType.Image) {
           // Image aspect ratio data
           let aspectRatio: BskyMediaAspectRatio|undefined = {"width": 0, "height": 0};
-          if (customMetadata && customMetadata.width !== undefined && customMetadata.height !== undefined) {
+          if (customMetadata?.width !== undefined && customMetadata?.height !== undefined) {
             aspectRatio.width = Number(customMetadata.width);
             aspectRatio.height = Number(customMetadata.height);
           } else if (USE_DEPRECATED_SIZE_PARSE) {
@@ -535,9 +535,9 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         });
       console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
-    } catch(err) {
+    } catch(err: unknown) {
       // This will try again in the future, next roundabout.
-      console.error(`encountered error while trying to push post ${postData.postid} up to bsky ${err}`);
+      console.error(`encountered error while trying to push post ${postData.postid} up to bsky %s`, err);
     }
     return false;
   };
@@ -612,7 +612,7 @@ export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]
     if (response.success)
       return response.data.posts;
   } catch(err) {
-    console.error(`Unable to get post records for ${records.toString()} had error ${err}`);
+    console.error(`Unable to get post records for ${records.toString()} had error %s`, err);
   }
   return null;
 };
@@ -624,7 +624,7 @@ export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) =
       return response.data.view;
     }
   } catch (err) {
-    console.error(`Unable to get feed record for ${feedURI} had error ${err}`);
+    console.error(`Unable to get feed record for ${feedURI} had error %s`, err);
   }
   return null;
 };
@@ -635,8 +635,8 @@ export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) =
     if (response.success) {
       return response.data.list;
     }
-  } catch(err) {
-    console.error(`Unable to resolve list record for ${listURI} had error ${err}`);
+  } catch(err: unknown) {
+    console.error(`Unable to resolve list record for ${listURI} had error %s`, err);
   }
   return null;
 };

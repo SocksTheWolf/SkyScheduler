@@ -50,8 +50,8 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
 
       return results.map((itm) => new Post(itm));
     }
-  } catch(err) {
-    console.error(`Failed to get posts for user, session could not be fetched ${err}`);
+  } catch(err: unknown) {
+    console.error(`Failed to get posts for user, session could not be fetched %s`, err);
   }
   return null;
 };
@@ -94,7 +94,7 @@ export const updateUserData = async (c: AllContext, newData: AccountUpdatePayloa
         await db.batch(queriesToExecute as BatchQuery);
       return true;
     }
-  } catch(err) {
+  } catch(_err) {
     console.error(`Failed to update new user data for user ${userId}`);
   }
   return false;

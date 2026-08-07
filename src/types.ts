@@ -6,7 +6,7 @@ import type { ContextVariables } from "./auth";
 import type { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
-import { EmbedDataType, TaskType } from "./enums";
+import type { EmbedDataType, TaskType } from "./enums";
 
 /*** Settings config wrappers for bindings ***/
 type ImageConfigSettings = {
@@ -277,4 +277,4 @@ export type PreloadRules = {
 
 /// MISC
 export type UserIdType = string|null;
-export type LooseObj = Record<string, any>;
+export type LooseObj = Record<string, unknown>;
