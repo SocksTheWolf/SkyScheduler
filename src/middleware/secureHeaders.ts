@@ -1,7 +1,7 @@
 import { secureHeaders } from "hono/secure-headers";
-import type { BaseContext } from "../types";
+import type { BaseContext, NextMiddleware } from "../types";
 
-export async function secureHeadersMiddleware(c: BaseContext, next: any) {
+export async function secureHeadersMiddleware(c: BaseContext, next: NextMiddleware) {
   // Supposedly secureHeaders is eating up the majority of render time, so we
   // do not use the CSP headers from here. Instead, we opt to do them manually
   // in the cspHelper middleware

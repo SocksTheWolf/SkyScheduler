@@ -1,4 +1,4 @@
-import type { BaseContext } from "../types";
+import type { BaseContext, NextMiddleware } from "../types";
 import { useCFTurnstile } from "../utils/helpers";
 
 type TurnstileResponse = {
@@ -10,7 +10,7 @@ type TurnstileRequestData = {
 }
 
 // Middleware that handles turnstile verification.
-export async function verifyTurnstile(c: BaseContext, next: any) {
+export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
   if (useCFTurnstile(c)) {
     const reqData = await c.req.json<TurnstileRequestData>();
     const userIP: string|undefined = c.req.header("CF-Connecting-IP");

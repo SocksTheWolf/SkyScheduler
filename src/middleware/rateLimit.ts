@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
 import get from 'just-safe-get';
-import type { BaseContext } from "../types";
+import type { BaseContext, NextMiddleware } from "../types";
 
 type RateLimitProps = {
   limiter: string;
@@ -11,7 +11,7 @@ type RateLimitProps = {
 };
 
 export const rateLimit = (prop: RateLimitProps) => {
-  return createMiddleware(async (c: BaseContext, next: any) => {
+  return createMiddleware(async (c: BaseContext, next: NextMiddleware) => {
     const rateLimitObj: RateLimit|null = get(c.env, prop.limiter, null);
     if (rateLimitObj === null) {
       await next();

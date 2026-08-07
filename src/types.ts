@@ -277,6 +277,7 @@ export type QueueTaskData = {
 };
 
 /// Contexts & Rendering
+export type NextMiddleware = () => Promise<void>;
 export type HonoBase = { Bindings: Bindings, Variables: ContextVariables };
 
 export type BaseContext = Context<HonoBase>;

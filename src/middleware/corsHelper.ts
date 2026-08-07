@@ -1,7 +1,7 @@
 import { cors } from "hono/cors";
-import type { BaseContext } from "../types";
+import type { BaseContext, NextMiddleware } from "../types";
 
-export const corsHelperMiddleware = async (c: BaseContext, next: any) => {
+export const corsHelperMiddleware = async (c: BaseContext, next: NextMiddleware) => {
   if (c.get("ssg")) {
     await next();
     return;
@@ -16,5 +16,6 @@ export const corsHelperMiddleware = async (c: BaseContext, next: any) => {
       "X-Retry-After", "Age", "Clear-Site-Data", "Location"],
     maxAge: 7200,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return middleware(c, next);
 };

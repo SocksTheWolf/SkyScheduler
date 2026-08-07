@@ -2,7 +2,7 @@ import { every } from "hono/combine";
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
 import { isSSGContext } from "hono/ssg";
-import type { BaseContext, RequireAuthMiddlewareProps } from "../types";
+import type { BaseContext, NextMiddleware, RequireAuthMiddlewareProps } from "../types";
 import { logoutAccount } from "../utils/helpers";
 
 function clearContext(c: BaseContext) {
@@ -17,13 +17,13 @@ function clearContext(c: BaseContext) {
 // Resets all environment variables to a blank state
 // this is so that they have default values, makes it easier to
 // query things like in the ratelimit middleware
-export async function blankAuthEnv(c: BaseContext, next: any) {
+export async function blankAuthEnv(c: BaseContext, next: NextMiddleware) {
   clearContext(c);
   await next();
 };
 
 // Middleware to verify authentication
-export async function pullAuthData(c: BaseContext, next: any) {
+export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
   const auth = c.get("auth");
   try {
     const session = await auth.api.getSession({
@@ -46,7 +46,7 @@ export async function pullAuthData(c: BaseContext, next: any) {
 };
 
 export function requireAuthEx(props: RequireAuthMiddlewareProps) {
-  return createMiddleware(async (c: BaseContext, next: any) => {
+  return createMiddleware(async (c: BaseContext, next: NextMiddleware) => {
     if (!hasAuth(c)) {
       if (props.forceLogout) {
         await logoutAccount(c);
@@ -65,7 +65,7 @@ export function requireAuthEx(props: RequireAuthMiddlewareProps) {
   });
 }
 
-export async function requireAuth(c: BaseContext, next: any) {
+export async function requireAuth(c: BaseContext, next: NextMiddleware) {
   if (!hasAuth(c)) {
     return c.json({ ok: false, msg: "Unauthorized" }, 401);
   }

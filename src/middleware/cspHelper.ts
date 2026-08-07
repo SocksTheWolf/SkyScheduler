@@ -1,10 +1,10 @@
 import { NONCE } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
 import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../limits";
-import type { BaseContext } from "../types";
+import type { BaseContext, NextMiddleware } from "../types";
 import { isInDev } from "../utils/helpers";
 
-export async function cspHelper(c: BaseContext, next: any) {
+export async function cspHelper(c: BaseContext, next: NextMiddleware) {
   const cspReportURL: string = c.env.CSP_REPORT_URL;
   const hasReportURL = !isEmpty(cspReportURL);
 
