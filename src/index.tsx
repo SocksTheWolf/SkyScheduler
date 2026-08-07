@@ -56,7 +56,7 @@ app.use("*", async (c, next) => {
     // @ts-ignore
     c.set("db", drizzle(c.env.DB, { schema, logger: false  }));
   }
-  c.set("auth", createAuth(c, (c.req.raw as any).cf || {}));
+  c.set("auth", createAuth(c, (c.req.raw as any).cf ?? {}));
   await next();
 });
 

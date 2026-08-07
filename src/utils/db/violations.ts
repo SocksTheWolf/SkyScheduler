@@ -49,7 +49,7 @@ export const userHasViolations = async(c: AllContext, userId: string): Promise<b
 };
 
 function createObjForValuesChange(violationType: AccountStatus[], value: boolean) {
-  let valuesUpdate: ViolationRecordChange = {};
+  const valuesUpdate: ViolationRecordChange = {};
   violationType.forEach((itm) => {
     switch(itm) {
       case AccountStatus.InvalidAccount:
@@ -91,7 +91,7 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
     return false;
   }
 
-  const db: DrizzleD1Database = c.get("db");
+  const db: DBProcessor = c.get("db");
   if (!db) {
     console.error("unable to get database to create violations for");
     return false;

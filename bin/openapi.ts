@@ -17,7 +17,7 @@ async function buildOpenAPISpec(): Promise<void> {
       await fs.unlink(openapiPath);
     }
     console.error(`failed to write openapi spec, got error ${err}`);
-    throw new Error("failed");
+    throw new Error("failed to write openapi spec", {cause: err});
   }
 }
 

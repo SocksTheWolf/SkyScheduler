@@ -13,10 +13,10 @@ const getRandomQueue = (env: Bindings, listName: string): Queue|null => {
   if (isEmpty(queueListNames))
     return null;
 
-  const queueName: string = random(queueListNames) || "";
+  const queueName: string = random(queueListNames) ?? "";
   if (queueListNames.length > 1)
     console.log(`Picked ${queueName} from ${listName}`);
-  return get(env, queueName, null);
+  return get(env, queueName, null) as Queue|null;
 };
 
 async function pushToQueue(queueConsumer: Queue|null, data: Post|Repost|null, taskType: TaskType, delay: number = -1) {

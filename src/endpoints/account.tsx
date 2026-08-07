@@ -10,7 +10,7 @@ import { DEFAULT_PDS } from "../limits";
 import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
-import type { BaseContext, HonoBase, LooseObj, UserIdType } from "../types";
+import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../types";
 import { lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyApi";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
 import { getAllMediaOfUser } from "../utils/db/file";
@@ -81,7 +81,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
 
   const auth = c.get("auth");
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
-  const newObject: LooseObj = {};
+  const newObject: AccountUpdatePayload = {};
   if (!isEmpty(username)) {
     if ((username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) &&
       !c.get("isAdmin")) {
@@ -269,7 +269,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
       // Burn the invite key
       c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
 
-      console.log(`user ${username} created! with code ${signupToken||'none'}`);
+      console.log(`user ${username} created! with code ${signupToken ?? 'none'}`);
       return c.json({ok: true, msg: "signup success"});
     }
     // in case we actually made it to here, without getting an exception thrown, we should make note

@@ -3,10 +3,9 @@ import {
   formatDuration,
   roundToNearestMinutes, startOfHour, subDays
 } from "date-fns";
-import type { Context } from "hono";
 import { EmbedDataType, TimeIntervalSettings } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
-import type { AllContext, Bindings, LooseObj } from "../types";
+import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
 
 export function floorCurrentTime(forRepost: boolean=false): Date {
   return floorGivenTime(new Date(), forRepost);
@@ -23,7 +22,7 @@ export function floorGivenTime(given: Date, forRepost: boolean=false): Date {
     case TimeIntervalSettings.QuarterHour:
     case TimeIntervalSettings.TenMinutes:
     case TimeIntervalSettings.FiveMinutes:
-      roundingSettings.nearestTo = check as Number;
+      roundingSettings.nearestTo = check as number;
     break;
   }
   return roundToNearestMinutes(given, roundingSettings);
@@ -92,7 +91,7 @@ export function has(obj: any, property: string): boolean {
   return false;
 }
 
-export const logoutAccount = async (c: Context): Promise<boolean> => {
+export const logoutAccount = async (c: BaseContext): Promise<boolean> => {
   try {
     const auth = c.get("auth");
     await auth.api.signOut({ headers: c.req.raw.headers });

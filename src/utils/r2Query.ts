@@ -79,10 +79,10 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
 
   // add width and height metadata if they exist
   if (metaData.width !== undefined) {
-    R2Metadata["width"] = metaData.width.toString();
+    R2Metadata.width = metaData.width.toString();
   }
   if (metaData.height !== undefined) {
-    R2Metadata["height"] = metaData.height.toString();
+    R2Metadata.height = metaData.height.toString();
   }
 
   // push file
@@ -259,7 +259,7 @@ const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
     type: file.type,
     user: userId
   };
-  return await rawUploadToR2(c, await file.stream(), fileMetaData);
+  return await rawUploadToR2(c, file.stream(), fileMetaData);
 };
 
 export const uploadFileR2 = async (c: AllContext, file: File, userId: UserIdType) => {

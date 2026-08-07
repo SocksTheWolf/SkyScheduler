@@ -1,6 +1,5 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
-import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { v4 as uuidv4, validate as uuidValid } from 'uuid';
 import { APP_NAME } from "../appInfo";
@@ -11,6 +10,7 @@ import { accounts, users } from "../db/auth.schema";
 import { AccountStatus, PostLabel, RepostType } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import type {
+  AccountUpdatePayload,
   AllContext, BatchQuery,
   BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
@@ -56,7 +56,7 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
   return null;
 };
 
-export const updateUserData = async (c: AllContext, newData: any): Promise<boolean> => {
+export const updateUserData = async (c: AllContext, newData: AccountUpdatePayload): Promise<boolean> => {
   const userId: UserIdType = c.get("userId");
   const db: DBProcessor = c.get("db");
   try {
@@ -416,7 +416,7 @@ export const createRepost = async (c: AllContext, body: any): Promise<CreateObje
       // push record update to add to json array
       if (!isScheduledPost) {
         dbOperations.push(repostInfoUpdateQuery.where(and(
-          eq(posts.userId, userId), eq(posts.cid, data.cid!))));
+          eq(posts.userId, userId), eq(posts.cid, data.cid))));
       } else {
         dbOperations.push(repostInfoUpdateQuery.where(and(
           eq(posts.userId, userId), eq(posts.uuid, data.id))));

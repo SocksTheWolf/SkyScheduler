@@ -8,7 +8,7 @@ type DashboardPasswordFieldSettings = BaseElementProps & {
 }
 
 export default function DashboardPasswordField(props: DashboardPasswordFieldSettings) {
-  let autocompleteSetting: string = "";
+  let autocompleteSetting: string;
   switch (props.autocomplete) {
     default:
     case PWAutoCompleteSettings.Off:

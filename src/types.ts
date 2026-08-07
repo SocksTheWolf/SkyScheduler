@@ -195,6 +195,11 @@ export type RequireAuthMiddlewareProps = {
 };
 
 /// USER WRAPPED DATA
+export type AccountUpdatePayload = {
+  username?: string;
+  updatedSession?: boolean;
+  password?: string;
+};
 export type EditPostChanges = {
   content: string;
   embedContent?: EmbedData[];
