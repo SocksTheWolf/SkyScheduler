@@ -15,10 +15,7 @@ async function getAccountHandle(account) {
   .then((resp) => {
     if (resp.ok) {
       return resp.json().then((lookup) => {
-        if (lookup.hasOwnProperty("did")) {
-          return lookup.did;
-        }
-        return null;
+        return lookup.did;
       });
     }
     return null;

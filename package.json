@@ -19,7 +19,7 @@
     "auth": "npx auth@latest generate --config auth.config.ts --output src/db/auth.schema.ts -y && npx prettier --write src/db/auth.schema.ts",
     "optimize": "run-s migrate:*:pragma",
     "generate": "drizzle-kit generate",
-    "lint": "eslint",
+    "lint": "eslint --concurrency auto --stats",
     "lint:fix": "eslint --fix",
     "migrate:local:db": "npm run base:db:migrate -- --local",
     "migrate:local:pragma": "npm run base:db:optimize -- --local -y",
@@ -88,20 +88,14 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
-    "@eslint/js": "^10.0.1",
-    "@hono/eslint-config": "^2.1.1",
     "@types/node": "^24.13.3",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^10.8.0",
-    "globals": "^17.9.0",
-    "jiti": "^2.7.0",
     "minify": "^14.1.0",
     "npm-run-all2": "^9.0.2",
     "replace-in-file": "^8.4.0",
     "static-sitemap-cli": "^2.2.8",
     "toml": "^5.0.0",
     "typed-htmx": "^0.3.1",
-    "typescript-eslint": "^8.66.0",
     "wrangler": "^4.119.0"
   },
   "overrides": {
@@ -120,5 +114,13 @@
     "@actions/http-client": {
       "undici": "^7.29.0"
     }
+  },
+  "optionalDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@hono/eslint-config": "^2.1.1",
+    "eslint": "^10.8.1",
+    "globals": "^17.9.0",
+    "jiti": "^2.7.0",
+    "typescript-eslint": "^8.66.0"
   }
 }

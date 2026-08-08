@@ -16,7 +16,7 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
       "base-uri": ["'none'"],
       "default-src": ["'none'"],
       "connect-src": ["'self'", cspReportURL,
-        "https://challenges.cloudflare.com", "https://cardyb.bsky.app",
+        "https://challenges.cloudflare.com", "https://plc.directory", "https://cardyb.bsky.app",
         "https://bsky.social", "https://public.api.bsky.app", "https://public.bsky.social"],
       "img-src": ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
       "media-src": ["'self'", 'data:', 'blob:'],

@@ -182,7 +182,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
     return { ok: false, msg: validation.error.toString() };
   }
 
-  const { content, scheduledDate, embeds, label, makePostNow, repostData, rootPost, parentPost } = validation.data;
+  const { content, scheduledDate, embeds, contentLabel, makePostNow, repostData, rootPost, parentPost } = validation.data;
   const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
 
   // Ensure scheduled date is in the future
@@ -294,7 +294,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
       repostInfo: (!isThreadedPost && repostInfo !== undefined) ? [repostInfo] : [],
       threadOrder: (!isThreadedPost) ? undefined : parentPostOrder,
       embedContent: embeds,
-      contentLabel: label ?? PostLabel.None,
+      contentLabel: contentLabel ?? PostLabel.None,
       userId: userId
     }));
 

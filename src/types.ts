@@ -175,6 +175,10 @@ export interface PLCDirectoryResponse {
   service?: PDSService[]
 }
 
+export interface ResolveHandleResponse {
+  did: string;
+}
+
 // These are bsky responses to making posts
 export type PostResponseObject = StrongRecordObject;
 

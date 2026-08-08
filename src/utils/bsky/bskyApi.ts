@@ -14,14 +14,16 @@ import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
-  BSKY_IMG_SIZE_LIMIT, DEFAULT_PDS, MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
+  BSKY_IMG_SIZE_LIMIT, DEFAULT_PDS,
+  MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
   USE_DEPRECATED_SIZE_PARSE
 } from "../../limits";
 import type {
   AllContext, BskyEmbedRecord, BskyEmbedWrapper,
   BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
-  BskyVideoRecordData, BskyWebLinkRecordData, PLCDirectoryResponse, PostRecordResponse,
-  PostStatus, WebAssociatedRef
+  BskyVideoRecordData, BskyWebLinkRecordData,
+  PLCDirectoryResponse, PostRecordResponse,
+  PostStatus, ResolveHandleResponse, WebAssociatedRef
 } from "../../types";
 import type { atpRecordURICaptures } from "../../validation/regexCases";
 import { atpRecordURI } from "../../validation/regexCases";
@@ -51,11 +53,8 @@ export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
     }
   }).then((resp) => {
     if (resp.ok) {
-      return resp.json<{did?: string}>().then((jsonData) => {
-        if (has(jsonData, "did")) {
-          return jsonData.did!;
-        }
-        return null;
+      return resp.json<ResolveHandleResponse>().then((jsonData) => {
+        return jsonData.did;
       });
     }
     return null;

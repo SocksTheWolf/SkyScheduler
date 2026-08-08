@@ -47,7 +47,7 @@ export const deleteFileListings = async (c: AllContext, files: string|string[]) 
   }
   const filesToDelete = [];
   filesToDelete.push(files);
-  const filesToWorkOn = flatten(filesToDelete);
+  const filesToWorkOn: string[] = flatten(filesToDelete);
   await db.delete(mediaFiles).where(inArray(mediaFiles.fileName, filesToWorkOn));
 };
 

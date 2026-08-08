@@ -437,7 +437,7 @@ postForm.addEventListener('submit', async (e) => {
         }
         postObject.embeds.push(webDataObj);
       }
-      postObject.label = document.getElementById("contentLabels").value;
+      postObject.contentLabel = document.getElementById("contentLabels").value;
     }
     // if we have post records, like a quote post or something
     if (hasRecord) {

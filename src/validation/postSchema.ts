@@ -31,13 +31,13 @@ export const PostSchema = z.object({
     VideoEmbedSchema,
     PostRecordSchema
   ], "invalid media type").array().max(MAX_EMBEDS_PER_POST, "too many items were provided").optional(),
-  label: z.enum(PostLabel, "content label must be set").optional(),
+  contentLabel: z.enum(PostLabel, "content label must be set").optional(),
   makePostNow: z.boolean().default(false),
   rootPost: z.uuidv4("root post id is invalid").optional(),
   parentPost: z.uuidv4("parent post id is invalid").optional(),
   ...RepostDataSchema.shape,
   ...ScheduledDateSchema.shape,
-}).superRefine(({embeds, label, makePostNow, repostData, rootPost, parentPost}, ctx) => {
+}).superRefine(({embeds, contentLabel, makePostNow, repostData, rootPost, parentPost}, ctx) => {
   // check that root and parentpost are unset if makePostNow is set
   if (rootPost !== undefined && parentPost !== undefined) {
     if (makePostNow) {
@@ -70,7 +70,7 @@ export const PostSchema = z.object({
   // Verify embed data
   if (embeds !== undefined && embeds.length > 0) {
     // Check if labels are set
-    if (label === undefined) {
+    if (contentLabel === undefined) {
       // If we only have one record and it's a quote post, don't bother
       // checking for undefined labels or anything else in the refine
       if (embeds.length == 1 && embeds[0].type == EmbedDataType.Record) {
@@ -80,7 +80,7 @@ export const PostSchema = z.object({
       ctx.addIssue({
         code: "custom",
         message: "Content labels are required for posting media",
-        path: ["label"]
+        path: ["contentLabel"]
       });
     }
 
