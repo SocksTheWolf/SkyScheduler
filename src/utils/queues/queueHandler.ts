@@ -36,11 +36,12 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         message.retry();
         continue;
       }
+      const postDataObj: Post|Repost = has(message.body.data, "contentLabel") ?
+        new Post(message.body.data as Post) : new Repost(message.body.data);
 
-      const postDataObj: Post|Repost = has(message.body.data, "contentLabel") ? new Post(message.body.data as Post) : new Repost(message.body.data);
-      const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
+      const userId = postDataObj.getUser();
+      const agent = await agency.getOrAddAgent(runtimeWrapper, userId, taskType);
       if (agent == null) {
-        const userId = postDataObj.getUser();
         // if we could not get an agent for you, we should check to see if you have violations
         // if you do, we stop processing you.
         if (await userHasViolations(runtimeWrapper, userId)) {

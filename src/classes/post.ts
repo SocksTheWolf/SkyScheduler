@@ -1,4 +1,3 @@
-import type { BlobRef } from "@atproto/api";
 import isEmpty from "just-is-empty";
 import type { PostLabel } from "../enums";
 import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
@@ -53,8 +52,6 @@ export class Post implements BaseContent {
   threadOrder: number;
   rootPost?: string;
   parentPost?: string;
-  // blob override data
-  blobOverride?: null|BlobRef;
 
   constructor(data: PostIntakeType) {
     this.userId = data.userId;
@@ -72,11 +69,11 @@ export class Post implements BaseContent {
     if (has(data, "scheduledDate"))
       this.scheduledDate = data.scheduledDate instanceof Date ? data.scheduledDate.toISOString() : data.scheduledDate;
 
-    if (data.repostInfo)
-      this.repostInfo = data.repostInfo;
+    if (has(data, "repostInfo"))
+      this.repostInfo = data.repostInfo!;
 
-    if (data.rootPost)
-      this.rootPost = data.rootPost;
+    if (has(data, "rootPost"))
+      this.rootPost = data.rootPost!;
 
     if (has(data, "parentPost"))
       this.parentPost = data.parentPost!;
@@ -110,6 +107,7 @@ export class Post implements BaseContent {
   hasEmbeds(): boolean {
     return this.embedContent !== undefined && this.embedContent.length > 0;
   }
+  get isThread() { return this.threadOrder >= 0; }
   get isThreadRoot() { return this.threadOrder == 0; }
   get isChildPost() { return this.parentPost !== undefined; }
   get isPosted() { return this.posted ?? false; }

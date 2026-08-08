@@ -25,7 +25,6 @@ export class Repost implements BaseContent {
     this.cid = data.cid ?? "";
     this.uri = data.uri ?? "";
     this.userId = data.userId;
-
     this.content = data.content ?? "";
 
     if (has(data, "scheduleGuid"))

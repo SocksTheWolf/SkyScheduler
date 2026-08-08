@@ -10,8 +10,6 @@ import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { getBskyUserPassForId } from "../utils/db/userinfo";
 import { createViolationForUser, shouldIgnoreViolation } from "../utils/db/violations";
 import { resetAppPasswordMessage } from "../utils/messages/resetAppPassword";
-import type { Post } from "./post";
-import type { Repost } from "./repost";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export class AgentMap {
@@ -38,10 +36,6 @@ export class AgentMap {
       }
     }
     return mappedAgent;
-  };
-  async getOrAddAgentFromObj(c: AllContext, data: Post|Repost, type: TaskType): Promise<AtProtoAgent|null> {
-    const userId: string = data.getUser()
-    return await this.getOrAddAgent(c, userId, type);
   };
   static async getAgentDirect(c: AllContext, userId: string, messageOnViolation: boolean): Promise<AgentLoginResponse> {
     const loginCreds = await getBskyUserPassForId(c, userId);

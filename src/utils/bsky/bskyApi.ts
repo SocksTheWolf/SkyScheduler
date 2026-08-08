@@ -374,9 +374,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         let blobRef: BlobRef|null;
         let rawFile: Blob|null = null;
         let customMetadata: Record<string, string>|undefined = undefined;
-        // Blob overrides are from the video service. If it exists and is not null,
-        // then use that instead of trying to upload video again here.
-        if (postData.blobOverride == null) {
+        {
           // Otherwise pull files from storage and upload directly with our agent.
           const file: R2ObjectBody|null = await c.env.R2.get(currentEmbed.content);
           if (!file) {
@@ -411,8 +409,6 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             return false;
           }
           blobRef = uploadFile.data.blob;
-        } else {
-          blobRef = postData.blobOverride;
         }
 
         // Handle images
@@ -425,7 +421,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             aspectRatio.height = Number(customMetadata.height);
           } else if (USE_DEPRECATED_SIZE_PARSE) {
             // TODO: Remove this code as it is currently DEPRECATED (R2 Service holds the stream sizes)
-            const sizeResult = await imageDimensionsFromStream(rawFile!.stream() as ReadableStream<Uint8Array>);
+            const sizeResult = await imageDimensionsFromStream(rawFile.stream() as ReadableStream<Uint8Array>);
             if (sizeResult) {
               aspectRatio.width = sizeResult.width;
               aspectRatio.height = sizeResult.height;
