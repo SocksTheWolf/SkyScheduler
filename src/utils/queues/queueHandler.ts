@@ -6,7 +6,7 @@ import { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
 import type { Bindings, QueueTaskData } from "../../types";
 import { userHasViolations } from "../db/violations";
-import { isPost } from "../helpers";
+import { has } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
 import { enqueueEmptyWork } from "./queuePublisher";
 
@@ -37,7 +37,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         continue;
       }
 
-      const postDataObj: Post|Repost = isPost(message.body.data) ? new Post(message.body.data as Post) : new Repost(message.body.data);
+      const postDataObj: Post|Repost = has(message.body.data, "contentLabel") ? new Post(message.body.data as Post) : new Repost(message.body.data);
       const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       if (agent == null) {
         const userId = postDataObj.getUser();

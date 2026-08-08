@@ -73,10 +73,6 @@ export function useCFTurnstile(ctx: AllContext|undefined): boolean {
   return USE_CAPTCHA;
 }
 
-export function isPost(data: unknown): boolean {
-  return has(data, "contentLabel");
-}
-
 export function isAltEditableType(type: EmbedDataType) {
   return type === EmbedDataType.Image || type === EmbedDataType.Video;
 }
