@@ -30,7 +30,7 @@ import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import type { Bindings, HonoBase, QueueTaskData } from "./types";
 import { processQueue } from "./utils/queues/queueHandler";
-import { handleSchedule } from "./utils/scheduler";
+import { handleSchedule, scheduleAllContentTasks } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
@@ -111,6 +111,11 @@ app.get("/reset-password/:id", (c) => {
 
 // Setup Application route
 app.get("/setup", async (c) => await setupAccounts(c));
+
+app.get("/cron", async (c) => {
+  c.executionCtx.waitUntil(scheduleAllContentTasks(c));
+  return c.html(<b>done</b>);
+})
 
 ///// Internal Application Exports /////
 

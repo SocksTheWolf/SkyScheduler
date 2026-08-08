@@ -74,7 +74,7 @@ export function useCFTurnstile(ctx: AllContext|undefined): boolean {
 }
 
 export function isPost(data: unknown): boolean {
-  return has(data, "user");
+  return has(data, "contentLabel");
 }
 
 export function isAltEditableType(type: EmbedDataType) {

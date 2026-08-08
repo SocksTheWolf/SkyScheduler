@@ -37,13 +37,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         continue;
       }
 
-      let postDataObj: Post|Repost;
-      if (message.body.data instanceof Post || message.body.data instanceof Repost) {
-        postDataObj = message.body.data;
-      } else {
-        // recreate the object if we need to (for whatever reason)
-        postDataObj = (isPost(message.body.data)) ? new Post(message.body.data) : new Repost(message.body.data);
-      }
+      const postDataObj: Post|Repost = isPost(message.body.data) ? new Post(message.body.data as Post) : new Repost(message.body.data);
       const agent = await agency.getOrAddAgentFromObj(runtimeWrapper, postDataObj, taskType);
       if (agent == null) {
         const userId = postDataObj.getUser();
