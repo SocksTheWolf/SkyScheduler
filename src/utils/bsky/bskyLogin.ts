@@ -55,7 +55,7 @@ export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: strin
       // handle is bad
       return AccountStatus.InvalidAccount;
     }
-    console.error(`encountered exception on login for user ${user}, err %s`, err);
+    console.error(`encountered exception on login for user ${user}, err ` + String(err));
   }
   return AccountStatus.UnhandledError;
 };

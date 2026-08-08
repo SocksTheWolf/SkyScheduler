@@ -60,7 +60,7 @@ export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
         }
       }
     } catch(err: unknown) {
-      console.error(`encountered error trying to prune: %s`, err);
+      console.error(`encountered error trying to prune: ` + String(err));
       // Remove all the posts in the current post group.
       continue;
     }

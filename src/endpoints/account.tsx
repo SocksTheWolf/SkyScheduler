@@ -116,7 +116,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
       }
       newObject.updatedSession = true;
     } catch (err: unknown) {
-      console.warn(`failed to update session pds: %s`, err);
+      console.warn("failed to update session pds: " + String(err));
       // this is technically not true, but w/e
       return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>, 401);
     }
@@ -271,8 +271,8 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     // in case we actually made it to here, without getting an exception thrown, we should make note
     // of this case
     console.error(`could not sign up user ${username}, no token was returned`);
-  } catch(err) {
-    console.error(`unable to create user, got error %s`, err);
+  } catch(err: unknown) {
+    console.error("unable to create user, got error " + String(err));
   }
 
   return c.json({ok: false, msg: "unknown error occurred, please try again"}, 500);
@@ -342,7 +342,7 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseCo
     }
   } catch (err: unknown) {
     // we know this failed.
-    console.warn(`failed to reset password with error: %s`, err);
+    console.warn("failed to reset password with error: " + String(err));
   }
 
   return c.json({ok: false, msg: "invalid token/password"}, 401);
@@ -398,7 +398,7 @@ account.post("/delete", authMiddlewareHTML, async (c) => {
     }
   } catch (err: unknown) {
     // @ts-ignore
-    console.error(`failed to delete user ${userId} had error %s`, (err.message ?? err.msg) ?? 'no code');
+    console.error(`failed to delete user ${userId} had error ` + String((err.message ?? err.msg) ?? 'no code'));
     return c.html(<b class="btn-error">Failed: Server Error</b>, 500);
   }
 });

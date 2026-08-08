@@ -63,7 +63,7 @@ export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: str
             // redirect any response to be a simple boolean value
             .then((res) => res.success)
             .catch((err: unknown) => {
-              console.error(`failed to delete own message, got error %s for ${user}`, err);
+              console.error(`failed to delete ${user} message, got err ` + String(err));
               // Eat the error, and attempt to just leave the convo instead
               return false;
             });
@@ -78,7 +78,7 @@ export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: str
         // * AND AND we have no unreads with the user.
         if ((!delResult || !convoData.hasLastMessage || convoData.isRequest) && convoData.unreadCount == 0) {
           return agent.chat.bsky.convo.leaveConvo({convoId: convoData.id}, chatHeaders).then((res) => res.success).catch((err: unknown) => {
-            console.warn(`failed to leave convo, got error %s for ${user}`, err);
+            console.warn(`failed to leave convo with ${user}, got error ` + String(err));
             // Any errors on leave convo should not fail the entire chain
             return true;
           });
@@ -86,7 +86,7 @@ export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: str
         // Otherwise redirect the last result value
         return delResult;
       }).catch((err: unknown) => {
-        console.error(`failed to execute message send, got error %s for ${user}`, err);
+        console.error(`failed to execute message send for ${user}, got error ` + String(err));
         return false;
     });
     return await messageChain;

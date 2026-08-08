@@ -99,7 +99,7 @@ export const logoutAccount = async (c: BaseContext): Promise<boolean> => {
     await auth.api.signOut({ headers: c.req.raw.headers });
     return true;
   } catch (err: unknown) {
-    console.error(`Unable to handle logout properly, redirecting anyways. %s`, err);
+    console.error("Unable to handle logout properly, redirecting anyways. " + String(err));
   }
   return false;
 };

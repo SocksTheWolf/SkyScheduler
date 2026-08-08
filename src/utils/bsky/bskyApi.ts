@@ -126,7 +126,7 @@ export const makeRepost = async (_: AllContext, content: Repost, usingAgent: AtP
     await usingAgent.repost(content.uri, content.cid);
     return true;
   } catch(err: unknown) {
-    console.error(`Failed to repost ${content.uri}, got error %s`, err);
+    console.error(`Failed to repost ${content.uri}, got error ` + String(err));
     return false;
   }
 };
@@ -253,7 +253,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
                 console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
               }
             } catch(err: unknown) {
-              console.warn(`Failed to fetch thumbnail %s for embed ${currentEmbed.content}, removing thumb`, err);
+              console.warn(`Thumbnail failed for embed ${currentEmbed.content} got err: ` + String(err));
             }
           }
           mediaEmbeds = {type: EmbedDataType.WebLink, data: externalData};
@@ -401,7 +401,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
                 return false;
               }
             }
-            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.uuid} with err %s`, err);
+            console.error(`Unable to upload ${currentEmbed.content} for post ${postData.uuid} with err ` + String(err));
             return false;
           }
 
@@ -559,7 +559,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       return true;
     } catch(err: unknown) {
       // This will try again in the future, next roundabout.
-      console.error(`encountered error while trying to push post ${postData.uuid} up to bsky %s`, err);
+      console.error(`encountered error while trying to push post ${postData.uuid} up to bsky ` + String(err));
     }
     return false;
   };
@@ -634,7 +634,7 @@ export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]
     if (response.success)
       return response.data.posts;
   } catch(err) {
-    console.error(`Unable to get post records for ${records.toString()} had error %s`, err);
+    console.error(`Unable to get post records for ${records.toString()} had error ` + String(err));
   }
   return null;
 };
@@ -646,7 +646,7 @@ export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) =
       return response.data.view;
     }
   } catch (err) {
-    console.error(`Unable to get feed record for ${feedURI} had error %s`, err);
+    console.error(`Unable to get feed record for ${feedURI} had error ` + String(err));
   }
   return null;
 };
@@ -658,7 +658,7 @@ export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) =
       return response.data.list;
     }
   } catch(err: unknown) {
-    console.error(`Unable to resolve list record for ${listURI} had error %s`, err);
+    console.error(`Unable to resolve list record for ${listURI} had error ` + String(err));
   }
   return null;
 };

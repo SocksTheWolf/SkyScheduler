@@ -52,7 +52,7 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
       return results.map((itm) => new Post(itm));
     }
   } catch(err: unknown) {
-    console.error(`Failed to get posts for user, session could not be fetched %s`, err);
+    console.error("Failed to get posts for user, session could not be fetched " + String(err));
   }
   return null;
 };

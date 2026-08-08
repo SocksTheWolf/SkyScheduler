@@ -39,7 +39,7 @@ export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
       c.set("session", session.session);
     }
   } catch (err: unknown) {
-    console.error(`Failed to process authentication, got err: %s`, err);
+    console.error("Failed to process authentication, got err: " + String(err));
     clearContext(c);
   }
   await next();

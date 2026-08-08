@@ -52,7 +52,7 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
       await addFileListing(c, bucketFile.name, bucketFile.user, bucketFile.date);
     }
   } catch(err: unknown) {
-    console.error(`Adding file listings got error %s`, err);
+    console.error("Adding file listings got error " + String(err));
   }
 
   const batchedQueries: BatchQueryArray = [];
