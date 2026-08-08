@@ -40,7 +40,7 @@ export class AgentMap {
     return mappedAgent;
   };
   async getOrAddAgentFromObj(c: AllContext, data: Post|Repost, type: TaskType): Promise<AtProtoAgent|null> {
-    const userId: string = (type === TaskType.Post) ? (data as Post).user : (data as Repost).userId;
+    const userId: string = data.getUser()
     return await this.getOrAddAgent(c, userId, type);
   };
   static async getAgentDirect(c: AllContext, userId: string, messageOnViolation: boolean): Promise<AgentLoginResponse> {
