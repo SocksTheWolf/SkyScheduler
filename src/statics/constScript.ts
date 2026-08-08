@@ -12,7 +12,7 @@ import {
 } from "../limits";
 import { postRecordURI } from "../validation/regexCases";
 
-export const CONST_SCRIPT_VERSION: number = 13;
+export const CONST_SCRIPT_VERSION: number = 14;
 
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {

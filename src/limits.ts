@@ -13,9 +13,9 @@ export const MAX_REPOST_DAYS: number = 10;
 // max amount of posts per thread
 export const MAX_POSTS_PER_THREAD: number = 10;
 // the maximum amount of repost posts (content not made from the app) an account can have at any one time.
-export const MAX_REPOST_POSTS: number = 40;
+export const MAX_REPOST_POSTS: number = 60;
 // a limit for the maximum number of repost rules a single post can have
-export const MAX_REPOST_RULES_PER_POST: number = 7;
+export const MAX_REPOST_RULES_PER_POST: number = 10;
 // Max length of a repost title
 export const MAX_REPOST_TITLE_LENGTH: number = 100;
 
