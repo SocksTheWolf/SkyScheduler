@@ -46,6 +46,7 @@ export interface Bindings {
   IMAGES: ImagesBinding;
   ASSETS?: Fetcher;
   POST_QUEUE: Queue;
+  POST_QUEUE2: Queue;
   REPOST_QUEUE: Queue;
   QUEUE_SETTINGS: QueueConfigSettings;
   INVITE_POOL?: KVNamespace;

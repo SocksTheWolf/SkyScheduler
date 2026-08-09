@@ -95,19 +95,29 @@ queue = "skyscheduler-post-queue"
 binding = "POST_QUEUE"
 
 [[queues.producers]]
+queue = "skyscheduler-post-queue2"
+binding = "POST_QUEUE2"
+
+[[queues.producers]]
 queue = "skyscheduler-repost-queue"
 binding = "REPOST_QUEUE"
 
 [[queues.consumers]]
 queue = "skyscheduler-post-queue"
-max_batch_size = 3
-max_batch_timeout = 5
+max_batch_size = 2
+max_batch_timeout = 0
+max_retries = 3
+
+[[queues.consumers]]
+queue = "skyscheduler-post-queue2"
+max_batch_size = 2
+max_batch_timeout = 0
 max_retries = 3
 
 [[queues.consumers]]
 queue = "skyscheduler-repost-queue"
 max_batch_size = 15
-max_batch_timeout = 10
+max_batch_timeout = 4
 max_retries = 3
 
 # used for resizing the thumbnails for link posts
@@ -143,7 +153,7 @@ CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # queue handling, pushing information.
-QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, pressure_retries=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE"], repost_queues=["REPOST_QUEUE"]}
+QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, pressure_retries=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
 
 # if we should be removing abandoned files from R2 storage
 R2_SETTINGS={auto_prune=true, prune_days=3}
