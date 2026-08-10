@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
 import { readFile } from "fs/promises";
@@ -97,10 +98,10 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
       try {
         const envFile = (await readFile(".env")).toString();
         const inDev: boolean = envFile.search("IN_DEV=true") >= 0;
-        c.env.IN_DEV = inDev ? "true" : "false";
+        c.env["IN_DEV"] = inDev ? "true" : "false";
       } catch (_err) {
         // file doesn't exist, but drop this anyways.
-        c.env.IN_DEV = "false";
+        c.env["IN_DEV"] = "false";
       }
     }
   }

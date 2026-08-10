@@ -1,3 +1,4 @@
+import isEmpty from "just-is-empty";
 import type { BaseContext, NextMiddleware } from "../types";
 import { useCFTurnstile } from "../utils/helpers";
 
@@ -6,7 +7,7 @@ interface TurnstileResponse {
 }
 
 interface TurnstileRequestData {
-  "cf-turnstile-response": string
+  "cf-turnstile-response"?: string
 }
 
 // Middleware that handles turnstile verification.
@@ -14,7 +15,11 @@ export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
   if (useCFTurnstile(c)) {
     const reqData = await c.req.json<TurnstileRequestData>();
     const userIP: string|undefined = c.req.header("CF-Connecting-IP");
-    const token: string = reqData["cf-turnstile-response"];
+    const token: string|undefined = reqData["cf-turnstile-response"];
+
+    if (isEmpty(token) || token === undefined) {
+      return c.json({ok: false, msg: "captcha information is missing!"}, 400);
+    }
 
     const formData = new FormData();
     formData.append("secret", c.env.TURNSTILE_SECRET_KEY);
