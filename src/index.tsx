@@ -122,9 +122,7 @@ export default {
     await processQueue(batch, env, ctx);
   },
   fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
-    // Hono does not have a way to clear the workers cache. This is the only way to do so.
-    // uncomment this to add to every request
-    //await ctx.cache?.purge({ purgeEverything: true });
+    // to clear the cache, call clearWorkersCache
     return app.fetch(request, env, ctx);
   },
   getApp() {

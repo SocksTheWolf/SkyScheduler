@@ -109,3 +109,18 @@ export const checkValidDateStr = (date: string): boolean => {
     return false;
   }
 };
+
+export const clearWorkersCache = async (ctx: ExecutionContext, options: CachePurgeOptions): Promise<boolean> => {
+  if (!ctx.cache)
+    return false;
+
+  const clearRequest = await ctx.cache.purge(options);
+  if (!clearRequest.success) {
+    if (clearRequest.errors.length > 0) {
+      const clearErrors: string[] = clearRequest.errors.map((err) => err.message);
+      console.error(`Unable to clear workers cache, got ${clearErrors.join(",")}`);
+    }
+    return false;
+  }
+  return true;
+};
