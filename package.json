@@ -23,7 +23,7 @@
     "auth": "npx auth@latest generate --config auth.config.ts --output src/db/auth.schema.ts -y && npx prettier --write src/db/auth.schema.ts",
     "optimize": "run-s migrate:*:pragma",
     "generate": "drizzle-kit generate",
-    "lint": "eslint --concurrency auto --stats",
+    "lint": "eslint --stats --concurrency auto",
     "lint:fix": "eslint --fix",
     "migrate:local:db": "npm run base:db:migrate -- --local",
     "migrate:local:pragma": "npm run base:db:optimize -- --local -y",
@@ -47,7 +47,7 @@
     "sitemap:clean": "replace-in-file \"/homepage|\\.tsx/g\" \"\" assets/sitemap.xml",
     "sitemap": "run-s sitemap:*",
     "openapi": "npx tsx ./bin/openapi.ts",
-    "types": "wrangler types src/wrangler.d.ts"
+    "types": "wrangler types src/definitions/wrangler.d.ts"
   },
   "scriptsComments": {
     "build-pages": "builds the static website pages (recommended)",

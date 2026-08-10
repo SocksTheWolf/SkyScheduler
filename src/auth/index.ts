@@ -1,15 +1,13 @@
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
-import type { Session } from "better-auth/types";
 import { withCloudflare } from "better-auth-cloudflare";
-import type { SecureHeadersVariables } from "hono/secure-headers";
 import { APP_NAME } from "../appInfo";
 import {
   BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
   DEFAULT_PDS
 } from "../limits";
-import type { AllContext, BaseContext, Bindings, DBProcessor, UserIdType } from "../types";
+import type { AllContext, BaseContext, Bindings, DBProcessor } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
@@ -183,17 +181,5 @@ function createAuth(c?: AllContext) {
 
 const processAuthRoute = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.raw);
 
-// Export for variable types
-type ContextVariables = SecureHeadersVariables & {
-  auth: ReturnType<typeof createAuth>;
-  userId: UserIdType;
-  isAdmin: boolean;
-  session: Session|null;
-  db?: DBProcessor;
-  pds: string;
-  ssg: boolean;
-};
-
 // Export for runtime usage
-export { createAuth, processAuthRoute, type ContextVariables };
-
+export { createAuth, processAuthRoute };

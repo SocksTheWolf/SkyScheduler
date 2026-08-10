@@ -4,7 +4,7 @@
 import type { ComAtprotoServerCreateSession } from "@atproto/api";
 import { Agent, CredentialSession } from "@atproto/api";
 import { AccountStatus, TaskType } from "../enums";
-import type { AgentConfigSettings, AllContext } from "../types";
+import type { AllContext } from "../types";
 import { loginToBsky } from "../utils/bsky/bskyLogin";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { getBskyUserPassForId } from "../utils/db/userinfo";

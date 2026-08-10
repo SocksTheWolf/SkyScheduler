@@ -6,10 +6,10 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores([".wrangler/**", ".github/**", "assets/**", ".vscode/**", "src/wrangler.d.ts", "*.config.ts"]),
+  globalIgnores([".wrangler/**", ".github/**", "assets/**", ".vscode/**", "dist/**", "src/definitions/wrangler.d.ts", "*.config.ts"]),
   { files: ["**.{js,ts,jsx,tsx}"], plugins: { js }, extends: ["js/recommended"],
     languageOptions: { globals: globals.browser } },
-  tseslint.configs.recommended,
+  tseslint.configs.strict,
   baseConfig,
   {
     languageOptions: {

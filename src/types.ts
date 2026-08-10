@@ -1,41 +1,14 @@
 import type { BlobRef } from "@atproto/api";
+import type { Session } from "better-auth/types";
 import type { BatchItem } from "drizzle-orm/batch";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { Context } from "hono";
-import type { ContextVariables } from "./auth";
+import type { SecureHeadersVariables } from "hono/secure-headers";
+import type { createAuth } from "./auth";
 import type { ScheduledContext } from "./classes/context";
 import type { Post } from "./classes/post";
 import type { Repost } from "./classes/repost";
 import type { EmbedDataType, TaskType } from "./enums";
-
-/*** Settings config wrappers for bindings ***/
-interface ImageConfigSettings {
-  enabled: boolean;
-  steps?: number[];
-  bucket_url?: string;
-}
-
-interface R2ConfigSettings {
-  auto_prune: boolean;
-  prune_days?: number;
-}
-
-interface QueueConfigSettings {
-  enabled: boolean;
-  repostsEnabled: boolean;
-  threadEnabled: boolean;
-  postNowEnabled?: boolean;
-  pressure_retries?: boolean;
-  delay_val: number;
-  max_retries: number;
-  post_queues: string[];
-  repost_queues: string[];
-}
-
-export interface AgentConfigSettings {
-  use_posts: boolean;
-  use_reposts: boolean;
-}
 
 /** Types, types, types **/
 export interface Bindings {
@@ -163,19 +136,6 @@ export interface BskyWebLinkRecordData {
   thumb?: BlobRef;
 }
 
-export interface PDSService {
-  type: string;
-  serviceEndpoint: string;
-}
-
-export interface ProperD1Result extends Omit<D1Result, "success"> {
-  success: boolean;
-};
-
-export interface PLCDirectoryResponse {
-  service?: PDSService[]
-}
-
 export interface ResolveHandleResponse {
   did: string;
 }
@@ -294,6 +254,16 @@ export interface QueueTaskData {
 
 /// Contexts & Rendering
 export type NextMiddleware = () => Promise<void>;
+export type ContextVariables = SecureHeadersVariables & {
+  auth: ReturnType<typeof createAuth>;
+  userId: UserIdType;
+  isAdmin: boolean;
+  session: Session|null;
+  db?: DBProcessor;
+  pds: string;
+  ssg: boolean;
+};
+
 export interface HonoBase {
   Bindings: Bindings,
   Variables: ContextVariables
@@ -301,11 +271,10 @@ export interface HonoBase {
 
 export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
-
-
 export interface BaseElementProps {
   ctx?: AllContext
 }
+
 // handling preloading and injection of dependencies into the layout
 export interface PreloadRules {
   type: "image"|"style"|"script"|"module";

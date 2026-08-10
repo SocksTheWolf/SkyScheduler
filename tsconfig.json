@@ -10,8 +10,10 @@
     ],
     "types": [
       "node",
-      "./src/global.d.ts",
-      "./src/wrangler.d.ts"
+      "./src/definitions/global.d.ts",
+      "./src/definitions/services.d.ts",
+      "./src/definitions/settings.d.ts",
+      "./src/definitions/wrangler.d.ts"
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"

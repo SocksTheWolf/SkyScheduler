@@ -22,7 +22,7 @@ import type {
   AllContext, BskyEmbedRecord, BskyEmbedWrapper,
   BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
   BskyVideoRecordData, BskyWebLinkRecordData,
-  PLCDirectoryResponse, PostRecordResponse,
+  PostRecordResponse,
   PostStatus, ResolveHandleResponse, WebAssociatedRef
 } from "../../types";
 import type { atpRecordURICaptures } from "../../validation/regexCases";

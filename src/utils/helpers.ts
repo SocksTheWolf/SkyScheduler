@@ -1,7 +1,7 @@
 import type { FormatDurationOptions } from "date-fns";
 import {
-  formatDuration,
-  roundToNearestMinutes, startOfHour, subDays
+  formatDuration, roundToNearestMinutes,
+  startOfHour, subDays
 } from "date-fns";
 import { EmbedDataType, TimeIntervalSettings } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";

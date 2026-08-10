@@ -170,6 +170,7 @@ skyscheduler/
 │   ├── auth/
 │   ├── classes/
 │   ├── db/
+│   ├── definitions/
 │   ├── endpoints/
 │   ├── layout/
 │   ├── middleware/

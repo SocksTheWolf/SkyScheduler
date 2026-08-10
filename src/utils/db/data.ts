@@ -17,8 +17,7 @@ import type {
   DBProcessor,
   EditPostChanges,
   GetAllPostedBatch,
-  PostRecordResponse,
-  ProperD1Result
+  PostRecordResponse
 } from "../../types";
 import { floorCurrentTime } from "../helpers";
 

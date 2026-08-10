@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { drizzle } from "drizzle-orm/d1";
 import type { ExecutionContext } from "hono";
@@ -17,12 +16,12 @@ export class ScheduledContext {
     this.set("db", drizzle(env.DB));
     this.set("ssg", false);
   }
-  get(name: string) {
+  get(name: string): any {
     if (this.#map.has(name))
       return this.#map.get(name);
     return null;
   }
-  set(name: string, value: any) {
+  set(name: string, value: any): void {
     this.#map.set(name, value);
   }
 };

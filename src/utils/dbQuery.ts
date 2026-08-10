@@ -14,22 +14,17 @@ import type {
   AllContext, BatchQuery,
   BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
-  DBProcessor,
-  DeleteResponse,
-  EditPostChanges,
-  ProperD1Result,
-  UserIdType
+  DBProcessor, DeleteResponse,
+  EditPostChanges, UserIdType
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import {
   getChildPostsOfThread, getPostByCID,
-  getPostThreadCount, getRepostCountQuery, updatePostForGivenUser
+  getPostThreadCount, getRepostCountQuery,
+  updatePostForGivenUser
 } from "./db/data";
-import {
-  getViolationsForUser,
-  removeViolationsDB
-} from "./db/violations";
+import { getViolationsForUser, removeViolationsDB } from "./db/violations";
 import { floorGivenTime, has, isAltEditableType } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 
