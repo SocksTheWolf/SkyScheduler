@@ -63,11 +63,12 @@ export function isInDev(env?: Bindings) {
   if (env === undefined)
     return false;
 
-  return env.IN_DEV === "true";
+  // eslint-disable-next-line @typescript-eslint/dot-notation
+  return env["IN_DEV"] === "true";
 }
 
 export function useCFTurnstile(ctx: AllContext|undefined): boolean {
-  if (ctx?.env.IN_DEV)
+  if (isInDev(ctx?.env))
     return false;
 
   return USE_CAPTCHA;
