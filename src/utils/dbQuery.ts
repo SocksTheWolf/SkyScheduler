@@ -7,7 +7,7 @@ import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
-import { AccountStatus, PostLabel, RepostType } from "../enums";
+import { AccountStatus, PostLabel, RepostType, TimeShape } from "../enums";
 import { MAX_POSTS_PER_THREAD, MAX_REPOST_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
 import type {
   AccountUpdatePayload,
@@ -178,16 +178,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
   }
 
   const { content, scheduledDate, embeds, contentLabel, makePostNow, repostData, rootPost, parentPost } = validation.data;
-  const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate));
-
-  // Ensure scheduled date is in the future
-  //
-  // Do not do this check if you are doing a threaded post
-  // or you have marked that you are posting right now.
-  if (!isAfter(scheduleDate, new Date()) &&
-    (!makePostNow && (isEmpty(rootPost) && isEmpty(parentPost)))) {
-    return { ok: false, msg: "Scheduled date must be in the future" };
-  }
+  const scheduleDate = floorGivenTime((makePostNow) ? new Date() : new Date(scheduledDate), TimeShape.Post);
 
   // Check if account is in violation
   const violationData = await getViolationsForUser(db, userId);
@@ -341,13 +332,7 @@ export const createRepost = async (c: AllContext, body: unknown): Promise<Create
   }
   const { data, scheduledDate, repostData } = validation.data;
   const isScheduledPost = (data.type === RepostType.FuturePost);
-  const scheduleDate = floorGivenTime(new Date(scheduledDate), true);
-  const timeNow = new Date();
-
-  // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, timeNow)) {
-    return { ok: false, msg: "Scheduled date must be in the future" };
-  }
+  const scheduleDate = floorGivenTime(new Date(scheduledDate), TimeShape.Repost);
 
   // Check if account is in violation
   const violationData = await getViolationsForUser(db, userId);

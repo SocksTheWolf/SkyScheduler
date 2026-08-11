@@ -34,7 +34,7 @@ export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
       c.set("pds", session.user.pds);
       // This can't be changed by anyone specifically because it's not a domain
       // and zod will require your username to be a domain.
-      c.set("isAdmin", session.user.name === "admin");
+      c.set("isAdmin", session.user.name === "admin" || session.user.name === c.env.DEFAULT_ADMIN_USER);
       // We can probably drop this too
       c.set("session", session.session);
     }

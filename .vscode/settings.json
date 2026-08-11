@@ -2,7 +2,7 @@
   "search.exclude": {
     "**/migrations": true,
     ".wrangler/**": true,
-    "/src/wrangler.d.ts": true,
+    "/src/definitions/wrangler.d.ts": true,
     "package-lock.json": true
   },
   "editor.tabSize": 2,

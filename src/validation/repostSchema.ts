@@ -1,6 +1,8 @@
+import { isAfter } from "date-fns";
 import * as z from "zod/v4";
-import { RepostType } from "../enums";
+import { RepostType, TimeShape } from "../enums";
 import { MAX_REPOST_TITLE_LENGTH, REPOSTING_TIME_INTERVAL } from "../limits";
+import { floorGivenTime } from "../utils/helpers";
 import { PostRecordSchema } from "./recordSchema";
 import { httpProtoRecord, postRecordURI, repostContentRecord } from "./regexCases";
 import { RepostDataSchema } from "./repostDataSchema";
@@ -35,7 +37,7 @@ export const RepostSchema = z.object({
   ], "invalid repost type"),
   ...RepostDataSchema.shape,
   ...ScheduledDateSchema.shape,
-}).superRefine(({repostData}, ctx) => {
+}).superRefine(({repostData, scheduledDate}, ctx) => {
   if (repostData !== undefined) {
     const minimumHourValue = REPOSTING_TIME_INTERVAL / 60;
     if (repostData.hours < minimumHourValue) {
@@ -45,5 +47,14 @@ export const RepostSchema = z.object({
         path: ["repostData"]
       });
     }
+  }
+  const scheduleDate = floorGivenTime(new Date(scheduledDate), TimeShape.Repost);
+  // Ensure scheduled date is in the future
+  if (!isAfter(scheduleDate, new Date())) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Scheduled repost date must be in the future",
+      path: ["scheduledDate"]
+    });
   }
 });

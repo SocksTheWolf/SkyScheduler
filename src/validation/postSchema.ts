@@ -1,11 +1,14 @@
+import { isAfter } from "date-fns";
+import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
-import { EmbedDataType, PostLabel } from "../enums";
+import { EmbedDataType, PostLabel, TimeShape } from "../enums";
 import {
   MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST,
   MAX_LENGTH, MAX_RECORDS_PER_POST,
   MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST,
   MIN_LENGTH, POSTING_TIME_INTERVAL
 } from "../limits";
+import { floorGivenTime } from "../utils/helpers";
 import {
   ImageEmbedSchema, LinkEmbedSchema,
   PostRecordSchema, VideoEmbedSchema
@@ -37,22 +40,37 @@ export const PostSchema = z.object({
   parentPost: z.uuidv4("parent post id is invalid").optional(),
   ...RepostDataSchema.shape,
   ...ScheduledDateSchema.shape,
-}).superRefine(({embeds, contentLabel, makePostNow, repostData, rootPost, parentPost}, ctx) => {
-  // check that root and parentpost are unset if makePostNow is set
-  if (rootPost !== undefined && parentPost !== undefined) {
+}).superRefine(({embeds, contentLabel, scheduledDate, makePostNow, repostData, rootPost, parentPost}, ctx) => {
+  // Threaded post checks
+  if (!isEmpty(rootPost) && !isEmpty(parentPost)) {
+    // Make post now is not allowed on threaded posts
     if (makePostNow) {
       ctx.addIssue({
         code: "custom",
+        continue: false,
         message: "You cannot use the post now feature while making threads",
         path: ["makePostNow"]
       });
     }
 
+    // make sure that repost data is explicitly missing for threads
     if (repostData !== undefined) {
       ctx.addIssue({
         code: "custom",
+        continue: false,
         message: "You cannot have reposts on child posts of threads",
         path: ["repostData"]
+      });
+    }
+  } else if (!makePostNow) {
+    // If this is not a threaded post, and we are not doing a post now,
+    // check that the post time is in the future
+    if (!isAfter(floorGivenTime(new Date(scheduledDate), TimeShape.Post), new Date())) {
+      ctx.addIssue({
+        code: "custom",
+        continue: false,
+        message: "Scheduled posts must be set in the future",
+        path: ["scheduledDate"]
       });
     }
   }
@@ -79,6 +97,7 @@ export const PostSchema = z.object({
 
       ctx.addIssue({
         code: "custom",
+        continue: false,
         message: "Content labels are required for posting media",
         path: ["contentLabel"]
       });

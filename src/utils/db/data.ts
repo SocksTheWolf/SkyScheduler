@@ -9,6 +9,7 @@ import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
+import { TimeShape } from "../../enums";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
 import type {
   AllContext,
@@ -28,7 +29,7 @@ export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: bo
     console.error("Could not get all posts for current time, db was null");
     return [];
   }
-  const currentTime: Date = floorCurrentTime();
+  const currentTime: Date = floorCurrentTime(TimeShape.Post);
 
   const violationUsers = db.select({violators: violations.userId}).from(violations);
   const postsToMake = db.$with('scheduledPosts').as(db.select().from(posts)
@@ -69,7 +70,7 @@ export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date):
 };
 
 export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost[]> => {
-  return await getAllRepostsForGivenTime(c, floorCurrentTime(true));
+  return await getAllRepostsForGivenTime(c, floorCurrentTime(TimeShape.Repost));
 };
 
 export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
@@ -78,7 +79,7 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
     console.error("unable to delete all reposts before current time, db was null");
     return;
   }
-  const currentTime = floorCurrentTime(true);
+  const currentTime = floorCurrentTime(TimeShape.Repost);
   const deletedPosts = await db.delete(reposts).where(lte(reposts.scheduledDate, currentTime))
     .returning({id: reposts.uuid, scheduleGuid: reposts.scheduleGuid});
 

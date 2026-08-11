@@ -3,17 +3,17 @@ import {
   formatDuration, roundToNearestMinutes,
   startOfHour, subDays
 } from "date-fns";
-import { EmbedDataType, TimeIntervalSettings } from "../enums";
+import { EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
 import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
 
-export function floorCurrentTime(forRepost: boolean=false): Date {
-  return floorGivenTime(new Date(), forRepost);
+export function floorCurrentTime(shape: TimeShape=TimeShape.Post): Date {
+  return floorGivenTime(new Date(), shape);
 }
 
-export function floorGivenTime(given: Date, forRepost: boolean=false): Date {
+export function floorGivenTime(given: Date, shape: TimeShape): Date {
   const roundingSettings: LooseObj = { roundingMethod: 'floor' };
-  const check: TimeIntervalSettings = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
+  const check: TimeIntervalSettings = (shape == TimeShape.Repost) ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
   switch (check) {
     default:
     case TimeIntervalSettings.Hour:

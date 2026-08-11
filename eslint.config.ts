@@ -9,7 +9,7 @@ export default defineConfig([
   globalIgnores([".wrangler/**", ".github/**", "assets/**", ".vscode/**", "dist/**", "src/definitions/wrangler.d.ts", "*.config.ts"]),
   { files: ["**.{js,ts,jsx,tsx}"], plugins: { js }, extends: ["js/recommended"],
     languageOptions: { globals: globals.browser } },
-  tseslint.configs.strict,
+  tseslint.configs.strictTypeChecked,
   baseConfig,
   {
     languageOptions: {

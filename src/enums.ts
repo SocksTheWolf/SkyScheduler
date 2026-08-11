@@ -55,6 +55,12 @@ export enum ImageResizeResult {
   ExhaustedResources
 };
 
+// What a time object is contextually used for.
+export enum TimeShape {
+  Post,
+  Repost
+};
+
 export enum TimeIntervalSettings {
   Hour = 60,
   HalfHour = 30,
