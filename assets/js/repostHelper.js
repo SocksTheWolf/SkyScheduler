@@ -5,37 +5,9 @@ const repostRecordURL = document.getElementById("repostRecordURL");
 const repostCycleOptions = document.getElementById("makeRepostOptions");
 const existingPostId = document.getElementById("postBaseInfo");
 const retweetFields = document.getElementById("retweetFields");
+const repostTime = document.getElementById("repostTime");
+// This is used outside of this file.
 const cancelScheduledRepostsBtn = document.getElementById("cancelScheduledRepost");
-
-async function getAccountHandle(account) {
-  if (account.match(/did\:plc\:/i)) {
-    return account;
-  }
-  return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`)
-  .then((resp) => {
-    if (resp.ok) {
-      return resp.json().then((lookup) => {
-        return lookup.did;
-      });
-    }
-    return null;
-  });
-}
-
-async function getPostCID(account, postid) {
-  return await fetch(`https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?collection=app.bsky.feed.post&repo=${account}&rkey=${postid}`)
-  .then((resp) => {
-    if (resp.ok) {
-      return resp.json().then((lookup) => {
-        if (lookup.hasOwnProperty("cid")) {
-          return lookup.cid;
-        }
-        return null;
-      });
-    }
-    return null;
-  });
-}
 
 document.addEventListener("resetRepost", () => {
   repostForm.reset();
@@ -50,9 +22,8 @@ document.addEventListener("resetRepost", () => {
   setSelectDisable(repostCycleOptions.parentElement, true);
   setElementVisible(cancelScheduledRepostsBtn.parentElement, false);
   repostCycleOptions.checked = false;
-  const repostTime = document.getElementById("repostTime");
   repostTime.value = "";
-  repostTime.setAttribute("min", getNextAvailPostingTime(true));
+  setNextAvailMinPostingTime(repostTime, true);
   if (existingPostId.hasAttribute("data-id")) {
     const highlight = getPostListElement(existingPostId.getAttribute("data-id"));
     if (highlight) {
@@ -65,8 +36,18 @@ document.addEventListener("resetRepost", () => {
 repostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   showRepostProgress(true);
-  const scheduledDateVal = document.getElementById("repostTime").value;
+  const scheduledDateVal = repostTime.value;
   const postRecordVal = repostRecordURL.value;
+  const invalidPostURL = () => {
+    pushToast("Invalid post URL", false);
+    showRepostProgress(false);
+  }
+  try {
+    const validURLTest = new URL(postRecordVal);
+  } catch(validURLErr) {
+    invalidPostURL();
+    return;
+  }
   let dateTime;
   try {
     dateTime = new Date(scheduledDateVal).toISOString();
@@ -97,10 +78,13 @@ repostForm.addEventListener('submit', async (e) => {
     if (repostTitle.value !== "" && isElementVisible(repostTitleSection)) {
       postObject.data.content = repostTitle.value;
     }
+    if (!ATPROTO_RECORD_REGEX.test(postRecordVal)) {
+      invalidPostURL();
+      return;
+    }
     const {account, postid} = ATPROTO_RECORD_REGEX.exec(postRecordVal)?.groups;
     if (account === undefined || postid === undefined) {
-      pushToast("URL provided is invalid!", false);
-      showRepostProgress(false);
+      invalidPostURL();
       return;
     }
     const didResponse = await getAccountHandle(account);
@@ -196,7 +180,6 @@ document.addEventListener("addNewRepost", (ev) => {
     else if (postFooterTime.hasAttribute("data-convertedtime"))
       newTimeValue = postFooterTime.getAttribute("data-convertedtime");
 
-    const repostTime = document.getElementById("repostTime");
     if (newTimeValue !== null) {
       repostTime.setAttribute("min", newTimeValue);
       repostTime.value = newTimeValue;

@@ -27,7 +27,9 @@ function updateAllTimes() {
     const isRepost = el.hasAttribute("repost");
     const timestampDate = new Date(el.innerText);
     el.setAttribute("data-originaltime", timestampDate.toISOString());
-    el.setAttribute("data-convertedtime", convertTimeValueLocally(timestampDate, isRepost));
+    const convertTime = convertTimeValueLocally(timestampDate, isRepost);
+    if (convertTime !== null)
+      el.setAttribute("data-convertedtime", convertTime);
     el.textContent = formatDate(timestampDate, isRepost);
     el.setAttribute("corrected", true);
   });
@@ -263,6 +265,11 @@ function setElementDisabled(el, disabled) {
 }
 
 function localTimeChange(date, forRepost=false) {
+  // if the date is invalid do not process the date.
+  if (!(date instanceof Date) || isNaN(date)) {
+    return null;
+  }
+
   let curMinutes = 0;
   const settingsCheck = forRepost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
   if (settingsCheck != 60) {
@@ -288,6 +295,12 @@ function getNextAvailPostingTime(forRepost=false) {
   if (settingsCheck == 60)
     curDate.setHours(curDate.getHours() + 1);
   return localTimeChange(curDate);
+}
+
+function setNextAvailMinPostingTime(el, forRepost=false) {
+  const nextTime = getNextAvailPostingTime(forRepost);
+  if (nextTime !== null)
+    el.setAttribute("min", nextTime);
 }
 
 function showContentLabeler(shouldShow) {
@@ -335,11 +348,13 @@ function setupDashboard() {
 
     // rounddown minutes
     dateScheduler.addEventListener('change', () => {
-      dateScheduler.value = convertTimeValueLocally(dateScheduler.value, false);
+      const adjustedTimeValue = convertTimeValueLocally(dateScheduler.value, false);
+      if (adjustedTimeValue !== null)
+        dateScheduler.value = adjustedTimeValue;
     });
 
     // push a minimum date to make it easier (less chance of typing 2025 by accident)
-    dateScheduler.setAttribute("min", getNextAvailPostingTime());
+    setNextAvailMinPostingTime(dateScheduler);
 
     if (scheduledPostNowBox) {
       addClickKeyboardListener(scheduledPostNowBox, () => {
