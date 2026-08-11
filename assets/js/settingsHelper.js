@@ -1,29 +1,29 @@
-function clearSettingsData() {
-  document.querySelectorAll("#changeInfo input").forEach((el) => el.value = "");
-  document.querySelectorAll("#deleteAccount input").forEach((el) => el.value = "");
-  document.getElementById("accountResponse").innerHTML = "";
-  document.getElementById("accountDeleteResponse").innerHTML = "";
-}
-
-function addEasyModalOpen(buttonID, modalEl, closeButtonID=null) {
-  addClickKeyboardListener(document.getElementById(buttonID), () => {
-    clearSettingsData();
-    openModal(modalEl);
-  });
-  if (closeButtonID !== null) {
-    addClickKeyboardListener(document.getElementById(closeButtonID), () => {
-      closeModal(modalEl);
-    });
-  }
-}
-
-document.addEventListener("violationOpenSettings", () => {
-  if (document.getElementById("violationSettingsLink")) {
-    addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
-  }
-});
-
 document.addEventListener("DOMContentLoaded", () => {
+  const clearSettingsData = () => {
+    document.querySelectorAll("#changeInfo input").forEach((el) => el.value = "");
+    document.querySelectorAll("#deleteAccount input").forEach((el) => el.value = "");
+    document.getElementById("accountResponse").innerHTML = "";
+    document.getElementById("accountDeleteResponse").innerHTML = "";
+  }
+
+  const addEasyModalOpen = (buttonID, modalEl, closeButtonID=null) => {
+    addClickKeyboardListener(document.getElementById(buttonID), () => {
+      clearSettingsData();
+      openModal(modalEl);
+    });
+    if (closeButtonID !== null) {
+      addClickKeyboardListener(document.getElementById(closeButtonID), () => {
+        closeModal(modalEl);
+      });
+    }
+  };
+
+  document.addEventListener("violationOpenSettings", () => {
+    if (document.getElementById("violationSettingsLink")) {
+      addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
+    }
+  });
+
   addUsernameFieldWatchers();
   const changeInfoModal = document.getElementById("changeInfo");
   const deleteAccountModal = document.getElementById("deleteAccount");
