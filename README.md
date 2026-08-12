@@ -42,7 +42,7 @@ SkyScheduler is a lightweight Cloudflare Workers-based microservice application 
 
 - Node.js (v24.15 or later)
 - Package Manager
-- Cloudflare Pro Workers account (you will hit CPU limits due to betterauth and egress to atproto)
+- Cloudflare Pro Workers account (you will hit CPU limits due to betterauth and egress to ATProto)
 
 ### Installation
 
@@ -68,8 +68,8 @@ cp .env.example .env
 _Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk .env.prod` to upload all the settings at once.
 
 4. Update your `wrangler.toml` with changes that reflect your account.
-   - You'll need to update the values for the kv, r2, queues, d1 to reflect the bindings on your account.
-   - Also make sure you update the `BETTER_AUTH_URL` to your working url as well.
+   - You'll need to update the values for the KV, R2, Queues, D1 to reflect the bindings on your account.
+   - Also make sure you update the `BETTER_AUTH_URL` to your working URL as well.
    - If you allow image resizing, you should also modify `IMAGE_SETTINGS`'s `bucket_url` to the correct host.
    - Do remember to update/remove the domain bindings!
 
@@ -83,7 +83,7 @@ npm install
 
    - `.ssclirc` - sitemap domain
    - `/src/limits.ts` - site configuration and application limits
-   - `/src/appInfo.ts` - site information such as name, description, domain, etc
+   - `/src/appInfo.ts` - site information such as name, description, domain, etc.
    - `/assets/_redirects` - redirect configuration
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
@@ -112,7 +112,7 @@ Ensure you have configured the `.env` file with the necessary credentials and se
 
 ### Application Variables
 
-Most of the application can be modified with `wrangler.toml`'s vars section or via `src/limits.ts`.
+Most of the application can be modified with `wrangler.toml`'s `vars` section or via `src/limits.ts`.
 
 Both files are heavily commented to explain what the options control.
 
@@ -134,7 +134,7 @@ SkyScheduler comes with a lot of commands to help manage the service. Documentat
 
 The most important ones to know:
 
-- `build-pages` - builds the static website pages.
+- `build:pages` - builds the static website pages.
   - **Note**: Automatically is called by wrangler builds. If SSG is disabled, this does nothing.
 - `dev` - runs the app in a local environment.
 - `generate` - run anytime you modify a file in the `src/db` folder.
@@ -146,9 +146,9 @@ The most important ones to know:
 - `invite:generate` - generates a valid invite key.
 - `invite:local/remote` - commits an invite key to the invite store.
 - `sitemap` - generates the sitemap.xml file.
-  - There's a github action that will do this automatically as well.
+  - There's a GitHub action that will do this automatically as well.
 - `openapi` - builds the OpenAPI spec.
-  - This is **not** automatically called by anything in the application, but there is a Github Action (`openapi.yml`) that uploads to artifacts.
+  - This is **not** automatically called by anything in the application, but there is a GitHub Action (`openapi.yml`) that uploads to artifacts.
   - Give the output file to the WAF.
 - `types` - whenever `wrangler.toml` changes or wrangler updates, run this command.
 
@@ -205,7 +205,7 @@ skyscheduler/
 - zod - data validation
 - image-dimensions - image data validation
 - date-fns - date processing helpers
-- drizzle - database orm/schemas
+- drizzle - database ORM/schemas
 - just - js helper library
 
 #### Client
@@ -236,4 +236,4 @@ Name, Logos and Branding are copyright SocksTheWolf, all rights reserved.
 See the [LICENSE](LICENSE) file for details.
 
 ---
-_Source hosted on [Github](https://github.com/SocksTheWolf/SkyScheduler), mirrored on [tangled](https://tangled.org/socksthewolf.com/skyscheduler)_
+_Source hosted on [GitHub](https://github.com/SocksTheWolf/SkyScheduler), mirrored on [tangled](https://tangled.org/socksthewolf.com/skyscheduler)_

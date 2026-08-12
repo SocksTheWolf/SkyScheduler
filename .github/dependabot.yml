@@ -24,3 +24,5 @@ updates:
           - 'version-update:semver-major'
       - dependency-name: 'wrangler'
       - dependency-name: 'minify'
+      - dependency-name: 'tsx'
+      - dependency-name: 'prettier'
