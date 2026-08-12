@@ -30,7 +30,7 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
         <a rel="author" target="_blank" title="Project author" tabindex={props.removeExcessTab ? -1 : 0}
           href={PROJECT_AUTHOR_SITE}>{PROJECT_AUTHOR}</a><br />
         <small>
-          <a class="secondary" target="_blank" tabindex={props.removeExcessTab ? -1 : 0}
+          <a class="tipLink secondary" target="_blank" tabindex={props.removeExcessTab ? -1 : 0}
             data-tooltip="Tips are not required as the service is free, but if this helps you, a tip would be appreciated <3"
             title="Tip the dev" href="/tip">Tip</a> -
           <a class="secondary" {...newWinAttr} href="/tos" title="Terms of Service">Terms</a> -

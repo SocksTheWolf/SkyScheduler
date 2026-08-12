@@ -174,7 +174,7 @@ html:not(.modal-is-open) {
   font-size: .7rem !important;
 }
 
-.repostTimesLeft [data-tooltip]::before {
+.pico .repostTimesLeft:hover::before, .pico .tipLink:hover::before {
   left: 90% !important;
   max-width: 200px !important;
 }
