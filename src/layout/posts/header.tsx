@@ -25,7 +25,7 @@ export default function PostDataHeader(props: PostDataHeaderOptions) {
     data-item={content.uuid}
     data-root={content.rootPost ?? content.uuid}
     data-parent={content.isChildPost ? content.parentPost : undefined}
-    data-repost={content.isRepost ?? undefined}
+    data-repost={content.isRepost ? true : undefined}
     data-scheduled={!props.posted || undefined}
     hidden={canSeeHeader ? undefined : true}>
     <RepostStatusIcon isRepost={content.isRepost} />
