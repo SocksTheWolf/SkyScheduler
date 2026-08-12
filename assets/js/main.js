@@ -157,7 +157,7 @@ function rawSubmitHandler(url, successCallback) {
         try {
           turnstile.reset();
         } catch (e) {
-          // literally do not do anything
+          // literally do not do anything if we can't find turnstile
         }
       }
     } catch (err) {

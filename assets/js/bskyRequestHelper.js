@@ -18,7 +18,7 @@ async function getPostCID(account, postid) {
   .then((resp) => {
     if (resp.ok) {
       return resp.json().then((lookup) => {
-        if (lookup.hasOwnProperty("cid")) {
+        if (Object.prototype.hasOwnProperty.call(lookup, "cid")) {
           return lookup.cid;
         }
         return null;

@@ -3,7 +3,8 @@
     "**/migrations": true,
     ".wrangler/**": true,
     "/src/definitions/wrangler.d.ts": true,
-    "package-lock.json": true
+    "package-lock.json": true,
+    "jsrules.config.ts": true
   },
   "editor.tabSize": 2,
   "chat.extensionUnification.enabled": false,

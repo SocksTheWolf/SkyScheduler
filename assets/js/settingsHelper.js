@@ -22,6 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("violationSettingsLink")) {
       addEasyModalOpen("violationSettingsLink", document.getElementById("changeInfo"));
     }
+    // if we have violations scroll over to them
+    const violationBar = document.getElementById("violationBar");
+    if (violationBar != null) {
+      violationBar.scrollIntoView();
+    }
   });
 
   addUsernameFieldWatchers();

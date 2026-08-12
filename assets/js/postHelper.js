@@ -3,10 +3,7 @@ const postNowCheckbox = document.getElementById('postNow');
 const scheduledDate = document.getElementById('scheduledDate');
 
 const recordUrlBox = document.getElementById('recordBox');
-const content = document.getElementById('content');
-const postForm = document.getElementById('postForm');
 const threadField = document.getElementById('threadInfo');
-const cancelThreadBtn = document.getElementById('cancelThreadPost');
 const postFormTitle = document.getElementById('postFormTitle')
 let hasFileLimit = false;
 let isPosting = false;
@@ -16,7 +13,6 @@ let waitingFiles = 0;
 /* Sections for handling UI changes and modifications */
 const sectionRetweet = document.getElementById('section-retweet');
 const sectionSchedule = document.getElementById('section-postSchedule');
-const sectionImageAttach = document.getElementById("section-imageAttachment");
 const sectionLinkAttach = document.getElementById("section-weblink");
 
 function addOnUnloadBlocker() {
@@ -502,6 +498,20 @@ function showPostProgress(shouldShow) {
   } else {
     el.textContent = "Schedule Post";
   }
+}
+
+function showContentLabeler(shouldShow) {
+  const contentLabelSelector = document.getElementById("content-label-selector");
+  const contentLabelSelect = document.getElementById("contentLabels");
+  const urlEmbedBox = document.getElementById('urlCard');
+
+  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
+    return;
+
+  setElementVisible(contentLabelSelector, shouldShow);
+  setElementRequired(contentLabelSelect, shouldShow);
+  if (!shouldShow)
+    contentLabelSelect.value = "";
 }
 
 function toggleUploadGuidelines(shouldShow) {

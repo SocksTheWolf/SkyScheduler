@@ -30,12 +30,12 @@ lerna-debug.log*
 
 # generated files
 openapi.json
+jsrules.config.ts
 assets/pages/
 assets/robots.txt
 assets/site.webmanifest
 assets/js/consts.js
 assets/.well-known/atproto-did
-assets/js/*.min.js
 assets/js/min/*.min.js
 assets/css/*.min.css
 

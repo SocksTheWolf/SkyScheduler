@@ -1,12 +1,15 @@
 // Change this value to break out of any caching that might be happening
 // for the runtime scripts (ex: main.js & postHelper.js)
-export const CURRENT_SCRIPT_VERSION: string = "2.0.4";
+export const CURRENT_SCRIPT_VERSION: string = "2.0.5";
 
-export const getAppScriptStr = (scriptName: string, ext: string="js") =>
-  `/${ext}/${scriptName}.min.${ext}?v=${CURRENT_SCRIPT_VERSION}`;
+const getAppScriptStr = (scriptName: string) =>
+  `/js/min/${scriptName}.min.js?v=${CURRENT_SCRIPT_VERSION}`;
+
+const getAppStyleStr = (styleName: string) =>
+  `/css/${styleName}.min.css?v=${CURRENT_SCRIPT_VERSION}`;
 
 // Eventually make this automatically generated.
 export const mainScriptStr: string = getAppScriptStr("main");
 export const dashboardScriptStr: string = getAppScriptStr("app");
-export const dashboardStyleStr: string = getAppScriptStr("dashboard", "css");
-export const dependModsStyleStr: string = getAppScriptStr("depmods", "css");
+export const dashboardStyleStr: string = getAppStyleStr("dashboard");
+export const dependModsStyleStr: string = getAppStyleStr("depmods");

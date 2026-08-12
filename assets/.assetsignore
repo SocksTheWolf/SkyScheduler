@@ -9,4 +9,3 @@ css/*Mods.css
 # Don't share the base js files, these are also smashed together
 js/*Helper.js
 js/main.js
-js/settings.js

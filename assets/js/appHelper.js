@@ -303,20 +303,6 @@ function setNextAvailMinPostingTime(el, forRepost=false) {
     el.setAttribute("min", nextTime);
 }
 
-function showContentLabeler(shouldShow) {
-  const contentLabelSelector = document.getElementById("content-label-selector");
-  const contentLabelSelect = document.getElementById("contentLabels");
-  const urlEmbedBox = document.getElementById('urlCard');
-
-  if (!shouldShow && (fileData.length > 0 || urlEmbedBox.value.length > 0))
-    return;
-
-  setElementVisible(contentLabelSelector, shouldShow);
-  setElementRequired(contentLabelSelect, shouldShow);
-  if (!shouldShow)
-    contentLabelSelect.value = "";
-}
-
 function setSelectDisable(nodeBase, disable) {
   nodeBase.querySelectorAll("select:not(#contentLabels)").forEach(
     (el) => setElementDisabled(el, disable));
@@ -334,7 +320,8 @@ function setupDashboard() {
   });
 
   // Mobile scroll button functionality
-  if (scrollBtn = document.querySelector(".scrollBtn")) {
+  const scrollBtn = document.querySelector(".scrollBtn");
+  if (scrollBtn != null) {
     addClickKeyboardListener(scrollBtn, (e) => {
       e.preventDefault();
       scrollContentTop();
@@ -414,7 +401,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   contentTabs = new PicoTabs('[role="tablist"]');
 
-  if (URLBooster = new URLSearchParams(window.location.search)) {
+  const URLBooster = new URLSearchParams(window.location.search);
+  if (URLBooster.size > 0) {
     if (URLBooster.has("retweet")) {
       contentTabs.switchTab("dashtabs", 1);
       scrollContentTop();
@@ -422,9 +410,5 @@ document.addEventListener("DOMContentLoaded", () => {
       contentTabs.switchTab("dashtabs", 0);
       scrollContentTop();
     }
-  }
-  // if we have violations scroll over to them
-  if (violationBar = document.getElementById("violationBar")) {
-    violationBar.scrollIntoView();
   }
 });

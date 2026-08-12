@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  if (resetToken = new URLSearchParams(window.location.search).get("token")) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const resetToken = searchParams.get("token");
+  if (resetToken !== null) {
     const resetTokenField = document.getElementById("resetToken");
     const submitButton = document.querySelector('button[type="submit"]');
     if (resetTokenField && submitButton) {

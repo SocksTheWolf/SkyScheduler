@@ -6,8 +6,6 @@ const repostCycleOptions = document.getElementById("makeRepostOptions");
 const existingPostId = document.getElementById("postBaseInfo");
 const retweetFields = document.getElementById("retweetFields");
 const repostTime = document.getElementById("repostTime");
-// This is used outside of this file.
-const cancelScheduledRepostsBtn = document.getElementById("cancelScheduledRepost");
 
 document.addEventListener("resetRepost", () => {
   repostForm.reset();
@@ -78,11 +76,13 @@ repostForm.addEventListener('submit', async (e) => {
     if (repostTitle.value !== "" && isElementVisible(repostTitleSection)) {
       postObject.data.content = repostTitle.value;
     }
+    // Check to see if url can match with our regex
     if (!ATPROTO_RECORD_REGEX.test(postRecordVal)) {
       invalidPostURL();
       return;
     }
-    const {account, postid} = ATPROTO_RECORD_REGEX.exec(postRecordVal)?.groups;
+    // test will tell us if this group will fail
+    const {account, postid} = ATPROTO_RECORD_REGEX.exec(postRecordVal).groups;
     if (account === undefined || postid === undefined) {
       invalidPostURL();
       return;

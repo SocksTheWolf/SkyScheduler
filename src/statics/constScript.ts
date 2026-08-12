@@ -25,7 +25,8 @@ export function makeConstScript() {
     fileTypeArray.push(...BSKY_GIF_MIME_TYPES);
   }
 
-  return `const DEFINITION_VERSION=${CONST_SCRIPT_VERSION};
+  return `/*eslint no-unused-vars: "off"*/
+const DEFINITION_VERSION=${CONST_SCRIPT_VERSION};
 const fileTypesSupported = [${makeStringArray(fileTypeArray)}];
 const imageTypes = [${makeStringArray(BSKY_IMG_MIME_TYPES)}];
 const videoTypes = [${makeStringArray(BSKY_VIDEO_MIME_TYPES)}];
