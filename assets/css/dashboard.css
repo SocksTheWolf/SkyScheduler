@@ -170,6 +170,15 @@ html:not(.modal-is-open) {
   margin-right: 5px;
 }
 
+.pico [data-tooltip]::before {
+  font-size: .7rem !important;
+}
+
+.repostTimesLeft [data-tooltip]::before {
+  left: 90% !important;
+  max-width: 200px !important;
+}
+
 /** VIOLATIONS **/
 .warning-box {
   position: relative;
