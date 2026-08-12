@@ -10,7 +10,6 @@ function openAltText(file, altTextButton, loadCallback, saveCallback) {
   const altTextField = document.getElementById("altTextField");
   const saveButton = document.getElementById("altTextSaveButton");
   const cancelButton = document.getElementById("altTextCancelButton");
-  const mediaPlayerTag = document.getElementById("altMediaPlayer");
   const isFileInstance = file instanceof File;
   const previewContainer = document.getElementById("mediaPreview");
   const isVideo = checkIsVideo(file);

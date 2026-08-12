@@ -43,8 +43,8 @@ repostForm.addEventListener('submit', async (e) => {
     showRepostProgress(false);
   }
   try {
-    const validURLTest = new URL(postRecordVal);
-  } catch(validURLErr) {
+    new URL(postRecordVal);
+  } catch(urlErr) {
     invalidPostURL();
     return;
   }

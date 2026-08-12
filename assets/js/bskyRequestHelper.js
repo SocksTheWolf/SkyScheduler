@@ -1,5 +1,5 @@
 async function getAccountHandle(account) {
-  if (account.match(/did\:plc\:/i)) {
+  if (account.match(/did:plc:/i)) {
     return account;
   }
   return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${account}`)

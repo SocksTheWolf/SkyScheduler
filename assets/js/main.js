@@ -1,6 +1,6 @@
 /* Functions that can be used anywhere on the website. */
 function pushToast(msg, isSuccess) {
-  var newToast = Toastify({
+  const newToast = Toastify({
     text: msg,
     stopOnFocus: false,
     ariaLive: true,
@@ -54,14 +54,14 @@ function updateUsername(val) {
   const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
   // Remove this bullshit unicode thing that gets injected on usernames if you copy them
   // from the bsky website, why the fuck did they do this?
-  let inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
+  const inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
   // prevent the did:plc: logic from appearing in the field
   if (inputData.includes("did:plc:") || inputData.includes("did:web:")) {
     pushToast("Invalid link posted, does not have handle in it", false);
     return "";
   }
   // Convert urls into handles
-  var matches = linkRegex.exec(inputData);
+  const matches = linkRegex.exec(inputData);
   if (matches != null && matches.length >= 2) {
     // was a URL, convert to handle
     return matches[1];
@@ -100,7 +100,7 @@ function redirectAfterDelay(url, customDelay=0) {
 function translateErrorObject(obj, defaultString, defaultTitle="Error Occurred!") {
   let errData = defaultString;
   // If we have a json object in the error message field
-  var hasJsonErr = false;
+  let hasJsonErr = false;
   try {
     errData = JSON.parse(obj.message || obj.msg || obj.error);
     hasJsonErr = true;
@@ -114,8 +114,8 @@ function translateErrorObject(obj, defaultString, defaultTitle="Error Occurred!"
   }
   // Check to see if we even have anything.
   if (hasJsonErr) {
-    var combinedErrors = "";
-    for (error of errData)
+    let combinedErrors = "";
+    for (const error of errData)
       combinedErrors += `${error.message}\n`;
     errData = combinedErrors;
   }
@@ -182,7 +182,7 @@ document.addEventListener("rateLimitNotice", function(ev) {
   pushToast(ev.detail.value, false);
 });
 
-document.addEventListener("accountLoginExpire", function(ev) {
+document.addEventListener("accountLoginExpire", function() {
   pushToast(`Your session has expired, logging out in ${ACCOUNT_EXPIRE_TIMEOUT} seconds...`, false);
   setTimeout(() => {document.location.href="/account/logout"}, ACCOUNT_EXPIRE_TIMEOUT * 1000);
 });
