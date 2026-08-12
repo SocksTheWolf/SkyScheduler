@@ -51,7 +51,7 @@ export function RepostCountElement(props: RepostCountProps) {
       }
     }
   }
-  return (<> | <span class="repostTimesLeft" tabindex={0} data-placement="left">
+  return (<> | <span class="repostTimesLeft" tabindex={0} data-placement="top">
     <span class="repostInfoData" hidden={true}>{raw(repostInfoStr)}</span>
     Reposts Left: {props.count}</span>
     <RepostEditorLink id={props.id} />
