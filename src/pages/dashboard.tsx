@@ -20,7 +20,10 @@ export default function Dashboard(props: BaseElementProps) {
     return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx;
-  return (<BaseLayout title="Dashboard" nonce={ctx.get("secureHeadersNonce")} mainClass="dashboard"
+  return (<BaseLayout
+      title="Dashboard"
+      nonce={ctx.get("secureHeadersNonce")}
+      mainClass="dashboard"
       interactivity={ScriptInclusionLevel.DashboardApp}
       preloads={[{href: dashboardScriptStr, type: "script"}]}>
     <div class="row-fluid">

@@ -10,4 +10,4 @@ If you did not mean to do this, log back onto ${APP_NAME} and provide an updated
 This message can only be seen by you. If you no longer want to use ${APP_NAME} or don't need to for awhile, no worries!
 
 This bot will only send you this message once (unless your password expires again after update).`;
-};
+}

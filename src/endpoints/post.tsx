@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
-import { validate as isValid } from 'uuid';
+import { validate as isValid } from "uuid";
 import type { Post } from "../classes/post";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
@@ -14,8 +14,13 @@ import type {
   DeleteResponse, EditPostChanges, HonoBase
 } from "../types";
 import {
-  createPost, createRepost, deletePost, deleteRepostRule, getPostById,
-  getPostByIdWithReposts, updatePostForUser
+  createPost,
+  createRepost,
+  deletePost,
+  deleteRepostRule,
+  getPostById,
+  getPostByIdWithReposts,
+  updatePostForUser,
 } from "../utils/dbQuery";
 import { isAltEditableType } from "../utils/helpers";
 import { requestDeleteFromR2, uploadFileR2 } from "../utils/r2Query";
@@ -30,7 +35,7 @@ export const post = new Hono<HonoBase>();
 post.post("/upload", authMiddleware, async (c) => {
   const validation = await c.req.parseBody().then((body) => FileUploadSchema.safeParse(body));
   if (!validation.success) {
-    return c.json({"success": false, "error": validation.error.toString()}, 400);
+    return c.json({ success: false, error: validation.error.toString() }, 400);
   }
 
   const { file } = validation.data;
@@ -48,7 +53,7 @@ post.delete("/upload", authMiddleware, async (c) => {
   // Validate that this is a legitimate key
   const validation = FileDeleteSchema.safeParse(body);
   if (!validation.success) {
-    return c.json({"ok": false, "msg": validation.error.toString()}, 402);
+    return c.json({ ok: false, msg: validation.error.toString() }, 402);
   }
 
   const { content } = validation.data;
@@ -60,31 +65,31 @@ post.delete("/upload", authMiddleware, async (c) => {
 });
 
 // Create post
-post.post("/create", authMiddleware, rateLimit({limiter: "POST_LIMITER"}), async (c) => {
+post.post("/create", authMiddleware, rateLimit({ limiter: "POST_LIMITER" }), async (c) => {
   const response: CreatePostQueryResponse = await c.req.json().then((body) => createPost(c, body));
   if (!response.ok) {
-    return c.json({ok: false, msg: response.msg}, 400);
+    return c.json({ ok: false, msg: response.msg }, 400);
   } else if (response.postNow && response.postId) {
     // Handling posting right now.
-    const postInfo: Post|null = await getPostById(c, response.postId);
+    const postInfo: Post | null = await getPostById(c, response.postId);
     if (!isEmpty(postInfo)) {
       if (!(await handlePostNowTask(c, postInfo!)))
-        return c.json({ok: false, msg: "Unable to post now, will try again during next nearest posting time"}, 406);
-      return c.json({ok: true, msg: "Created Post!", id: response.postId});
+        return c.json({ ok: false, msg: "Unable to post now, will try again during next nearest posting time" }, 406);
+      return c.json({ ok: true, msg: "Created Post!", id: response.postId });
     } else {
-      return c.json({ok: false, msg: "Unable to get post content, post may have been lost"}, 401);
+      return c.json({ ok: false, msg: "Unable to get post content, post may have been lost" }, 401);
     }
   }
-  return c.json({ ok: true, msg: "Post scheduled successfully!", id: response.postId});
+  return c.json({ ok: true, msg: "Post scheduled successfully!", id: response.postId });
 });
 
 // Create repost
-post.post("/create/repost", authMiddleware, rateLimit({limiter: "REPOST_LIMITER"}), async (c) => {
+post.post("/create/repost", authMiddleware, rateLimit({ limiter: "REPOST_LIMITER" }), async (c) => {
   const response: CreateObjectResponse = await c.req.json().then((body) => createRepost(c, body));
   if (!response.ok) {
-    return c.json({ok: false, msg: response.msg}, 400);
+    return c.json({ ok: false, msg: response.msg }, 400);
   }
-  return c.json({ ok: true, msg: "Retweet scheduled successfully!", id: response.postId});
+  return c.json({ ok: true, msg: "Retweet scheduled successfully!", id: response.postId });
 });
 
 // Get all posts
@@ -222,7 +227,7 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
 });
 
 // get the repost rule editor
-post.get("/:id/repost", authMiddlewareHTML, rateLimit({limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true}), async (c) => {
+post.get("/:id/repost", authMiddlewareHTML, rateLimit({ limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true }), async (c) => {
   if (CAN_EDIT_REPOST_RULES) {
     const { id } = c.req.param();
     if (isValid(id)) {
@@ -245,6 +250,7 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
         return c.html(<></>, 200);
       }
     }
+    return c.html(<b class="btn-error">Internal error occurred</b>, 403);
   }
   return c.html(<b class="btn-error">Internal error occurred</b>, 403);
 });

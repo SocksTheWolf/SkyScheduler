@@ -1,20 +1,20 @@
-import isEmpty from 'just-is-empty';
-import split from 'just-split';
-import { AtProtoAgent } from '../../classes/bskyAgents';
-import type { AllContext } from '../../types';
-import { getAllPostedPosts, getAllPostedPostsOfUser } from '../db/data';
-import { getAgentPostRecords } from './bskyApi';
+import isEmpty from "just-is-empty";
+import split from "just-split";
+import { AtProtoAgent } from "../../classes/bskyAgents";
+import type { AllContext } from "../../types";
+import { getAllPostedPosts, getAllPostedPostsOfUser } from "../db/data";
+import { getAgentPostRecords } from "./bskyApi";
 
 // This looks for a bunch of posts that are posted and determines if the posts
 // are still on the network or not. If they are not, then this prunes the posts from
 // the database. This call is quite expensive and should only be ran on a weekly
 // cron job.
 export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
-  const allPostedPosts = (userId !== undefined) ? await getAllPostedPostsOfUser(c, userId) : await getAllPostedPosts(c);
+  const allPostedPosts = userId !== undefined ? await getAllPostedPostsOfUser(c, userId) : await getAllPostedPosts(c);
   const removePostIds: string[] = [];
   const postedGroups = split(allPostedPosts, 25);
   // Bluesky public API
-  const agent = new AtProtoAgent('https://public.api.bsky.app');
+  const agent = new AtProtoAgent("https://public.api.bsky.app");
   while (!isEmpty(postedGroups)) {
     const currentGroup = postedGroups.pop();
     // This technically shouldn't be possible because we do a check in the while loop beforehand.
@@ -59,7 +59,7 @@ export const pruneBskyPosts = async (c: AllContext, userId?: string) => {
           });
         }
       }
-    } catch(err: unknown) {
+    } catch (err: unknown) {
       console.error(`encountered error trying to prune: ` + String(err));
       // Remove all the posts in the current post group.
       continue;

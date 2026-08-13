@@ -13,16 +13,16 @@ interface SSGServeProps {
 
 class NonceInject {
   nonce: string;
-  constructor(inNonce: string|undefined) {
+  constructor(inNonce: string | undefined) {
     this.nonce = inNonce ?? "";
   }
   element(el: Element) {
     if (el.tagName === "meta") {
-      el.replace(getHTMXConfigStr(this.nonce), {html: true});
+      el.replace(getHTMXConfigStr(this.nonce), { html: true });
       return;
     }
     if (el.tagName === "script") {
-      const scriptType: string|null = el.getAttribute("type");
+      const scriptType: string | null = el.getAttribute("type");
       // skip anything that uses script but does not need the nonce
       if (scriptType !== null &&
           scriptType !== "text/javascript" &&
@@ -34,7 +34,6 @@ class NonceInject {
     el.setAttribute("nonce", this.nonce);
   }
 }
-
 
 const serveStaticPage = async (c: BaseContext, page?: string): Promise<Response> => {
   // if we're explicitly not given a page, then take the current path name removing the slash
@@ -106,4 +105,4 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
     }
   }
   await next();
-};
+}

@@ -1,9 +1,9 @@
-import { validate as isValid } from 'uuid';
+import { validate as isValid } from "uuid";
 import type { Post } from "../classes/post";
 import type { RepostInfo } from "../classes/repost";
 import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
-import { formatTimeFromHours } from '../utils/helpers';
+import { formatTimeFromHours } from "../utils/helpers";
 
 type RepostEditorTableProps = BaseElementProps & {
   id: string;
@@ -50,7 +50,7 @@ type RepostDataPopoverProps = BaseElementProps & {
 };
 
 export async function RepostDataPopover(props: RepostDataPopoverProps) {
-  const repostInfoData: Post|null = await getPostById(props.ctx, props.id);
+  const repostInfoData: Post | null = await getPostById(props.ctx, props.id);
   if (repostInfoData === null) {
     return (<></>);
   }

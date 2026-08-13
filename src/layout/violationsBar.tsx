@@ -41,7 +41,7 @@ export async function ViolationNoticeBar(props: ViolationNoticeBarProps) {
     let renderButton = null;
     if (violationData.tosViolation) {
       errorStr = `Your account is in violation of ${APP_NAME} usage. You are blocked from using services at this time.`;
-    } else if(violationData.userPassInvalid) {
+    } else if (violationData.userPassInvalid) {
       renderButton = updateSettingsButton;
       errorStr = `Your Bluesky handle or application password is invalid.`;
     } else if (violationData.accountGone) {

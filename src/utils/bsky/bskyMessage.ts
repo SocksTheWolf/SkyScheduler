@@ -1,20 +1,18 @@
-import { RichText } from '@atproto/api';
-import isEmpty from 'just-is-empty';
+import { RichText } from "@atproto/api";
+import isEmpty from "just-is-empty";
 import { AtProtoAgent } from "../../classes/bskyAgents";
-import { BSkyConvoInfo } from '../../classes/bskyConvoInfo';
+import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
 import { AccountStatus } from "../../enums";
-import { DEFAULT_CHAT_PDS } from '../../limits';
-import type { Bindings, UserIdType } from '../../types';
-import { lookupBskyHandle } from './bskyApi';
-import { loginToBsky } from './bskyLogin';
+import { DEFAULT_CHAT_PDS } from "../../limits";
+import type { Bindings, UserIdType } from "../../types";
+import { lookupBskyHandle } from "./bskyApi";
+import { loginToBsky } from "./bskyLogin";
 
-const chatHeaders = {headers: {
-  "atproto-proxy": "did:web:api.bsky.chat#bsky_chat"
-}};
+const chatHeaders = { headers: { "atproto-proxy": "did:web:api.bsky.chat#bsky_chat" } };
 
-async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Promise<BSkyConvoInfo|null> {
+async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Promise<BSkyConvoInfo | null> {
   if (isEmpty(env.RESET_BOT_APP_PASS)) {
-    console.warn("The bot app reset pass is not defined!")
+    console.warn("The bot app reset pass is not defined!");
     return null;
   }
   const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
@@ -33,11 +31,11 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
 // This is very slow, but probably good to check?
 export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
   const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
-  return await getDMConvo(agent, env, user) !== null;
+  return (await getDMConvo(agent, env, user)) !== null;
 };
 
 export const createDMWithUsername = async (env: Bindings, username: string, msg: string): Promise<boolean> => {
-  return await lookupBskyHandle(username).then(resp => createDMWithUser(env, resp, msg));
+  return await lookupBskyHandle(username).then((resp) => createDMWithUser(env, resp, msg));
 };
 
 export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
@@ -45,15 +43,15 @@ export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: str
     return false;
 
   const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
-  const convoData: BSkyConvoInfo|null = await getDMConvo(agent, env, user);
+  const convoData: BSkyConvoInfo | null = await getDMConvo(agent, env, user);
   if (convoData !== null) {
     // Generate facets so we get things like links.
-    const rt = new RichText({text: msg});
+    const rt = new RichText({ text: msg });
 
     // The most beautiful redirected promise ever.
     const messageChain = rt.detectFacets(agent)
       // Accept any conversations we may have with the user already
-      .then(() => agent.chat.bsky.convo.acceptConvo({convoId: convoData.id}, chatHeaders))
+      .then(() => agent.chat.bsky.convo.acceptConvo({ convoId: convoData.id }, chatHeaders))
       // send a message to this user
       .then(() => agent.chat.bsky.convo.sendMessage({convoId: convoData.id, message: {text: msg, facets: rt.facets}}, chatHeaders))
       .then((result) => {
@@ -88,7 +86,7 @@ export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: str
       }).catch((err: unknown) => {
         console.error(`failed to execute message send for ${user}, got error ` + String(err));
         return false;
-    });
+      });
     return await messageChain;
   }
   console.warn(`could not get the dm convo with ${user}`);

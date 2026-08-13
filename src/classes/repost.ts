@@ -3,14 +3,14 @@ import { has } from "../utils/helpers";
 
 interface DBRepost {
   uuid: string;
-  uri: string|null;
-  cid: string|null;
+  uri: string | null;
+  cid: string | null;
   userId: string;
-  scheduleGuid?: string|null;
-  content?: string|null;
+  scheduleGuid?: string | null;
+  content?: string | null;
 }
 
-export type RepostIntakeType = Repost|DBRepost;
+export type RepostIntakeType = Repost | DBRepost;
 
 export class Repost implements BaseContent {
   uuid: string;
@@ -33,23 +33,23 @@ export class Repost implements BaseContent {
   getUser(): string {
     return this.userId;
   }
-};
+}
 
 // Contains the repost info for a post
 export class RepostInfo {
   guid: string;
-  time: Date|string;
+  time: Date | string;
   hours: number;
   count: number;
-  constructor(id: string, time: string|Date, isRepost: boolean, repostData: RepostIntakeData) {
+  constructor(id: string, time: string | Date, isRepost: boolean, repostData: RepostIntakeData) {
     this.time = time;
     this.guid = id;
     if (has(repostData, "hours") && has(repostData, "times")) {
       this.hours = repostData!.hours;
       this.count = repostData!.times;
     } else {
-      this.count = (isRepost) ? 1 : 0;
+      this.count = isRepost ? 1 : 0;
       this.hours = 0;
     }
   }
-};
+}

@@ -64,10 +64,7 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
 
     // Manually inject the CSP headers
     if (USE_CSP_REPORT_ONLY || isInDev(c.env)) {
-      c.res.headers.set(
-        "content-security-policy-report-only",
-        CSPDefinitionHeader,
-      );
+      c.res.headers.set("content-security-policy-report-only", CSPDefinitionHeader);
     } else {
       c.res.headers.set("content-security-policy", CSPDefinitionHeader);
     }

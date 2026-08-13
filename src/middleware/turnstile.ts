@@ -7,15 +7,15 @@ interface TurnstileResponse {
 }
 
 interface TurnstileRequestData {
-  "cf-turnstile-response"?: string
+  "cf-turnstile-response"?: string;
 }
 
 // Middleware that handles turnstile verification.
 export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
   if (useCFTurnstile(c)) {
     const reqData = await c.req.json<TurnstileRequestData>();
-    const userIP: string|undefined = c.req.header("CF-Connecting-IP");
-    const token: string|undefined = reqData["cf-turnstile-response"];
+    const userIP: string | undefined = c.req.header("CF-Connecting-IP");
+    const token: string | undefined = reqData["cf-turnstile-response"];
 
     if (isEmpty(token) || token === undefined) {
       return c.json({ ok: false, msg: "captcha information is missing!" }, 400);
@@ -29,7 +29,7 @@ export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
 
     const turnstileFetch = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
-      body: formData
+      body: formData,
     });
 
     // Check if we could contact siteverify

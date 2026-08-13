@@ -11,8 +11,8 @@ import { handlePostTask, handleRepostTask } from "../scheduler";
 import { enqueueEmptyWork } from "./queuePublisher";
 
 interface BufferBlast {
-  type: TaskType,
-  time: number
+  type: TaskType;
+  time: number;
 }
 
 export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
@@ -36,8 +36,9 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         message.retry();
         continue;
       }
-      const postDataObj: Post|Repost = has(message.body.data, "contentLabel") ?
-        new Post(message.body.data as Post) : new Repost(message.body.data);
+      const postDataObj: Post | Repost = has(message.body.data, "contentLabel")
+        ? new Post(message.body.data as Post)
+        : new Repost(message.body.data);
 
       const userId = postDataObj.getUser();
       const agent = await agency.getOrAddAgent(runtimeWrapper, userId, taskType);
@@ -51,15 +52,14 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         } else {
           console.warn(`Could not make an agent for ${userId}, got null.`);
         }
-
       } else {
         switch (taskType) {
           case TaskType.Post:
             wasSuccess = await handlePostTask(runtimeWrapper, postDataObj as Post, agent);
-          break;
+            break;
           case TaskType.Repost:
             wasSuccess = await handleRepostTask(runtimeWrapper, postDataObj, agent);
-          break;
+            break;
         }
       }
     } else if (taskType == TaskType.Blast) {
@@ -73,9 +73,9 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     // Handle queue acknowledgement on success/failure
     if (!wasSuccess) {
       const currentAttempts: number = message.attempts;
-      const delaySeconds = delay*(currentAttempts+1);
+      const delaySeconds = delay * (currentAttempts + 1);
       console.log(`attempting to retry message ${taskType} in ${delaySeconds}`);
-      message.retry({delaySeconds: delaySeconds});
+      message.retry({ delaySeconds: delaySeconds });
 
       // if the attempts are over the maximum amount of retries then do not backblast
       if (currentAttempts > maxRetries)
@@ -83,7 +83,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
 
       // push a backblast so that this item will retry in the future.
       // it basically just writes null in the buffer, which is silly but w/e
-      bufferBlasts.push({type: taskType, time: delaySeconds});
+      bufferBlasts.push({ type: taskType, time: delaySeconds });
     } else {
       message.ack();
     }
@@ -97,4 +97,4 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
       await enqueueEmptyWork(runtimeWrapper, blast.type, blast.time + 10);
     }
   }
-};
+}

@@ -15,17 +15,17 @@ import { resetAppPasswordMessage } from "../utils/messages/resetAppPassword";
 export class AgentMap {
   #forPosts: boolean;
   #forReposts: boolean;
-  #map: Map<string, AtProtoAgent|null>;
+  #map: Map<string, AtProtoAgent | null>;
   constructor(config: AgentConfigSettings) {
     this.#forPosts = config.use_posts;
     this.#forReposts = config.use_reposts;
     this.#map = new Map();
   }
-  async getOrAddAgent(c: AllContext, userId: string, type: TaskType): Promise<AtProtoAgent|null> {
+  async getOrAddAgent(c: AllContext, userId: string, type: TaskType): Promise<AtProtoAgent | null> {
     const usesAgent: boolean = this.usesAgentForType(type);
-    let mappedAgent = (usesAgent) ? this.#map.get(userId) : null;
+    let mappedAgent = usesAgent ? this.#map.get(userId) : null;
     if (mappedAgent === undefined) {
-      const {agent, violation, violationType} = await AgentMap.getAgentDirect(c, userId, true);
+      const { agent, violation, violationType } = await AgentMap.getAgentDirect(c, userId, true);
       mappedAgent = agent;
       if (usesAgent) {
         // only add this agent if it's not null
@@ -36,14 +36,14 @@ export class AgentMap {
       }
     }
     return mappedAgent;
-  };
+  }
   static async getAgentDirect(c: AllContext, userId: string, messageOnViolation: boolean): Promise<AgentLoginResponse> {
     const loginCreds = await getBskyUserPassForId(c, userId);
     if (!loginCreds.valid) {
       console.error(`credentials for user ${userId} were invalid`);
-      return {agent: null, violation: false};
+      return { agent: null, violation: false };
     }
-    const {username, password, pds} = loginCreds;
+    const { username, password, pds } = loginCreds;
     // Login to bsky
     const agent = new AtProtoAgent(pds);
 
@@ -58,12 +58,12 @@ export class AgentMap {
       } else {
         console.error(`Unable to login ${userId}, no new violation made, got ${loginResponse}`);
       }
-      return {agent: null, violation: true, violationType: loginResponse};
+      return { agent: null, violation: true, violationType: loginResponse };
     }
-    return {agent: agent, violation: false};
-  };
+    return { agent: agent, violation: false };
+  }
   usesAgentForType(type: TaskType) {
-    switch(type) {
+    switch (type) {
       case TaskType.Post:
         return this.#forPosts;
       case TaskType.Repost:
@@ -71,12 +71,12 @@ export class AgentMap {
     }
     return false;
   }
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export class AtProtoAgent extends Agent {
-  serviceToken: string|null;
-  servTokenExpire: number|null;
+  serviceToken: string | null;
+  servTokenExpire: number | null;
   constructor(serviceURL: string) {
     super(new CredentialSession(new URL(serviceURL)));
     this.serviceToken = null;
@@ -97,23 +97,23 @@ export class AtProtoAgent extends Agent {
     const { data: serviceAuth } = await this.com.atproto.server.getServiceAuth({
       aud: `did:web:${(this.sessionManager as CredentialSession).dispatchUrl.host}`,
       lxm: "com.atproto.repo.uploadBlob",
-      exp: this.servTokenExpire
+      exp: this.servTokenExpire,
     });
     this.serviceToken = serviceAuth.token;
     return this.serviceToken;
   }
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export interface AgentLoginResponse {
   agent: AtProtoAgent | null;
   violation: boolean;
   violationType?: AccountStatus;
-};
+}
 
 // login options, mostly the same as the credential store
 export interface AtProtoAgentLoginOptions {
   identifier: string;
   password: string;
   allowTakendown?: boolean;
-};
+}

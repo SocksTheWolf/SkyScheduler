@@ -11,4 +11,4 @@ export class BSkyConvoInfo {
     this.hasLastMessage = convo.lastMessage !== undefined;
     this.unreadCount = convo.unreadCount;
   }
-};
+}

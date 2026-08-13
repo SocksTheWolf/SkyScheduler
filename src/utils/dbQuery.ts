@@ -1,7 +1,7 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
 import isEmpty from "just-is-empty";
-import { v4 as uuidv4, validate as uuidValid } from 'uuid';
+import { v4 as uuidv4, validate as uuidValid } from "uuid";
 import { APP_NAME } from "../appInfo";
 import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";

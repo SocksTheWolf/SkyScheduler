@@ -2,7 +2,7 @@ import { raw } from "hono/html";
 import type { LooseObj, PreloadRules } from "../../types";
 
 interface NoncePropType {
-  nonce?: string
+  nonce?: string;
 }
 
 type DepTagsType = NoncePropType & {
@@ -10,7 +10,7 @@ type DepTagsType = NoncePropType & {
 };
 
 // generate css/js tags for the given dependencies
-export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
+export function IncludeDependencyTags({ scripts, nonce }: DepTagsType) {
   if (scripts === undefined) {
     return null;
   }
@@ -18,40 +18,54 @@ export function IncludeDependencyTags({scripts, nonce}: DepTagsType) {
   const html = scripts.map((itm) => {
     switch (itm.type) {
       case "script":
-        return (<script type="text/javascript" src={itm.href} nonce={nonce} async={itm.async ?? undefined} defer={itm.defer??undefined}></script>);
+        return (
+          <script
+            type="text/javascript"
+            src={itm.href}
+            nonce={nonce}
+            async={itm.async ?? undefined}
+            defer={itm.defer ?? undefined}></script>
+        );
       case "module":
-        return (<script type="module" src={itm.href} nonce={nonce} async={itm.async ?? undefined} defer={itm.defer??undefined}></script>);
+        return (
+          <script
+            type="module"
+            src={itm.href}
+            nonce={nonce}
+            async={itm.async ?? undefined}
+            defer={itm.defer ?? undefined}></script>
+        );
       case "style":
         return (<link href={itm.href} rel="stylesheet" type="text/css" nonce={nonce} />);
       default:
         return (<></>);
     }
   });
-  return (<>{html}</>);
-};
+  return <>{html}</>;
+}
 
-export function PreloadDependencyTags({scripts}: DepTagsType) {
+export function PreloadDependencyTags({ scripts }: DepTagsType) {
   if (scripts === undefined) {
     return null;
   }
 
   const html = scripts.map((itm) => {
-    return (<link rel="preload" href={itm.href} as={itm.type} />);
+    return <link rel="preload" href={itm.href} as={itm.type} />;
   });
-  return (<>{html}</>);
-};
+  return <>{html}</>;
+}
 
-export function getHTMXConfigStr(nonce: string|undefined) {
+export function getHTMXConfigStr(nonce: string | undefined) {
   const HTMXConfigObj: LooseObj = {
     responseHandling: [
-      {code:"204", swap:false},
-      {code:"400", swap:false, error:true},
-      {code:"404", swap:true, error:true},
-      {code:"[234]..", swap:true, error:false},
-      {code:"500", swap:true, error:true},
-      {code:"[5]..", swap:false, error:true},
-      {code:"...", swap:true}
-    ]
+      { code: "204", swap: false },
+      { code: "400", swap: false, error: true },
+      { code: "404", swap: true, error: true },
+      { code: "[234]..", swap: true, error: false },
+      { code: "500", swap: true, error: true },
+      { code: "[5]..", swap: false, error: true },
+      { code: "...", swap: true },
+    ],
   };
   if (nonce !== undefined) {
     HTMXConfigObj.allowEval = false;
@@ -59,8 +73,8 @@ export function getHTMXConfigStr(nonce: string|undefined) {
   }
 
   return `<meta name="htmx-config" content='${JSON.stringify(HTMXConfigObj)}' />`;
-};
+}
 
-export function HTMXNonceTag({nonce}: NoncePropType) {
+export function HTMXNonceTag({ nonce }: NoncePropType) {
   return raw(getHTMXConfigStr(nonce));
-};
+}

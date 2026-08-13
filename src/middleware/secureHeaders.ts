@@ -11,9 +11,9 @@ export async function secureHeadersMiddleware(c: BaseContext, next: NextMiddlewa
     removePoweredBy: true,
     crossOriginOpenerPolicy: "same-origin",
     strictTransportSecurity: "max-age=31536000; includeSubDomains; preload",
-    xFrameOptions: "DENY"
+    xFrameOptions: "DENY",
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return middleware(c, next);
-};
+}

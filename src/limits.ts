@@ -160,15 +160,7 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_IMG_FILE_EXTS_STR: string = [
-  "png",
-  "jpg",
-  "jpeg",
-  "bmp",
-  "webp",
-  "heic",
-  "svg",
-].join(", ");
+export const BSKY_IMG_FILE_EXTS_STR: string = ["png", "jpg", "jpeg", "bmp", "webp", "heic", "svg"].join(", ");
 
 // BSky limits that are inferred
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
@@ -200,12 +192,7 @@ export const BSKY_VIDEO_MAX_DURATION: number = 3; // in minutes
 // NOTE: this is still at 100MB due to reliability concerns, also we have no multipart upload support atm
 // but dropzone technically could support it.
 export const BSKY_VIDEO_MAX_SIZE_IN_MB: number = 100;
-export const BSKY_VIDEO_MIME_TYPES: string[] = [
-  "video/mp4",
-  "video/mpeg",
-  "video/webm",
-  "video/quicktime",
-];
+export const BSKY_VIDEO_MIME_TYPES: string[] = ["video/mp4", "video/mpeg", "video/webm", "video/quicktime"];
 
 export const BSKY_VIDEO_FILE_EXTS: string[] = ["mp4", "mpeg", "mov", "webm"];
 

@@ -6,7 +6,7 @@ import type {
 } from "@atproto/api";
 import { RichText } from "@atproto/api";
 import { ResponseType, XRPCError } from "@atproto/xrpc";
-import { imageDimensionsFromStream } from 'image-dimensions';
+import { imageDimensionsFromStream } from "image-dimensions";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
@@ -45,12 +45,9 @@ export const doesHandleExist = async (user: string) => {
   }
 };
 
-export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
+export const lookupBskyHandle = async (user: string): Promise<string | null> => {
   return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
-    cf: {
-      cacheTtlByStatus: {"200-299": 600, 404: 1, "500-599": 0},
-      cacheEverything: true,
-    }
+    cf: { cacheTtlByStatus: { "200-299": 600, 404: 1, "500-599": 0 }, cacheEverything: true },
   }).then((resp) => {
     if (resp.ok) {
       return resp.json<ResolveHandleResponse>().then((jsonData) => {
@@ -61,7 +58,7 @@ export const lookupBskyHandle = async (user: string) : Promise<string|null> => {
   });
 };
 
-export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
+export const lookupBskyPDS = async (userDID: string): Promise<string> => {
   return await fetch(`https://plc.directory/${userDID}`).then((resp) => {
     return (resp.json<PLCDirectoryResponse>()).then((data) => {
       if (has(data, "service")) {
@@ -77,7 +74,7 @@ export const lookupBskyPDS = async (userDID: string) : Promise<string> => {
   });
 };
 
-export const makePost = async (c: AllContext, content: Post|null, usingAgent: AtProtoAgent) => {
+export const makePost = async (c: AllContext, content: Post | null, usingAgent: AtProtoAgent) => {
   if (content === null) {
     console.warn("Dropping invocation of makePost, content was null");
     return false;
@@ -85,7 +82,7 @@ export const makePost = async (c: AllContext, content: Post|null, usingAgent: At
 
   // make a check to see if the post has already been posted onto bsky
   // skip over this check if we are a threaded post, as we could have had a child post that didn't make it.
-  if (!content.isThreadRoot && await isPostAlreadyPosted(c, content.uuid)) {
+  if (!content.isThreadRoot && (await isPostAlreadyPosted(c, content.uuid))) {
     console.log(`Dropped handling make post for post ${content.uuid}, already posted.`);
     return true;
   }
@@ -125,13 +122,13 @@ export const makeRepost = async (_: AllContext, content: Repost, usingAgent: AtP
   try {
     await usingAgent.repost(content.uri, content.cid);
     return true;
-  } catch(err: unknown) {
+  } catch (err: unknown) {
     console.error(`Failed to repost ${content.uri}, got error ` + String(err));
     return false;
   }
 };
 
-const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): Promise<PostStatus|null> => {
+const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): Promise<PostStatus | null> => {
   const username = await getUsernameForUserId(c, content.userId);
   // incredibly unlikely but we'll handle it
   if (username === null) {
@@ -144,13 +141,11 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
   // Lambda that handles making a post record and submitting it to bsky
   const postSegment = async (postData: Post) => {
-    const rt = new RichText({
-      text: postData.content,
-    });
+    const rt = new RichText({ text: postData.content });
 
     await rt.detectFacets(agent);
     const postRecord: AppBskyFeedPost.Record = {
-      $type: 'app.bsky.feed.post',
+      $type: "app.bsky.feed.post",
       text: rt.text,
       facets: rt.facets,
       createdAt: new Date().toISOString(),
@@ -159,21 +154,21 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       const contentValues = [];
       switch (postData.contentLabel) {
         case PostLabel.Adult:
-          contentValues.push({"val": "porn"});
-        break;
+          contentValues.push({ val: "porn" });
+          break;
         case PostLabel.Graphic:
-          contentValues.push({"val": "graphic-media"});
-        break;
+          contentValues.push({ val: "graphic-media" });
+          break;
         case PostLabel.Nudity:
-          contentValues.push({"val": "nudity"});
-        break;
+          contentValues.push({ val: "nudity" });
+          break;
         case PostLabel.Suggestive:
-          contentValues.push({"val": "sexual"});
-        break;
+          contentValues.push({ val: "sexual" });
+          break;
         case PostLabel.GraphicAdult:
-          contentValues.push({"val": "porn"});
-          contentValues.push({"val": "graphic-media"});
-        break;
+          contentValues.push({ val: "porn" });
+          contentValues.push({ val: "graphic-media" });
+          break;
       }
       postRecord.labels = {
         "$type": "com.atproto.label.defs#selfLabels",
@@ -191,9 +186,13 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       let bskyRecordInfo: BskyRecordWrapper = {};
       let embedsProcessed: number = 0;
       const isRecordViolation = (attemptToWrite: EmbedDataType): boolean => {
-        return mediaEmbeds.type != EmbedDataType.None && mediaEmbeds.type != attemptToWrite
-          && mediaEmbeds.type != EmbedDataType.Record && attemptToWrite != EmbedDataType.Record;
-      }
+        return (
+          mediaEmbeds.type != EmbedDataType.None &&
+          mediaEmbeds.type != attemptToWrite &&
+          mediaEmbeds.type != EmbedDataType.Record &&
+          attemptToWrite != EmbedDataType.Record
+        );
+      };
       for (const currentEmbed of postData.embedContent!) {
         const currentEmbedType: EmbedDataType = currentEmbed.type;
         ++embedsProcessed;
@@ -214,7 +213,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           const externalData: BskyWebLinkRecordData = {
             uri: currentEmbed.uri!,
             title: currentEmbed.title ?? "",
-            description: currentEmbed.description ?? ""
+            description: currentEmbed.description ?? "",
           };
 
           // support standard.site formats
@@ -252,11 +251,11 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
               } else {
                 console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
               }
-            } catch(err: unknown) {
+            } catch (err: unknown) {
               console.warn(`Thumbnail failed for embed ${currentEmbed.content} got err: ` + String(err));
             }
           }
-          mediaEmbeds = {type: EmbedDataType.WebLink, data: externalData};
+          mediaEmbeds = { type: EmbedDataType.WebLink, data: externalData };
           continue;
         } else if (currentEmbedType == EmbedDataType.Record) {
           let changedRecord = false;
@@ -272,26 +271,25 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
             continue;
           }
 
-          const {account, type, postid} = atpRecordURI.exec(currentEmbed.content)?.groups as atpRecordURICaptures;
+          const { account, type, postid } = atpRecordURI.exec(currentEmbed.content)?.groups as atpRecordURICaptures;
           if (account === undefined || type === undefined || postid === undefined) {
             console.error(`Unable to get account, type or post id from ${currentEmbed.content}`);
             // Change the record back.
-            if (changedRecord)
-                mediaEmbeds.type = EmbedDataType.None;
+            if (changedRecord) mediaEmbeds.type = EmbedDataType.None;
             continue;
           }
           let typeURI: string;
           switch (type) {
             case "feed":
               typeURI = "app.bsky.feed.generator";
-            break;
+              break;
             default:
             case "post":
               typeURI = "app.bsky.feed.post";
-            break;
+              break;
             case "lists":
               typeURI = "app.bsky.graph.list";
-            break;
+              break;
           }
           // get the did for the account, we are logged in so this should always be a value
           let resolvedDID: string = agent.did!;
@@ -364,19 +362,16 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           }
 
           // Got the record info, push it to our object.
-          bskyRecordInfo = {
-            cid: cid,
-            uri: uri
-          }
+          bskyRecordInfo = { cid: cid, uri: uri };
           continue;
         }
 
-        let blobRef: BlobRef|null;
-        let rawFile: Blob|null = null;
-        let customMetadata: Record<string, string>|undefined = undefined;
+        let blobRef: BlobRef | null;
+        let rawFile: Blob | null = null;
+        let customMetadata: Record<string, string> | undefined = undefined;
         {
           // Otherwise pull files from storage and upload directly with our agent.
-          const file: R2ObjectBody|null = await c.env.R2.get(currentEmbed.content);
+          const file: R2ObjectBody | null = await c.env.R2.get(currentEmbed.content);
           if (!file) {
             console.warn(`Could not get the file ${currentEmbed.content} from R2 for post!`);
             return false;
@@ -414,7 +409,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         // Handle images
         if (currentEmbedType == EmbedDataType.Image) {
           // Image aspect ratio data
-          let aspectRatio: BskyMediaAspectRatio|undefined = {"width": 0, "height": 0};
+          let aspectRatio: BskyMediaAspectRatio | undefined = { width: 0, height: 0 };
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (customMetadata?.width !== undefined && customMetadata?.height !== undefined) {
             aspectRatio.width = Number(customMetadata.width);
@@ -437,7 +432,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           const imageRecordData: BskyImageRecordData = {
             image: blobRef,
             alt: truncate(currentEmbed.alt ?? "", MAX_ALT_TEXT),
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
           };
           // Push the image data to the array.
           imagesArray.push(imageRecordData);
@@ -447,12 +442,9 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         } else if (currentEmbedType == EmbedDataType.Video) {
           const bskyMetadata: BskyVideoRecordData = {
             blob: blobRef,
-            ar: {
-              width: currentEmbed.width!,
-              height: currentEmbed.height!
-            },
+            ar: { width: currentEmbed.width!, height: currentEmbed.height! },
             alt: truncate(currentEmbed.alt ?? "", MAX_ALT_TEXT),
-          }
+          };
           mediaEmbeds = { type: EmbedDataType.Video, data: bskyMetadata };
           continue;
         }
@@ -471,44 +463,42 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         }
       };
 
-      const getMediaRecord = (): $Typed<AppBskyEmbedImages.Main> | $Typed<AppBskyEmbedVideo.Main> | $Typed<AppBskyEmbedGallery.Main> | $Typed<AppBskyEmbedExternal.Main> | $Typed<AppBskyEmbedRecord.Main> | undefined => {
+      const getMediaRecord = ():
+        | $Typed<AppBskyEmbedImages.Main>
+        | $Typed<AppBskyEmbedVideo.Main>
+        | $Typed<AppBskyEmbedGallery.Main>
+        | $Typed<AppBskyEmbedExternal.Main>
+        | $Typed<AppBskyEmbedRecord.Main>
+        | undefined => {
         switch (mediaEmbeds.type) {
           case EmbedDataType.Image:
-          if (imagesArray.length < 4) {
-            return {
-              "$type": "app.bsky.embed.images",
-              "images": mediaEmbeds.data!
+            if (imagesArray.length < 4) {
+              return { $type: "app.bsky.embed.images", images: mediaEmbeds.data! };
+            } else {
+              // multi image galleries
+              return {
+                $type: "app.bsky.embed.gallery",
+                items: mediaEmbeds.data!.map((itm) => {
+                  return {
+                    $type: "app.bsky.embed.gallery#image",
+                    image: itm.image,
+                    alt: itm.alt,
+                    aspectRatio: itm.aspectRatio ?? { width: 0, height: 0 },
+                  };
+                }),
+              };
             }
-          } else {
-            // multi image galleries
-            return {
-              "$type": "app.bsky.embed.gallery",
-              "items": mediaEmbeds.data!.map((itm) => {
-                return {
-                  "$type": 'app.bsky.embed.gallery#image',
-                  image: itm.image,
-                  alt: itm.alt,
-                  aspectRatio: itm.aspectRatio ?? {
-                    width: 0, height: 0
-                  }
-                }
-              })
-            }
-          }
           case EmbedDataType.WebLink:
-          return {
-            "$type": "app.bsky.embed.external",
-            "external": mediaEmbeds.data
-          }
+            return { $type: "app.bsky.embed.external", external: mediaEmbeds.data };
           case EmbedDataType.Video:
-          return {
-            "$type": "app.bsky.embed.video",
-            "video": mediaEmbeds.data.blob,
-            "alt": mediaEmbeds.data.alt,
-            "aspectRatio": mediaEmbeds.data.ar
-          }
+            return {
+              $type: "app.bsky.embed.video",
+              video: mediaEmbeds.data.blob,
+              alt: mediaEmbeds.data.alt,
+              aspectRatio: mediaEmbeds.data.ar,
+            };
           case EmbedDataType.Record:
-          return {...writeRecord()};
+            return { ...writeRecord() };
         }
       };
 
@@ -522,25 +512,19 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         }
       } else if (mediaEmbeds.type != EmbedDataType.None) {
         // Otherwise, write media regularly.
-        postRecord.embed = getMediaRecord()
+        postRecord.embed = getMediaRecord();
       }
     }
 
     // set up the thread chain
     if (postData.isChildPost) {
-      const rootPostRecord: PostRecordResponse|undefined = postMap.get(postData.rootPost!);
-      const parentPostRecord: PostRecordResponse|undefined = postMap.get(postData.parentPost!);
+      const rootPostRecord: PostRecordResponse | undefined = postMap.get(postData.rootPost!);
+      const parentPostRecord: PostRecordResponse | undefined = postMap.get(postData.parentPost!);
       if (!isEmpty(rootPostRecord) && !isEmpty(parentPostRecord)) {
         postRecord.reply = {
-          "root": {
-            "uri": rootPostRecord!.uri,
-            "cid": rootPostRecord!.cid
-          },
-          "parent": {
-            "uri": parentPostRecord!.uri,
-            "cid": parentPostRecord!.cid
-          }
-        }
+          root: { uri: rootPostRecord!.uri, cid: rootPostRecord!.cid },
+          parent: { uri: parentPostRecord!.uri, cid: parentPostRecord!.cid },
+        };
       }
     }
 
@@ -553,7 +537,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         });
       console.log(`Posted to Bluesky: ${response.uri}`);
       return true;
-    } catch(err: unknown) {
+    } catch (err: unknown) {
       // This will try again in the future, next roundabout.
       console.error(`encountered error while trying to push post ${postData.uuid} up to bsky ` + String(err));
     }
@@ -592,13 +576,13 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
   // If this is a post thread root
   if (content.isThreadRoot) {
-    const childPosts = await getChildPostsOfThread(c, content.uuid) ?? [];
+    const childPosts = (await getChildPostsOfThread(c, content.uuid)) ?? [];
     expected += childPosts.length;
     // get the thread children.
     for (const child of childPosts) {
       // If this post is already posted, we might be trying to restore from a failed state
       if (child.posted) {
-        postMap.set(child.uuid, {postID: null, uri: child.uri, cid: child.cid});
+        postMap.set(child.uuid, { postID: null, uri: child.uri, cid: child.cid });
         ++successes;
         continue;
       }
@@ -614,10 +598,12 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
   // Return a nice array for the folks at home
   const returnObj: PostStatus = {
-    records: Array.from(postMap.values()).filter((post) => { return post.postID !== null;}),
+    records: Array.from(postMap.values()).filter((post) => {
+      return post.postID !== null;
+    }),
     expected: expected,
-    got: successes
-  }
+    got: successes,
+  };
   console.log(`posted ${successes}/${expected}, did ${successThisRound} work units`);
 
   return returnObj;
@@ -637,7 +623,7 @@ export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]
 
 export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) => {
   try {
-    const response = await agent.app.bsky.feed.getFeedGenerator({feed: feedURI});
+    const response = await agent.app.bsky.feed.getFeedGenerator({ feed: feedURI });
     if (response.success && response.data.isValid) {
       return response.data.view;
     }
@@ -649,11 +635,11 @@ export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) =
 
 export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) => {
   try {
-    const response = await agent.app.bsky.graph.getList({list: listURI, limit: 1});
+    const response = await agent.app.bsky.graph.getList({ list: listURI, limit: 1 });
     if (response.success) {
       return response.data.list;
     }
-  } catch(err: unknown) {
+  } catch (err: unknown) {
     console.error(`Unable to resolve list record for ${listURI} had error ` + String(err));
   }
   return null;

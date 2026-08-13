@@ -13,15 +13,16 @@ export default function ForgotPassword(props: BaseElementProps) {
   return (<BaseLayout title="Forgot Password" nonce={ctx.get("secureHeadersNonce")}
     preloads={TurnstileCaptchaPreloads(ctx)}>
       <NavTags />
-      <AccountHandler title="Forgot Password Reset"
+      <AccountHandler
+        title="Forgot Password Reset"
         submitText={`Request ${APP_NAME} Password Reset`}
         nonce={ctx.get("secureHeadersNonce")}
-        loadingText="Requesting Password Reset..." endpoint="/account/forgot"
+        loadingText="Requesting Password Reset..."
+        endpoint="/account/forgot"
         successText="Attempted to send DM. If you do not have it, please make sure you are following the account."
         redirect="/login"
         customRedirectDelay={2000}
         footerHTML={<FooterCopyright />}>
-
         <center hx-history="false">
           <p>You will receive a <a target="_blank" href="https://bsky.app/messages">Direct Message</a> from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on BSky/PDS with a link to reset your password.<br />
             If you encounter errors, your <a href="https://bsky.app/messages/settings" class="secondary" rel="nofollow" target="_blank">Direct Communication settings</a> might be set to forbid

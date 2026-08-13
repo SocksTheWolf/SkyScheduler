@@ -1,11 +1,11 @@
-import { raw } from 'hono/html';
-import type { Child } from 'hono/jsx';
+import { raw } from "hono/html";
+import type { Child } from "hono/jsx";
 import { APP_NAME } from "../appInfo";
-import { ScriptInclusionLevel } from '../enums';
+import { ScriptInclusionLevel } from "../enums";
 import type { BaseElementProps, PreloadRules } from "../types";
-import { getScriptsForInteractivity } from './helpers/includesList';
+import { getScriptsForInteractivity } from "./helpers/includesList";
 import { HTMXNonceTag, IncludeDependencyTags, PreloadDependencyTags } from "./helpers/includesTags";
-import { MetaTags, PersonaTags } from './helpers/metaTags';
+import { MetaTags, PersonaTags } from "./helpers/metaTags";
 
 type BaseLayoutProps = BaseElementProps & {
   children: Child;

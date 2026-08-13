@@ -20,15 +20,13 @@ function clearContext(c: BaseContext) {
 export async function blankAuthEnv(c: BaseContext, next: NextMiddleware) {
   clearContext(c);
   await next();
-};
+}
 
 // Middleware to verify authentication
 export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
   const auth = c.get("auth");
   try {
-    const session = await auth.api.getSession({
-      headers: c.req.raw.headers
-    });
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
     if (session?.session) {
       c.set("userId", session.user.id);
       c.set("pds", session.user.pds);
@@ -43,7 +41,7 @@ export async function pullAuthData(c: BaseContext, next: NextMiddleware) {
     clearContext(c);
   }
   await next();
-};
+}
 
 export function requireAuthEx(props: RequireAuthMiddlewareProps) {
   return createMiddleware(async (c: BaseContext, next: NextMiddleware) => {
@@ -70,14 +68,14 @@ export async function requireAuth(c: BaseContext, next: NextMiddleware) {
     return c.json({ ok: false, msg: "Unauthorized" }, 401);
   }
   await next();
-};
+}
 
 export function hasAuth(c: BaseContext) {
-  return (c.get("session") !== null && c.get("userId") !== null);
-};
+  return c.get("session") !== null && c.get("userId") !== null;
+}
 
 export const authMiddleware = every(pullAuthData, requireAuth);
 // displays error message, pushes event to log you out in a few seconds
-export const authMiddlewareHTML = every(pullAuthData, requireAuthEx({returnHTML: true}));
+export const authMiddlewareHTML = every(pullAuthData, requireAuthEx({ returnHTML: true }));
 // force logs you out. Usually you should use this one unless it's really dire
-export const authMiddlewareHTMLLogout = every(pullAuthData, requireAuthEx({returnHTML: true, forceLogout: true}));
+export const authMiddlewareHTMLLogout = every(pullAuthData, requireAuthEx({ returnHTML: true, forceLogout: true }));

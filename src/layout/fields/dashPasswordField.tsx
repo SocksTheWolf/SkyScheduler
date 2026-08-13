@@ -13,13 +13,13 @@ export default function DashboardPasswordField(props: DashboardPasswordFieldSett
     default:
     case PWAutoCompleteSettings.Off:
       autocompleteSetting = "off";
-    break;
+      break;
     case PWAutoCompleteSettings.CurrentPass:
       autocompleteSetting = "current-password";
-    break;
+      break;
     case PWAutoCompleteSettings.NewPass:
       autocompleteSetting = "new-password";
-    break;
+      break;
   }
   return (<input id="password" type="password" name="password" minlength={MIN_DASHBOARD_PASS}
     maxlength={MAX_DASHBOARD_PASS} required={props.required ?? undefined}

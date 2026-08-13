@@ -1,6 +1,6 @@
-import { imageDimensionsFromStream } from 'image-dimensions';
-import truncate from 'just-truncate';
-import { v4 as uuidv4 } from 'uuid';
+import { imageDimensionsFromStream } from "image-dimensions";
+import truncate from "just-truncate";
+import { v4 as uuidv4 } from "uuid";
 import { ImageResizeResult } from "../enums";
 import {
   BSKY_GIF_MIME_TYPES,
@@ -11,23 +11,23 @@ import {
   CF_IMAGES_MAX_DIMENSION,
   GIF_UPLOAD_ALLOWED,
   MAX_IMAGE_WIDTH,
-  MB_TO_BYTES
+  MB_TO_BYTES,
 } from "../limits";
-import type { AllContext, EmbedData, R2BucketObject, UserIdType } from '../types';
-import { addFileListing, deleteFileListings, isMediaOwnedByUser } from './db/file';
-import { isAltEditableType } from './helpers';
+import type { AllContext, EmbedData, R2BucketObject, UserIdType } from "../types";
+import { addFileListing, deleteFileListings, isMediaOwnedByUser } from "./db/file";
+import { isAltEditableType } from "./helpers";
 
 interface FileMetaData {
-  name: string,
-  size: number,
-  user: string,
-  type: string,
+  name: string;
+  size: number;
+  user: string;
+  type: string;
   qualityLevel?: number;
   height?: number;
   width?: number;
 }
 
-export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[]|undefined, isQueued: boolean=false) => {
+export const deleteEmbedsFromR2 = async (c: AllContext, embeds: EmbedData[] | undefined, isQueued: boolean = false) => {
   const itemsToDelete: string[] = [];
 
   if (embeds !== undefined && embeds.length > 0) {
@@ -61,21 +61,25 @@ export const deleteFromR2 = async (c: AllContext, embeds: string[]|string, isQue
   const deleteFileListingPromise = deleteFileListings(c, embeds);
   const deleteFilePromises = Promise.all([killFilesPromise, deleteFileListingPromise]);
   if (isQueued) {
-    await deleteFilePromises
+    await deleteFilePromises;
   } else {
     c.executionCtx.waitUntil(deleteFilePromises);
   }
 };
 
-const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, metaData: FileMetaData) => {
-  const fileExt: string|undefined = metaData.name.split(".").pop();
+const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer | ReadableStream, metaData: FileMetaData) => {
+  const fileExt: string | undefined = metaData.name.split(".").pop();
   if (fileExt === undefined) {
-    return {"success": false, "error": "unable to upload, file name is invalid"};
+    return { success: false, error: "unable to upload, file name is invalid" };
   }
 
   const fileName = `${uuidv4()}.${fileExt.toLowerCase()}`;
-  const R2Metadata: Record<string, string> = {"user": metaData.user,
-    "type": metaData.type, "ext": fileExt, "filename": truncate(metaData.name, 500) };
+  const R2Metadata: Record<string, string> = {
+    user: metaData.user,
+    type: metaData.type,
+    ext: fileExt,
+    filename: truncate(metaData.name, 500),
+  };
 
   // add width and height metadata if they exist
   if (metaData.width !== undefined) {
@@ -86,41 +90,49 @@ const rawUploadToR2 = async (c: AllContext, buffer: ArrayBuffer|ReadableStream, 
   }
 
   // push file
-  const R2UploadRes = await c.env.R2.put(fileName, buffer, {
-    customMetadata: R2Metadata
-  });
+  const R2UploadRes = await c.env.R2.put(fileName, buffer, { customMetadata: R2Metadata });
 
   // successfully uploaded file
   if (R2UploadRes.size > 0) {
     // push file listing
     await addFileListing(c, fileName, metaData.user);
 
-    return {"success": true, "data": R2UploadRes.key, "originalName": metaData.name,
-      "fileSize": metaData.size, "qualityLevel": metaData.qualityLevel};
+    return {
+      success: true,
+      data: R2UploadRes.key,
+      originalName: metaData.name,
+      fileSize: metaData.size,
+      qualityLevel: metaData.qualityLevel,
+    };
   } else {
-    return {"success": false, "error": "unable to push to file storage"};
+    return { success: false, error: "unable to push to file storage" };
   }
 };
 
-const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
+const uploadImageToR2 = async (c: AllContext, file: File, userId: string) => {
   const originalName = file.name;
   // We need to double check this image for various size information.
   const imageMetaData = await imageDimensionsFromStream(file.stream() as ReadableStream<Uint8Array>);
   if (imageMetaData === undefined) {
-    return {"success": false, "error": "image data could not be processed"};
+    return { success: false, error: "image data could not be processed" };
   }
 
   // if the image is over the cf image transforms, then return an error.
   if (imageMetaData.width > CF_IMAGES_MAX_DIMENSION || imageMetaData.height > CF_IMAGES_MAX_DIMENSION) {
-    return {"success": false, "error": "image dimensions are too large to autosize. make sure your files fit the limits."};
+    return { success: false, error: "image dimensions are too large to autosize. make sure your files fit the limits." };
   }
 
   // our process data once handled.
-  const fileProcessData = {qualityLevel: 100, type: file.type, size: file.size,
-    width: imageMetaData.width, height: imageMetaData.height };
+  const fileProcessData = {
+    qualityLevel: 100,
+    type: file.type,
+    size: file.size,
+    width: imageMetaData.width,
+    height: imageMetaData.height,
+  };
 
   // The file we'll eventually upload to R2 (this object will change based on compression/resizes)
-  let fileToProcess: ArrayBuffer|ReadableStream|null = null;
+  let fileToProcess: ArrayBuffer | ReadableStream | null = null;
 
   if (file.size > BSKY_IMG_SIZE_LIMIT) {
     // reset, we'll get this later.
@@ -131,21 +143,17 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
       // Randomly generated id to be used during the resize process
       const resizeFilename = uuidv4();
       const resizeBucketPush = await c.env.R2RESIZE.put(resizeFilename, await file.bytes(), {
-        customMetadata: {"user": userId },
-        httpMetadata: { contentType: file.type }
+        customMetadata: { user: userId },
+        httpMetadata: { contentType: file.type },
       });
 
       if (resizeBucketPush.size <= 0) {
         console.error(`Failed to push ${file.name} to the resizing bucket`);
-        return {"success": false, "error": "resize process ran out of disk space, you'll need to resize the image or try again"};
+        return { success: false, error: "resize process ran out of disk space, you'll need to resize the image or try again" };
       }
 
       // Default image rules for resizing an image
-      const imageRules: RequestInitCfPropertiesImage = {
-        fit: "scale-down",
-        metadata: "copyright",
-        format: "jpeg",
-      };
+      const imageRules: RequestInitCfPropertiesImage = { fit: "scale-down", metadata: "copyright", format: "jpeg" };
 
       // if the application is to also resize the width automatically, do so here.
       // this will preserve aspect ratio
@@ -157,22 +165,15 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
       for (let i = 0; i < c.env.IMAGE_SETTINGS.steps.length; ++i) {
         const qualityLevel: number = c.env.IMAGE_SETTINGS.steps[i];
         const response = await fetch(new URL(resizeFilename, c.env.IMAGE_SETTINGS.bucket_url), {
-          headers: {
-            "x-skyscheduler-helper": c.env.RESIZE_SECRET_HEADER
-          },
-          cf: {
-            image: {
-              quality: qualityLevel,
-              ...imageRules
-            }
-          }
+          headers: { "x-skyscheduler-helper": c.env.RESIZE_SECRET_HEADER },
+          cf: { image: { quality: qualityLevel, ...imageRules } },
         });
         if (response.ok) {
           const resizedHeader = response.headers.get("Cf-Resized");
           const returnType = response.headers.get("Content-Type") ?? "";
           const transformFileSize: number = Number(response.headers.get("Content-Length")) || 0;
-          const hasResizeHeader: boolean = (resizedHeader !== null);
-          const resizeHadError: boolean = (!hasResizeHeader || resizedHeader!.includes("err="));
+          const hasResizeHeader: boolean = resizedHeader !== null;
+          const resizeHadError: boolean = !hasResizeHeader || resizedHeader!.includes("err=");
 
           if (!resizeHadError && BSKY_IMG_MIME_TYPES.includes(returnType)) {
             console.log(`Attempting quality level ${qualityLevel}% for ${originalName}, size: ${transformFileSize}`);
@@ -207,7 +208,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
             console.warn(`File ${file.name} was not handled ${response.statusText}`);
             if (hasResizeHeader) {
               // figure out if we have exhausted image transformations
-              const errCode = /err=(\d+)/.exec((resizedHeader!));
+              const errCode = /err=(\d+)/.exec(resizedHeader!);
               if (errCode && parseInt(errCode[1]) === 9422) {
                 resizeResult = ImageResizeResult.ExhaustedResources;
                 break;
@@ -227,14 +228,15 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
       switch (resizeResult) {
         case ImageResizeResult.ExhaustedResources:
           errorString = `Image resize service is exhausted, please manually resize the image to be under ${BSKY_IMG_SIZE_LIMIT_IN_MB}MB.`;
-        break;
+          break;
         default:
-        case ImageResizeResult.TooLarge:
-          { const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT)/MB_TO_BYTES).toFixed(2);
+        case ImageResizeResult.TooLarge: {
+          const fileSizeOverAmount: string = ((file.size - BSKY_IMG_SIZE_LIMIT) / MB_TO_BYTES).toFixed(2);
           errorString = `Image is too large to post, the file size is over by ${fileSizeOverAmount}MB`;
-        break; }
+          break;
+        }
       }
-      return {"success": false, "originalName": originalName, "error": errorString };
+      return { success: false, originalName: originalName, error: errorString };
     }
   }
 
@@ -253,12 +255,7 @@ const uploadImageToR2 = async(c: AllContext, file: File, userId: string) => {
 };
 
 const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
-  const fileMetaData: FileMetaData = {
-    name: file.name,
-    size: file.size,
-    type: file.type,
-    user: userId
-  };
+  const fileMetaData: FileMetaData = { name: file.name, size: file.size, type: file.type, user: userId };
   return await rawUploadToR2(c, file.stream(), fileMetaData);
 };
 
@@ -275,25 +272,18 @@ export const uploadFileR2 = async (c: AllContext, file: File, userId: UserIdType
       return await uploadVideoToR2(c, file, userId);
     }
   }
-  return {"success": false, "error": "unable to push to R2"};
+  return { success: false, error: "unable to push to R2" };
 };
 
 export const getAllFilesList = async (c: AllContext) => {
-  const options: R2ListOptions = {
-    limit: 1000,
-    include: ["customMetadata"]
-  };
+  const options: R2ListOptions = { limit: 1000, include: ["customMetadata"] };
   const values: R2BucketObject[] = [];
 
   let hasHitEnd = false;
   while (!hasHitEnd) {
     const response = await c.env.R2.list(options);
     for (const file of response.objects) {
-      values.push({
-        name: file.key,
-        user: file.customMetadata?.user ?? null,
-        date: file.uploaded
-      });
+      values.push({ name: file.key, user: file.customMetadata?.user ?? null, date: file.uploaded });
     }
 
     if (response.truncated)

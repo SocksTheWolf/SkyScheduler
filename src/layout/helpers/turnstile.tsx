@@ -1,9 +1,9 @@
 import type { AllContext, BaseElementProps, PreloadRules } from "../../types";
 import { useCFTurnstile } from "../../utils/helpers";
 
-export function TurnstileCaptchaPreloads(ctx: AllContext): PreloadRules[]|undefined {
+export function TurnstileCaptchaPreloads(ctx: AllContext): PreloadRules[] | undefined {
   if (useCFTurnstile(ctx)) {
-    return [{type: "script", href: "https://challenges.cloudflare.com/turnstile/v0/api.js"}];
+    return [{ type: "script", href: "https://challenges.cloudflare.com/turnstile/v0/api.js" }];
   }
   return undefined;
 }

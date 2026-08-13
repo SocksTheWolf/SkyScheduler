@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import type { RepostInfo } from "../classes/repost";
 import { PostLabel } from "../enums";
-import type { EmbedData } from '../types';
+import type { EmbedData } from "../types";
 import { users } from "./auth.schema";
 
 export const posts = sqliteTable('posts', {

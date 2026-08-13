@@ -4,7 +4,7 @@ import {
 } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
-import { validate as uuidValid } from 'uuid';
+import { validate as uuidValid } from "uuid";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";

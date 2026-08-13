@@ -42,10 +42,10 @@ export interface Bindings {
   RESIZE_SECRET_HEADER: string;
   RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
-  IN_DEV: "true"|"false"|undefined;
+  IN_DEV: "true" | "false" | undefined;
   CSP_REPORT_URL: string;
-  IS_SSG: "true"|"false"|undefined;
-};
+  IS_SSG: "true" | "false" | undefined;
+}
 
 export interface EmbedData {
   content: string;
@@ -202,7 +202,7 @@ export type RepostIntakeData = {
 /// R2
 export interface R2BucketObject {
   name: string;
-  user: string|null;
+  user: string | null;
   date: Date;
 }
 
@@ -222,7 +222,7 @@ export type Violation = ViolationRecordChange & {
 };
 
 /// DATABASE
-export type DBProcessor = DrizzleD1Database|null;
+export type DBProcessor = DrizzleD1Database | null;
 export type BatchQueryItem = BatchItem<"sqlite">;
 export type BatchQueryArray = BatchQueryItem[];
 export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
@@ -230,11 +230,11 @@ export type BatchQuery = [BatchQueryItem, ...BatchQueryArray];
 // Used for the pruning and database operations
 export interface GetAllPostedBatch {
   id: string;
-  uri: string|null;
+  uri: string | null;
 }
 
 export interface DBServiceLogin {
-  user: string|null;
+  user: string | null;
   pass: string;
   pds: string;
 }
@@ -249,7 +249,7 @@ export interface FileListingRecord {
 /// RUNNERS
 export interface QueueTaskData {
   type: TaskType;
-  data: Post|Repost|null;
+  data: Post | Repost | null;
 }
 
 /// Contexts & Rendering
@@ -258,7 +258,7 @@ export type ContextVariables = SecureHeadersVariables & {
   auth: ReturnType<typeof createAuth>;
   userId: UserIdType;
   isAdmin: boolean;
-  session: Session|null;
+  session: Session | null;
   db?: DBProcessor;
   pds: string;
   ssg: boolean;
@@ -270,19 +270,19 @@ export interface HonoBase {
 }
 
 export type BaseContext = Context<HonoBase>;
-export type AllContext = BaseContext|ScheduledContext;
+export type AllContext = BaseContext | ScheduledContext;
 export interface BaseElementProps {
   ctx?: AllContext;
 }
 
 // handling preloading and injection of dependencies into the layout
 export interface PreloadRules {
-  type: "image"|"style"|"script"|"module";
+  type: "image" | "style" | "script" | "module";
   href: string;
   defer?: boolean;
   async?: boolean;
 }
 
 /// MISC
-export type UserIdType = string|null;
+export type UserIdType = string | null;
 export type LooseObj = Record<string, unknown>;

@@ -1,19 +1,16 @@
 import type { FormatDurationOptions } from "date-fns";
-import {
-  formatDuration, roundToNearestMinutes,
-  startOfHour, subDays
-} from "date-fns";
+import { formatDuration, roundToNearestMinutes, startOfHour, subDays } from "date-fns";
 import { EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
 import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
 
-export function floorCurrentTime(shape: TimeShape=TimeShape.Post): Date {
+export function floorCurrentTime(shape: TimeShape = TimeShape.Post): Date {
   return floorGivenTime(new Date(), shape);
 }
 
 export function floorGivenTime(given: Date, shape: TimeShape): Date {
-  const roundingSettings: LooseObj = { roundingMethod: 'floor' };
-  const check: TimeIntervalSettings = (shape == TimeShape.Repost) ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
+  const roundingSettings: LooseObj = { roundingMethod: "floor" };
+  const check: TimeIntervalSettings = shape == TimeShape.Repost ? REPOSTING_TIME_INTERVAL : POSTING_TIME_INTERVAL;
   switch (check) {
     default:
     case TimeIntervalSettings.Hour:
@@ -23,22 +20,22 @@ export function floorGivenTime(given: Date, shape: TimeShape): Date {
     case TimeIntervalSettings.TenMinutes:
     case TimeIntervalSettings.FiveMinutes:
       roundingSettings.nearestTo = check;
-    break;
+      break;
   }
   return roundToNearestMinutes(given, roundingSettings);
 }
 
 export function formatTimeFromHours(inputHours: number): string {
-  const formatDateOptions: FormatDurationOptions = {zero: false, format: ["days", "hours", "minutes"]};
-  const overageDays = Math.floor(inputHours/24);
+  const formatDateOptions: FormatDurationOptions = { zero: false, format: ["days", "hours", "minutes"] };
+  const overageDays = Math.floor(inputHours / 24);
   const flatHours = Math.floor(inputHours) % 24;
   const realMinutes = Math.ceil(inputHours * 60) % 60;
-  return formatDuration({days: overageDays, hours: flatHours, minutes: realMinutes}, formatDateOptions);
+  return formatDuration({ days: overageDays, hours: flatHours, minutes: realMinutes }, formatDateOptions);
 }
 
 export function formatTime(day: number, hour: number, minutes: number): string {
-  const formatDateOptions: FormatDurationOptions = {zero: false, format: ["days", "hours", "minutes"]};
-  return formatDuration({days: day, hours: hour, minutes: minutes}, formatDateOptions);
+  const formatDateOptions: FormatDurationOptions = { zero: false, format: ["days", "hours", "minutes"] };
+  return formatDuration({ days: day, hours: hour, minutes: minutes }, formatDateOptions);
 }
 
 export function explainPostingTimeInterval(): string {

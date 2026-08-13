@@ -9,23 +9,23 @@ import type { RepostInfo } from "./repost";
 interface DBPost {
   uuid: string;
   content: string;
-  embedContent?: EmbedData[],
+  embedContent?: EmbedData[];
   contentLabel: PostLabel;
   userId: string;
-  cid?: string|null;
-  uri?: string|null;
-  scheduledDate?: Date|string;
-  postNow: boolean|null;
-  threadOrder: number|null;
-  repostInfo: RepostInfo[]|null,
-  isRepost: boolean|null;
-  posted: boolean|null;
-  rootPost: string|null;
-  parentPost: string|null;
-  repostCount?: number|null;
+  cid?: string | null;
+  uri?: string | null;
+  scheduledDate?: Date | string;
+  postNow: boolean | null;
+  threadOrder: number | null;
+  repostInfo: RepostInfo[] | null;
+  isRepost: boolean | null;
+  posted: boolean | null;
+  rootPost: string | null;
+  parentPost: string | null;
+  repostCount?: number | null;
 }
 
-export type PostIntakeType = Post|DBPost;
+export type PostIntakeType = Post | DBPost;
 
 // Basically a copy of the schema
 export class Post implements BaseContent {
@@ -92,8 +92,8 @@ export class Post implements BaseContent {
     if (this.posted == false && !isEmpty(data.cid) && this.isThreadRoot)
       this.posted = true;
   }
-  getURI(): string|null {
-    return this.uri ? "https://bsky.app/profile/" + this.uri.replace("at://","").replace("app.bsky.feed.","") : null;
+  getURI(): string | null {
+    return this.uri ? "https://bsky.app/profile/" + this.uri.replace("at://", "").replace("app.bsky.feed.", "") : null;
   }
   getUser(): string {
     return this.userId;
@@ -107,9 +107,19 @@ export class Post implements BaseContent {
   hasEmbeds(): boolean {
     return this.embedContent !== undefined && this.embedContent.length > 0;
   }
-  get isThread() { return this.threadOrder >= 0; }
-  get isThreadRoot() { return this.threadOrder == 0; }
-  get isChildPost() { return this.parentPost !== undefined; }
-  get isPosted() { return this.posted ?? false; }
-  get isARepost() { return this.isRepost ?? false; }
-};
+  get isThread() {
+    return this.threadOrder >= 0;
+  }
+  get isThreadRoot() {
+    return this.threadOrder == 0;
+  }
+  get isChildPost() {
+    return this.parentPost !== undefined;
+  }
+  get isPosted() {
+    return this.posted ?? false;
+  }
+  get isARepost() {
+    return this.isRepost ?? false;
+  }
+}

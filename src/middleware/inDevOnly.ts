@@ -6,4 +6,4 @@ export async function onlyInDevelopment(c: BaseContext, next: NextMiddleware) {
     return c.notFound();
   }
   await next();
-};
+}

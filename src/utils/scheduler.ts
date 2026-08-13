@@ -1,28 +1,33 @@
-import isEmpty from 'just-is-empty';
-import type { AtProtoAgent } from '../classes/bskyAgents';
-import { AgentMap } from '../classes/bskyAgents';
+import isEmpty from "just-is-empty";
+import type { AtProtoAgent } from "../classes/bskyAgents";
+import { AgentMap } from "../classes/bskyAgents";
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
 import { TaskType } from "../enums";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from '../limits';
-import type { AllContext } from '../types';
-import { makePost, makeRepost } from './bsky/bskyApi';
-import { pruneBskyPosts } from './bsky/bskyPrune';
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../limits";
+import type { AllContext } from "../types";
+import { makePost, makeRepost } from "./bsky/bskyApi";
+import { pruneBskyPosts } from "./bsky/bskyPrune";
 import {
-  deleteAllRepostsBeforeCurrentTime, deletePosts,
+  deleteAllRepostsBeforeCurrentTime,
+  deletePosts,
   getAllPostsForCurrentTime,
-  getAllRepostsForCurrentTime, purgePostedPosts,
-  setPostNowOffForPost
-} from './db/data';
-import { getAllAbandonedMedia } from './db/file';
+  getAllRepostsForCurrentTime,
+  purgePostedPosts,
+  setPostNowOffForPost,
+} from "./db/data";
+import { getAllAbandonedMedia } from "./db/file";
 import {
-  enqueuePost, enqueueRepost, isQueueEnabled,
-  isRepostQueueEnabled, shouldPostNowQueue,
-  shouldPostThreadQueue
-} from './queues/queuePublisher';
-import { deleteFromR2 } from './r2Query';
+  enqueuePost,
+  enqueueRepost,
+  isQueueEnabled,
+  isRepostQueueEnabled,
+  shouldPostNowQueue,
+  shouldPostThreadQueue,
+} from "./queues/queuePublisher";
+import { deleteFromR2 } from "./r2Query";
 
-export const handlePostTask = async(runtime: AllContext, postData: Post, agent: AtProtoAgent|null) => {
+export const handlePostTask = async (runtime: AllContext, postData: Post, agent: AtProtoAgent | null) => {
   if (agent === null) {
     console.error(`Unable to make agent to post ${postData.uuid}`);
     return false;
@@ -36,18 +41,18 @@ export const handlePostTask = async(runtime: AllContext, postData: Post, agent: 
   return madePost;
 };
 
-export const handlePostNowTask = async(c: AllContext, postData: Post) => {
+export const handlePostNowTask = async (c: AllContext, postData: Post) => {
   let postStatus;
   if (shouldPostNowQueue(c.env)) {
     try {
       c.executionCtx.waitUntil(enqueuePost(c, postData));
       postStatus = true;
-    } catch(err: unknown) {
+    } catch (err: unknown) {
       console.error(`Post now queue for ${postData.uuid} got error: ` + String(err));
       postStatus = false;
     }
   } else {
-    const {agent} = await AgentMap.getAgentDirect(c, postData.userId, false);
+    const { agent } = await AgentMap.getAgentDirect(c, postData.userId, false);
     if (agent === null) {
       console.error(`unable to get agent for user ${postData.userId} to post now`);
       postStatus = false;
@@ -55,13 +60,12 @@ export const handlePostNowTask = async(c: AllContext, postData: Post) => {
       postStatus = await makePost(c, postData, agent);
     }
   }
-  if (!postStatus)
-    c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.uuid));
+  if (!postStatus) c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.uuid));
 
   return postStatus;
 };
 
-export const handleRepostTask = async(c: AllContext, postData: Repost, agent: AtProtoAgent|null) => {
+export const handleRepostTask = async (c: AllContext, postData: Repost, agent: AtProtoAgent | null) => {
   if (agent === null) {
     console.error(`Unable to make agent to repost ${postData.uuid}`);
     return false;
@@ -94,7 +98,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(c);
   const queueEnabled: boolean = isQueueEnabled(c.env);
   const threadQueueEnabled: boolean = shouldPostThreadQueue(c.env);
-  const agency = (withAgency) ?? new AgentMap(c.env.TASK_SETTINGS);
+  const agency = withAgency ?? new AgentMap(c.env.TASK_SETTINGS);
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
@@ -113,7 +117,7 @@ export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => 
 };
 
 export const scheduleRepostTask = async (c: AllContext, withAgency?: AgentMap) => {
-  const agency = (withAgency) ?? new AgentMap(c.env.TASK_SETTINGS);
+  const agency = withAgency ?? new AgentMap(c.env.TASK_SETTINGS);
   const repostQueueEnabled: boolean = isRepostQueueEnabled(c.env);
   const scheduledReposts: Repost[] = await getAllRepostsForCurrentTime(c);
   // Push any reposts
@@ -126,14 +130,14 @@ export const scheduleRepostTask = async (c: AllContext, withAgency?: AgentMap) =
       } else {
         await enqueueRepost(c, repost);
       }
-    };
+    }
     c.executionCtx.waitUntil(deleteAllRepostsBeforeCurrentTime(c));
   } else {
     console.log("no reposts scheduled for this time");
   }
 };
 
-export const cleanUpPostsTask = async(c: AllContext) => {
+export const cleanUpPostsTask = async (c: AllContext) => {
   const purgedPosts: number = await purgePostedPosts(c);
   console.log(`Purged ${purgedPosts} old posts from the database`);
 
@@ -148,7 +152,7 @@ export const cleanUpPostsTask = async(c: AllContext) => {
   }
 };
 
-export const cleanupAbandonedFiles = async(c: AllContext) => {
+export const cleanupAbandonedFiles = async (c: AllContext) => {
   const abandonedFiles: string[] = await getAllAbandonedMedia(c);
   if (!isEmpty(abandonedFiles)) {
     await deleteFromR2(c, abandonedFiles);
@@ -162,18 +166,18 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
     // Leave this cronjob alone
     case "37 03 * * sun":
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
-    break;
+      break;
     /* MODIFY CRONJOBS FROM HERE */
     case "0 * * * *":
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
       c.executionCtx.waitUntil(scheduleAllContentTasks(c));
-    break;
+      break;
     case "30 * * * *":
       c.executionCtx.waitUntil(scheduleRepostTask(c));
-    break;
+      break;
     /* END MODIFICATION */
     default:
       console.error(`No tasks have been defined for ${cronTime}`);
-    break;
+      break;
   }
 };

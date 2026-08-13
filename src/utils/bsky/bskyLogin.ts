@@ -19,15 +19,11 @@ const checkAccountStatus = (data: ComAtprotoServerCreateSession.OutputSchema) =>
     return AccountStatus.InvalidAccount;
   }
   return AccountStatus.Ok;
-}
+};
 
 export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: string) => {
   try {
-    const loginResponse = await agent.login({
-      identifier: user,
-      password: pass,
-      allowTakendown: true
-    });
+    const loginResponse = await agent.login({ identifier: user, password: pass, allowTakendown: true });
     if (!loginResponse.success) {
       const failedCheck: AccountStatus = checkAccountStatus(loginResponse.data);
       // If the account was ok, that means we currently are having a platform outage

@@ -13,7 +13,7 @@ preview.get("/file/:id", pullAuthData, async (c) => {
   }
 
   const { id } = c.req.param();
-  const validation = FileContentSchema.safeParse({content: id});
+  const validation = FileContentSchema.safeParse({ content: id });
   if (!validation.success) {
     return c.redirect("/thumbs/missing.png", 301);
   }
@@ -35,7 +35,5 @@ preview.get("/file/:id", pullAuthData, async (c) => {
   }
 
   // @ts-ignore
-  return c.body(await fetchedFile.blob(), 200, {
-    "Content-Type": contentType
-  })
+  return c.body(await fetchedFile.blob(), 200, { "Content-Type": contentType });
 });

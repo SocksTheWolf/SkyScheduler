@@ -1,6 +1,6 @@
 import js from "@eslint/js";
 //@ts-ignore
-import baseConfig from '@hono/eslint-config';
+import baseConfig from "@hono/eslint-config";
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";

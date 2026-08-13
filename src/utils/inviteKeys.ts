@@ -4,9 +4,9 @@ import { has } from "./helpers";
 
 export const isUsingInviteKeys = (c: AllContext): boolean => {
   return has(c.env, "INVITE_POOL") && USE_INVITE_KEYS;
-}
+};
 
-export const doesInviteKeyHaveValues = async (c: AllContext, inviteKey: string|undefined): Promise<boolean> => {
+export const doesInviteKeyHaveValues = async (c: AllContext, inviteKey: string | undefined): Promise<boolean> => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return false;
@@ -32,7 +32,7 @@ export const doesInviteKeyHaveValues = async (c: AllContext, inviteKey: string|u
   return true;
 };
 
-export const consumeInviteKey = async(c: AllContext, inviteKey: string|undefined) => {
+export const consumeInviteKey = async (c: AllContext, inviteKey: string | undefined) => {
   if (isUsingInviteKeys(c)) {
     if (inviteKey === undefined)
       return;
@@ -65,4 +65,4 @@ export const consumeInviteKey = async(c: AllContext, inviteKey: string|undefined
     // put the new value on the stack
     await c.env.INVITE_POOL!.put(inviteKey, newValue.toString());
   }
-}
+};

@@ -12,7 +12,7 @@ interface RateLimitProps {
 
 export const rateLimit = (prop: RateLimitProps) => {
   return createMiddleware(async (c: BaseContext, next: NextMiddleware) => {
-    const rateLimitObj: RateLimit|null = get(c.env, prop.limiter, null);
+    const rateLimitObj: RateLimit | null = get(c.env, prop.limiter, null);
     if (rateLimitObj === null) {
       await next();
       return;
@@ -30,8 +30,7 @@ export const rateLimit = (prop: RateLimitProps) => {
       await next();
     } else {
       // rate limited.
-      const str: string =
-        prop.message ?? "You are currently rate limited, try again later";
+      const str: string = prop.message ?? "You are currently rate limited, try again later";
       if (prop.toast) {
         c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
         if (!prop.html) {

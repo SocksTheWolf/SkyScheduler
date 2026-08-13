@@ -1,6 +1,6 @@
-import { html } from 'hono/html';
-import type { Child } from 'hono/jsx';
-import type { HtmlEscapedString } from 'hono/utils/html';
+import { html } from "hono/html";
+import type { Child } from "hono/jsx";
+import type { HtmlEscapedString } from "hono/utils/html";
 
 interface FooterLink {
   title: string;
@@ -17,9 +17,9 @@ interface AccountFormProps {
   redirect: string;
   disabledByDefault?: boolean;
   customRedirectDelay?: number;
-  footerLinks?: FooterLink[]
+  footerLinks?: FooterLink[];
   footerHTML?: string | Promise<HtmlEscapedString>;
-  nonce?: string
+  nonce?: string;
 }
 
 export default function AccountHandler(props: AccountFormProps) {

@@ -24,4 +24,4 @@ export class ScheduledContext {
   set(name: string, value: any): void {
     this.#map.set(name, value);
   }
-};
+}
