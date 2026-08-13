@@ -8,13 +8,19 @@ interface RobotRule {
 
 // Put robots.txt rules in here.
 const defaultRules: RobotRule[] = [
-  {agent: "*", disallow: [
-    "*.js$", "*.css$",
-    "/admin", "/thumbs",
-    "/icons", "/fonts",
-    "/openapi.json"
-  ]}
-]
+  {
+    agent: "*",
+    disallow: [
+      "*.js$",
+      "*.css$",
+      "/admin",
+      "/thumbs",
+      "/icons",
+      "/fonts",
+      "/openapi.json",
+    ],
+  },
+];
 
 export function generateRobotsTxt(): string {
   let outputStr = "";

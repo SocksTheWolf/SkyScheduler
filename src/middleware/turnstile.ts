@@ -18,7 +18,7 @@ export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
     const token: string|undefined = reqData["cf-turnstile-response"];
 
     if (isEmpty(token) || token === undefined) {
-      return c.json({ok: false, msg: "captcha information is missing!"}, 400);
+      return c.json({ ok: false, msg: "captcha information is missing!" }, 400);
     }
 
     const formData = new FormData();
@@ -34,14 +34,14 @@ export async function verifyTurnstile(c: BaseContext, next: NextMiddleware) {
 
     // Check if we could contact siteverify
     if (!turnstileFetch.ok) {
-      return c.json({ok: false, msg: "timed out verifying captcha"}, 400);
+      return c.json({ ok: false, msg: "timed out verifying captcha" }, 400);
     }
 
     // Check if the output was okay
     const turnstileOutcome = await turnstileFetch.json<TurnstileResponse>();
     if (!turnstileOutcome.success) {
-      return c.json({ok: false, msg: "captcha timed out"}, 401);
+      return c.json({ ok: false, msg: "captcha timed out" }, 401);
     }
   }
   await next();
-};
+}

@@ -10,14 +10,14 @@ async function buildOpenAPISpec(): Promise<void> {
     await fs.writeFile(openapiPath, spec);
 
     console.log("openapi spec wrote");
-  } catch(err: unknown) {
+  } catch (err: unknown) {
     // this is improbable, but if we somehow wrote anything, we need to
     // get rid of it.
     if (existsSync(openapiPath)) {
       await fs.unlink(openapiPath);
     }
     console.error("failed to write openapi spec, got error " + String(err));
-    throw new Error("failed to write openapi spec", {cause: err});
+    throw new Error("failed to write openapi spec", { cause: err });
   }
 }
 

@@ -17,7 +17,7 @@ export const CONST_SCRIPT_VERSION: number = 14;
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript() {
   const makeStringArray = (typeMap: string[]) => {
-    return typeMap.map((type) => `"${type}"`).join()
+    return typeMap.map((type) => `"${type}"`).join();
   };
 
   const fileTypeArray = [...BSKY_IMG_MIME_TYPES, ...BSKY_VIDEO_MIME_TYPES];

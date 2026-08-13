@@ -15,15 +15,32 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
     const secPolicy = {
       "base-uri": ["'none'"],
       "default-src": ["'none'"],
-      "connect-src": ["'self'", cspReportURL,
-        "https://challenges.cloudflare.com", "https://plc.directory", "https://cardyb.bsky.app",
-        "https://bsky.social", "https://public.api.bsky.app", "https://public.bsky.social"],
-      "img-src": ["'self'", 'data:', 'blob:', "https://cdn.bsky.app"],
-      "media-src": ["'self'", 'data:', 'blob:'],
+      "connect-src": [
+        "'self'",
+        cspReportURL,
+        "https://challenges.cloudflare.com",
+        "https://plc.directory",
+        "https://cardyb.bsky.app",
+        "https://bsky.social",
+        "https://public.api.bsky.app",
+        "https://public.bsky.social",
+      ],
+      "img-src": ["'self'", "data:", "blob:", "https://cdn.bsky.app"],
+      "media-src": ["'self'", "data:", "blob:"],
       "frame-src": ["'self'", "https://challenges.cloudflare.com"],
-      "script-src": ["'self'", nonceVal, "https://challenges.cloudflare.com", "'strict-dynamic'"],
+      "script-src": [
+        "'self'",
+        nonceVal,
+        "https://challenges.cloudflare.com",
+        "'strict-dynamic'",
+      ],
       "script-src-attr": ["'none'"],
-      "script-src-elem": ["'self'", "https://challenges.cloudflare.com", nonceVal, "'report-sample'"],
+      "script-src-elem": [
+        "'self'",
+        "https://challenges.cloudflare.com",
+        nonceVal,
+        "'report-sample'",
+      ],
       "style-src": ["'self'", nonceVal, "'report-sample'"],
       "style-src-elem": ["'self'", nonceVal, "'report-sample'"],
       "style-src-attr": ["'none'"],
@@ -42,15 +59,18 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
 
     if (hasReportURL) {
       CSPDefinitionHeader += `report-to report-csp; report-uri ${cspReportURL}`;
-      c.res.headers.set("Reporting-Endpoints", `report-csp=${cspReportURL}`)
+      c.res.headers.set("Reporting-Endpoints", `report-csp=${cspReportURL}`);
     }
 
     // Manually inject the CSP headers
     if (USE_CSP_REPORT_ONLY || isInDev(c.env)) {
-      c.res.headers.set("content-security-policy-report-only", CSPDefinitionHeader);
+      c.res.headers.set(
+        "content-security-policy-report-only",
+        CSPDefinitionHeader,
+      );
     } else {
       c.res.headers.set("content-security-policy", CSPDefinitionHeader);
     }
   }
   await next();
-};
+}

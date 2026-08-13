@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import * as app from "../src/index";
-import { USE_STATIC_HTML } from '../src/limits';
+import { USE_STATIC_HTML } from "../src/limits";
 import type { HonoBase } from "../src/types";
 
 interface MoveMapRule {
@@ -18,16 +18,15 @@ const outputDirectory: string = "./assets/pages";
 // list of static files that need to be moved to various locations
 // pathed from the outputDirectory
 const moveMap: MoveMapRule[] = [
-  {file: "consts.js", destFolder: "../js"},
-  {file: "atproto-did", destFolder: "../.well-known"},
-  {file: "site.webmanifest", destFolder: "../"},
-  {file: "robots.txt", destFolder: "../"}
+  { file: "consts.js", destFolder: "../js" },
+  { file: "atproto-did", destFolder: "../.well-known" },
+  { file: "site.webmanifest", destFolder: "../" },
+  { file: "robots.txt", destFolder: "../" },
 ];
 
 async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   // If we do not build static html, then do not generate anything.
-  if (!USE_STATIC_HTML)
-    return;
+  if (!USE_STATIC_HTML) return;
 
   // clean up the existing directory if it exists already
   if (existsSync(outputDirectory)) {
@@ -44,11 +43,10 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
       } else {
         // it's a directory
         console.log(`Removed directory ${fileLoc}`);
-        await fs.rm(fileLoc, {force: true, recursive: true});
+        await fs.rm(fileLoc, { force: true, recursive: true });
       }
     }
   }
-
 
   console.log("\nBuilding SSG app...");
   const response: ToSSGResult = await toSSG(app, fs, {
@@ -57,8 +55,8 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
       "text/html": "html",
       "text/no-ext": "",
       // we want the file to output as .js., so we can bulk program a move map
-      "text/javascript": ""
-    }
+      "text/javascript": "",
+    },
   });
   if (response.success) {
     console.log(`\nBuilt Files:\n${response.files.join("\n")}`);

@@ -7,13 +7,13 @@ import path from "node:path";
 
 enum CaptureType {
   CONSTS,
-  FUNCS
+  FUNCS,
 }
 
 type LintGenRule = {
   files: string;
-  rule: CaptureType
-}
+  rule: CaptureType;
+};
 
 // hardcoded variables/functions from the deps folder
 const thirdPartyDependencies = {
@@ -34,22 +34,24 @@ const instructions: LintGenRule[] = [
   { files: "assets/js/*.js", rule: CaptureType.FUNCS },
   { files: "assets/js/consts.js", rule: CaptureType.CONSTS },
   { files: "assets/js/appSelectHelper.js", rule: CaptureType.CONSTS },
-]
+];
 
 function createRules() {
   let combinedRules = "";
   let numReads = 0;
-  const requiredReads = existsSync(path.join("assets/js", "consts.js")) ? instructions.length : instructions.length - 1;
+  const requiredReads = existsSync(path.join("assets/js", "consts.js"))
+    ? instructions.length
+    : instructions.length - 1;
 
   const writeIfFinished = () => {
     if (numReads >= requiredReads) {
-        const lineWrite = `export const configObject = {
+      const lineWrite = `export const configObject = {
         ${combinedRules}
         /* third party dependencies */
         ...${JSON.stringify(thirdPartyDependencies)}
         }`;
 
-        writeFileSync("jsrules.config.ts", lineWrite);
+      writeFileSync("jsrules.config.ts", lineWrite);
     }
   };
 
@@ -67,9 +69,9 @@ function createRules() {
   for (const command of instructions) {
     const cmdStr = `cat ${command.files} | ${command.rule == CaptureType.FUNCS ? functionSniffer : constsSniffer}`;
     exec(cmdStr, (_error, stdOut, _stdErr) => {
-        ++numReads;
-        combinedRules += stdOut;
-        writeIfFinished();
+      ++numReads;
+      combinedRules += stdOut;
+      writeIfFinished();
     });
   }
   writeIfFinished();

@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { html } from "hono/html";
-import get from 'just-safe-get';
+import get from "just-safe-get";
 import type { BaseContext, NextMiddleware } from "../types";
 
 interface RateLimitProps {
@@ -30,7 +30,8 @@ export const rateLimit = (prop: RateLimitProps) => {
       await next();
     } else {
       // rate limited.
-      const str: string = prop.message ?? "You are currently rate limited, try again later";
+      const str: string =
+        prop.message ?? "You are currently rate limited, try again later";
       if (prop.toast) {
         c.header("HX-Trigger-After-Settle", `{"rateLimitNotice": "${str}"}`);
         if (!prop.html) {
@@ -40,7 +41,7 @@ export const rateLimit = (prop: RateLimitProps) => {
       if (prop.html) {
         return c.html(html`<b class="btn-error">${str}</b>`, 429);
       } else {
-        return c.json({ok: false, msg: str, rate_limited: true}, 429);
+        return c.json({ ok: false, msg: str, rate_limited: true }, 429);
       }
     }
   });
