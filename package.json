@@ -27,7 +27,6 @@
     "generate": "drizzle-kit generate",
     "eslint": "npm run lint",
     "lint": "run-s code:lint:*",
-    "lint:fix": "eslint --fix",
     "migrate:local:db": "npm run base:db:migrate -- --local",
     "migrate:local:pragma": "npm run base:db:optimize -- --local -y",
     "migrate:prod:db": "npm run base:db:migrate -- --remote",
