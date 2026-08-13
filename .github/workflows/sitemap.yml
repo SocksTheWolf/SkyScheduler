@@ -8,12 +8,6 @@ on:
     paths:
       - "src/pages/*.tsx"
       - "src/layout/main.tsx"
-      - "src/layout/helpers/*.tsx"
-      - ".github/workflows/sitemap.yml"
-      - "!src/layout/helpers/uploadInfo.tsx"
-      - "!src/layout/helpers/turnstile.tsx"
-      - "!src/layout/helpers/includesTags.tsx"
-      - "!assets/sitemap.xml"
   workflow_dispatch: {}
 
 permissions:

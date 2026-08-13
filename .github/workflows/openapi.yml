@@ -6,8 +6,6 @@ on:
       - "src/endpoints/openapi.tsx"
       - "src/validation/**"
       - "bin/openapi.ts"
-      - "package.json"
-      - ".github/workflows/openapi.yml"
   workflow_dispatch: {}
 
 permissions:
