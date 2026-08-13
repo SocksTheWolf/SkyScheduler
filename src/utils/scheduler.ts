@@ -60,7 +60,8 @@ export const handlePostNowTask = async (c: AllContext, postData: Post) => {
       postStatus = await makePost(c, postData, agent);
     }
   }
-  if (!postStatus) c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.uuid));
+  if (!postStatus)
+    c.executionCtx.waitUntil(setPostNowOffForPost(c, postData.uuid));
 
   return postStatus;
 };

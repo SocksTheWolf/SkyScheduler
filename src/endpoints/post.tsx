@@ -250,7 +250,6 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
         return c.html(<></>, 200);
       }
     }
-    return c.html(<b class="btn-error">Internal error occurred</b>, 403);
   }
   return c.html(<b class="btn-error">Internal error occurred</b>, 403);
 });

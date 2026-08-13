@@ -275,7 +275,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           if (account === undefined || type === undefined || postid === undefined) {
             console.error(`Unable to get account, type or post id from ${currentEmbed.content}`);
             // Change the record back.
-            if (changedRecord) mediaEmbeds.type = EmbedDataType.None;
+            if (changedRecord)
+              mediaEmbeds.type = EmbedDataType.None;
             continue;
           }
           let typeURI: string;

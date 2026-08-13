@@ -36,6 +36,10 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
         message.retry();
         continue;
       }
+
+      // how we currently tell the difference is by searching for content label
+      // because this object might be a copy of the class, or it could just be some arbitrary json because
+      // the class didn't copy properly.
       const postDataObj: Post | Repost = has(message.body.data, "contentLabel")
         ? new Post(message.body.data as Post)
         : new Repost(message.body.data);
