@@ -264,6 +264,10 @@ export type ContextVariables = SecureHeadersVariables & {
   ssg: boolean;
 };
 
+export interface NoncePropType {
+  nonce?: string;
+}
+
 export interface HonoBase {
   Bindings: Bindings;
   Variables: ContextVariables;

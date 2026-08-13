@@ -111,6 +111,9 @@ export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
 // if we should try to use SSG rendering for pages vs dynamic rendering
 export const USE_STATIC_HTML: boolean = true;
 
+// if we should enable chrome speculation rules to speed up the site
+export const ALLOW_SPECULATION_RULES: boolean = false;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/

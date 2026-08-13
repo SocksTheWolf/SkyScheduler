@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/dot-notation */
+import { readFile } from "fs/promises";
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
-import { readFile } from "fs/promises";
-import { getHTMXConfigStr } from "../layout/helpers/includesTags";
+import { getHTMXConfigStr } from "../layout/helpers/htmxConfig";
 import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../limits";
 import type { BaseContext, NextMiddleware } from "../types";
 import { has } from "../utils/helpers";
@@ -27,7 +27,8 @@ class NonceInject {
       if (scriptType !== null &&
           scriptType !== "text/javascript" &&
           scriptType !== "application/javascript" &&
-          scriptType !== "module") {
+          scriptType !== "module")
+      {
         return;
       }
     }

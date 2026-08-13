@@ -3,9 +3,11 @@ import type { Child } from "hono/jsx";
 import { APP_NAME } from "../appInfo";
 import { ScriptInclusionLevel } from "../enums";
 import type { BaseElementProps, PreloadRules } from "../types";
+import { HTMXConfig } from "./helpers/htmxConfig";
 import { getScriptsForInteractivity } from "./helpers/includesList";
-import { HTMXNonceTag, IncludeDependencyTags, PreloadDependencyTags } from "./helpers/includesTags";
+import { IncludeDependencyTags, PreloadDependencyTags } from "./helpers/includesTags";
 import { MetaTags, PersonaTags } from "./helpers/metaTags";
+import { SpeculationRulesTag } from "./helpers/speculation";
 
 type BaseLayoutProps = BaseElementProps & {
   children: Child;
@@ -41,7 +43,8 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
-      <HTMXNonceTag nonce={props.nonce} />
+      <HTMXConfig nonce={props.nonce} />
+      <SpeculationRulesTag />
       <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
       <PersonaTags />
       {props.interactivity === ScriptInclusionLevel.NonInteractive ? <script type="text/javascript">let FF_FOUC_FIX;</script> : null}
