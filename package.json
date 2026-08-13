@@ -102,7 +102,7 @@
     "toml": "^5.0.0",
     "tsx": "^4.23.12",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.120.1"
+    "wrangler": "^4.122.0"
   },
   "overrides": {
     "hono-openapi": {
