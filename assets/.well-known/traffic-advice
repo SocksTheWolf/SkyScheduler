@@ -1,6 +1,4 @@
-{
+[{
   "user_agent": "prefetch-proxy",
-  "google_prefetch_proxy_eap": {
-    "fraction": 0.7
-  }
-}
+  "fraction": 0.7
+}]
