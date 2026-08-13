@@ -1,8 +1,9 @@
 {
   "search.exclude": {
-    "**/migrations": true,
+    "migrations/**": true,
     ".wrangler/**": true,
-    "/src/definitions/wrangler.d.ts": true,
+    ".vscode/**": true,
+    "src/definitions/wrangler.d.ts": true,
     "package-lock.json": true,
     "jsrules.config.ts": true
   },
