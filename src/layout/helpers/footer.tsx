@@ -1,5 +1,6 @@
 import {
-  APP_NAME, APP_REPO, PROGRESS_MADE, PROGRESS_TOTAL,
+  APP_NAME,
+  PROGRESS_MADE, PROGRESS_TOTAL,
   PROJECT_AUTHOR, PROJECT_AUTHOR_SITE
 } from "../../appInfo";
 import { CURRENT_SCRIPT_VERSION } from "../../statics/appScripts";
@@ -18,7 +19,7 @@ type FooterCopyrightProps = BaseElementProps & {
 export default function FooterCopyright(props: FooterCopyrightProps) {
   const newWinAttr = props.inNewWindow ? {"target": '_blank'} : {};
   const projectURL = (<a class="secondary" tabindex={props.removeExcessTab ? -1 : 0} target="_blank" title="Project source repository"
-    href={APP_REPO}>{APP_NAME}</a>);
+    href="/source">{APP_NAME}</a>);
   const homepageURL = (<a class="secondary" title="Homepage" href="/">{APP_NAME}</a>);
   const progressBarTooltip = `$${PROGRESS_MADE}/$${PROGRESS_TOTAL} for this month`;
   return (

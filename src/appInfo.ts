@@ -13,9 +13,6 @@ export const SITE_DESCRIPTION: string =
 // Link to the image to display on the social card.
 export const SOCIAL_CARD_IMAGE: string = `${SITE_URL}/social-card.png`;
 
-// The public repository that this application can be found on
-export const APP_REPO: string = "https://github.com/SocksTheWolf/skyscheduler";
-
 // Author information, used for JSON-LD and footers
 export const PROJECT_AUTHOR: string = "SocksTheWolf";
 export const PROJECT_AUTHOR_SITE: string = "https://socksthewolf.com";

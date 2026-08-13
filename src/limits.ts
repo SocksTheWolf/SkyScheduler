@@ -90,6 +90,10 @@ export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
 // Once CSP is good enough, change this to false to have it be enforced.
 export const USE_CSP_REPORT_ONLY: boolean = false;
 
+// if we should allow other websites/applications to make requests
+// to our website.
+export const ALLOW_CORS_ALL: boolean = false;
+
 /** Feature Settings **/
 /* ------------------ */
 // if the user can edit the repost rules for their posts

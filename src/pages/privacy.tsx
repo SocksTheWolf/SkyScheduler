@@ -1,4 +1,4 @@
-import { APP_NAME, APP_REPO } from "../appInfo";
+import { APP_NAME } from "../appInfo";
 import { ScriptInclusionLevel } from "../enums";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
@@ -52,7 +52,7 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
               <li>Data is not accessible to the maintainers of {APP_NAME}</li>
               <li>{APP_NAME} does not sell your data to any third party</li>
               <li>No data is used for genAI purposes nor for training any models</li>
-              <li>You can verify this by just looking at <a href={APP_REPO} class="secondary" ref="noopener nofollow">the source code</a></li>
+              <li>You can verify this by just looking at <a href="/source" class="secondary" ref="noopener nofollow">the source code</a></li>
             </ul>
           </div>
         </p>

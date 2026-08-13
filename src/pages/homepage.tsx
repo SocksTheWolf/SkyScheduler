@@ -1,4 +1,4 @@
-import { APP_NAME, APP_REPO } from "../appInfo";
+import { APP_NAME } from "../appInfo";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
 import { BaseLayout } from "../layout/main";
@@ -17,7 +17,7 @@ export default function Homepage(props?: BaseElementProps) {
         <noscript><header>Javascript is required to use this website!</header></noscript>
         <p>
           <strong>{APP_NAME}</strong> is a
-          free, <a href={APP_REPO} rel="nofollow" target="_blank">open source</a> service
+          free, <a href="/source" rel="nofollow" target="_blank">open source</a> service
           that allows you to schedule and automatically repost your content on Bluesky!<br />
           Boost engagement and reach more people no matter what time of day!<br />
           <center>
