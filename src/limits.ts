@@ -118,10 +118,12 @@ export const USE_STATIC_HTML: boolean = true;
 // 2. Modify handleSchedule in scheduler.ts to add a new switch case for the given action.
 // 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
 
-export const POSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+export const POSTING_TIME_INTERVAL: TimeIntervalSettings =
+  TimeIntervalSettings.Hour;
 // This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
 // as there's no files that need to be uploaded or change
-export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings = TimeIntervalSettings.Hour;
+export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings =
+  TimeIntervalSettings.Hour;
 
 /*********************************************************/
 /**** INTERNAL/SERVICE LIMITS, DO NOT CHANGE DIRECTLY ****/
@@ -134,7 +136,7 @@ export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 // Helper conversion math
 export const MB_TO_BYTES: number = 1000 * 1000;
 export const TO_SEC: number = 60;
-export const TO_MS: number = TO_SEC*1000;
+export const TO_MS: number = TO_SEC * 1000;
 
 // Max post length limit via
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L63
@@ -154,7 +156,7 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
   "image/heic",
   "image/bmp",
   "image/avif",
-  "image/svg+xml"
+  "image/svg+xml",
 ];
 
 // Used for human readable display
@@ -165,7 +167,7 @@ export const BSKY_IMG_FILE_EXTS_STR: string = [
   "bmp",
   "webp",
   "heic",
-  "svg"
+  "svg",
 ].join(", ");
 
 // BSky limits that are inferred
@@ -202,20 +204,13 @@ export const BSKY_VIDEO_MIME_TYPES: string[] = [
   "video/mp4",
   "video/mpeg",
   "video/webm",
-  "video/quicktime"
+  "video/quicktime",
 ];
 
-export const BSKY_VIDEO_FILE_EXTS: string[] = [
-  "mp4",
-  "mpeg",
-  "mov",
-  "webm"
-];
+export const BSKY_VIDEO_FILE_EXTS: string[] = ["mp4", "mpeg", "mov", "webm"];
 
 // Used for human readable display
-export const BSKY_GIF_MIME_TYPES: string[] = [
-  "image/gif"
-];
+export const BSKY_GIF_MIME_TYPES: string[] = ["image/gif"];
 
 // Used for human readable display
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

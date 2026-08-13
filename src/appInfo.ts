@@ -8,7 +8,8 @@ export const APP_NAME: string = "SkyScheduler";
 // Site URL, used in places where we won't have the CF env bindings (most static rendered assets)
 export const SITE_URL: string = "https://skyscheduler.work";
 // Description of the website, used for meta tags and social cards.
-export const SITE_DESCRIPTION: string = "Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!";
+export const SITE_DESCRIPTION: string =
+  "Schedule and automatically repost on Bluesky! Boost engagement and reach more people no matter what time of day!";
 // Link to the image to display on the social card.
 export const SOCIAL_CARD_IMAGE: string = `${SITE_URL}/social-card.png`;
 

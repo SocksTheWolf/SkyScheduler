@@ -80,20 +80,20 @@ export type WebAssociatedRef = StrongRecordObject & {
 };
 
 export interface BskyEmbedRecord {
-  "$type": "app.bsky.embed.record";
-  record: StrongRecordObject
+  $type: "app.bsky.embed.record";
+  record: StrongRecordObject;
 }
 
-export type BskyEmbedWrapper = BskyEmptyEmbed|BskyVideoEmbed|BskyImgEmbed|BskyWebEmbed;
+export type BskyEmbedWrapper = BskyEmptyEmbed | BskyVideoEmbed | BskyImgEmbed | BskyWebEmbed;
 
 export interface BskyEmptyEmbed {
-  type: EmbedDataType.None|EmbedDataType.Record;
+  type: EmbedDataType.None | EmbedDataType.Record;
   data?: undefined;
 }
 
 export interface BskyVideoEmbed {
   type: EmbedDataType.Video;
-  data: BskyVideoRecordData
+  data: BskyVideoRecordData;
 }
 
 export interface BskyImgEmbed {
@@ -203,7 +203,7 @@ export type RepostIntakeData = {
 export interface R2BucketObject {
   name: string;
   user: string|null;
-  date: Date
+  date: Date;
 }
 
 /// VIOLATIONS
@@ -265,14 +265,14 @@ export type ContextVariables = SecureHeadersVariables & {
 };
 
 export interface HonoBase {
-  Bindings: Bindings,
-  Variables: ContextVariables
+  Bindings: Bindings;
+  Variables: ContextVariables;
 }
 
 export type BaseContext = Context<HonoBase>;
 export type AllContext = BaseContext|ScheduledContext;
 export interface BaseElementProps {
-  ctx?: AllContext
+  ctx?: AllContext;
 }
 
 // handling preloading and injection of dependencies into the layout

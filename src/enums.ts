@@ -1,17 +1,16 @@
-
 export enum EmbedDataType {
   None = 0,
   Image = 1,
   WebLink = 2,
   Video = 3,
-  Record = 4
-};
+  Record = 4,
+}
 
 export enum RepostType {
   None = 0,
   ExistingPost = 1,
-  FuturePost = 2
-};
+  FuturePost = 2,
+}
 
 export enum PostLabel {
   None = "None",
@@ -19,15 +18,15 @@ export enum PostLabel {
   Nudity = "Nudity",
   Adult = "Adult",
   Graphic = "Graphic",
-  GraphicAdult = "GraphicAdult"
-};
+  GraphicAdult = "GraphicAdult",
+}
 
 export enum TaskType {
   None,
   Blast,
   Post,
-  Repost
-};
+  Repost,
+}
 
 export enum AccountStatus {
   None = 0,
@@ -39,38 +38,38 @@ export enum AccountStatus {
   PlatformOutage,
   MediaTooBig,
   UnhandledError,
-  TOSViolation
-};
+  TOSViolation,
+}
 
 export enum PWAutoCompleteSettings {
   Off,
   NewPass,
-  CurrentPass
-};
+  CurrentPass,
+}
 
 export enum ImageResizeResult {
   None,
   Success,
   TooLarge,
-  ExhaustedResources
-};
+  ExhaustedResources,
+}
 
 // What a time object is contextually used for.
 export enum TimeShape {
   Post,
-  Repost
-};
+  Repost,
+}
 
 export enum TimeIntervalSettings {
   Hour = 60,
   HalfHour = 30,
   QuarterHour = 15,
   TenMinutes = 10,
-  FiveMinutes = 5
-};
+  FiveMinutes = 5,
+}
 
 export enum ScriptInclusionLevel {
   NonInteractive,
   Interactive,
-  DashboardApp
-};
+  DashboardApp,
+}

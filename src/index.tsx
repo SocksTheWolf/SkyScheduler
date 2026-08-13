@@ -35,14 +35,16 @@ import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
 app.use(blankAuthEnv);
-app.use(csrf({origin: SITE_URL}), secureHeadersMiddleware, corsHelperMiddleware, cspHelper);
+app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, corsHelperMiddleware, cspHelper);
 app.use(ssgGenMiddleware);
 
 ///// Static Files /////
 app.route("/", staticFiles);
 
 ///// Static Pages /////
-app.all("/", cachePublicMiddleware, ssgServe({page: "index"}), (c) => c.html(<Homepage ctx={c} />));
+app.all("/", cachePublicMiddleware, ssgServe({ page: "index" }), (c) =>
+  c.html(<Homepage ctx={c} />)
+);
 app.get("/tos", cachePublicMiddleware, ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
 app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
 
@@ -54,7 +56,7 @@ app.use("*", async (c, next) => {
     // but I don't care, it should be fine anyways.
 
     // @ts-ignore
-    c.set("db", drizzle(c.env.DB, { schema, logger: false  }));
+    c.set("db", drizzle(c.env.DB, { schema, logger: false }));
   }
   c.set("auth", createAuth(c));
   await next();
@@ -127,5 +129,5 @@ export default {
   },
   getApp() {
     return app;
-  }
+  },
 };

@@ -2,10 +2,10 @@
 interface PDSService {
   type: string;
   serviceEndpoint: string;
-};
+}
 
 interface PLCDirectoryResponse {
-  service?: PDSService[]
+  service?: PDSService[];
 }
 
 // And this is a fix for D1Result marking success as a "true"
