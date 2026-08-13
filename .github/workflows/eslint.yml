@@ -1,11 +1,18 @@
 name: ESLint
-
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "assets/js/*.js"
+      - "src/**"
+      - "eslint.config.ts"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
+    paths:
+      - "assets/js/*.js"
+      - "src/**"
+      - "eslint.config.ts"
 
 jobs:
   eslint:

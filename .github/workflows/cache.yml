@@ -9,7 +9,7 @@ on:
       - "!assets/_headers"
       - "!assets/sitemap.xml"
       - "!assets/dep/original/**"
-      - "!assets/.well-known/**"
+      - "!assets/js/min/**"
       - "src/pages/**"
       - "src/statics/**"
   workflow_dispatch: {}
