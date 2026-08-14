@@ -9,6 +9,7 @@ import { minify } from "minify";
 import { existsSync, statSync } from "node:fs";
 import { glob, mkdir, writeFile } from "node:fs/promises";
 import { ATPROTO_DID } from "../src/appInfo";
+import { CaptureType } from "../src/enums";
 import { USE_STATIC_HTML } from "../src/limits";
 import { appManifestGenerate } from "../src/statics/appManifest";
 import { makeConstScript } from "../src/statics/constScript";
@@ -19,7 +20,6 @@ import { generateLintRules, lintRuleOutputFile } from "./helpers/lint";
 import { buildSitemap } from "./helpers/sitemap";
 import { buildApp } from "./helpers/staticSite";
 import { runCommandAsync } from "./helpers/subCommand";
-import { CaptureType } from "./types";
 
 // All the various build rules
 const buildRules = new Map<string, BuildRule>();

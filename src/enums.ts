@@ -73,3 +73,9 @@ export enum ScriptInclusionLevel {
   Interactive,
   DashboardApp,
 }
+
+// used for lint building
+export enum CaptureType {
+  CONSTS,
+  FUNCS
+}
