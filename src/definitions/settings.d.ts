@@ -13,10 +13,8 @@ interface R2ConfigSettings {
 
 interface QueueConfigSettings {
   enabled: boolean;
-  repostsEnabled: boolean;
   threadEnabled: boolean;
   postNowEnabled?: boolean;
-  pressure_retries?: boolean;
   delay_val: number;
   max_retries: number;
   post_queues: string[];

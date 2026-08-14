@@ -34,7 +34,7 @@ async function pushToQueue(queueConsumer: Queue | null, data: Post | Repost | nu
 const hasPostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && !isInDev(env);
 const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && !isInDev(env);
 export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
-export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.repostsEnabled && hasRepostQueue(env);
+export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasRepostQueue(env);
 export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
 export const shouldPostThreadQueue = (env: Bindings) =>
   env.QUEUE_SETTINGS.threadEnabled && (hasPostQueue(env) || isQueueEnabled(env));

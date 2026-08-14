@@ -23,7 +23,6 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
   // Retry settings
   const delay: number = env.QUEUE_SETTINGS.delay_val;
   const maxRetries: number = env.QUEUE_SETTINGS.max_retries;
-  const bufferRetries: boolean = env.QUEUE_SETTINGS.pressure_retries ?? false;
   let bufferBlasts: BufferBlast[] = [];
 
   for (const message of batch.messages) {
@@ -94,7 +93,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
   }
   // If we have any retries, they'll only get delivered on next batch
   // so we're going to back blast the buffer queue so that we can make sure the retries go.
-  if (bufferRetries && bufferBlasts.length > 0) {
+  if (bufferBlasts.length > 0) {
     bufferBlasts = unique(bufferBlasts);
     console.log(`Attempting to backblast ${bufferBlasts.length} items`);
     for (const blast of bufferBlasts) {

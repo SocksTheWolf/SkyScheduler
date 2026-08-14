@@ -2,8 +2,7 @@
 name = "skyscheduler"
 main = "src/index.tsx"
 compatibility_date = "2025-11-18"
-compatibility_flags = [ "nodejs_compat", "nodejs_compat_do_not_populate_process_env",
-  "nodejs_als", "disable_ctx_exports", "disable_nodejs_http_server_modules" ]
+compatibility_flags = [ "nodejs_compat", "nodejs_compat_do_not_populate_process_env", "disable_ctx_exports", "disable_nodejs_http_server_modules" ]
 send_metrics = false
 minify = true
 upload_source_maps = true
@@ -150,7 +149,7 @@ CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # queue handling, pushing information.
-QUEUE_SETTINGS = {enabled=true, repostsEnabled=true, postNowEnabled=false, threadEnabled=true, pressure_retries=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
+QUEUE_SETTINGS = {enabled=true, postNowEnabled=false, threadEnabled=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
 
 # if we should be removing abandoned files from R2 storage
 R2_SETTINGS={auto_prune=true, prune_days=3}
