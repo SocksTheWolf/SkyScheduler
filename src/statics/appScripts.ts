@@ -5,11 +5,7 @@ export const CURRENT_SCRIPT_VERSION: string = "2.0.8";
 const getAppScriptStr = (scriptName: string) =>
   `/js/min/${scriptName}.min.js?v=${CURRENT_SCRIPT_VERSION}`;
 
-const getAppStyleStr = (styleName: string) =>
-  `/css/${styleName}.min.css?v=${CURRENT_SCRIPT_VERSION}`;
-
 // Eventually make this automatically generated.
 export const mainScriptStr: string = getAppScriptStr("main");
 export const dashboardScriptStr: string = getAppScriptStr("app");
-export const dashboardStyleStr: string = getAppStyleStr("dashboard");
-export const dependModsStyleStr: string = getAppStyleStr("depmods");
+

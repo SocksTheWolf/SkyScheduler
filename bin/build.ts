@@ -109,19 +109,19 @@ const buildTriggers: BuildTrigger[] = [
   {
     name: "build css stylesheet",
     triggers: ["build:css:style"],
-    match: ["assets/css/stylesheet.css"],
+    match: ["assets/css/stylesheet.css", "src/statics/appStyles.ts",],
     against: "assets/css/stylesheet.min.css",
   },
   {
     name: "build css dashboard",
     triggers: ["build:css:dash"],
-    match: ["assets/css/dashboard.css"],
+    match: ["assets/css/dashboard.css", "src/statics/appStyles.ts",],
     against: "assets/css/dashboard.min.css",
   },
   {
     name: "build css mods",
     triggers: ["build:css:mods"],
-    match: ["assets/css/*Mods.css"],
+    match: ["assets/css/*Mods.css", "src/statics/appStyles.ts",],
     against: "assets/css/depmods.min.css",
   },
   // lint web scripts
@@ -165,7 +165,11 @@ if (USE_STATIC_HTML) {
   buildTriggers.push({
     name: "pages",
     triggers: ["build:pages", "build:sitemap"],
-    match: ["src/layout/**", "src/pages/*.tsx", "src/appInfo.ts"],
+    match: ["src/layout/**",
+      "src/pages/*.tsx",
+      "src/appInfo.ts",
+      "src/statics/*.ts",],
+    ignores: ["src/statics/appManifest.ts", "src/statics/robots.ts"],
     against: "assets/pages/index.html",
   });
 }

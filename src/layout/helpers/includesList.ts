@@ -1,13 +1,17 @@
 // This is a separate file to help create includes lists
 import { ScriptInclusionLevel } from "../../enums";
-import { dashboardStyleStr, dependModsStyleStr, mainScriptStr } from "../../statics/appScripts";
+import { mainScriptStr } from "../../statics/appScripts";
+import {
+  dashboardStyleStr, dependModsStyleStr,
+  mainStyleStr
+} from "../../statics/appStyles";
 import { constScriptStr } from "../../statics/constScript";
 import type { PreloadRules } from "../../types";
 
 // Basic scripts, no interactivity
 const defaultPreloads: PreloadRules[] = [
   { type: "style", href: "/dep/pico.min.css" },
-  { type: "style", href: "/css/stylesheet.min.css" },
+  { type: "style", href: mainStyleStr },
 ];
 
 // Interactivity scripts
