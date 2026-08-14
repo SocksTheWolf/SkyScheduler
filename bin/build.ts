@@ -212,6 +212,7 @@ if (!isEmpty(ATPROTO_DID)) {
 
 async function main() {
   const fileModMap = new Map<string, number>();
+  // eslint-disable-next-line @typescript-eslint/dot-notation
   const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
   let buildCommands: string[] = [];
 
@@ -265,7 +266,7 @@ async function main() {
   }
 
   // build anything that exists.
-  let lintCommands: BuildRule[] = [];
+  const lintCommands: BuildRule[] = [];
   for (const command of buildCommands) {
     const rule: BuildRule | undefined = buildRules.get(command);
     if (rule === undefined) {
@@ -282,24 +283,24 @@ async function main() {
 
     if (typeof rule.buildCommand === "string") {
       runCommandAsync(rule.buildCommand, async (output: string) => {
-        debug(`${command} - executed build command ${rule.buildCommand}`);
+        debug(`${command} - executed build command ${rule.buildCommand.toString()}`);
         if (rule.output === undefined)
           return;
 
         if (rule.minify) {
           try {
             // @ts-ignore
-            const data = await minify.auto(output, minifyOptions);
+            const data: string = (rule.output.includes(".js")) ? await minify.js(output, minifyOptions) : await minify.css(output);
             await writeFile(rule.output, data);
-          } catch (err) {
-            error(`${command} - Got error: ${err}`);
+          } catch (err: unknown) {
+            error(`${command} - Got error: ` + String(err));
           }
         } else {
           await writeFile(rule.output, output);
         }
       });
     } else {
-      const output: string | void = await rule.buildCommand();
+      const output: BuildRuleFuncOutput = await rule.buildCommand();
       debug(`${command} - Was ran`);
       if (typeof output === "string" && rule.output !== undefined) {
         await writeFile(rule.output, output);

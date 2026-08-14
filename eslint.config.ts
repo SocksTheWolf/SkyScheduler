@@ -19,7 +19,7 @@ export default defineConfig([
   ]),
   // ESLint for Typescript
   {
-    files: ["src/**.{ts,tsx}", "bin/**"],
+    files: ["src/**", "bin/**"],
     plugins: { js },
     extends: ["js/recommended", tseslint.configs.strictTypeChecked, baseConfig],
     languageOptions: { parserOptions: { projectService: true } },

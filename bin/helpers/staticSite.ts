@@ -45,7 +45,7 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   if (response.success) {
     log(`\nBuilt Static Files:\n${response.files.join("\n")}`);
   } else {
-    error(`Encountered error when trying to SSG site ${response}`);
+    error(`Encountered error when trying to SSG site ${response.error}`);
   }
 }
 

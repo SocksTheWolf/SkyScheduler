@@ -15,7 +15,7 @@ export async function buildSitemap() {
   }
 
   // dump out the entire sitemap file.
-  return await (`<?xml version="1.0" encoding="UTF-8"?>
+  return (`<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${page.map((page) => `\t<url>\n\t\t<loc>${SITE_URL}/${page.url}</loc>\n\t\t<lastmod>${page.lastMod}</lastmod>\n\t</url>`).join('\n')}
   </urlset>`);

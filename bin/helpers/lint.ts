@@ -51,15 +51,17 @@ export async function generateLintRules(commands: BuildRule[]) {
   // builds up the entire combined rules and dumps it.
   //
   // Basically just make cat and sed into a single file.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
   const constsSniffer = `sed "s/const \\(.*\\)=.*;/\\${1}: false,/g;t"`;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
   const functionSniffer = `grep -Po \"(function (.*)\\()\" | sed "s/^function \\(.*\\)(/\\${1}: false,/g;t"`;
 
   // anyways, run through our instructions and make the file.
   for (const command of commands) {
-    if (command.captures === undefined)
+    if (command.captures === undefined || typeof command.buildCommand !== "string")
       continue;
 
-    const cmdStr = `${command.buildCommand} | ${command.captures == CaptureType.FUNCS ? functionSniffer : constsSniffer}`;
+    const cmdStr: string = `${command.buildCommand} | ${command.captures == CaptureType.FUNCS ? functionSniffer : constsSniffer}`;
     runCommandAsync(cmdStr, writeIfFinished);
   }
 }
