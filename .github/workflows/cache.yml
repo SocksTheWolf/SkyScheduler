@@ -4,10 +4,11 @@ on:
     branches: ["main"]
     paths:
       - "assets/**"
+      - "!assets/.well-known/*"
       - "!assets/.assetsignore"
       - "!assets/_redirects"
       - "!assets/_headers"
-      - "!assets/sitemap.xml"
+      - "!assets/fonts/**"
       - "!assets/dep/original/**"
       - "!assets/js/min/**"
       - "src/pages/**"
