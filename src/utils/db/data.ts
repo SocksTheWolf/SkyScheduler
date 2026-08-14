@@ -5,9 +5,9 @@ import {
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from "uuid";
-import { TRUNCATE_POSTED_CONTENT } from "../../config";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
+import { TRUNCATE_POSTED_CONTENT } from "../../config";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
 import { TimeShape } from "../../enums";

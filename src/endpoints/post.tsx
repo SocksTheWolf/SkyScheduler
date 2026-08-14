@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from "uuid";
-import { CAN_EDIT_REPOST_RULES } from "../config";
 import type { Post } from "../classes/post";
+import { CAN_EDIT_REPOST_RULES } from "../config";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";

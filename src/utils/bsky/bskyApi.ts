@@ -9,10 +9,10 @@ import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { imageDimensionsFromStream } from "image-dimensions";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
-import { DEFAULT_PDS, USE_DEPRECATED_SIZE_PARSE } from "../../config";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
+import { DEFAULT_PDS, USE_DEPRECATED_SIZE_PARSE } from "../../config";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
   BSKY_IMG_SIZE_LIMIT,
@@ -368,8 +368,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
         }
 
         let blobRef: BlobRef | null;
-        let rawFile: Blob | null = null;
-        let customMetadata: Record<string, string> | undefined = undefined;
+        let rawFile: Blob | null;
+        let customMetadata: Record<string, string> | undefined;
         {
           // Otherwise pull files from storage and upload directly with our agent.
           const file: R2ObjectBody | null = await c.env.R2.get(currentEmbed.content);

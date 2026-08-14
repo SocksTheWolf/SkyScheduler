@@ -1,9 +1,9 @@
 import isEmpty from "just-is-empty";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../config";
 import type { AtProtoAgent } from "../classes/bskyAgents";
 import { AgentMap } from "../classes/bskyAgents";
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../config";
 import { TaskType } from "../enums";
 import type { AllContext } from "../types";
 import { makePost, makeRepost } from "./bsky/bskyApi";

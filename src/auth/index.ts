@@ -2,8 +2,8 @@ import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
-import { DEFAULT_PDS } from "../config";
 import { APP_NAME } from "../appInfo";
+import { DEFAULT_PDS } from "../config";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import type { AllContext, BaseContext, Bindings, DBProcessor } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
@@ -15,6 +15,7 @@ import { createPasswordResetMessage } from "../utils/messages/accountReset";
 // as such, we dynamically import and then set the appropriate function signature from there
 type waitUntilCallback = (_: Promise<unknown>) => void;
 let waitUntil: waitUntilCallback;
+// eslint-disable-next-line @typescript-eslint/dot-notation
 if (process.env["IS_SSG"] === "true") {
   waitUntil = (await import("../workerShim")).waitUntilShim;
 } else {

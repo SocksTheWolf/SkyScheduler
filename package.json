@@ -83,6 +83,7 @@
     "@types/node": "^24.13.3",
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
+    "prettier": "^3.9.6",
     "toml": "^5.0.0",
     "tsx": "^4.23.12",
     "typed-htmx": "^0.3.1",

@@ -1,7 +1,7 @@
 import { html } from "hono/html";
 import isEmpty from "just-is-empty";
-import { TRUNCATE_POSTED_CONTENT } from "../config";
 import type { Post } from "../classes/post";
+import { TRUNCATE_POSTED_CONTENT } from "../config";
 import { MAX_POSTED_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
 import PostDataFooter from "./posts/footer";

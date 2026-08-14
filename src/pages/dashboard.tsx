@@ -1,5 +1,5 @@
-import { SHOW_SUPPORT_PROGRESS_BAR } from "../config";
 import { APP_NAME, DASHBOARD_TAG_LINE } from "../appInfo";
+import { SHOW_SUPPORT_PROGRESS_BAR } from "../config";
 import { ScriptInclusionLevel } from "../enums";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
