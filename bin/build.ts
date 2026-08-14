@@ -124,7 +124,7 @@ const buildTriggers: BuildTrigger[] = [
     match: ["assets/css/*Mods.css"],
     against: "assets/css/depmods.min.css",
   },
-  // lint object rules
+  // lint web scripts
   {
     name: "lint",
     triggers: ["lint:consts", "lint:all_funcs", "lint:selectHelper"],
@@ -133,6 +133,7 @@ const buildTriggers: BuildTrigger[] = [
       "src/statics/appScripts.ts",
       "src/statics/constScript.ts",
     ],
+    ignores: ["assets/js/consts.js"],
     against: lintRuleOutputFile,
   },
   // static files
@@ -187,6 +188,7 @@ if (!isEmpty(ATPROTO_DID)) {
 
 async function main() {
   const fileModMap = new Map<string, number>();
+  const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
   let buildCommands: string[] = [];
 
   // create the js output directory if it doesn't exist
@@ -231,7 +233,8 @@ async function main() {
   // make sure that buildCommands only contains uniques
   buildCommands = unique(buildCommands);
 
-  log(`\nRunning Build Rules: ${buildCommands.join(",")}\n`);
+  if (buildCommands.length > 0)
+    log(`\nRunning Build Rules: ${buildCommands.join(",")}\n`);
 
   // build anything that exists.
   let lintCommands: BuildRule[] = [];
@@ -244,7 +247,8 @@ async function main() {
 
     // We handle lints later
     if (rule.captures !== undefined) {
-      lintCommands.push(rule);
+      if (canMakeLint)
+        lintCommands.push(rule);
       continue;
     }
 
@@ -277,7 +281,7 @@ async function main() {
 
   // Generate any lints that are necessary
   if (lintCommands.length > 0) {
-    debug("running lint rules command");
+    log("building lint configs");
     await generateLintRules(lintCommands);
   }
 }

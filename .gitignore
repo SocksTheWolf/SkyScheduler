@@ -32,6 +32,7 @@ lerna-debug.log*
 openapi.json
 jsrules.config.ts
 assets/pages/
+assets/sitemap.xml
 assets/robots.txt
 assets/site.webmanifest
 assets/js/consts.js

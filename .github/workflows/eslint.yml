@@ -39,7 +39,6 @@ jobs:
           npm install
           npm install @microsoft/eslint-formatter-sarif@3.1.0
           npm run build
-          npm run code:lint:gen
 
       - name: Run ESLint
         env:
