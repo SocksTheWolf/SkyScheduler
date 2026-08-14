@@ -27,3 +27,17 @@ async function getPostCID(account, postid) {
     return null;
   });
 }
+
+async function searchBSkyMentions(query, callback) {
+  const queryActors = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${query}&limit=${MAX_AUTO_COMPLETE_NAMES}`);
+  if (queryActors.ok) {
+    try {
+      const jsonData = await queryActors.json();
+      callback(jsonData.actors);
+      return;
+    } catch(err) {
+      console.error(`fetching bsky mentionlist returned ${err}`);
+    }
+  }
+  callback([]);
+}
