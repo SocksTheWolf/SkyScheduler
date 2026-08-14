@@ -65,7 +65,7 @@ export const ssgServe = (props?: SSGServeProps) => {
 };
 
 // Middleware to help during the generation of SSG content. Does nothing in runtime.
-const IMPORTANT_ENV_FLAGS = ["RESET_BOT_USERNAME", "TURNSTILE_PUBLIC_KEY", "IN_DEV"];
+const IMPORTANT_ENV_FLAGS = ["TURNSTILE_PUBLIC_KEY", "IN_DEV"];
 export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
   // Are we building SSG content right now?
   if (isSSGContext(c)) {

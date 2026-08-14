@@ -2,8 +2,9 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import isEmpty from "just-is-empty";
-import { DEFAULT_PDS } from "../config";
+import { SERVICE_ACCOUNT } from "../appInfo";
 import { ScheduledContext } from "../classes/context";
+import { DEFAULT_PDS } from "../config";
 import { AccountStatus } from "../enums";
 import PDSInputField from "../layout/fields/pdsInputField";
 import { ViolationNoticeBar } from "../layout/violationsBar";
@@ -83,7 +84,7 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
   const newObject: AccountUpdatePayload = {};
   if (!isEmpty(username)) {
-    if ((username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) &&
+    if ((username === SERVICE_ACCOUNT || username === c.env.DEFAULT_ADMIN_USER) &&
       !c.get("isAdmin")) {
         return c.html(<b class="btn-error">Invalid username provided</b>, 422);
     } else {
@@ -217,7 +218,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   }
 
   // Prevent sign ups with these accounts, they are setup using a different method.
-  if (username === c.env.RESET_BOT_USERNAME || username === c.env.DEFAULT_ADMIN_USER) {
+  if (username === SERVICE_ACCOUNT || username === c.env.DEFAULT_ADMIN_USER) {
     if (!isInDev(c.env))
       return c.json({ok: false, msg: "forbidden account"}, 401);
     else
@@ -307,7 +308,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
   if (!canMessageUser) {
     return c.json({ok: false, msg:
-      `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${c.env.RESET_BOT_USERNAME} and your DM permissions`}, 401);
+      `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${SERVICE_ACCOUNT} and your DM permissions`}, 401);
   }
 
   const { status, message } = await auth.api.requestPasswordReset({

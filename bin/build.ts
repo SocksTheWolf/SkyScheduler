@@ -8,11 +8,12 @@ import unique from "just-unique";
 import { minify } from "minify";
 import { existsSync, statSync } from "node:fs";
 import { glob, mkdir, writeFile } from "node:fs/promises";
-import { USE_STATIC_HTML } from "../src/config";
 import { ATPROTO_DID } from "../src/appInfo";
+import { USE_STATIC_HTML } from "../src/config";
 import { CaptureType } from "../src/enums";
 import { appManifestGenerate } from "../src/statics/appManifest";
 import { makeConstScript } from "../src/statics/constScript";
+import { redirectRules } from "../src/statics/redirects";
 import { generateRobotsTxt } from "../src/statics/robots";
 import { minifyOptions } from "./configs/minifyOptions";
 import { debug, error, log, warn } from "./helpers/console";
@@ -76,6 +77,10 @@ buildRules.set("build:sitemap", {
   buildCommand: buildSitemap,
   output: "assets/sitemap.xml"
 });
+buildRules.set("build:redirects", {
+  buildCommand: redirectRules,
+  output: "assets/_redirects"
+})
 
 // This rule set is used in two different places, so cache it out for maintaining both rules easily.
 const constScriptMatches = ["src/statics/constScript.ts", "src/limits.ts", "src/config.ts"];
@@ -153,6 +158,12 @@ const buildTriggers: BuildTrigger[] = [
     against: "assets/site.webmanifest",
   },
   {
+    name: "redirects",
+    triggers: ["build:redirects"],
+    match: ["src/statics/redirects.ts", "src/appInfo.ts"],
+    against: "assets/_redirects",
+  },
+  {
     name: "sitemap",
     triggers: ["build:sitemap"],
     match: ["src/pages/*"],
@@ -172,7 +183,7 @@ if (USE_STATIC_HTML) {
       "src/pages/*.tsx",
       "src/appInfo.ts",
       "src/statics/*.ts",],
-    ignores: ["src/statics/appManifest.ts", "src/statics/robots.ts"],
+    ignores: ["src/statics/appManifest.ts", "src/statics/robots.ts", "src/statics/redirects.ts"],
     against: "assets/pages/index.html",
   });
 }

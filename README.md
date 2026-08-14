@@ -20,29 +20,31 @@
 
 [![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](./)
 
-SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly. Perfect for content creators and social media managers who want to plan their social media content in advance.
+SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly.
+
+Perfect for content creators and social media managers who want to plan their social media content in advance.
 
 ## Features
 
-- **Multiple user/account handling**: Manage multiple users/bsky accounts easily
-- **Bluesky Post Scheduling**: Schedule multiple posts to your Bluesky account
-- **Custom Time Slots**: Time selection is limited to 1hr/30m/15m/10m/5m intervals (configurable, default 1hr) to optimize worker execution and reduce unnecessary runs
+- **Multiple user/account handling**: Manage multiple users/bluesky accounts easily.
+- **Bluesky Post/Retweet Scheduling**: Schedule multiple posts to your Bluesky account.
+- **Custom Time Slots**: Time selection is limited to 1hr/30m/15m/10m/5m intervals (configurable, default 1hr) to optimize worker execution and reduce unnecessary runs.
 - **Post Threading**: Schedule entire post threads with full media support per post!
-- **Simple Setup**: Fairly minimal setup and easy to use
-- **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images
+- **Simple Setup**: Fairly minimal setup and easy to use.
+- **Supports media posts**: Automatically handles content tagging and formatting your media so that it looks the best on BSky. Image transforms via Cloudflare Images.
 - **Handles Link Embeds**: Post your content with a link embed easily!
-- **Automatic reposting**: Schedule how many times you want your post to be reposted on the network. Get more visibility and engagement without having to do more work
-- **Repost anything**: Need to retweet something made out of SkyScheduler? Yeah, you can.
-- **Invite Keys**: Want to throttle the signups to your portal or keep the pool to friends/org only? Use invite keys to manage signups
+- **Automatic reposting**: Schedule how many times you want your post to be reposted on the network. Get more visibility and engagement without having to do more work.
+- **Repost anything**: Need to retweet something made externally from outside of SkyScheduler? Yeah, you can.
+- **Invite Keys**: Optionally throttle the signups of your service to select groups? Use invite keys to manage signups.
 - **SSG Page Generation**: Most pages can be automatically built and served statically, to save on processing overhead.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v24.15 or later)
+- Node.js (v24.18 or later)
 - Package Manager
-- Cloudflare Pro Workers account (you will hit CPU limits due to betterauth and egress to ATProto)
+- Cloudflare Pro Workers account (you will hit CPU limits due to BetterAuth and egress to ATProto)
 
 ### Installation
 
@@ -81,14 +83,14 @@ npm install
 
 6. Modify any site information located in:
 
-   - `/src/limits.ts` - site configuration and application limits
    - `/src/appInfo.ts` - site information such as name, description, domain, etc.
-   - `/assets/_redirects` - redirect configuration
+   - `/src/config.ts` - site configuration and feature flags
+   - `/src/limits.ts` - application limits (usually do not need to change much of anything here)
 
 7. Deploy the application to Cloudflare Workers. You might need to login to your Cloudflare account if you haven't already.
 
 ```bash
-npm run deploy
+npm run deploy -- --secrets-file=.env
 ```
 
 **NOTE**: You can also run dev by using `npm run dev`.
@@ -133,8 +135,8 @@ SkyScheduler comes with a lot of commands to help manage the service. Documentat
 
 The most important ones to know:
 
-- `build:pages` - builds the static website pages.
-  - **Note**: Automatically is called by wrangler builds. If SSG is disabled, this does nothing.
+- `build` - builds static website files.
+  - **Note**: Automatically is called by wrangler builds.
 - `dev` - runs the app in a local environment.
 - `generate` - run anytime you modify a file in the `src/db` folder.
   - This will generate SQL migration files.
@@ -144,8 +146,6 @@ The most important ones to know:
   - **Note**: This has a chance of wrangler failing to commit, you may have to run it more than once (it is safe to execute).
 - `invite:generate` - generates a valid invite key.
 - `invite:local/remote` - commits an invite key to the invite store.
-- `sitemap` - generates the sitemap.xml file.
-  - There's a GitHub action that will do this automatically as well.
 - `openapi` - builds the OpenAPI spec.
   - This is **not** automatically called by anything in the application, but there is a GitHub Action (`openapi.yml`) that uploads to artifacts.
   - Give the output file to the WAF.
@@ -195,27 +195,27 @@ skyscheduler/
 
 #### Server
 
-- BetterAuth - site login/authentication
-- BetterAuthCloudflare - helper for BetterAuth on CF
-- hono - request routing/processing
-- uuid - id generation
-- zod - data validation
-- image-dimensions - image data validation
-- date-fns - date processing helpers
-- drizzle - database ORM/schemas
-- just - js helper library
+- `BetterAuth` - site login/authentication
+- `BetterAuthCloudflare` - helper for BetterAuth on CF
+- `Hono` - request routing/processing
+- `uuid` - id generation
+- `zod` - data validation
+- `image-dimensions` - image data validation
+- `date-fns` - date processing helpers
+- `drizzle` - database ORM/schemas
+- `just` - JS helper library
 
 #### Client
 
-- [htmx](https://htmx.org/) - client requests and responsiveness
-  - [form-json](https://github.com/xehrad/form-json) - for handling post edits
-- [countable](https://github.com/RadLikeWhoa/Countable) - dynamic input counter
-- [toastify](https://github.com/apvarun/toastify-js) - client notifications
-- [dropzone](https://github.com/dropzone/dropzone) - file upload negotiation
-- [tribute](https://github.com/redmine-ui/tribute) - client autocomplete library
-- [pico](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
-- [mingcute](https://github.com/mingcute-design/mingcute-icons) - most icons
-- [just-has](https://github.com/angus-c/just#just-has) - parsing bsky data
+- [`htmx`](https://htmx.org/) - client requests and responsiveness
+  - [`form-json`](https://github.com/xehrad/form-json) - for handling post edits
+- [`countable`](https://github.com/RadLikeWhoa/Countable) - dynamic input counter
+- [`toastify`](https://github.com/apvarun/toastify-js) - client notifications
+- [`dropzone`](https://github.com/dropzone/dropzone) - file upload negotiation
+- [`tribute`](https://github.com/redmine-ui/tribute) - client autocomplete library
+- [`pico`](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
+- [`mingcute`](https://github.com/mingcute-design/mingcute-icons) - most icons
+- [`just-has`](https://github.com/angus-c/just#just-has) - parsing Bluesky data
 
 ## Contributions
 

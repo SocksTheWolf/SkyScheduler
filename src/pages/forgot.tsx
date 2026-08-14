@@ -1,4 +1,4 @@
-import { APP_NAME } from "../appInfo";
+import { APP_NAME, SERVICE_ACCOUNT } from "../appInfo";
 import AccountHandler from "../layout/account";
 import UsernameField from "../layout/fields/usernameField";
 import FooterCopyright from "../layout/helpers/footer";
@@ -9,7 +9,7 @@ import type { AllContext, BaseElementProps } from "../types";
 
 export default function ForgotPassword(props: BaseElementProps) {
   const ctx: AllContext = props.ctx!;
-  const botAccountURL: string = `https://bsky.app/profile/${ctx.env.RESET_BOT_USERNAME}`;
+  const botAccountURL: string = `https://bsky.app/profile/${SERVICE_ACCOUNT}`;
   return (<BaseLayout title="Forgot Password" nonce={ctx.get("secureHeadersNonce")}
     preloads={TurnstileCaptchaPreloads(ctx)}>
       <NavTags />
@@ -24,7 +24,7 @@ export default function ForgotPassword(props: BaseElementProps) {
         customRedirectDelay={2000}
         footerHTML={<FooterCopyright />}>
         <center hx-history="false">
-          <p>You will receive a <a target="_blank" href="https://bsky.app/messages">Direct Message</a> from <code>@{ctx.env.RESET_BOT_USERNAME}</code> on BSky/PDS with a link to reset your password.<br />
+          <p>You will receive a <a target="_blank" href="https://bsky.app/messages">Direct Message</a> from <code>@{SERVICE_ACCOUNT}</code> on BSky/PDS with a link to reset your password.<br />
             If you encounter errors, your <a href="https://bsky.app/messages/settings" class="secondary" rel="nofollow" target="_blank">Direct Communication settings</a> might be set to forbid
             Direct Messages from accounts you don't follow.<br /><br />
             It is <strong>heavily recommended</strong> to <a href={botAccountURL} target="_blank">follow the service account</a>.<br /><br />

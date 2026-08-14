@@ -1,8 +1,9 @@
 import { RichText } from "@atproto/api";
 import isEmpty from "just-is-empty";
-import { DEFAULT_CHAT_PDS } from "../../config";
+import { SERVICE_ACCOUNT } from "../../appInfo";
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
+import { DEFAULT_CHAT_PDS } from "../../config";
 import { AccountStatus } from "../../enums";
 import type { Bindings, UserIdType } from "../../types";
 import { lookupBskyHandle } from "./bskyApi";
@@ -15,7 +16,7 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
     console.warn("The bot app reset pass is not defined!");
     return null;
   }
-  const loginResponse = await loginToBsky(agent, env.RESET_BOT_USERNAME, env.RESET_BOT_APP_PASS);
+  const loginResponse = await loginToBsky(agent, SERVICE_ACCOUNT, env.RESET_BOT_APP_PASS);
   if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
     return null;

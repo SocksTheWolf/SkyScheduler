@@ -140,9 +140,6 @@ required=["BETTER_AUTH_SECRET", "DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "RES
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
 BETTER_AUTH_URL="https://skyscheduler.work"
 
-# The name of the bot that is used for password resets
-RESET_BOT_USERNAME="skyscheduler.work"
-
 # The turnstile captcha public key
 TURNSTILE_PUBLIC_KEY="0x4AAAAAABkTE_9TV_bUnLGK"
 

@@ -40,7 +40,6 @@ export interface Bindings {
   TURNSTILE_PUBLIC_KEY: string;
   TURNSTILE_SECRET_KEY: string;
   RESIZE_SECRET_HEADER: string;
-  RESET_BOT_USERNAME: string;
   RESET_BOT_APP_PASS: string;
   IN_DEV: "true" | "false" | undefined;
   CSP_REPORT_URL: string;
