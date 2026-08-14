@@ -1,7 +1,7 @@
 import { raw } from "hono/html";
 import isEmpty from "just-is-empty";
+import { CAN_EDIT_REPOST_RULES } from "../../config";
 import type { RepostInfo } from "../../classes/repost";
-import { CAN_EDIT_REPOST_RULES } from "../../limits";
 import type { BaseElementProps } from "../../types";
 import { formatTimeFromHours } from "../../utils/helpers";
 

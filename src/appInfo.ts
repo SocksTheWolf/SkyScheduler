@@ -35,9 +35,6 @@ export const APP_MANIFEST_GUID: string = "com.socksthewolf.skyscheduler";
 export const APP_MANIFEST_THEME_COLOR: string = "#80b3e0";
 export const APP_MANIFEST_BG_COLOR: string = "#3c5479";
 
-// if the support bar should be shown or not. Currently is only visible on the dashboard page
-export const SHOW_SUPPORT_PROGRESS_BAR: boolean = false;
-
 // for the progress bar, this is an easily editable file for updating the bar
 // maybe we'll support webhooks in the future, but w/e
 

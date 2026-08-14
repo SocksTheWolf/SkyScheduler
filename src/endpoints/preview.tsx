@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
-import { BSKY_IMG_MIME_TYPES, PREVENT_NON_IMAGE_PREVIEWS } from "../limits";
+import { PREVENT_NON_IMAGE_PREVIEWS } from "../config";
+import { BSKY_IMG_MIME_TYPES } from "../limits";
 import { hasAuth, pullAuthData } from "../middleware/auth";
 import type { HonoBase } from "../types";
 import { FileContentSchema } from "../validation/mediaSchema";

@@ -111,7 +111,7 @@ Ensure you have configured the `.env` file with the necessary credentials and se
 
 ### Application Variables
 
-Most of the application can be modified with `wrangler.toml`'s `vars` section or via `src/limits.ts`.
+Most of the application can be modified with `wrangler.toml`'s `vars` section, `src/config.ts` or via `src/limits.ts`.
 
 Both files are heavily commented to explain what the options control.
 

@@ -1,6 +1,7 @@
 import isEmpty from "just-is-empty";
+import { CAN_REPOST_SCHEDULED_POSTS } from "../config";
 import type { PostLabel } from "../enums";
-import { CAN_REPOST_SCHEDULED_POSTS, MAX_REPOST_RULES_PER_POST } from "../limits";
+import { MAX_REPOST_RULES_PER_POST } from "../limits";
 import type { BaseContent, EmbedData } from "../types";
 import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";

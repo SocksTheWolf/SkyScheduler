@@ -1,4 +1,5 @@
-import { APP_NAME, DASHBOARD_TAG_LINE, SHOW_SUPPORT_PROGRESS_BAR } from "../appInfo";
+import { SHOW_SUPPORT_PROGRESS_BAR } from "../config";
+import { APP_NAME, DASHBOARD_TAG_LINE } from "../appInfo";
 import { ScriptInclusionLevel } from "../enums";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
@@ -52,7 +53,8 @@ export default function Dashboard(props: BaseElementProps) {
           <footer class="sidebarBottom">
             <LogoutButton />
             <hr />
-            <FooterCopyright inNewWindow={true} showHomepage={true} showProgressBar={SHOW_SUPPORT_PROGRESS_BAR}
+            <FooterCopyright inNewWindow={true} showHomepage={true}
+              showProgressBar={SHOW_SUPPORT_PROGRESS_BAR}
               showVersion={true} removeExcessTab={true} />
           </footer>
         </article>

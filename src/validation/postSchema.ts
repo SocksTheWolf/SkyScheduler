@@ -1,12 +1,13 @@
 import { isAfter } from "date-fns";
 import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
+import { POSTING_TIME_INTERVAL } from "../config";
 import { EmbedDataType, PostLabel, TimeShape } from "../enums";
 import {
   MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST,
   MAX_LENGTH, MAX_RECORDS_PER_POST,
   MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST,
-  MIN_LENGTH, POSTING_TIME_INTERVAL
+  MIN_LENGTH
 } from "../limits";
 import { floorGivenTime } from "../utils/helpers";
 import {

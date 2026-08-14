@@ -9,14 +9,14 @@ import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { imageDimensionsFromStream } from "image-dimensions";
 import isEmpty from "just-is-empty";
 import truncate from "just-truncate";
+import { DEFAULT_PDS, USE_DEPRECATED_SIZE_PARSE } from "../../config";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
-  BSKY_IMG_SIZE_LIMIT, DEFAULT_PDS,
-  MAX_ALT_TEXT, MAX_EMBEDS_PER_POST,
-  USE_DEPRECATED_SIZE_PARSE
+  BSKY_IMG_SIZE_LIMIT,
+  MAX_ALT_TEXT, MAX_EMBEDS_PER_POST
 } from "../../limits";
 import type {
   AllContext, BskyEmbedRecord, BskyEmbedWrapper,

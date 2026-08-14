@@ -1,6 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { DEFAULT_PDS } from "../limits";
+import { DEFAULT_PDS } from "../config";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),

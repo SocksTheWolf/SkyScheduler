@@ -1,7 +1,8 @@
 import { isAfter } from "date-fns";
 import * as z from "zod/v4";
+import { REPOSTING_TIME_INTERVAL } from "../config";
 import { RepostType, TimeShape } from "../enums";
-import { MAX_REPOST_TITLE_LENGTH, REPOSTING_TIME_INTERVAL } from "../limits";
+import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import { floorGivenTime } from "../utils/helpers";
 import { PostRecordSchema } from "./recordSchema";
 import { httpProtoRecord, postRecordURI, repostContentRecord } from "./regexCases";

@@ -1,4 +1,4 @@
-import { USE_INVITE_KEYS } from "../limits";
+import { USE_INVITE_KEYS } from "../config";
 import type { AllContext } from "../types";
 import { has } from "./helpers";
 

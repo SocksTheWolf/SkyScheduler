@@ -5,12 +5,13 @@ import {
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
 import { validate as uuidValid } from "uuid";
+import { TRUNCATE_POSTED_CONTENT } from "../../config";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { posts, repostCounts, reposts } from "../../db/app.schema";
 import { violations } from "../../db/enforcement.schema";
 import { TimeShape } from "../../enums";
-import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH, TRUNCATE_POSTED_CONTENT } from "../../limits";
+import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
 import type {
   AllContext,
   BatchQuery,

@@ -1,6 +1,6 @@
 import { NONCE } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
-import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../limits";
+import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../config";
 import type { BaseContext, NextMiddleware } from "../types";
 import { isInDev } from "../utils/helpers";
 

@@ -1,6 +1,6 @@
 // this file handles injecting speculation rules.
 import { raw } from "hono/html";
-import { ALLOW_SPECULATION_RULES } from "../../limits";
+import { ALLOW_SPECULATION_RULES } from "../../config";
 
 export function SpeculationRulesTag() {
   if (!ALLOW_SPECULATION_RULES)

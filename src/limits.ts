@@ -1,7 +1,5 @@
-import { TimeIntervalSettings } from "./enums";
-
 /*********************************************************/
-/****            APPLICATION CONFIGURATIONS           ****/
+/****                APPLICATION LIMITS               ****/
 /*********************************************************/
 
 // minimum length of a post
@@ -21,8 +19,6 @@ export const MAX_REPOST_TITLE_LENGTH: number = 100;
 
 /** Storage settings **/
 /* ------------------ */
-// if we should truncate posted content
-export const TRUNCATE_POSTED_CONTENT: boolean = false;
 // How much of the content we keep in the DB after a post has been made.
 // (Only if TRUNCATE_POSTED_CONTENT is true)
 export const MAX_POSTED_LENGTH: number = 50;
@@ -36,12 +32,6 @@ export const MAX_HOLD_DAYS_BEFORE_PURGE: number = 7;
 export const MIN_DASHBOARD_PASS: number = 8;
 export const MAX_DASHBOARD_PASS: number = 30;
 
-export const USE_CAPTCHA: boolean = true;
-
-// if signups should be gated by the usage of invites
-// set up the link to the invite keys in SITE_INVITE_URL in siteinfo
-export const USE_INVITE_KEYS: boolean = false;
-
 // How long between when we detect an account session is no longer valid
 // and when we force the user to log back in
 // (this is in seconds)
@@ -49,14 +39,12 @@ export const ACCOUNT_EXPIRE_FORCE_LOGOUT: number = 5;
 
 /** Media content **/
 /* --------------- */
-// if gifs should be allowed to upload
+// if gifs should be allowed to upload (this does require video processing on bsky end)
 export const GIF_UPLOAD_ALLOWED: boolean = false;
 // max length of an animated gif in minutes
 // gifs are big so this has a separate configurable setting
 export const MAX_GIF_LENGTH: number = 1;
 
-// if we can preview anything other than images
-export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 // the maximum size of an image file to generate a thumbnail for, in MB.
 // generation is done on client side using canvas elements, so keep this low for mobile.
 export const MAX_THUMBNAIL_SIZE: number = 15;
@@ -72,65 +60,6 @@ export const MAX_IMAGE_WIDTH: number = 3000;
 export const BSKY_NAME_LOOKUP_LIMIT: number = 8; // 8 is the same value bsky uses
 // number of characters to activate a bsky handle search
 export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
-
-/** Default PDS Settings **/
-/* ---------------------- */
-// What is the default PDS to use (if one cannot be inferred for an user)
-export const DEFAULT_PDS: string = "https://bsky.social";
-
-// What is the default chat endpoint (probably needs to match with wherever your bot account is)
-export const DEFAULT_CHAT_PDS: string = "https://bsky.social";
-
-/** Security Settings **/
-/* ------------------- */
-// controls if we inject granular content security policy headers into requests
-// or use the basic values from hono
-export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
-// the above must be on, otherwise this will do nothing. This will only report CSP failures
-// Once CSP is good enough, change this to false to have it be enforced.
-export const USE_CSP_REPORT_ONLY: boolean = false;
-
-// if we should allow other websites/applications to make requests
-// to our website.
-export const ALLOW_CORS_ALL: boolean = false;
-
-/** Feature Settings **/
-/* ------------------ */
-// if the user can edit the repost rules for their posts
-export const CAN_EDIT_REPOST_RULES: boolean = true;
-
-// if users can repost scheduled posts before they are posted
-export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
-
-/** Experimental Feature Flags **/
-/* ---------------------------- */
-// allow for deprecated image size parsing.
-// NOTE: All new applications should set this to false.
-export const USE_DEPRECATED_SIZE_PARSE: boolean = true;
-
-// if we should try to use SSG rendering for pages vs dynamic rendering
-export const USE_STATIC_HTML: boolean = true;
-
-// if we should enable chrome speculation rules to speed up the site
-export const ALLOW_SPECULATION_RULES: boolean = false;
-
-/*********************************************************/
-/****          APPLICATION INTERVAL SETTINGS          ****/
-/*********************************************************/
-
-// If these are changed from the default value of Hour (or have different values from each other),
-// then you must also do the following:
-//
-// 1. Set the new crontab values in wrangler.toml
-// 2. Modify handleSchedule in scheduler.ts to add a new switch case for the given action.
-// 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
-
-export const POSTING_TIME_INTERVAL: TimeIntervalSettings =
-  TimeIntervalSettings.Hour;
-// This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
-// as there's no files that need to be uploaded or change
-export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings =
-  TimeIntervalSettings.Hour;
 
 /*********************************************************/
 /**** INTERNAL/SERVICE LIMITS, DO NOT CHANGE DIRECTLY ****/

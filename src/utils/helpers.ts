@@ -1,7 +1,7 @@
 import type { FormatDurationOptions } from "date-fns";
 import { formatDuration, roundToNearestMinutes, startOfHour, subDays } from "date-fns";
+import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../config";
 import { EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../limits";
 import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
 
 export function floorCurrentTime(shape: TimeShape = TimeShape.Post): Date {

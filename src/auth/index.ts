@@ -1,12 +1,10 @@
+import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
-import { withCloudflare } from "better-auth-cloudflare";
+import { DEFAULT_PDS } from "../config";
 import { APP_NAME } from "../appInfo";
-import {
-  BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH,
-  DEFAULT_PDS
-} from "../limits";
+import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";
 import type { AllContext, BaseContext, Bindings, DBProcessor } from "../types";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
@@ -182,3 +180,4 @@ const processAuthRoute = (ctx: BaseContext) => ctx.get("auth").handler(ctx.req.r
 
 // Export for runtime usage
 export { createAuth, processAuthRoute };
+

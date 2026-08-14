@@ -1,9 +1,9 @@
 import { RichText } from "@atproto/api";
 import isEmpty from "just-is-empty";
+import { DEFAULT_CHAT_PDS } from "../../config";
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
 import { AccountStatus } from "../../enums";
-import { DEFAULT_CHAT_PDS } from "../../limits";
 import type { Bindings, UserIdType } from "../../types";
 import { lookupBskyHandle } from "./bskyApi";
 import { loginToBsky } from "./bskyLogin";

@@ -1,5 +1,5 @@
 import { cors } from "hono/cors";
-import { ALLOW_CORS_ALL } from "../limits";
+import { ALLOW_CORS_ALL } from "../config";
 import type { BaseContext, NextMiddleware } from "../types";
 
 export const corsHelperMiddleware = async (c: BaseContext, next: NextMiddleware) => {

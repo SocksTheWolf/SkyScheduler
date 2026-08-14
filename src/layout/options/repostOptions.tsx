@@ -1,5 +1,6 @@
 import isEmpty from "just-is-empty";
-import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT, REPOSTING_TIME_INTERVAL } from "../../limits";
+import { REPOSTING_TIME_INTERVAL } from "../../config";
+import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../../limits";
 import type { BaseElementProps } from "../../types";
 import { formatTime } from "../../utils/helpers";
 

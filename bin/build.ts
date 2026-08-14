@@ -8,9 +8,9 @@ import unique from "just-unique";
 import { minify } from "minify";
 import { existsSync, statSync } from "node:fs";
 import { glob, mkdir, writeFile } from "node:fs/promises";
+import { USE_STATIC_HTML } from "../src/config";
 import { ATPROTO_DID } from "../src/appInfo";
 import { CaptureType } from "../src/enums";
-import { USE_STATIC_HTML } from "../src/limits";
 import { appManifestGenerate } from "../src/statics/appManifest";
 import { makeConstScript } from "../src/statics/constScript";
 import { generateRobotsTxt } from "../src/statics/robots";
@@ -77,6 +77,9 @@ buildRules.set("build:sitemap", {
   output: "assets/sitemap.xml"
 });
 
+// This rule set is used in two different places, so cache it out for maintaining both rules easily.
+const constScriptMatches = ["src/statics/constScript.ts", "src/limits.ts", "src/config.ts"];
+
 // The things that trigger off builds if the rules are a match
 const buildTriggers: BuildTrigger[] = [
   // build app script
@@ -95,7 +98,7 @@ const buildTriggers: BuildTrigger[] = [
       "lint:all_funcs",
       "lint:selectHelper",
     ],
-    match: ["src/statics/constScript.ts", "src/limits.ts"],
+    match: constScriptMatches,
     against: "assets/js/consts.js",
   },
   // build main
@@ -131,7 +134,7 @@ const buildTriggers: BuildTrigger[] = [
     match: [
       "assets/js/*.js",
       "src/statics/appScripts.ts",
-      "src/statics/constScript.ts",
+      ...constScriptMatches
     ],
     ignores: ["assets/js/consts.js"],
     against: lintRuleOutputFile,
@@ -207,11 +210,12 @@ async function main() {
 
   // Check to see if we need to build
   for (const trigger of buildTriggers) {
-    debug(`Checking "${trigger.name}" for matches`);
+    debug(`Checking "${trigger.name}" for matches via ${trigger.match.join(",")}`);
     let compareAgainst: number;
 
     // Check if the comparison file exists, if it doesn't, make the file.
     if (!existsSync(trigger.against)) {
+      debug(`${trigger.name} - against file is missing ${trigger.against}, building`);
       addBuildCommands(trigger);
       continue;
     }

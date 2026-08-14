@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
 import { validate as isValid } from "uuid";
+import { CAN_EDIT_REPOST_RULES } from "../config";
 import type { Post } from "../classes/post";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
 import { RepostDataPopover } from "../layout/repostEditor";
-import { CAN_EDIT_REPOST_RULES } from "../limits";
 import { authMiddleware, authMiddlewareHTML } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import type {

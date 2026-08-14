@@ -3,8 +3,8 @@ import fs from "fs/promises";
 import type { Hono } from "hono";
 import { type ToSSGResult, toSSG } from "hono/ssg";
 import path from "path";
+import { USE_STATIC_HTML } from "../../src/config";
 import * as app from "../../src/index";
-import { USE_STATIC_HTML } from "../../src/limits";
 import type { HonoBase } from "../../src/types";
 import { debug, error, log } from "./console";
 
