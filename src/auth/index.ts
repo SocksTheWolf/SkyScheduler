@@ -19,7 +19,6 @@ type waitUntilCallback = (_: Promise<unknown>) => void;
 let waitUntil: waitUntilCallback;
 if (process.env["IS_SSG"] === "true") {
   waitUntil = (await import("../workerShim")).waitUntilShim;
-  console.log("SSG Shim Installed");
 } else {
   waitUntil = (await import("cloudflare:workers")).waitUntil;
 }

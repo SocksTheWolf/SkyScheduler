@@ -201,9 +201,7 @@ async function main() {
   }
 
   const addBuildCommands = (trigger: BuildTrigger) => {
-    debug(
-      `Match: Adding "${trigger.name}" build commands: "${trigger.triggers.join(", ")}"`,
-    );
+    debug(`Match: Adding "${trigger.name}" build commands: "${trigger.triggers.join(", ")}"`);
     buildCommands.push(...trigger.triggers);
   };
 
@@ -237,8 +235,13 @@ async function main() {
   // make sure that buildCommands only contains uniques
   buildCommands = unique(buildCommands);
 
-  if (buildCommands.length > 0)
-    log(`\nRunning Build Rules: ${buildCommands.join(",")}\n`);
+  // Do not print anything if we do not have any build commands at all.
+  if (buildCommands.length > 0) {
+    log(`\nRunning Build Rules: ${buildCommands.join(", ")}\n`);
+  } else {
+    log("No Build Necessary");
+    return;
+  }
 
   // build anything that exists.
   let lintCommands: BuildRule[] = [];

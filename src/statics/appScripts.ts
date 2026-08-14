@@ -8,4 +8,3 @@ const getAppScriptStr = (scriptName: string) =>
 // Eventually make this automatically generated.
 export const mainScriptStr: string = getAppScriptStr("main");
 export const dashboardScriptStr: string = getAppScriptStr("app");
-
