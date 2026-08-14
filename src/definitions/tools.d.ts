@@ -1,8 +1,9 @@
 interface BuildTrigger {
   name: string;
   match: string[];
+  ignores?: string[];
   against: string;
-  triggersRules: string[];
+  triggers: string[];
 }
 
 type BuildRuleFuncOutput = void|string;

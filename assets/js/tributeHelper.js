@@ -20,6 +20,7 @@ function searchBSkyMentions(query, callback) {
   xhr.send();
 }
 
+// Adds autocomplete to an element
 function tributeToElement(el) {
   const mentionTribute = new Tribute({
     menuItemTemplate: function(item) {
@@ -44,6 +45,7 @@ function tributeToElement(el) {
   mentionTribute.attach(el);
 }
 
+// removes autocomplete from an element
 function detachTribute(el) {
   el.dispatchEvent(new Event("detach"));
 }

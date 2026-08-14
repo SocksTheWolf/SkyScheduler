@@ -1,3 +1,4 @@
+// This file only handles the reset password page.
 document.addEventListener("DOMContentLoaded", () => {
   const searchParams = new URLSearchParams(window.location.search);
   const resetToken = searchParams.get("token");

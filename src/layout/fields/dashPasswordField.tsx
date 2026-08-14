@@ -21,7 +21,9 @@ export default function DashboardPasswordField(props: DashboardPasswordFieldSett
       autocompleteSetting = "new-password";
       break;
   }
-  return (<input id="password" type="password" name="password" minlength={MIN_DASHBOARD_PASS}
-    maxlength={MAX_DASHBOARD_PASS} required={props.required ?? undefined}
+  return (<input id="password" type="password" name="password"
+    minlength={MIN_DASHBOARD_PASS}
+    maxlength={MAX_DASHBOARD_PASS}
+    required={props.required ?? undefined}
     autocomplete={autocompleteSetting} />);
 }

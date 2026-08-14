@@ -81,7 +81,6 @@ npm install
 
 6. Modify any site information located in:
 
-   - `.ssclirc` - sitemap domain
    - `/src/limits.ts` - site configuration and application limits
    - `/src/appInfo.ts` - site information such as name, description, domain, etc.
    - `/assets/_redirects` - redirect configuration
@@ -184,7 +183,6 @@ skyscheduler/
 ├── .env.example
 ├── .node-version
 ├── .markdownlint.json
-├── .ssclirc
 ├── auth.config.ts
 ├── drizzle.config.ts
 ├── eslint.config.ts

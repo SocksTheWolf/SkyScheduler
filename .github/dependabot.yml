@@ -9,7 +9,7 @@ updates:
   # node updates
   - package-ecosystem: "npm"
     registries:
-    - npm-registry
+      - npm-registry
     directory: "/"
     schedule:
       interval: "weekly"
@@ -17,13 +17,24 @@ updates:
       default-days: 10
       semver-major-days: 30
       semver-minor-days: 12
-    ignore:
-      - dependency-name: '@types/node'
-        # Always get patch and minor versions of node types
+    allow:
+      - dependency-type: "production"
         update-types:
-          - 'version-update:semver-major'
-      - dependency-name: 'wrangler'
-      - dependency-name: 'minify'
-      - dependency-name: 'tsx'
-      - dependency-name: 'prettier'
-      - dependency-name: '@types/minify'
+          - "version-update:semver-patch"
+          - "version-update:semver-minor"
+    ignore:
+      # A github action updates wrangler for us
+      - dependency-name: "wrangler"
+      # Ignore all of minify
+      - dependency-name: "@types/minify"
+      - dependency-name: "minify"
+      # Always get patch and minor versions of node types
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
+      # Ignore TSX's patches
+      - dependency-name: "tsx"
+        update-types:
+          - "version-update:semver-patch"
+      # We only use prettier for some nice formatting, ignore otherwise.
+      - dependency-name: "prettier"

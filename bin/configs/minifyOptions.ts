@@ -1,4 +1,4 @@
-{
+export const minifyOptions = {
   "js": {
     "type": "terser",
     "terser": {
@@ -16,14 +16,6 @@
           "updateUsername"
         ]
       }
-    },
-    "putout": {
-      "quote": "'",
-      "mangle": false,
-      "mangleClassNames": false,
-      "removeUnusedVariables": false,
-      "removeConsole": false,
-      "removeUselessSpread": true
     }
   }
-}
+};

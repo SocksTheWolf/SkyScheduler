@@ -1,12 +1,11 @@
 import {
-  APP_MANIFEST_BG_COLOR,
-  APP_MANIFEST_GUID,
+  APP_MANIFEST_BG_COLOR, APP_MANIFEST_GUID,
   APP_MANIFEST_THEME_COLOR, APP_NAME,
   SITE_DESCRIPTION, SITE_URL
 } from "../appInfo";
 
-export function appManifestGenerate() {
-  return {
+export function appManifestGenerate(): string {
+  return JSON.stringify({
     name: APP_NAME,
     short_name: APP_NAME,
     categories: ["social", "social networking", "productivity", "utilities"],
@@ -43,5 +42,5 @@ export function appManifestGenerate() {
       { src: "screenshots/dash2.png", sizes: "495x857", type: "image/png", form_factor: "narrow", label: "New Post View" },
     ],
     edge_side_panel: { preferred_width: 510 },
-  };
+  });
 }

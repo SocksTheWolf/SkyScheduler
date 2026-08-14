@@ -9,13 +9,14 @@ import { ScheduledContext } from "./classes/context";
 import { schema } from "./db/schema";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
+import { generateOpenAPI } from "./endpoints/openapi";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
-import { staticFiles } from "./endpoints/statics";
 import { blankAuthEnv } from "./middleware/auth";
 import { cachePrivateMiddleware, cachePublicMiddleware } from "./middleware/cacheControl";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { cspHelper } from "./middleware/cspHelper";
+import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
@@ -39,7 +40,9 @@ app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, corsHelperMiddlewar
 app.use(ssgGenMiddleware);
 
 ///// Static Files /////
-app.route("/", staticFiles);
+app.get("/openapi.json", disableSSG(), onlyInDevelopment, async (c) => {
+  return c.json(await generateOpenAPI());
+});
 
 ///// Static Pages /////
 app.all("/", cachePublicMiddleware, ssgServe({ page: "index" }), (c) =>
