@@ -22,48 +22,54 @@ import { buildSitemap } from "./helpers/sitemap";
 import { buildApp } from "./helpers/staticSite";
 import { runCommandAsync } from "./helpers/subCommand";
 
+// Easy path swaps
+const sDir: string = "src/statics";
+const aInfo: string = "src/appInfo.ts";
+const aJS: string = "assets/js";
+const aCSS: string = "assets/css";
+
 // All the various build rules
 const buildRules = new Map<string, BuildRule>();
 buildRules.set("build:js:main", {
-  buildCommand: "cat assets/js/main.js",
-  output: "assets/js/min/main.min.js",
+  buildCommand: `cat ${aJS}/main.js`,
+  output: `${aJS}/min/main.min.js`,
   minify: true,
 });
 buildRules.set("build:js:app", {
-  buildCommand: "cat assets/js/*Helper.js",
-  output: "assets/js/min/app.min.js",
+  buildCommand: `cat ${aJS}/*Helper.js`,
+  output: `${aJS}/min/app.min.js`,
   minify: true,
 });
 buildRules.set("build:css:style", {
-  buildCommand: "cat assets/css/stylesheet.css",
-  output: "assets/css/stylesheet.min.css",
+  buildCommand: `cat ${aCSS}/stylesheet.css`,
+  output: `${aCSS}/stylesheet.min.css`,
   minify: true,
 });
 buildRules.set("build:css:dash", {
-  buildCommand: "cat assets/css/dashboard.css",
-  output: "assets/css/dashboard.min.css",
+  buildCommand: `cat ${aCSS}/dashboard.css`,
+  output: `${aCSS}/dashboard.min.css`,
   minify: true,
 });
 buildRules.set("build:css:mods", {
-  buildCommand: "cat assets/css/*Mods.css",
-  output: "assets/css/depmods.min.css",
+  buildCommand: `cat ${aCSS}/*Mods.css`,
+  output: `${aCSS}/depmods.min.css`,
   minify: true,
 });
 buildRules.set("lint:consts", {
-  buildCommand: "cat assets/js/consts.js",
+  buildCommand: `cat ${aJS}/consts.js`,
   captures: CaptureType.CONSTS,
 });
 buildRules.set("lint:all_funcs", {
-  buildCommand: "cat assets/js/*.js",
+  buildCommand: `cat ${aJS}/*.js`,
   captures: CaptureType.FUNCS,
 });
 buildRules.set("lint:selectHelper", {
-  buildCommand: "cat assets/js/appSelectHelper.js",
+  buildCommand: `cat ${aJS}/appSelectHelper.js`,
   captures: CaptureType.CONSTS,
 });
 buildRules.set("build:consts", {
   buildCommand: makeConstScript,
-  output: "assets/js/consts.js",
+  output: `${aJS}/consts.js`,
 });
 buildRules.set("build:appmanifest", {
   buildCommand: appManifestGenerate,
@@ -80,10 +86,10 @@ buildRules.set("build:sitemap", {
 buildRules.set("build:redirects", {
   buildCommand: redirectRules,
   output: "assets/_redirects"
-})
+});
 
 // This rule set is used in two different places, so cache it out for maintaining both rules easily.
-const constScriptMatches = ["src/statics/constScript.ts", "src/limits.ts", "src/config.ts"];
+const constScriptMatches = [`${sDir}/constScript.ts`, "src/limits.ts", "src/config.ts"];
 
 // The things that trigger off builds if the rules are a match
 const buildTriggers: BuildTrigger[] = [
@@ -91,8 +97,8 @@ const buildTriggers: BuildTrigger[] = [
   {
     name: "build js app scripts",
     triggers: ["build:js:app"],
-    match: ["assets/js/*Helper.js", "src/statics/appScripts.ts"],
-    against: "assets/js/min/app.min.js",
+    match: [`${aJS}/*Helper.js`, `${sDir}/appScripts.ts`],
+    against: `${aJS}/min/app.min.js`,
   },
   // build const and lints
   {
@@ -104,63 +110,63 @@ const buildTriggers: BuildTrigger[] = [
       "lint:selectHelper",
     ],
     match: constScriptMatches,
-    against: "assets/js/consts.js",
+    against: `${aJS}/consts.js`,
   },
   // build main
   {
     name: "build js main",
     triggers: ["build:js:main"],
-    match: ["assets/js/main.js", "src/statics/appScripts.ts"],
-    against: "assets/js/min/main.min.js",
+    match: [`${aJS}/main.js`, `${sDir}/appScripts.ts`],
+    against: `${aJS}/min/main.min.js`,
   },
   // stylesheets
   {
     name: "build css stylesheet",
     triggers: ["build:css:style"],
-    match: ["assets/css/stylesheet.css", "src/statics/appStyles.ts",],
-    against: "assets/css/stylesheet.min.css",
+    match: [`${aCSS}/stylesheet.css`, `${sDir}/appStyles.ts`],
+    against: `${aCSS}/stylesheet.min.css`,
   },
   {
     name: "build css dashboard",
     triggers: ["build:css:dash"],
-    match: ["assets/css/dashboard.css", "src/statics/appStyles.ts",],
-    against: "assets/css/dashboard.min.css",
+    match: [`${aCSS}/dashboard.css`, `${sDir}/appStyles.ts`],
+    against: `${aCSS}/dashboard.min.css`,
   },
   {
     name: "build css mods",
     triggers: ["build:css:mods"],
-    match: ["assets/css/*Mods.css", "src/statics/appStyles.ts",],
-    against: "assets/css/depmods.min.css",
+    match: [`${aCSS}/*Mods.css`, `${sDir}/appStyles.ts`],
+    against: `${aCSS}/depmods.min.css`,
   },
   // lint web scripts
   {
     name: "lint",
     triggers: ["lint:consts", "lint:all_funcs", "lint:selectHelper"],
     match: [
-      "assets/js/*.js",
-      "src/statics/appScripts.ts",
+      `${aJS}/*.js`,
+      `${sDir}/appScripts.ts`,
       ...constScriptMatches
     ],
-    ignores: ["assets/js/consts.js"],
+    ignores: [`${aJS}/consts.js`],
     against: lintRuleOutputFile,
   },
   // static files
   {
     name: "robots",
     triggers: ["build:robots"],
-    match: ["src/statics/robots.ts", "src/appInfo.ts"],
+    match: [`${sDir}/robots.ts`, aInfo],
     against: "assets/robots.txt",
   },
   {
     name: "manifest",
     triggers: ["build:appmanifest"],
-    match: ["src/statics/appManifest.ts", "src/appInfo.ts"],
+    match: [`${sDir}/appManifest.ts`, aInfo],
     against: "assets/site.webmanifest",
   },
   {
     name: "redirects",
     triggers: ["build:redirects"],
-    match: ["src/statics/redirects.ts", "src/appInfo.ts"],
+    match: [`${sDir}/redirects.ts`, aInfo],
     against: "assets/_redirects",
   },
   {
@@ -181,9 +187,9 @@ if (USE_STATIC_HTML) {
     triggers: ["build:pages", "build:sitemap"],
     match: ["src/layout/**",
       "src/pages/*.tsx",
-      "src/appInfo.ts",
-      "src/statics/*.ts",],
-    ignores: ["src/statics/appManifest.ts", "src/statics/robots.ts", "src/statics/redirects.ts"],
+      aInfo,
+      `${sDir}/*.ts`],
+    ignores: [`${sDir}/appManifest.ts`, `${sDir}/robots.ts`, `${sDir}/redirects.ts`],
     against: "assets/pages/index.html",
   });
 }
@@ -199,7 +205,7 @@ if (!isEmpty(ATPROTO_DID)) {
   buildTriggers.push({
     name: "proto",
     triggers: ["build:proto"],
-    match: ["src/appInfo.ts"],
+    match: [aInfo],
     against: "assets/.well-known/atproto-did",
   });
 }
@@ -277,7 +283,8 @@ async function main() {
     if (typeof rule.buildCommand === "string") {
       runCommandAsync(rule.buildCommand, async (output: string) => {
         debug(`${command} - executed build command ${rule.buildCommand}`);
-        if (rule.output === undefined) return;
+        if (rule.output === undefined)
+          return;
 
         if (rule.minify) {
           try {

@@ -19,6 +19,9 @@ import {
 } from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
+// Easy access change for the openapi string version
+const CURRENT_OPENAPI_VERSION: string = '1.2.6';
+
 const openapiRoutes = new Hono<HonoBase>();
 
 openapiRoutes.post("/post/create", describeRoute({
@@ -665,7 +668,7 @@ export async function generateOpenAPI() {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,
-        version: '1.2.6',
+        version: CURRENT_OPENAPI_VERSION,
         description: `The API Routes for ${APP_NAME} that can be used for providing API access
           or for the API Shield feature of Cloudflare`,
         termsOfService: `${SITE_URL}/tos`,
