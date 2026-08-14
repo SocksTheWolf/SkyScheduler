@@ -10,12 +10,14 @@ const thirdPartyDependencies = {
   Dropzone: false,
   Toastify: false,
   Tribute: false,
-  openModal: false,
-  closeModal: false,
-  PicoTabs: false,
   Countable: false,
   has: false,
   turnstile: false,
+  // Pico Modals
+  openModal: false,
+  closeModal: false,
+  // Pico Tabs
+  PicoTabs: false,
   contentTabs: false,
 };
 

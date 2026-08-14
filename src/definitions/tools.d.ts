@@ -6,6 +6,11 @@ interface BuildTrigger {
   triggers: string[];
 }
 
+interface SitemapPageInfo {
+  url: string;
+  lastMod: string;
+}
+
 type BuildRuleFuncOutput = void|string;
 type BuildRuleFunction = () => BuildRuleFuncOutput|Promise<BuildRuleFuncOutput>;
 
@@ -14,11 +19,6 @@ interface BuildRule {
   output?: string;
   minify?: boolean;
   captures?: CaptureType;
-};
+}
 
 type CommandCallbackFunction = (data: string) => void;
-
-interface MoveMapRule {
-  file: string;
-  destFolder: string;
-}

@@ -1,14 +1,15 @@
 import { existsSync } from "fs";
-import fs from "fs/promises";
+import fs, { readdir, rm, stat, unlink } from "fs/promises";
 import type { Hono } from "hono";
-import { type ToSSGResult, toSSG } from "hono/ssg";
+import type { ToSSGResult } from "hono/ssg";
+import { toSSG } from "hono/ssg";
 import path from "path";
 import { USE_STATIC_HTML } from "../../src/config";
 import * as app from "../../src/index";
 import type { HonoBase } from "../../src/types";
 import { debug, error, log } from "./console";
 
-async function buildStaticSite(app: Hono<HonoBase>, moveMap?: MoveMapRule[]): Promise<void> {
+async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   const outputDirectory: string = "./assets/pages";
   // If we do not build static html, then do not generate anything.
   if (!USE_STATIC_HTML)
@@ -19,17 +20,17 @@ async function buildStaticSite(app: Hono<HonoBase>, moveMap?: MoveMapRule[]): Pr
     debug("Removing existing files...");
     // Go through the file list in the pages directory,
     // remove everything, but do not get rid of the pages folder.
-    for (const file of await fs.readdir(outputDirectory)) {
+    for (const file of await readdir(outputDirectory)) {
       const fileLoc: string = path.join(outputDirectory, file);
       // Check if directory
-      if (!(await fs.stat(fileLoc)).isDirectory()) {
+      if (!(await stat(fileLoc)).isDirectory()) {
         // it's a file
         debug(`Removed ${fileLoc}`);
-        await fs.unlink(fileLoc);
+        await unlink(fileLoc);
       } else {
         // it's a directory
         debug(`Removed directory ${fileLoc}`);
-        await fs.rm(fileLoc, { force: true, recursive: true });
+        await rm(fileLoc, { force: true, recursive: true });
       }
     }
   }
@@ -38,29 +39,16 @@ async function buildStaticSite(app: Hono<HonoBase>, moveMap?: MoveMapRule[]): Pr
   const response: ToSSGResult = await toSSG(app, fs, {
     dir: outputDirectory,
     extensionMap: {
-      "text/html": "html",
-      "text/no-ext": "",
-      // we want the file to output as .js., so we can bulk program a move map
-      "text/javascript": "",
+      "text/html": "html"
     },
   });
   if (response.success) {
     log(`\nBuilt Static Files:\n${response.files.join("\n")}`);
-    if (moveMap !== undefined) {
-      debug("Executing move map...");
-      // execute our move map
-      for (const mv of moveMap) {
-        const moveTo = path.join(outputDirectory, mv.destFolder, mv.file);
-        await fs.rename(path.join(outputDirectory, mv.file) + ".", moveTo);
-        debug(`Moved ${mv.file} to ${moveTo}`);
-      }
-    }
-    log("\nDone!");
   } else {
     error(`Encountered error when trying to SSG site ${response}`);
   }
 }
 
-export async function buildApp(moveMap?: MoveMapRule[]) {
-  await buildStaticSite(app.default.getApp(), moveMap);
+export async function buildApp() {
+  await buildStaticSite(app.default.getApp());
 }
