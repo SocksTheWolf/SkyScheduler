@@ -44,6 +44,12 @@ export const USE_CSP_REPORT_ONLY: boolean = false;
 // to our website.
 export const ALLOW_CORS_ALL: boolean = false;
 
+/** Media content **/
+/* --------------- */
+// if we can preview anything other than images.
+// if true, we will early out any other content pulls (mostly videos)
+export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
+
 /** Feature Settings **/
 /* ------------------ */
 // if the user can edit the repost rules for their posts
@@ -51,6 +57,9 @@ export const CAN_EDIT_REPOST_RULES: boolean = true;
 
 // if users can repost scheduled posts before they are posted
 export const CAN_REPOST_SCHEDULED_POSTS: boolean = true;
+
+// if the openapi spec should be publicly accessible
+export const PUBLIC_OPENAPI_SPEC: boolean = false;
 
 /** Experimental Feature Flags **/
 /* ---------------------------- */
@@ -63,11 +72,6 @@ export const USE_STATIC_HTML: boolean = true;
 
 // if we should enable chrome speculation rules to speed up the site
 export const ALLOW_SPECULATION_RULES: boolean = false;
-
-/** Media content **/
-/* --------------- */
-// if we can preview anything other than images
-export const PREVENT_NON_IMAGE_PREVIEWS: boolean = false;
 
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/

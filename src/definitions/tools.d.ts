@@ -11,7 +11,8 @@ interface SitemapPageInfo {
   lastMod: string;
 }
 
-type BuildRuleFuncOutput = void|string;
+type BuildRuleFuncOutput = undefined|string;
+type BuildRuleFuncPromise = Promise<undefined>;
 type BuildRuleFunction = () => BuildRuleFuncOutput|Promise<BuildRuleFuncOutput>;
 
 interface BuildRule {
@@ -19,6 +20,9 @@ interface BuildRule {
   output?: string;
   minify?: boolean;
   captures?: CaptureType;
-}
+};
 
-type CommandCallbackFunction = (data: string) => void;
+type BuildRules = Map<string, BuildRule>;
+type BuildTriggers = BuildTrigger[];
+
+type CommandCallbackFunction = (data: string) => Promise<void>;

@@ -33,6 +33,7 @@ openapi.json
 jsrules.config.ts
 assets/pages/
 assets/sitemap.xml
+assets/openapi.json
 assets/_redirects
 assets/robots.txt
 assets/site.webmanifest

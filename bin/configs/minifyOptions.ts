@@ -1,10 +1,10 @@
 export const minifyOptions = {
-  "js": {
-    "type": "terser",
-    "terser": {
-      "mangle": {
-        "toplevel": true,
-        "reserved": [
+  js: {
+    type: "terser",
+    terser: {
+      mangle: {
+        toplevel: true,
+        reserved: [
           "pushToast",
           "addKeyboardListener",
           "addClickKeyboardListener",

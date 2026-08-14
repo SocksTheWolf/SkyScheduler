@@ -1,7 +1,7 @@
-import { withCloudflare } from "better-auth-cloudflare";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
+import { withCloudflare } from "better-auth-cloudflare";
 import { APP_NAME } from "../appInfo";
 import { DEFAULT_PDS } from "../config";
 import { BSKY_MAX_USERNAME_LENGTH, BSKY_MIN_USERNAME_LENGTH } from "../limits";

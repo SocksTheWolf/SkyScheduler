@@ -1,4 +1,5 @@
 import { SITE_URL } from "../appInfo";
+import { PUBLIC_OPENAPI_SPEC } from "../config";
 
 interface RobotRule {
   agent: string;
@@ -17,13 +18,17 @@ const defaultRules: RobotRule[] = [
       "/thumbs",
       "/icons",
       "/fonts",
-      "/openapi.json",
     ],
   },
 ];
 
 export function generateRobotsTxt(): string {
   let outputStr = "";
+  // by default, do not allow robots to look at /openapi.json
+  if (PUBLIC_OPENAPI_SPEC) {
+    defaultRules[0].disallow?.push("/openapi.json");
+  }
+
   for (const rule of defaultRules) {
     outputStr += `User-agent: ${rule.agent}\n`;
 

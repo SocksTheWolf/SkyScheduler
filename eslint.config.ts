@@ -1,5 +1,5 @@
 import js from "@eslint/js";
-//@ts-ignore
+//@ts-expect-error - missing types on lint config
 import baseConfig from "@hono/eslint-config";
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
@@ -32,6 +32,9 @@ export default defineConfig([
       "@typescript-eslint/no-unnecessary-condition": "error",
       // ts ignore annoyances
       "@typescript-eslint/ban-ts-comment": "off",
+      // probably need to configure this better, but a lot of wrangler/env injections need to use array access
+      // usually during builds or tsx
+      "@typescript-eslint/dot-notation": "warn",
     },
   },
   // ESLint for website JS

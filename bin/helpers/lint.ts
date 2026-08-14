@@ -62,6 +62,6 @@ export async function generateLintRules(commands: BuildRule[]) {
       continue;
 
     const cmdStr: string = `${command.buildCommand} | ${command.captures == CaptureType.FUNCS ? functionSniffer : constsSniffer}`;
-    runCommandAsync(cmdStr, writeIfFinished);
+    await runCommandAsync(cmdStr, writeIfFinished);
   }
 }

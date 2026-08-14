@@ -4,23 +4,17 @@
 //
 // but this only runs in development while building, so not a big deal.
 import isEmpty from "just-is-empty";
-import unique from "just-unique";
-import { minify } from "minify";
-import { existsSync, statSync } from "node:fs";
-import { glob, mkdir, writeFile } from "node:fs/promises";
 import { ATPROTO_DID } from "../src/appInfo";
-import { USE_STATIC_HTML } from "../src/config";
+import { PUBLIC_OPENAPI_SPEC, USE_STATIC_HTML } from "../src/config";
 import { CaptureType } from "../src/enums";
 import { appManifestGenerate } from "../src/statics/appManifest";
 import { makeConstScript } from "../src/statics/constScript";
 import { redirectRules } from "../src/statics/redirects";
 import { generateRobotsTxt } from "../src/statics/robots";
-import { minifyOptions } from "./configs/minifyOptions";
-import { debug, error, log, warn } from "./helpers/console";
-import { generateLintRules, lintRuleOutputFile } from "./helpers/lint";
+import { debug } from "./helpers/console";
+import { lintRuleOutputFile } from "./helpers/lint";
+import { buildRunner } from "./helpers/runner";
 import { buildSitemap } from "./helpers/sitemap";
-import { buildApp } from "./helpers/staticSite";
-import { runCommandAsync } from "./helpers/subCommand";
 
 // Easy path swaps
 const sDir: string = "src/statics";
@@ -168,17 +162,12 @@ const buildTriggers: BuildTrigger[] = [
     triggers: ["build:redirects"],
     match: [`${sDir}/redirects.ts`, aInfo],
     against: "assets/_redirects",
-  },
-  {
-    name: "sitemap",
-    triggers: ["build:sitemap"],
-    match: ["src/pages/*"],
-    against: "assets/sitemap.xml",
-  },
+  }
 ];
 
 // Add SSG operations
 if (USE_STATIC_HTML) {
+  const { buildApp } = await import("./helpers/staticSite");
   debug("adding ssg pages build checks");
 
   buildRules.set("build:pages", { buildCommand: buildApp });
@@ -192,6 +181,25 @@ if (USE_STATIC_HTML) {
     ignores: [`${sDir}/appManifest.ts`, `${sDir}/robots.ts`, `${sDir}/redirects.ts`],
     against: "assets/pages/index.html",
   });
+} else {
+  // push the sitemap build rules if we aren't doing ssgs
+  buildTriggers.push({
+    name: "sitemap",
+    triggers: ["build:sitemap"],
+    match: ["src/pages/*"],
+    against: "assets/sitemap.xml",
+  });
+}
+
+if (PUBLIC_OPENAPI_SPEC) {
+  const { buildOpenAPISpec } = await import("./openapi");
+  buildRules.set("build:openapi", { buildCommand: buildOpenAPISpec });
+  buildTriggers.push({
+    name: "openapi",
+    triggers: ["build:openapi"],
+    match: ["src/validation/**", "src/endpoints/openapi.tsx"],
+    against: "assets/openapi.json",
+  });
 }
 
 // Add the atproto output if the setting is set
@@ -202,6 +210,7 @@ if (!isEmpty(ATPROTO_DID)) {
     buildCommand: () => ATPROTO_DID,
     output: "assets/.well-known/atproto-did",
   });
+
   buildTriggers.push({
     name: "proto",
     triggers: ["build:proto"],
@@ -210,113 +219,4 @@ if (!isEmpty(ATPROTO_DID)) {
   });
 }
 
-async function main() {
-  const fileModMap = new Map<string, number>();
-  // eslint-disable-next-line @typescript-eslint/dot-notation
-  const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
-  let buildCommands: string[] = [];
-
-  // create the js output directory if it doesn't exist
-  if (!existsSync("assets/js/min")) {
-    await mkdir("assets/js/min");
-  }
-
-  const addBuildCommands = (trigger: BuildTrigger) => {
-    debug(`Match: Adding "${trigger.name}" build commands: "${trigger.triggers.join(", ")}"`);
-    buildCommands.push(...trigger.triggers);
-  };
-
-  // Check to see if we need to build
-  for (const trigger of buildTriggers) {
-    debug(`Checking "${trigger.name}" for matches via ${trigger.match.join(",")}`);
-    let compareAgainst: number;
-
-    // Check if the comparison file exists, if it doesn't, make the file.
-    if (!existsSync(trigger.against)) {
-      debug(`${trigger.name} - against file is missing ${trigger.against}, building`);
-      addBuildCommands(trigger);
-      continue;
-    }
-
-    // get the modtime of the against and cache it.
-    if (!fileModMap.has(trigger.against)) {
-      compareAgainst = statSync(trigger.against).mtimeMs;
-      fileModMap.set(trigger.against, compareAgainst);
-    } else {
-      compareAgainst = fileModMap.get(trigger.against)!;
-    }
-
-    for await (const matchedFile of glob(trigger.match, {exclude: trigger.ignores})) {
-      if (compareAgainst < statSync(matchedFile).mtimeMs) {
-        addBuildCommands(trigger);
-        break;
-      }
-    }
-  }
-
-  // make sure that buildCommands only contains uniques
-  buildCommands = unique(buildCommands);
-
-  // Do not print anything if we do not have any build commands at all.
-  if (buildCommands.length > 0) {
-    log(`\nRunning Build Rules: ${buildCommands.join(", ")}\n`);
-  } else {
-    log("No Build Necessary");
-    return;
-  }
-
-  // build anything that exists.
-  const lintCommands: BuildRule[] = [];
-  for (const command of buildCommands) {
-    const rule: BuildRule | undefined = buildRules.get(command);
-    if (rule === undefined) {
-      warn(`${command} - invalid build command was specified`);
-      continue;
-    }
-
-    // We handle lints later
-    if (rule.captures !== undefined) {
-      if (canMakeLint)
-        lintCommands.push(rule);
-      continue;
-    }
-
-    if (typeof rule.buildCommand === "string") {
-      const callback = async (output: string) => {
-        debug(`${command} - executed build command ${rule.buildCommand.toString()}`);
-        if (rule.output === undefined)
-          return;
-
-        if (rule.minify) {
-          try {
-            // @ts-ignore
-            const data: string = (rule.output.includes(".js")) ? await minify.js(output, minifyOptions) : await minify.css(output);
-            await writeFile(rule.output, data);
-          } catch (err: unknown) {
-            error(`${command} - Got error: ` + String(err));
-          }
-        } else {
-          await writeFile(rule.output, output);
-        }
-      };
-      // some crazy evil things going on with this command down here.
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      runCommandAsync(rule.buildCommand, callback);
-    } else {
-      const output: BuildRuleFuncOutput = await rule.buildCommand();
-      debug(`${command} - Was ran`);
-      if (typeof output === "string" && rule.output !== undefined) {
-        await writeFile(rule.output, output);
-        debug(`${command} - Wrote file ${rule.output}`);
-      }
-    }
-  }
-
-  // Generate any lints that are necessary
-  if (lintCommands.length > 0) {
-    log("building lint configs");
-    await generateLintRules(lintCommands);
-  }
-}
-
-await main();
+await buildRunner(buildTriggers, buildRules);

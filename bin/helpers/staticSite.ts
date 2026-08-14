@@ -49,6 +49,6 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   }
 }
 
-export async function buildApp() {
+export async function buildApp(): BuildRuleFuncPromise {
   await buildStaticSite(app.default.getApp());
 }
