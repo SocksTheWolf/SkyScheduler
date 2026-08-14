@@ -15,7 +15,7 @@ import { postRecordURI } from "../validation/regexCases";
 export const CONST_SCRIPT_VERSION: number = 14;
 
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
-export function makeConstScript() {
+export function makeConstScript(): string {
   const makeStringArray = (typeMap: string[]) => {
     return typeMap.map((type) => `"${type}"`).join();
   };
@@ -26,6 +26,7 @@ export function makeConstScript() {
   }
 
   return `/*eslint no-unused-vars: "off"*/
+/* Application constant variable definitions */
 const DEFINITION_VERSION=${CONST_SCRIPT_VERSION};
 const fileTypesSupported = [${makeStringArray(fileTypeArray)}];
 const imageTypes = [${makeStringArray(BSKY_IMG_MIME_TYPES)}];

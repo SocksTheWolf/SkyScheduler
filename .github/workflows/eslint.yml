@@ -7,7 +7,6 @@ on:
       - "src/**"
       - "bin/genlint.ts"
       - "eslint.config.ts"
-      - ".minify.json"
       - ".node-version"
   pull_request:
     # The branches below must be a subset of the branches above

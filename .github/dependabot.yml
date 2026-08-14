@@ -26,3 +26,4 @@ updates:
       - dependency-name: 'minify'
       - dependency-name: 'tsx'
       - dependency-name: 'prettier'
+      - dependency-name: '@types/minify'

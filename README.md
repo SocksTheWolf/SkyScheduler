@@ -184,7 +184,6 @@ skyscheduler/
 ├── .env.example
 ├── .node-version
 ├── .markdownlint.json
-├── .minify.json
 ├── .ssclirc
 ├── auth.config.ts
 ├── drizzle.config.ts
