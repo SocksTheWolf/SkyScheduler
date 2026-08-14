@@ -1,8 +1,8 @@
-import { existsSync } from "fs";
-import fs, { readdir, rm, stat, unlink } from "fs/promises";
 import type { Hono } from "hono";
 import type { ToSSGResult } from "hono/ssg";
 import { toSSG } from "hono/ssg";
+import { existsSync } from "fs";
+import fs, { readdir, rm, stat, unlink } from "fs/promises";
 import path from "path";
 import { USE_STATIC_HTML } from "../../src/config";
 import * as app from "../../src/index";

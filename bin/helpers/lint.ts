@@ -1,5 +1,5 @@
-import { writeFile } from "fs/promises";
 import * as prettier from "prettier";
+import { writeFile } from "fs/promises";
 import { CaptureType } from "../../src/enums";
 import { debug } from "./console";
 import { runCommandAsync } from "./subCommand";

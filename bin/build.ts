@@ -282,7 +282,7 @@ async function main() {
     }
 
     if (typeof rule.buildCommand === "string") {
-      runCommandAsync(rule.buildCommand, async (output: string) => {
+      const callback = async (output: string) => {
         debug(`${command} - executed build command ${rule.buildCommand.toString()}`);
         if (rule.output === undefined)
           return;
@@ -298,7 +298,10 @@ async function main() {
         } else {
           await writeFile(rule.output, output);
         }
-      });
+      };
+      // some crazy evil things going on with this command down here.
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      runCommandAsync(rule.buildCommand, callback);
     } else {
       const output: BuildRuleFuncOutput = await rule.buildCommand();
       debug(`${command} - Was ran`);
