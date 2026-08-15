@@ -17,14 +17,36 @@ updates:
       default-days: 10
       semver-major-days: 30
       semver-minor-days: 12
+    groups:
+      eslint:
+        patterns:
+          - "*eslint*"
+          - "globals"
+          - "jiti"
+      hono:
+        patterns:
+          - "*hono*"
+      atproto:
+        patterns:
+          - "@atproto/*"
+      dev:
+        patterns:
+          - "toml"
+          - "tsx"
+          - "minify"
+      auth:
+        patterns:
+          - "better-auth"
+          - "drizzle-*"
     allow:
       - dependency-type: "production"
         update-types:
           - "version-update:semver-patch"
           - "version-update:semver-minor"
     ignore:
-      # A github action updates wrangler for us
+      # A github action updates these for us
       - dependency-name: "wrangler"
+      - dependency-name: "hono"
       # Ignore all of minify
       - dependency-name: "@types/minify"
       - dependency-name: "minify"
