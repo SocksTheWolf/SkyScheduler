@@ -166,10 +166,10 @@ skyscheduler/
 │   └── thumbs/
 ├── bin/
 ├── src/
+│   ├── @types/
 │   ├── auth/
 │   ├── classes/
 │   ├── db/
-│   ├── definitions/
 │   ├── endpoints/
 │   ├── layout/
 │   ├── middleware/

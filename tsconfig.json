@@ -8,11 +8,6 @@
     "lib": ["ESNext"],
     "types": [
       "node",
-      "./src/definitions/global.d.ts",
-      "./src/definitions/services.d.ts",
-      "./src/definitions/settings.d.ts",
-      "./src/definitions/tools.d.ts",
-      "./src/definitions/wrangler.d.ts"
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"

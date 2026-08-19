@@ -13,7 +13,7 @@ export default defineConfig([
     "assets/dep/**",
     ".vscode/**",
     "dist/**",
-    "src/definitions/wrangler.d.ts",
+    "src/@types/**",
     "*.config.ts",
     "assets/js/min/**",
   ]),
