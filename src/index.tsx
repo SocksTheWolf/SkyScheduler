@@ -1,4 +1,3 @@
-import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { every } from "hono/combine";
 import { csrf } from "hono/csrf";
@@ -6,7 +5,6 @@ import { disableSSG } from "hono/ssg";
 import { SITE_URL } from "./appInfo";
 import { createAuth, processAuthRoute } from "./auth";
 import { ScheduledContext } from "./classes/context";
-import { schema } from "./db/schema";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { generateOpenAPI } from "./endpoints/openapi";
@@ -30,6 +28,7 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import type { Bindings, HonoBase, QueueTaskData } from "./types";
+import { getDrizzle } from "./utils/helpers";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";
@@ -59,7 +58,7 @@ app.use("*", async (c, next) => {
     // but I don't care, it should be fine anyways.
 
     // @ts-ignore
-    c.set("db", drizzle(c.env.DB, { schema, logger: false }));
+    c.set("db", getDrizzle(c.env.DB));
   }
   c.set("auth", createAuth(c));
   await next();

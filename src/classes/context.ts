@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { drizzle } from "drizzle-orm/d1";
 import type { ExecutionContext } from "hono";
 import type { Bindings } from "../types";
+import { getDrizzle } from "../utils/helpers";
 
 export class ScheduledContext {
   executionCtx: ExecutionContext;
@@ -13,7 +13,7 @@ export class ScheduledContext {
     this.#map = new Map<string, any>();
     this.env = env;
     this.executionCtx = executionCtx;
-    this.set("db", drizzle(env.DB));
+    this.set("db", getDrizzle(env.DB));
     this.set("ssg", false);
   }
   get(name: string): any {
