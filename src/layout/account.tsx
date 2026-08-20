@@ -31,7 +31,7 @@ export default function AccountHandler(props: AccountFormProps) {
       <header>
         <center><h3>{props.title}</h3></center>
       </header>
-      <form id="loginForm">
+      <form id="loginForm" method="post">
         {props.children}
         <center>
           <button type="submit" disabled={props.disabledByDefault ?? false}>
