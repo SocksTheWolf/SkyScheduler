@@ -134,15 +134,15 @@ const removeInvalidFacets = (inFacets?: Facet[]) => {
   }
   const savedFacets: Facet[] = [];
   for (const facet of inFacets) {
+    let facetIsValid = true;
     // mmmmmmm N^2 to fix the dumbest bug.
-    const facetsFeature: unknown[] = [];
     for (const feature of facet.features) {
       if (AppBskyRichtextFacet.isMention(feature) && !AppBskyRichtextFacet.validateMention(feature).success) {
-        continue;
+        facetIsValid = false;
+        break;
       }
-      facetsFeature.push(feature);
     }
-    if (facetsFeature.length > 0)
+    if (facetIsValid)
       savedFacets.push(facet);
   }
   return savedFacets;
