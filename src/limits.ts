@@ -152,3 +152,5 @@ export const MAX_GIF_LENGTH_LIMIT: number = MAX_GIF_LENGTH * TO_SEC;
 export const CF_IMAGES_FILE_SIZE_LIMIT_IN_MB: number = 70;
 export const CF_IMAGES_FILE_SIZE_LIMIT: number = CF_IMAGES_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const CF_IMAGES_MAX_DIMENSION: number = 10000;
+// Limits for Cloudflare KV
+export const CF_KV_MIN_TTL: number = 60;

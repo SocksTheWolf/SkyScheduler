@@ -196,7 +196,6 @@ skyscheduler/
 #### Server
 
 - `BetterAuth` - site login/authentication
-- `BetterAuthCloudflare` - helper for BetterAuth on CF
 - `Hono` - request routing/processing
 - `uuid` - id generation
 - `zod` - data validation
