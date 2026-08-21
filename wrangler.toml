@@ -119,6 +119,10 @@ max_batch_size = 15
 max_batch_timeout = 4
 max_retries = 3
 
+# Comment this out if you don't have a tail logger
+[[tail_consumers]]
+service = "taillog"
+
 # used for resizing the thumbnails for link posts
 [images]
 binding = "IMAGES"
