@@ -35,7 +35,7 @@ import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
 app.use(blankAuthEnv);
-app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, corsHelperMiddleware, cspHelper);
+app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, cspHelper, corsHelperMiddleware);
 app.use(ssgGenMiddleware);
 
 ///// Static Files /////
