@@ -11,7 +11,7 @@ function tributeToElement(el) {
     noMatchTemplate: () => '<span class="acBskyHandle">No Match Found</span>',
     lookup: 'handle',
     fillAttr: 'handle',
-    spaceSelectsMatch: true,
+    spaceSelectsMatch: false,
     menuItemLimit: MAX_AUTO_COMPLETE_NAMES,
     menuShowMinLength: MIN_CHAR_AUTO_COMPLETE_NAMES,
     menuContainer: el.parentNode
