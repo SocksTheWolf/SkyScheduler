@@ -80,11 +80,18 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
       continue;
     }
 
-    // We handle lints later
-    if (rule.captures !== undefined) {
-      if (canMakeLint)
+    // Check if this only affects the build output
+    if (rule.isTypeAction) {
+      // Check if we can process these kinds of actions rn
+      if (!canMakeLint)
+        continue;
+
+      // if it's a capture, we should move these instructions to the end of the build process
+      if (rule.captures !== undefined) {
         lintCommands.push(rule);
-      continue;
+        continue;
+      }
+      // otherwise, keep going
     }
 
     // if this build type is of an exec string

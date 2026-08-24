@@ -20,6 +20,7 @@ interface BuildRule {
   output?: string;
   minify?: boolean;
   captures?: CaptureType;
+  isTypeAction?: boolean;
 };
 
 type BuildRules = Map<string, BuildRule>;

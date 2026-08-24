@@ -52,14 +52,17 @@ buildRules.set("build:css:mods", {
 buildRules.set("lint:consts", {
   buildCommand: `cat ${aJS}/consts.js`,
   captures: CaptureType.CONSTS,
+  isTypeAction: true
 });
 buildRules.set("lint:all_funcs", {
   buildCommand: `cat ${aJS}/*.js`,
   captures: CaptureType.FUNCS,
+  isTypeAction: true
 });
 buildRules.set("lint:selectHelper", {
   buildCommand: `cat ${aJS}/appSelectHelper.js`,
   captures: CaptureType.CONSTS,
+  isTypeAction: true
 });
 buildRules.set("build:consts", {
   buildCommand: makeConstScript,
@@ -83,6 +86,7 @@ buildRules.set("build:redirects", {
 });
 buildRules.set("build:types:wrangler", {
   buildCommand: `npm run types`,
+  isTypeAction: true
 });
 
 // This rule set is used in two different places, so cache it out for maintaining both rules easily.
