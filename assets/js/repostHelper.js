@@ -40,12 +40,7 @@ repostForm.addEventListener('submit', async (e) => {
     pushToast("Invalid post URL", false);
     showRepostProgress(false);
   }
-  try {
-    new URL(postRecordVal);
-  } catch(urlErr) {
-    invalidPostURL();
-    return;
-  }
+
   let dateTime;
   try {
     dateTime = new Date(scheduledDateVal).toISOString();
@@ -54,27 +49,33 @@ repostForm.addEventListener('submit', async (e) => {
     showRepostProgress(false);
     return;
   }
-
   const postObject = {
     scheduledDate: dateTime,
     data: {
-      type: 0
+      type: REPOST_TYPE_NONE
     }
   };
 
   if (existingPostId.hasAttribute("data-id")) {
     postObject.data = {
-      type: 2,
+      type: REPOST_TYPE_FUTURE,
       id: existingPostId.getAttribute("data-id")
     }
   } else {
     postObject.data = {
-      url: postRecordVal,
-      type: 1
+      type: REPOST_TYPE_EXISTING,
+      url: postRecordVal
     };
     // Push any names we have for the post here too
     if (repostTitle.value !== "" && isElementVisible(repostTitleSection)) {
       postObject.data.content = repostTitle.value;
+    }
+    try {
+      if (isElementVisible(retweetFields))
+        new URL(postRecordVal);
+    } catch(urlErr) {
+      invalidPostURL();
+      return;
     }
     // Check to see if url can match with our regex
     if (!ATPROTO_RECORD_REGEX.test(postRecordVal)) {

@@ -1,5 +1,5 @@
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../config";
-import { EmbedDataType } from "../enums";
+import { EmbedDataType, RepostType } from "../enums";
 import {
   ACCOUNT_EXPIRE_FORCE_LOGOUT,
   BSKY_GIF_MIME_TYPES, BSKY_IMG_MIME_TYPES,
@@ -13,7 +13,7 @@ import {
 } from "../limits";
 import { postRecordURI } from "../validation/regexCases";
 
-export const CONST_SCRIPT_VERSION: number = 14;
+export const CONST_SCRIPT_VERSION: number = 15;
 
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript(): string {
@@ -46,9 +46,14 @@ const FILE_DROP_MAX_FILES=${MAX_FILES_PER_POST};
 const ATPROTO_RECORD_REGEX=${postRecordURI};
 const POSTING_TIME_INTERVAL=${POSTING_TIME_INTERVAL};
 const REPOSTING_TIME_INTERVAL=${REPOSTING_TIME_INTERVAL};
+/* EmbedDataType enum */
 const IMAGE_DATA_TYPE=${EmbedDataType.Image};
 const VIDEO_DATA_TYPE=${EmbedDataType.Video};
 const WEBLINK_DATA_TYPE=${EmbedDataType.WebLink};
 const RECORD_DATA_TYPE=${EmbedDataType.Record};
+/* RepostType enum */
+const REPOST_TYPE_NONE=${RepostType.None};
+const REPOST_TYPE_EXISTING=${RepostType.ExistingPost};
+const REPOST_TYPE_FUTURE=${RepostType.FuturePost};
 const ACCOUNT_EXPIRE_TIMEOUT=${Math.abs(ACCOUNT_EXPIRE_FORCE_LOGOUT)};`;
 }
