@@ -50,8 +50,6 @@ function pushReturnToHomepageToast() {
 setTimeout(pushReturnToHomepageToast, 1500);
 
 function updateUsername(val) {
-  const domainRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-  const linkRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
   // Remove this bullshit unicode thing that gets injected on usernames if you copy them
   // from the bsky website, why the fuck did they do this?
   const inputData = val.replace(/[^\x00-\x7F]/g, "").replace("@", "");
@@ -61,15 +59,15 @@ function updateUsername(val) {
     return "";
   }
   // Convert urls into handles
-  const matches = linkRegex.exec(inputData);
+  const matches = DID_CAPTURE_REGEX.exec(inputData);
   if (matches != null && matches.length >= 2) {
     // was a URL, convert to handle
     return matches[1];
   }
   // was something else, check if we need to add .bsky.social
-  if (!inputData.match(domainRegex)) {
+  if (!inputData.match(DOMAIN_REGEX)) {
     const newName = inputData + ".bsky.social";
-    if (newName.match(domainRegex)) {
+    if (newName.match(DOMAIN_REGEX)) {
       return newName;
     }
   }

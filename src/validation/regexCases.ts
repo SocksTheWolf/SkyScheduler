@@ -10,12 +10,19 @@ export interface atpRecordURICaptures {
   type?: string;
   postid?: string;
 }
+// did capture from record
+export const didCaptureRegex = /(?:^.*\/profile\/)([0-9a-zA-Z\-\.]+)(?:\/post\/\w+)?(?:\/)?$/g;
+// any record URI
 export const atpRecordURI = /(?:^.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/(?<type>post|feed|lists)\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
-// only a post record URI
+// public facing post record URI (for reposts)
 export const postRecordURI = /(?:^.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
-// atproto uris
+// atproto post record URI
 export const atProtoPostURI = /at\:\/\/(?:[0-9a-zA-Z\-\.\:]+)\/app\.bsky\.feed\.post\/(?:[a-z0-9]+)(?:\/)?$/i;
 // atproto schema uris
 export const atProtoRecordURI = /at\:\/\/(?:[0-9a-z\-\.\:]+)\/(?:[a-z0-9\.\#]+)\/(?:[a-z0-9]+)(?:\/)?$/i;
 // repost record
 export const repostContentRecord = /Repost of (?:.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
+// bsky handle regex
+export const domainHandleRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+// mention capture regex
+export const mentionCaptureRegex = /@((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,})/g;
