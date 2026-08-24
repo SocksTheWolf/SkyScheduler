@@ -143,7 +143,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
     const wasPosted = (i == 0 && !allPosted) ? false : true;
     dbOperations.push(db.update(posts).set(
       {content: TRUNCATE_POSTED_CONTENT ? sql`substr(posts.content, 0, ${MAX_POSTED_LENGTH+1})` : posts.content,
-        posted: wasPosted, uri: record.uri, cid: record.cid, embedContent: []})
+        posted: wasPosted, uri: record.uri, cid: record.cid, embedContent: [], mentionsCache: []})
     .where(eq(posts.uuid, record.postID)));
   }
 

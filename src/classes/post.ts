@@ -2,7 +2,7 @@ import isEmpty from "just-is-empty";
 import { CAN_REPOST_SCHEDULED_POSTS } from "../config";
 import type { PostLabel } from "../enums";
 import { MAX_REPOST_RULES_PER_POST } from "../limits";
-import type { BaseContent, EmbedData } from "../types";
+import type { BaseContent, EmbedData, MentionCache } from "../types";
 import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";
 
@@ -11,6 +11,7 @@ interface DBPost {
   uuid: string;
   content: string;
   embedContent?: EmbedData[];
+  mentionsCache?: MentionCache[];
   contentLabel: PostLabel;
   userId: string;
   cid?: string | null;
@@ -37,6 +38,7 @@ export class Post implements BaseContent {
   // post data
   content: string;
   embedContent?: EmbedData[];
+  mentionsCache?: MentionCache[];
   contentLabel: PostLabel;
   // post flags
   postNow: boolean;
@@ -58,6 +60,7 @@ export class Post implements BaseContent {
     this.userId = data.userId;
     this.uuid = data.uuid;
     this.embedContent = data.embedContent;
+    this.mentionsCache = data.mentionsCache;
 
     this.contentLabel = data.contentLabel;
     this.content = data.content;

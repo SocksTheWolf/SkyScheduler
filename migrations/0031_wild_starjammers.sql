@@ -1,0 +1,1 @@
+ALTER TABLE `posts` ADD `mentionsCache` text DEFAULT '[]' NOT NULL;

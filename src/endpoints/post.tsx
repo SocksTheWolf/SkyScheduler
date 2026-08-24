@@ -13,6 +13,7 @@ import type {
   CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse, EditPostChanges, HonoBase
 } from "../types";
+import { getMentionsFromContent } from "../utils/bsky/mentions";
 import {
   createPost,
   createRepost,
@@ -172,7 +173,8 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
       }
     }
   }
-  const payload: EditPostChanges = { content: content };
+  const newMentionsCache = await getMentionsFromContent(content, originalPost.mentionsCache);
+  const payload: EditPostChanges = { content: content, mentionsCache: newMentionsCache };
   // push edited embedContent.
   if (hasEmbedEdits)
     payload.embedContent = originalPost.embedContent;

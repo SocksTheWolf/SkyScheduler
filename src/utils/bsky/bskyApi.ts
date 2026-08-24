@@ -2,9 +2,9 @@ import type {
   $Typed, AppBskyEmbedExternal,
   AppBskyEmbedGallery, AppBskyEmbedImages,
   AppBskyEmbedRecord, AppBskyEmbedVideo,
-  AppBskyFeedPost, BlobRef, Facet,
+  AppBskyFeedPost, BlobRef
 } from "@atproto/api";
-import { AppBskyRichtextFacet, RichText } from "@atproto/api";
+import { RichText } from "@atproto/api";
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { imageDimensionsFromStream } from "image-dimensions";
 import isEmpty from "just-is-empty";
@@ -35,6 +35,7 @@ import { getUsernameForUserId } from "../db/userinfo";
 import { createViolationForUser } from "../db/violations";
 import { has } from "../helpers";
 import { deleteEmbedsFromR2 } from "../r2Query";
+import { removeOrResolveInvalidFacets } from "./mentions";
 
 export const doesHandleExist = async (user: string) => {
   try {
@@ -128,26 +129,6 @@ export const makeRepost = async (_: AllContext, content: Repost, usingAgent: AtP
   }
 };
 
-const removeInvalidFacets = (inFacets?: Facet[]) => {
-  if (inFacets === undefined) {
-    return undefined;
-  }
-  const savedFacets: Facet[] = [];
-  for (const facet of inFacets) {
-    let facetIsValid = true;
-    // mmmmmmm N^2 to fix the dumbest bug.
-    for (const feature of facet.features) {
-      if (AppBskyRichtextFacet.isMention(feature) && !AppBskyRichtextFacet.validateMention(feature).success) {
-        facetIsValid = false;
-        break;
-      }
-    }
-    if (facetIsValid)
-      savedFacets.push(facet);
-  }
-  return savedFacets;
-}
-
 const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): Promise<PostStatus | null> => {
   const username = await getUsernameForUserId(c, content.userId);
   // incredibly unlikely but we'll handle it
@@ -167,7 +148,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
     const postRecord: AppBskyFeedPost.Record = {
       $type: "app.bsky.feed.post",
       text: rt.text,
-      facets: removeInvalidFacets(rt.facets),
+      facets: removeOrResolveInvalidFacets(postData.content, rt.facets, postData.mentionsCache),
       createdAt: new Date().toISOString(),
     };
     if (postData.contentLabel !== PostLabel.None) {

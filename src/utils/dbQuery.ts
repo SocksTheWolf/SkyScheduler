@@ -19,6 +19,7 @@ import type {
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
+import { getMentionsFromContent } from "./bsky/mentions";
 import {
   getChildPostsOfThread, getPostByCID,
   getPostThreadCount, getRepostCountQuery,
@@ -269,6 +270,9 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
     rootPostID = postUUID;
   }
 
+  // create the mentions cache for the initial post.
+  const mentions = await getMentionsFromContent(content);
+
   // Add the post to the DB
   dbOperations.push(db.insert(posts).values({
       content,
@@ -277,6 +281,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
       scheduledDate: (!isThreadedPost) ? scheduleDate : new Date(rootPostData!.scheduledDate!),
       rootPost: rootPostID,
       parentPost: parentPostID,
+      mentionsCache: mentions,
       repostInfo: (!isThreadedPost && repostInfo !== undefined) ? [repostInfo] : [],
       threadOrder: (!isThreadedPost) ? undefined : parentPostOrder,
       embedContent: embeds,

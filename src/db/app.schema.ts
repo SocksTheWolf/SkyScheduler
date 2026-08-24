@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import type { RepostInfo } from "../classes/repost";
 import { PostLabel } from "../enums";
-import type { EmbedData } from "../types";
+import type { EmbedData, MentionCache } from "../types";
 import { users } from "./auth.schema";
 
 export const posts = sqliteTable('posts', {
@@ -23,6 +23,8 @@ export const posts = sqliteTable('posts', {
   rootPost: text('rootPost'),
   parentPost: text('parentPost'),
   threadOrder: integer('threadOrder').default(-1),
+  // mentions cache
+  mentionsCache: text('mentionsCache', {mode: 'json'}).notNull().$type<MentionCache[]>().default(sql`'[]'`),
   // bsky content labels
   contentLabel: text('contentLabel', {mode: 'text'}).$type<PostLabel>().default(PostLabel.None).notNull(),
   // metadata timestamps

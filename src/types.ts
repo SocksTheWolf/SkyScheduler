@@ -59,6 +59,11 @@ export interface EmbedData {
   associatedRefs?: WebAssociatedRef[];
 }
 
+export interface MentionCache {
+  handle: string;
+  did: string;
+}
+
 export interface BaseContent {
   userId: string;
   content: string;
@@ -191,6 +196,7 @@ export interface AccountUpdatePayload {
 export interface EditPostChanges {
   content: string;
   embedContent?: EmbedData[];
+  mentionsCache?: MentionCache[];
 }
 
 export type RepostIntakeData = {
