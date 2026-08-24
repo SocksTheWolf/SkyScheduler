@@ -11,6 +11,7 @@ import type { PreloadRules } from "../../types";
 // Basic scripts, no interactivity
 const defaultPreloads: PreloadRules[] = [
   { type: "style", href: "/dep/pico.min.css" },
+  { type: "script", href: constScriptStr },
   { type: "style", href: mainStyleStr },
 ];
 
@@ -32,7 +33,6 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   { href: "/dep/modal.min.js", type: "script" },
   { href: "/dep/tabs.min.js", type: "script" },
   { href: "/dep/has.min.js", type: "script" },
-  { type: "script", href: constScriptStr },
   { type: "script", href: "/dep/dropzone.min.js" },
   { type: "style", href: "/dep/dropzone.min.css" },
   { type: "style", href: "/dep/tribute.min.css" },
