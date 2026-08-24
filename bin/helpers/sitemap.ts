@@ -1,13 +1,13 @@
 import { statSync } from "node:fs";
 import { glob } from "node:fs/promises";
 import { SITE_URL } from "../../src/appInfo";
+import { sitemapIgnoreFiles } from "../configs/sitemapIgnore";
 
 export async function buildSitemap() {
-  const ignoreFiles: string[] = ["**/forgot.html", "**/reset.html", "**/dashboard.html"];
   const page: SitemapPageInfo[] = [];
 
   // build up sitemap page information
-  for await (const filePath of glob("assets/pages/*", {exclude: ignoreFiles})) {
+  for await (const filePath of glob("assets/pages/*", {exclude: sitemapIgnoreFiles})) {
     page.push({
       url: filePath.replace(/(assets\\pages\\|assets\/pages\/|index|\.html)/g, ""),
       lastMod: statSync(filePath).mtime.toISOString()

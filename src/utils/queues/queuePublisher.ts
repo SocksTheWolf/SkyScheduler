@@ -36,14 +36,9 @@ const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_que
 export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
 export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasRepostQueue(env);
 export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
-export const shouldPostThreadQueue = (env: Bindings) =>
-  env.QUEUE_SETTINGS.threadEnabled && (hasPostQueue(env) || isQueueEnabled(env));
 
 export async function enqueuePost(c: AllContext, data: Post, delay: number = -1) {
-  if (data.isThreadRoot) {
-    if (!shouldPostThreadQueue(c.env))
-      return;
-  } else if (!isQueueEnabled(c.env))
+  if (!isQueueEnabled(c.env))
     return;
 
   const postType = TaskType.Post,

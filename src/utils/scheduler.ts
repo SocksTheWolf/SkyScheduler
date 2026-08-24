@@ -22,8 +22,7 @@ import {
   enqueueRepost,
   isQueueEnabled,
   isRepostQueueEnabled,
-  shouldPostNowQueue,
-  shouldPostThreadQueue,
+  shouldPostNowQueue
 } from "./queues/queuePublisher";
 import { deleteFromR2 } from "./r2Query";
 
@@ -98,14 +97,13 @@ export const scheduleAllContentTasks = async (c: AllContext) => {
 export const schedulePostTask = async (c: AllContext, withAgency?: AgentMap) => {
   const scheduledPosts: Post[] = await getAllPostsForCurrentTime(c);
   const queueEnabled: boolean = isQueueEnabled(c.env);
-  const threadQueueEnabled: boolean = shouldPostThreadQueue(c.env);
   const agency = withAgency ?? new AgentMap(c.env.TASK_SETTINGS);
 
   // Push any posts
   if (!isEmpty(scheduledPosts)) {
     console.log(`handling ${scheduledPosts.length} posts...`);
     for (const post of scheduledPosts) {
-      if (queueEnabled || (post.isThreadRoot && threadQueueEnabled)) {
+      if (queueEnabled) {
         await enqueuePost(c, post);
       } else {
         const agent = await agency.getOrAddAgent(c, post.userId, TaskType.Post);

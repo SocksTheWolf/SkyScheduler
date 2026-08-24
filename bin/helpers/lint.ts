@@ -1,25 +1,9 @@
 import * as prettier from "prettier";
 import { writeFile } from "fs/promises";
 import { CaptureType } from "../../src/enums";
+import { thirdPartyDependencies } from "../configs/siteDepsExports";
 import { debug } from "./console";
 import { runCommandAsync } from "./subCommand";
-
-// hardcoded variables/functions from the deps folder
-const thirdPartyDependencies = {
-  htmx: false,
-  Dropzone: false,
-  Toastify: false,
-  Tribute: false,
-  Countable: false,
-  has: false,
-  turnstile: false,
-  // Pico Modals
-  openModal: false,
-  closeModal: false,
-  // Pico Tabs
-  PicoTabs: false,
-  contentTabs: false,
-};
 
 export const lintRuleOutputFile = "jsrules.config.ts";
 

@@ -8,10 +8,19 @@ import { generateLintRules } from "./lint";
 import { runCommandAsync } from "./subCommand";
 
 export async function buildRunner(buildTriggers: BuildTriggers, buildRules: BuildRules) {
+  // prevent multiple re-entry operations.
+  if (process.env.IS_BUILDING !== undefined) {
+    debug("recursive re-entry detected, stopping...");
+    return;
+  }
+
   const fileModMap = new Map<string, number>();
   // eslint-disable-next-line @typescript-eslint/dot-notation
   const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
   let buildCommands: string[] = [];
+
+  // set that we are currently building
+  process.env.IS_BUILDING = "true";
 
   // create the js output directory if it doesn't exist
   if (!existsSync("assets/js/min")) {
@@ -113,4 +122,5 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
     log("building lint configs");
     await generateLintRules(lintCommands);
   }
+  log("Completed build");
 }

@@ -81,6 +81,9 @@ buildRules.set("build:redirects", {
   buildCommand: redirectRules,
   output: "assets/_redirects"
 });
+buildRules.set("build:types:wrangler", {
+  buildCommand: `npm run types`,
+});
 
 // This rule set is used in two different places, so cache it out for maintaining both rules easily.
 const constScriptMatches = [`${sDir}/constScript.ts`, "src/limits.ts", "src/config.ts"];
@@ -139,6 +142,7 @@ const buildTriggers: BuildTrigger[] = [
     match: [
       `${aJS}/*.js`,
       `${sDir}/appScripts.ts`,
+      "bin/configs/siteDepsExports.ts",
       ...constScriptMatches
     ],
     ignores: [`${aJS}/consts.js`],
@@ -162,7 +166,16 @@ const buildTriggers: BuildTrigger[] = [
     triggers: ["build:redirects"],
     match: [`${sDir}/redirects.ts`, aInfo],
     against: "assets/_redirects",
-  }
+  },
+  // build types
+  {
+    name: "build wrangler types",
+    triggers: [
+      "build:types:wrangler",
+    ],
+    match: ["wrangler.toml", "package.json", "package-lock.json"],
+    against: `src/@types/wrangler.d.ts`
+  },
 ];
 
 // Add SSG operations
@@ -176,6 +189,8 @@ if (USE_STATIC_HTML) {
     triggers: ["build:pages", "build:sitemap"],
     match: ["src/layout/**",
       "src/pages/*.tsx",
+      "bin/configs/sitemapIgnore.ts",
+      "bin/configs/siteDepsExports.ts",
       aInfo,
       `${sDir}/*.ts`],
     ignores: [`${sDir}/appManifest.ts`, `${sDir}/robots.ts`, `${sDir}/redirects.ts`],
@@ -186,7 +201,7 @@ if (USE_STATIC_HTML) {
   buildTriggers.push({
     name: "sitemap",
     triggers: ["build:sitemap"],
-    match: ["src/pages/*"],
+    match: ["src/pages/*", "bin/configs/sitemapIgnore.ts"],
     against: "assets/sitemap.xml",
   });
 }

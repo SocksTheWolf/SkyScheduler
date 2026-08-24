@@ -2,14 +2,21 @@
 name = "skyscheduler"
 main = "src/index.tsx"
 compatibility_date = "2025-11-18"
-compatibility_flags = [ "nodejs_compat", "nodejs_compat_do_not_populate_process_env", "disable_ctx_exports", "disable_nodejs_http_server_modules" ]
+compatibility_flags = [
+  "nodejs_compat",
+  "nodejs_compat_do_not_populate_process_env",
+  "disable_ctx_exports",
+  "disable_nodejs_http_server_modules"
+]
 send_metrics = false
 minify = true
 upload_source_maps = true
 preview_urls = false
 
 assets = { binding = "ASSETS", run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
-routes = [{ pattern = "skyscheduler.work", custom_domain = true }]
+routes = [
+  { pattern = "skyscheduler.work", custom_domain = true }
+]
 
 [build]
 command = "npm run build"
@@ -122,6 +129,7 @@ max_retries = 3
 # Comment this out if you don't have a tail logger
 [[tail_consumers]]
 service = "taillogger"
+remote = false
 
 # used for resizing the thumbnails for link posts
 [images]
@@ -149,11 +157,13 @@ TURNSTILE_PUBLIC_KEY="0x4AAAAAABkTE_9TV_bUnLGK"
 # the host for CSP reports to go to. if the CSP flags are off, this will not be used.
 CSP_REPORT_URL="https://report.skyscheduler.work/csp"
 
-# If we should use cf image transforms & how much of a quality percentage should we try and the public location of the resize bucket.
+# If we should use cf image transforms &
+# how much of a quality percentage should we try and the public location of the resize bucket.
 IMAGE_SETTINGS={enabled=true, steps=[95, 85, 75], bucket_url="https://resize.skyscheduler.work/"}
 
 # queue handling, pushing information.
-QUEUE_SETTINGS = {enabled=true, postNowEnabled=false, threadEnabled=true, delay_val=100, max_retries=3, post_queues=["POST_QUEUE", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
+QUEUE_SETTINGS = {enabled=true, postNowEnabled=false, delay_val=100, max_retries=3, post_queues=[
+  "POST_QUEUE", "POST_QUEUE2"], repost_queues=["REPOST_QUEUE"]}
 
 # if we should be removing abandoned files from R2 storage
 R2_SETTINGS={auto_prune=true, prune_days=3}

@@ -5,9 +5,11 @@ on:
     paths:
       - "assets/js/*.js"
       - "src/**"
-      - "bin/genlint.ts"
+      - "bin/configs/siteDepsExports.ts"
       - "eslint.config.ts"
       - ".node-version"
+      - "package.json"
+      - "wrangler.toml"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -15,10 +17,12 @@ on:
       - "assets/js/*.js"
       - "src/**"
       - "eslint.config.ts"
+      - "wrangler.toml"
+      - "package.json"
 
 jobs:
   eslint:
-    name: Run eslint scanning
+    name: Run ESLint scan
     runs-on: ubuntu-latest
     permissions:
       contents: read
