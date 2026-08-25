@@ -61,7 +61,7 @@
     "@atproto/api": "^0.20.39",
     "@atproto/xrpc": "^0.8.10",
     "@hono/standard-validator": "^0.3.0",
-    "better-auth": "^1.6.27",
+    "better-auth": "^1.6.29",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.13.3",
