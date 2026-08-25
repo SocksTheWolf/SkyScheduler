@@ -30,4 +30,3 @@ jobs:
     uses: socksthewolf/workflows/.github/workflows/run_eslint.yml@main
     with:
       ref: ${{ github.ref }}
-      needs_build: true
