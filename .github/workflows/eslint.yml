@@ -6,6 +6,7 @@ on:
       - "assets/js/*.js"
       - "src/**"
       - "bin/configs/siteDepsExports.ts"
+      - ".github/workflows/eslint.yml"
       - "eslint.config.ts"
       - ".node-version"
       - "package.json"
@@ -16,6 +17,7 @@ on:
     paths:
       - "assets/js/*.js"
       - "src/**"
+      - "bin/configs/siteDepsExports.ts"
       - "eslint.config.ts"
       - "wrangler.toml"
       - "package.json"
