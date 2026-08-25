@@ -20,6 +20,10 @@ on:
       - "wrangler.toml"
       - "package.json"
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   run:
     name: Scan
