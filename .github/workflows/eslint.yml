@@ -21,40 +21,9 @@ on:
       - "package.json"
 
 jobs:
-  eslint:
-    name: Run ESLint scan
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Setup node
-        uses: actions/setup-node@v7
-        with:
-          cache: "npm"
-          node-version-file: ".node-version"
-          package-manager-cache: true
-
-      - name: Install ESLint
-        run: |
-          npm install
-          npm install @microsoft/eslint-formatter-sarif@3.1.0
-          npm run build
-
-      - name: Run ESLint
-        env:
-          SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-        run: npx eslint .
-          --config eslint.config.ts
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
-        continue-on-error: true
-
-      - name: Upload analysis results to GitHub
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: eslint-results.sarif
-          wait-for-processing: true
+  run:
+    name: Scan
+    uses: socksthewolf/workflows/.github/workflows/run_eslint.yml@main
+    with:
+      ref: ${{ github.ref }}
+      needs_build: true

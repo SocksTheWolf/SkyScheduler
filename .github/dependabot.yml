@@ -23,9 +23,21 @@ updates:
           - "*eslint*"
           - "globals"
           - "jiti"
-      hono:
+          - "typed-htmx"
+          - "@types/*"
+      openapi:
         patterns:
-          - "*hono*"
+          - "hono-openapi"
+          - "@hono/standard-validator"
+      app:
+        patterns:
+          - "hono"
+          - "date-fns"
+          - "drizzle-*"
+          - "image-dimensions"
+          - "just-*"
+          - "uuid"
+          - "zod"
       atproto:
         patterns:
           - "@atproto/*"
@@ -37,7 +49,6 @@ updates:
       auth:
         patterns:
           - "better-auth"
-          - "drizzle-*"
     allow:
       - dependency-type: "production"
         update-types:
