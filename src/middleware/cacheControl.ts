@@ -9,6 +9,6 @@ export async function cachePublicMiddleware(c: BaseContext, next: NextMiddleware
 
 export async function cachePrivateMiddleware(c: BaseContext, next: NextMiddleware) {
   c.res.headers.set("Cache-Tag", "private");
-  c.res.headers.set("Cache-Control", "private, max-age=20, stale-while-revalidate=10, must-revalidate");
+  c.res.headers.set("Cache-Control", "private, max-age=5, stale-while-revalidate=2, must-revalidate");
   await next();
 }
