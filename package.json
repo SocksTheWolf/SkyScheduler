@@ -74,8 +74,8 @@
     "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",
     "just-unique": "^4.2.0",
-    "uuid": "^14.0.1",
-    "zod": "^4.4.3"
+    "uuid": "^14.0.2",
+    "zod": "^4.5.1"
   },
   "devDependencies": {
     "@types/minify": "^9.1.4",
