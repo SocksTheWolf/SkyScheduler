@@ -73,8 +73,6 @@ export const handleRepostTask = async (c: AllContext, postData: Repost, agent: A
   const madeRepost = await makeRepost(c, postData, agent);
   if (madeRepost) {
     console.log(`Reposted ${postData.uri} successfully!`);
-  } else {
-    console.warn(`Failed to repost ${postData.uri}`);
   }
   return madeRepost;
 };
