@@ -94,10 +94,12 @@ buildRules.set("build:types:wrangler", {
   isTypeAction: true
 });
 
-// This rule set is used in two different places, so cache it out for maintaining both rules easily.
-const constScriptMatches = [`${sDir}/constScript.ts`, "src/limits.ts", "src/config.ts"];
-// Same as above but used in a couple different places. linting and builds both need to check
-// version files and saved names
+// These rules are used in a couple of different places, so cache them out for easy reuse
+const siteConfigMatches = ["src/limits.ts", "src/config.ts"];
+const constScriptMatches = [`${sDir}/constScript.ts`,
+  `src/enums.ts`,
+  `src/validation/regexCases.ts`,
+  ...siteConfigMatches];
 const appScriptMatches = [`${sDir}/appScripts.ts`, "bin/configs/minifyOptions.ts"];
 
 // The things that trigger off builds if the rules are a match
@@ -203,6 +205,7 @@ if (USE_STATIC_HTML) {
       "src/pages/*.tsx",
       "bin/configs/sitemapIgnore.ts",
       "bin/configs/siteDepsExports.ts",
+      ...siteConfigMatches,
       aInfo,
       `${sDir}/*.ts`],
     ignores: [`${sDir}/appManifest.ts`, `${sDir}/robots.ts`, `${sDir}/redirects.ts`],
