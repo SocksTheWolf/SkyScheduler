@@ -114,6 +114,15 @@ document.addEventListener("scrollListTop", function() {
   scrollToObject(document.getElementById("posts"));
 });
 
+document.addEventListener("noPostsReloadWatch", function(ev) {
+  sidebarButtonListener(".noPostsReloadBtn", "refreshPostsProxy");
+});
+
+// a simple function to get around adding click registers on the refresh button
+document.addEventListener("refreshPostsProxy", function(ev) {
+  refreshPosts();
+})
+
 document.addEventListener("scrollListToPost", function(ev) {
   scrollToPost(ev.detail);
 });

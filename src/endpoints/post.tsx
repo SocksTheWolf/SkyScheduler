@@ -96,6 +96,7 @@ post.post("/create/repost", authMiddleware, rateLimit({ limiter: "REPOST_LIMITER
 // Get all posts
 post.all("/all", authMiddlewareHTML, async (c) => {
   c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons");
+  c.header("HX-Trigger-After-Settle", "noPostsReloadWatch");
   return c.html(<ScheduledPostList ctx={c} />);
 });
 

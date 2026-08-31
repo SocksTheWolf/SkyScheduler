@@ -17,11 +17,16 @@ export const ScheduledPostList = async (props: BaseElementProps) => {
           return <PostHTML post={data} />;
         })}
       </>);
+    } else {
+      return (<article>
+        <HiddenAnchor />
+        <p>No content scheduled</p>
+        <a class="noPostsReloadBtn secondary" role="button" listen="false" href="#">Reload</a>
+      </article>);
     }
   }
-
   return (<article>
     <HiddenAnchor />
-    <p>No posts scheduled</p>
+    <p>No posts found, if this is unexpected, please re-login.</p>
   </article>);
 };

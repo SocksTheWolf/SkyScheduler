@@ -2,7 +2,7 @@
 // it could be better, probably with less dependency on cat
 // and bringing the entire thing within the node architecture
 //
-// but this only runs in development while building, so not a big deal.
+// but this only runs in development while building, so not a huge deal.
 import isEmpty from "just-is-empty";
 import { ATPROTO_DID } from "../src/appInfo";
 import { PUBLIC_OPENAPI_SPEC, USE_STATIC_HTML } from "../src/config";
@@ -16,11 +16,16 @@ import { lintRuleOutputFile } from "./helpers/lint";
 import { buildRunner } from "./helpers/runner";
 import { buildSitemap } from "./helpers/sitemap";
 
+// TODO: It would be nice to have a simple string build cache map
+// that way you can make sure you don't make a mistake without
+// directories, globs or output paths
+
 // Easy path swaps
 const sDir: string = "src/statics";
 const aInfo: string = "src/appInfo.ts";
 const aJS: string = "assets/js";
 const aCSS: string = "assets/css";
+const appStyleVersionFile = `${sDir}/appStyles.ts`;
 
 // All the various build rules
 const buildRules = new Map<string, BuildRule>();
@@ -91,6 +96,9 @@ buildRules.set("build:types:wrangler", {
 
 // This rule set is used in two different places, so cache it out for maintaining both rules easily.
 const constScriptMatches = [`${sDir}/constScript.ts`, "src/limits.ts", "src/config.ts"];
+// Same as above but used in a couple different places. linting and builds both need to check
+// version files and saved names
+const appScriptMatches = [`${sDir}/appScripts.ts`, "bin/configs/minifyOptions.ts"];
 
 // The things that trigger off builds if the rules are a match
 const buildTriggers: BuildTrigger[] = [
@@ -98,7 +106,7 @@ const buildTriggers: BuildTrigger[] = [
   {
     name: "build js app scripts",
     triggers: ["build:js:app"],
-    match: [`${aJS}/*Helper.js`, `${sDir}/appScripts.ts`],
+    match: [`${aJS}/*Helper.js`, ...appScriptMatches],
     against: `${aJS}/min/app.min.js`,
   },
   // build const and lints
@@ -117,26 +125,26 @@ const buildTriggers: BuildTrigger[] = [
   {
     name: "build js main",
     triggers: ["build:js:main"],
-    match: [`${aJS}/main.js`, `${sDir}/appScripts.ts`],
+    match: [`${aJS}/main.js`, ...appScriptMatches],
     against: `${aJS}/min/main.min.js`,
   },
   // stylesheets
   {
     name: "build css stylesheet",
     triggers: ["build:css:style"],
-    match: [`${aCSS}/stylesheet.css`, `${sDir}/appStyles.ts`],
+    match: [`${aCSS}/stylesheet.css`, appStyleVersionFile],
     against: `${aCSS}/stylesheet.min.css`,
   },
   {
     name: "build css dashboard",
     triggers: ["build:css:dash"],
-    match: [`${aCSS}/dashboard.css`, `${sDir}/appStyles.ts`],
+    match: [`${aCSS}/dashboard.css`, appStyleVersionFile],
     against: `${aCSS}/dashboard.min.css`,
   },
   {
     name: "build css mods",
     triggers: ["build:css:mods"],
-    match: [`${aCSS}/*Mods.css`, `${sDir}/appStyles.ts`],
+    match: [`${aCSS}/*Mods.css`, appStyleVersionFile],
     against: `${aCSS}/depmods.min.css`,
   },
   // lint web scripts
@@ -145,8 +153,8 @@ const buildTriggers: BuildTrigger[] = [
     triggers: ["lint:consts", "lint:all_funcs", "lint:selectHelper"],
     match: [
       `${aJS}/*.js`,
-      `${sDir}/appScripts.ts`,
       "bin/configs/siteDepsExports.ts",
+      ...appScriptMatches,
       ...constScriptMatches
     ],
     ignores: [`${aJS}/consts.js`],
