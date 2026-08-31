@@ -20,7 +20,7 @@ import {
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.2.6';
+const CURRENT_OPENAPI_VERSION: string = '1.2.7';
 
 const openapiRoutes = new Hono<HonoBase>();
 

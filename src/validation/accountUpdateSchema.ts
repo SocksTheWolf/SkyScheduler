@@ -3,12 +3,12 @@ import {
   BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH,
   MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
 } from "../limits";
-import { appPasswordRegex } from "./regexCases";
+import { appPasswordRegex, domainRegexCheck } from "./regexCases";
 
 export const AccountUpdateSchema = z.object({
   username: z.string().trim().toLowerCase()
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(z.regexes.domain, "username must be in the format of a custom domain or USERNAME.bsky.social")
+    .regex(domainRegexCheck, "username must be in the format of a custom domain or USERNAME.bsky.social")
     .optional()
     .or(z.literal("")),
   password: z.string().trim()

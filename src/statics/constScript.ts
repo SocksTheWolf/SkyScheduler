@@ -11,9 +11,9 @@ import {
   MAX_GIF_LENGTH_LIMIT, MAX_LENGTH, MAX_THUMBNAIL_SIZE,
   R2_FILE_SIZE_LIMIT
 } from "../limits";
-import { didCaptureRegex, domainHandleRegex, postRecordURI } from "../validation/regexCases";
+import { didCaptureRegex, domainRegexCheck, postRecordURI } from "../validation/regexCases";
 
-export const CONST_SCRIPT_VERSION: number = 16;
+export const CONST_SCRIPT_VERSION: number = 17;
 
 export const constScriptStr: string = `/js/consts.js?v=${CONST_SCRIPT_VERSION}`;
 export function makeConstScript(): string {
@@ -45,7 +45,7 @@ const FILE_DROP_MAX_THUMB_SIZE=${MAX_THUMBNAIL_SIZE};
 const FILE_DROP_MAX_FILES=${MAX_FILES_PER_POST};
 /* Regexes */
 const ATPROTO_RECORD_REGEX=${postRecordURI};
-const DOMAIN_REGEX=${domainHandleRegex};
+const DOMAIN_REGEX=${domainRegexCheck};
 const DID_CAPTURE_REGEX=${didCaptureRegex};
 /* Interval settings */
 const POSTING_TIME_INTERVAL=${POSTING_TIME_INTERVAL};

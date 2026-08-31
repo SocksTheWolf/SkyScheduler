@@ -7,13 +7,13 @@ import {
   MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
 } from "../limits";
 import { checkValidDateStr } from "../utils/helpers";
-import { appPasswordRegex } from "./regexCases";
+import { appPasswordRegex, domainRegexCheck } from "./regexCases";
 
 export const UsernameSchema = z.object({
   username: z.string().trim().toLowerCase()
     .nonempty("username is missing")
     .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(z.regexes.domain, "username should be in a format like username.bsky.social or a domain")
+    .regex(domainRegexCheck, "username should be in a format like username.bsky.social or a domain")
     .max(BSKY_MAX_USERNAME_LENGTH, "username too long")
     .nonoptional()
 });

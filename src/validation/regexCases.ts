@@ -2,6 +2,9 @@
 export const appPasswordRegex = /(?:[0-9a-z]{4}-){3}[0-9a-z]{4}/i;
 // protocols to check links against
 export const httpProtoRecord = /^https?$/;
+// hostname regex, zod updated theirs to a version that looks ahead and it's incompatible with api shield
+// this is also the same regex we used for bsky handles
+export const domainRegexCheck = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 // GUID + file extensions
 export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|webp|heic|svg|mp4|gif|webm|mpeg|mov)$/i;
 // Given a link to a post/feed/list/profile record
@@ -22,7 +25,5 @@ export const atProtoPostURI = /at\:\/\/(?:[0-9a-zA-Z\-\.\:]+)\/app\.bsky\.feed\.
 export const atProtoRecordURI = /at\:\/\/(?:[0-9a-z\-\.\:]+)\/(?:[a-z0-9\.\#]+)\/(?:[a-z0-9]+)(?:\/)?$/i;
 // repost record
 export const repostContentRecord = /Repost of (?:.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
-// bsky handle regex
-export const domainHandleRegex = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 // mention capture regex
 export const mentionCaptureRegex = /@((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,})/g;

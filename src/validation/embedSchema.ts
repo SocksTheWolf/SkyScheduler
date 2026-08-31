@@ -4,7 +4,7 @@ import { EmbedDataType } from "../enums";
 import { BSKY_VIDEO_LENGTH_LIMIT, MAX_ASSOCIATEDREFS_PER_LINK } from "../limits";
 import { FileContentSchema } from "./mediaSchema";
 import { StrongRecordSchema } from "./recordSchema";
-import { atpRecordURI, httpProtoRecord } from "./regexCases";
+import { atpRecordURI, domainRegexCheck, httpProtoRecord } from "./regexCases";
 import { AltTextSchema } from "./sharedValidations";
 
 export const ImageEmbedSchema = z.object({
@@ -53,7 +53,7 @@ export const LinkEmbedSchema = z.object({
   uri: z.url({
     normalize: true,
     protocol: httpProtoRecord,
-    hostname: z.regexes.domain,
+    hostname: domainRegexCheck,
     error: "provided link is not an URL, please check the value and try again"
   }).trim()
     .nonoptional("link embeds require a url"),
@@ -67,7 +67,7 @@ export const PostRecordSchema = z.object({
   content: z.url({
     normalize: true,
     protocol: httpProtoRecord,
-    hostname: z.regexes.domain,
+    hostname: domainRegexCheck,
     error: "post/feed/list record url is invalid"
   }).trim()
     .toLowerCase()

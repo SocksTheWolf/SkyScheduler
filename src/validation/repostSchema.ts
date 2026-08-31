@@ -5,7 +5,10 @@ import { RepostType, TimeShape } from "../enums";
 import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import { floorGivenTime } from "../utils/helpers";
 import { PostRecordSchema } from "./recordSchema";
-import { httpProtoRecord, postRecordURI, repostContentRecord } from "./regexCases";
+import {
+  domainRegexCheck, httpProtoRecord,
+  postRecordURI, repostContentRecord
+} from "./regexCases";
 import { RepostDataSchema } from "./repostDataSchema";
 import { ScheduledDateSchema } from "./sharedValidations";
 
@@ -14,7 +17,7 @@ const PublishedRepostSchema = z.object({
   url: z.url({
     normalize: true,
     protocol: httpProtoRecord,
-    hostname: z.regexes.domain,
+    hostname: domainRegexCheck,
     error: "provided link is not a valid URL"
   }).trim()
     .regex(postRecordURI, "url is not a valid post record link")
