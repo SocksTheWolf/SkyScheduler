@@ -81,7 +81,43 @@ openapiRoutes.post("/post/create/repost", describeRoute({
 validator('json', RepostSchema));
 
 // Get all posts
-openapiRoutes.all("/post/all", describeRoute({
+openapiRoutes.get("/post/all", describeRoute({
+  description: 'Gets all posts for the current account',
+  responses: {
+    200: {
+      description: 'post list',
+      content: {
+        'text/html': { schema: resolver(CreatePostResponseSchema) },
+      }
+    },
+    401: {
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    }
+  }
+}));
+
+openapiRoutes.post("/post/all", describeRoute({
+  description: 'Gets all posts for the current account',
+  responses: {
+    200: {
+      description: 'post list',
+      content: {
+        'text/html': { schema: resolver(CreatePostResponseSchema) },
+      }
+    },
+    401: {
+      description: "not logged in",
+      content: {
+        'text/html': {}
+      }
+    }
+  }
+}));
+
+openapiRoutes.delete("/post/all", describeRoute({
   description: 'Gets all posts for the current account',
   responses: {
     200: {
