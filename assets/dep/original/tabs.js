@@ -13,7 +13,7 @@ class PicoTabContainer {
 class PicoTabs {
 	constructor(tabListContainerSelector) {
 		this.tabMap = new Map();
-		let tabLists = document.querySelectorAll(tabListContainerSelector);
+		const tabLists = document.querySelectorAll(tabListContainerSelector);
 
 		// Proceed only if tablists are found
 		if (tabLists.length === 0) {
