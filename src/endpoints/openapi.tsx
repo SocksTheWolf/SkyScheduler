@@ -7,6 +7,7 @@ import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
+import { ResetCallbackQuery, ResetTokenValid } from "../validation/endpointResetSchema";
 import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
@@ -20,7 +21,7 @@ import {
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.2.7';
+const CURRENT_OPENAPI_VERSION: string = '1.2.8';
 
 const openapiRoutes = new Hono<HonoBase>();
 
@@ -698,6 +699,19 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
     }
   }
 }), validator("param", CheckFileSchema));
+
+openapiRoutes.get("/reset-password/:id", describeRoute({
+  description: "Hands off reset token validation, cannot fail directly",
+  responses: {
+    302: {
+      description: "handed off"
+    }
+  }
+}), validator("param", ResetTokenValid));
+
+openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
+  description: "Validates password reset tokens"
+}), validator("param", ResetTokenValid), validator("query", ResetCallbackQuery));
 
 export async function generateOpenAPI() {
   return await generateSpecs(openapiRoutes, {

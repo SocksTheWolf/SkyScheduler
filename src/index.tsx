@@ -110,7 +110,8 @@ app.get("/reset-password/:id", (c) => {
   // Alternatively you can just URL rewrite this in cloudflare and it'll look
   // 100x times better.
   const { id } = c.req.param();
-  return c.redirect(`/api/auth/reset-password/${id}?callbackURL=%2Freset`);
+  // the default is 302, but we'll force it for future proofing
+  return c.redirect(`/api/auth/reset-password/${id}?callbackURL=%2Freset`, 302);
 });
 
 // Setup Application route
