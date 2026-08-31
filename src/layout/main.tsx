@@ -19,6 +19,12 @@ type BaseLayoutProps = BaseElementProps & {
   nonce?: string;
 };
 
+// Firefox extensions may inject early and cause the page to flash incorrectly
+// to avoid the flash, add this tag.
+function FirefoxFOUCFix() {
+  return (<script type="text/javascript">{raw(`let FF_FOUC_FIX;`)}</script>);
+}
+
 export const BaseLayout = (props: BaseLayoutProps) => {
   let preloadList: PreloadRules[] = getScriptsForInteractivity(props.interactivity);
   const scriptIncludeList: PreloadRules[] = preloadList;
@@ -47,7 +53,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       <SpeculationRulesTag />
       <IncludeDependencyTags scripts={scriptIncludeList} nonce={props.nonce} />
       <PersonaTags />
-      {props.interactivity === ScriptInclusionLevel.NonInteractive ? <script type="text/javascript">let FF_FOUC_FIX;</script> : null}
+      {props.interactivity === ScriptInclusionLevel.NonInteractive ? <FirefoxFOUCFix /> : null}
     </head>
     <body>
       <container class="pico">

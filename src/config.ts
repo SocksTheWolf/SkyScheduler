@@ -36,7 +36,8 @@ export const DEFAULT_CHAT_PDS: string = "https://bsky.social";
 // controls if we inject granular content security policy headers into requests
 // or use the basic values from hono
 export const USE_GRANULAR_CSP_SETTINGS: boolean = true;
-// the above must be on, otherwise this will do nothing. This will only report CSP failures
+
+// This will only report CSP failures
 // Once CSP is good enough, change this to false to have it be enforced.
 export const USE_CSP_REPORT_ONLY: boolean = false;
 
