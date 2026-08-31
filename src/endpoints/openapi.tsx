@@ -7,7 +7,7 @@ import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
-import { ResetCallbackQuery, ResetTokenValid } from "../validation/endpointResetSchema";
+import { ResetCallbackQuery, ResetTokenValid } from "../validation/authResetSchema";
 import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
