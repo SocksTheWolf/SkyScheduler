@@ -1,7 +1,8 @@
 # Mirror everything to Tangled
 name: Tangled Bangled
 on:
-  workflow_call:
+  workflow_dispatch: {}
+  workflow_call: {}
   push:
     branches: "main"
 
