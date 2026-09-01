@@ -358,7 +358,8 @@ postForm.addEventListener('submit', async (e) => {
   try {
     dateTime = isThreadPost || postNow ? new Date().toISOString() :
       new Date(scheduledDateVal).toISOString();
-  } catch(dateErr) {
+  } catch(dateEx) {
+    console.error(`date transform threw error: ${dateEx}`);
     pushToast("Invalid date", false);
     showPostProgress(false);
     return;
@@ -401,7 +402,7 @@ postForm.addEventListener('submit', async (e) => {
     if (hasFiles || hasWebEmbed) {
       postObject.embeds = [];
       if (hasFiles) {
-        fileData.forEach((value, key) => {
+        fileData.forEach((value, _key) => {
           postObject.embeds.push(value)
         });
       } else {

@@ -44,7 +44,8 @@ repostForm.addEventListener('submit', async (e) => {
   let dateTime;
   try {
     dateTime = new Date(scheduledDateVal).toISOString();
-  } catch(dateErr) {
+  } catch(dateEx) {
+    console.error(`date transform threw error: ${dateEx}`);
     pushToast("Invalid date", false);
     showRepostProgress(false);
     return;
@@ -74,6 +75,7 @@ repostForm.addEventListener('submit', async (e) => {
       if (isElementVisible(retweetFields))
         new URL(postRecordVal);
     } catch(urlErr) {
+      console.warn(`URL could not be converted ${urlErr}`);
       invalidPostURL();
       return;
     }

@@ -10,11 +10,12 @@ export default defineConfig([
   globalIgnores([
     ".wrangler/**",
     ".github/**",
-    "assets/dep/**",
     ".vscode/**",
     "dist/**",
+    "migrations/**",
     "src/@types/**",
     "*.config.ts",
+    "assets/dep/**",
     "assets/js/min/**",
   ]),
   // ESLint for Typescript

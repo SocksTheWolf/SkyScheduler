@@ -114,12 +114,12 @@ document.addEventListener("scrollListTop", function() {
   scrollToObject(document.getElementById("posts"));
 });
 
-document.addEventListener("noPostsReloadWatch", function(ev) {
+document.addEventListener("noPostsReloadWatch", function() {
   sidebarButtonListener(".noPostsReloadBtn", "refreshPostsProxy");
 });
 
 // a simple function to get around adding click registers on the refresh button
-document.addEventListener("refreshPostsProxy", function(ev) {
+document.addEventListener("refreshPostsProxy", function() {
   refreshPosts();
 })
 
@@ -202,7 +202,7 @@ document.addEventListener("postUpdatedNotice", function() {
   pushToast("Post updated successfully!", true);
 })
 
-document.addEventListener("accountUpdated", function(ev) {
+document.addEventListener("accountUpdated", function() {
   closeModal(document.getElementById("changeInfo"));
   document.getElementById("settingsData").reset();
   pushToast("Settings Updated!", true);
