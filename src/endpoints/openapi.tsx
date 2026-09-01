@@ -7,21 +7,22 @@ import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
 import { AccountUpdateSchema } from "../validation/accountUpdateSchema";
-import { ResetCallbackQuery, ResetTokenValid } from "../validation/authResetSchema";
 import { FileUploadSchema } from "../validation/fileUploadSchema";
 import { LoginSchema } from "../validation/loginSchema";
 import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema, PostSchema } from "../validation/postSchema";
 import { RepostSchema } from "../validation/repostSchema";
 import {
-  CheckFileSchema, CheckGUIDSchema, CreatePostResponseSchema,
+  CheckFileSchema, CheckGUIDSchema,
+  CheckRepostGUIDSchema, CreatePostResponseSchema,
   FileUploadFailSchema,
-  FileUploadSuccessSchema, GenericResponseSchema
+  FileUploadSuccessSchema, GenericResponseSchema,
+  ResetCallbackQuery, ResetTokenValid
 } from "../validation/responseSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.2.8';
+const CURRENT_OPENAPI_VERSION: string = '1.2.9';
 
 const openapiRoutes = new Hono<HonoBase>();
 
@@ -288,7 +289,7 @@ openapiRoutes.get("/post/:id/repost", describeRoute({
   }
 }), validator("param", CheckGUIDSchema));
 
-openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
+openapiRoutes.delete("/post/:id/repost/:schedule", describeRoute({
   description: "Delete the given schedule for the given post",
   responses: {
     200: {
@@ -316,7 +317,7 @@ openapiRoutes.delete("/post/:id/repost/:scheduleid", describeRoute({
       }
     }
   }
-}), validator("param", CheckGUIDSchema));
+}), validator("param", CheckRepostGUIDSchema));
 
 // Create media upload
 openapiRoutes.post("/post/upload", describeRoute({
@@ -700,7 +701,7 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
   }
 }), validator("param", CheckFileSchema));
 
-openapiRoutes.get("/reset-password/:id", describeRoute({
+openapiRoutes.get("/reset-password/:token", describeRoute({
   description: "Hands off reset token validation, cannot fail directly",
   responses: {
     302: {
@@ -709,7 +710,7 @@ openapiRoutes.get("/reset-password/:id", describeRoute({
   }
 }), validator("param", ResetTokenValid));
 
-openapiRoutes.get("/api/auth/reset-password/:id", describeRoute({
+openapiRoutes.get("/api/auth/reset-password/:token", describeRoute({
   description: "Validates password reset tokens"
 }), validator("param", ResetTokenValid), validator("query", ResetCallbackQuery));
 
