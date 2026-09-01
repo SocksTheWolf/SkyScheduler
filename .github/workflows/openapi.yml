@@ -4,6 +4,11 @@ on:
     branches: ["main"]
     paths:
       - "src/endpoints/openapi.tsx"
+      - "src/limits.ts"
+      - "src/enums.ts"
+      - "src/types.ts"
+      - "src/appInfo.ts"
+      - "package.json"
       - "src/validation/**"
       - "bin/openapi.ts"
   workflow_dispatch: {}
