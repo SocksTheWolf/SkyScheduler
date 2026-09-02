@@ -40,7 +40,7 @@ export function formatTime(day: number, hour: number, minutes: number): string {
   return formatDuration({ days: day, hours: hour, minutes: minutes }, formatDateOptions);
 }
 
-export function explainTimeInterval(input: TimeIntervalSettings): string {
+export function explainTimeInterval(input: TimeIntervalSettings, usePlural: boolean=false): string {
   switch (input) {
     default:
     case TimeIntervalSettings.Hour:
@@ -50,7 +50,7 @@ export function explainTimeInterval(input: TimeIntervalSettings): string {
     case TimeIntervalSettings.QuarterHour:
     case TimeIntervalSettings.TenMinutes:
     case TimeIntervalSettings.FiveMinutes:
-      return `${input} minute`;
+      return `${input} minute${usePlural ? 's' : ''}`;
   }
 }
 

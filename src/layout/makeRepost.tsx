@@ -1,3 +1,4 @@
+import { REPOSTING_TIME_INTERVAL } from "../config";
 import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
 import RepostOptions from "./options/repostOptions";
@@ -26,7 +27,7 @@ export function RepostCreation(_props?: BaseElementProps) {
           Will update existing titles, cannot be used on scheduled posts.</small>
       </blockquote>
     </article>
-    <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" header="Retweet At" />
+    <ScheduleOptions timeID="repostTime" allowNow={false} type="retweet" isRepost={true} header="Retweet At" timeInterval={REPOSTING_TIME_INTERVAL} />
     <article>
       <header>Retweet Cadance</header>
       <RepostOptions id="makeRepostOptions" contentType="post" timeString="the time above" checkboxLabel="Should Retweet multiple times?" />

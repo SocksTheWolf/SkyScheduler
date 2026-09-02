@@ -344,7 +344,7 @@ function setupDashboard() {
 
     // rounddown minutes
     dateScheduler.addEventListener('change', () => {
-      const adjustedTimeValue = convertTimeValueLocally(dateScheduler.value, false);
+      const adjustedTimeValue = convertTimeValueLocally(dateScheduler.value, el.hasAttribute("isRepost"));
       if (adjustedTimeValue !== null)
         dateScheduler.value = adjustedTimeValue;
     });

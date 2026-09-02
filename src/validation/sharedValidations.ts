@@ -40,6 +40,8 @@ export const AltTextSchema = z.object({
 });
 
 export const ScheduledDateSchema = z.object({
+  // no matter what the client does end up sending, we floor to the nearest valid time.
+  // these are verified in the superRefnes for the post/repost schemas
   scheduledDate: z.string().trim()
     .nonempty("scheduled date is malformed")
     .nonoptional("scheduled date must be provided")

@@ -1,3 +1,4 @@
+import { POSTING_TIME_INTERVAL } from "../config";
 import { MAX_LENGTH } from "../limits";
 import type { BaseElementProps } from "../types";
 import UploadInfo from "./helpers/uploadInfo";
@@ -64,7 +65,7 @@ export function PostCreation(props: BaseElementProps) {
           </details>
           <details id="section-postSchedule" open>
             <summary title="click to toggle section" role="button" class="outline secondary">Post Scheduling</summary>
-            <ScheduleOptions allowNow={true} timeID="scheduledDate" checkboxID="postNow" type="post" />
+            <ScheduleOptions allowNow={true} timeID="scheduledDate" checkboxID="postNow" type="post" timeInterval={POSTING_TIME_INTERVAL} />
           </details>
 
           <details id="section-retweet">
