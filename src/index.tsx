@@ -7,7 +7,6 @@ import { createAuth, processAuthRoute } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
-import { generateOpenAPI } from "./endpoints/openapi";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
 import { FundingProgress } from "./layout/helpers/fundProgress";
@@ -15,7 +14,6 @@ import { blankAuthEnv } from "./middleware/auth";
 import { cachePrivateMiddleware, cachePublicMiddleware } from "./middleware/cacheControl";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
 import { cspHelper } from "./middleware/cspHelper";
-import { onlyInDevelopment } from "./middleware/inDevOnly";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
@@ -39,20 +37,13 @@ app.use(blankAuthEnv);
 app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, cspHelper, corsHelperMiddleware);
 app.use(ssgGenMiddleware);
 
-///// Static Files /////
-app.get("/openapi.json", disableSSG(), onlyInDevelopment, async (c) => {
-  return c.json(await generateOpenAPI());
-});
-
 ///// Static Pages /////
 app.all("/", cachePublicMiddleware, ssgServe({ page: "index" }), (c) =>
   c.html(<Homepage ctx={c} />)
 );
 app.get("/tos", cachePublicMiddleware, ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
 app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
-app.get("/funding", cachePublicMiddleware, disableSSG(), (c) => {
-  return c.html(<FundingProgress ctx={c} />);
-});
+app.get("/funding", cachePublicMiddleware, disableSSG(), (c) => c.html(<FundingProgress ctx={c} />));
 
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
