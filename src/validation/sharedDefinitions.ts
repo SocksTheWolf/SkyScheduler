@@ -18,4 +18,4 @@ export const PasswordDefinition = z.string().trim()
 export const AppPasswordDefinition = z.string().trim()
   .nonempty("missing bsky app password")
   .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
-  .regex(appPasswordRegex, "please go back and recreate a new app password from your bsky settings");
+  .regex(appPasswordRegex, "invalid app password, recreate a new app password from your bsky settings");

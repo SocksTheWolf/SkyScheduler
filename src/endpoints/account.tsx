@@ -233,7 +233,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   // Check bsky handle existing
   const profileDID: string|null = await lookupBskyHandle(username);
   if (profileDID === null) {
-    return c.json({ok: false, msg: "bsky handle returned invalid, please check input"}, 400);
+    return c.json({ok: false, msg: "bsky handle could not be resolved, please check input"}, 400);
   }
 
   // Check if the user has violated TOS.
