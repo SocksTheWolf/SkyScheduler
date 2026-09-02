@@ -20,7 +20,7 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
   const homepageURL = (<a class="secondary" title="Homepage" href="/">{APP_NAME}</a>);
   return (
     <center><small>
-      {props.showProgressBar ? <div class="serverFunds" hx-get="/progress" hx-trigger="load once" hx-target="this" hx-swap="innerHTML"></div> : null}
+      {props.showProgressBar ? <div class="serverFunds" hx-get="/funding" hx-trigger="load once" hx-target="this" hx-swap="innerHTML"></div> : null}
       {props.showHomepage ? homepageURL : projectURL} &copy; {new Date().getFullYear()}
       <span class="credits">
         <a rel="author" target="_blank" title="Project author" tabindex={props.removeExcessTab ? -1 : 0}

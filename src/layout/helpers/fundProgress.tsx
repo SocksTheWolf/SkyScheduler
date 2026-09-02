@@ -2,7 +2,7 @@ import { FUNDING_KEY, PROGRESS_TOTAL } from "../../appInfo";
 import type { AllContext, BaseElementProps } from "../../types";
 import { TipLink } from "./tipLink";
 
-export async function ProgressBar(props: BaseElementProps) {
+export async function FundingProgress(props: BaseElementProps) {
   const ctx: AllContext = props.ctx!;
   const curProgress: string = await ctx.env.FUNDING?.get(FUNDING_KEY) ?? "0.00";
   const totalAmount: string = PROGRESS_TOTAL.toFixed(2);
