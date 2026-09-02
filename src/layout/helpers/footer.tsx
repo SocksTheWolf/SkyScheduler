@@ -2,6 +2,7 @@ import { APP_NAME, PROJECT_AUTHOR, PROJECT_AUTHOR_SITE } from "../../appInfo";
 import { CURRENT_SCRIPT_VERSION } from "../../statics/appScripts";
 import { CONST_SCRIPT_VERSION } from "../../statics/constScript";
 import type { BaseElementProps } from "../../types";
+import { LoadFundingProgress } from "./fundProgress";
 import { TipLink } from "./tipLink";
 
 // Helper footer for various pages
@@ -20,7 +21,7 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
   const homepageURL = (<a class="secondary" title="Homepage" href="/">{APP_NAME}</a>);
   return (
     <center><small>
-      {props.showProgressBar ? <div class="serverFunds" hx-get="/funding" hx-trigger="load once" hx-target="this" hx-swap="innerHTML"></div> : null}
+      {props.showProgressBar ? <LoadFundingProgress /> : null}
       {props.showHomepage ? homepageURL : projectURL} &copy; {new Date().getFullYear()}
       <span class="credits">
         <a rel="author" target="_blank" title="Project author" tabindex={props.removeExcessTab ? -1 : 0}
