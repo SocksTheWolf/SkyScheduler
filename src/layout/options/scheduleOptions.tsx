@@ -28,7 +28,7 @@ export default function ScheduleOptions(props: ScheduleOptionsProps) {
       {postNowHTML}
       <footer>
         <small>
-          <i>You can schedule {props.type}s in the future, at every {explainPostingTimeInterval()}. Time is rounded down to the nearest interval.</i>
+          <i>You can schedule {props.type}s in the future, at every {explainPostingTimeInterval()}. Time is rounded down to the nearest {explainPostingTimeInterval()}.</i>
         </small>
       </footer>
     </article>

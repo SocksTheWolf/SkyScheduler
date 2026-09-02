@@ -203,6 +203,7 @@ if (USE_STATIC_HTML) {
     triggers: ["build:pages", "build:sitemap"],
     match: ["src/layout/**",
       "src/pages/*.tsx",
+      "src/utils/helpers.ts",
       "bin/configs/sitemapIgnore.ts",
       "bin/configs/siteDepsExports.ts",
       ...siteConfigMatches,

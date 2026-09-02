@@ -40,8 +40,8 @@ export function formatTime(day: number, hour: number, minutes: number): string {
   return formatDuration({ days: day, hours: hour, minutes: minutes }, formatDateOptions);
 }
 
-export function explainPostingTimeInterval(): string {
-  switch (POSTING_TIME_INTERVAL) {
+export function explainTimeInterval(input: TimeIntervalSettings): string {
+  switch (input) {
     default:
     case TimeIntervalSettings.Hour:
       return "hour";
@@ -50,8 +50,16 @@ export function explainPostingTimeInterval(): string {
     case TimeIntervalSettings.QuarterHour:
     case TimeIntervalSettings.TenMinutes:
     case TimeIntervalSettings.FiveMinutes:
-      return `${POSTING_TIME_INTERVAL} minutes`;
+      return `${input} minute`;
   }
+}
+
+export function explainRepostTimeInterval(): string {
+  return explainTimeInterval(REPOSTING_TIME_INTERVAL);
+}
+
+export function explainPostingTimeInterval(): string {
+  return explainTimeInterval(POSTING_TIME_INTERVAL);
 }
 
 export function daysAgo(days: number): Date {

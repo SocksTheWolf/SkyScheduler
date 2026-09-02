@@ -7,7 +7,7 @@ import {
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import type { BaseElementProps } from "../types";
-import { explainPostingTimeInterval } from "../utils/helpers";
+import { explainPostingTimeInterval, explainRepostTimeInterval } from "../utils/helpers";
 
 export default function Homepage(props?: BaseElementProps) {
   return (<BaseLayout title="Home" nonce={props?.ctx?.get("secureHeadersNonce")} mainClass="homepage">
@@ -44,8 +44,8 @@ export default function Homepage(props?: BaseElementProps) {
               content labels and full support for alt text</li>
             <li>Edit the content of posts <i>and</i> alt text before publish</li>
             <li>Publish entire threads with up to {MAX_POSTS_PER_THREAD} child posts per thread</li>
-            <li>Automatically retweet <u>anything</u> at an interval of your choosing up to {MAX_REPOST_INTERVAL} times
-              every {MAX_REPOST_IN_HOURS-1} hours ({MAX_REPOST_DAYS} days)</li>
+            <li>Automatically retweet <u>anything</u> over a {explainRepostTimeInterval()} interval of your choice up to {MAX_REPOST_INTERVAL} times
+              for a maximum of {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
             <ul>
               <li><small>Even content that's wasn't originally made on {APP_NAME}</small></li>
             </ul>
