@@ -328,6 +328,17 @@ textarea {
   user-select: none;
 }
 
+/* FUNDING BAR */
+.fundsProgress {
+  bottom: -0.4rem;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+.fundsBox {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 /* ALT TEXT */
 #altTextField {
   margin-top: 10px;

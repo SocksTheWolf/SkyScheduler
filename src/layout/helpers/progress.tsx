@@ -1,14 +1,20 @@
 import { FUNDING_KEY, PROGRESS_TOTAL } from "../../appInfo";
 import type { AllContext, BaseElementProps } from "../../types";
+import { TipLink } from "./tipLink";
 
 export async function ProgressBar(props: BaseElementProps) {
   const ctx: AllContext = props.ctx!;
-  const totalAmount: string = await ctx.env.FUNDING?.get(FUNDING_KEY) ?? "0.00";
-  const progressBarTooltip = `$${totalAmount}/$${PROGRESS_TOTAL} for this month`;
-  return (<>
+  const curProgress: string = await ctx.env.FUNDING?.get(FUNDING_KEY) ?? "0.00";
+  const totalAmount: string = PROGRESS_TOTAL.toFixed(2);
+  const progressBarTooltip = `$${curProgress}/$${totalAmount} for this month`;
+  return (<div class="fundsBox">
     <span data-tooltip={progressBarTooltip}>Current Server Fund Progress:</span>
-    <progress value={totalAmount} max={PROGRESS_TOTAL} /><br />
-    <a href="/tip" target="_blank" class="secondary" title="Tip on Kofi">Tip here</a>
+    <div role="group">
+      <span>$0</span>
+      <progress class="fundsProgress" value={curProgress} max={totalAmount} />
+      <span>${PROGRESS_TOTAL}</span>
+    </div><br />
+    <TipLink text="Tip Here" />
     <hr />
-  </>);
+  </div>);
 }
