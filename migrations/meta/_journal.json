@@ -225,6 +225,13 @@
       "when": 1787600859214,
       "tag": "0031_wild_starjammers",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "6",
+      "when": 1788389238012,
+      "tag": "0032_late_dagger",
+      "breakpoints": true
     }
   ]
 }

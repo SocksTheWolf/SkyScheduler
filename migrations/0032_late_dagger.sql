@@ -1,0 +1,1 @@
+DROP INDEX `repost_postid_idx`;
