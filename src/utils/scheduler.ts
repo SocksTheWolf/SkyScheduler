@@ -165,11 +165,14 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
       break;
     /* MODIFY CRONJOBS FROM HERE */
-    case "0 * * * *":
+    /*case "0 * * * *":
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
       c.executionCtx.waitUntil(scheduleAllContentTasks(c));
+      break;*/
+    case "0 * * * *":
+      c.executionCtx.waitUntil(schedulePostTask(c));
       break;
-    case "30 * * * *":
+    case "*/15 * * * *":
       c.executionCtx.waitUntil(scheduleRepostTask(c));
       break;
     /* END MODIFICATION */

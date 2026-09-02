@@ -90,4 +90,4 @@ export const POSTING_TIME_INTERVAL: TimeIntervalSettings =
 // This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
 // as there's no files that need to be uploaded or change
 export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings =
-  TimeIntervalSettings.HalfHour;
+  TimeIntervalSettings.QuarterHour;
