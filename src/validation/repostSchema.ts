@@ -9,7 +9,7 @@ import {
   postRecordURI, repostContentRecord
 } from "./regexCases";
 import { RepostDataSchema } from "./repostDataSchema";
-import { ScheduledDateSchema } from "./sharedValidations";
+import { ScheduledDateSchema } from "./sharedSchemas";
 
 const PublishedRepostSchema = z.object({
   ...PostRecordSchema.shape,

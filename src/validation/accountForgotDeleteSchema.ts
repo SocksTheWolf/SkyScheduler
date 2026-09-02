@@ -1,4 +1,4 @@
-import { PasswordSchema, UsernameSchema } from "./sharedValidations";
+import { PasswordSchema, UsernameSchema } from "./sharedSchemas";
 
 export const AccountDeleteSchema = PasswordSchema;
 export const AccountForgotSchema = UsernameSchema;

@@ -15,7 +15,7 @@ import {
 } from "./embedSchema";
 import { FileContentSchema } from "./mediaSchema";
 import { RepostDataSchema } from "./repostDataSchema";
-import { AltTextSchema, ScheduledDateSchema } from "./sharedValidations";
+import { AltTextSchema, ScheduledDateSchema } from "./sharedSchemas";
 
 const TextContent = z.object({
   content: z.string().trim()

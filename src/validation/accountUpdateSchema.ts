@@ -1,24 +1,14 @@
 import * as z from "zod/v4";
-import {
-  BSKY_MAX_APP_PASSWORD_LENGTH, BSKY_MIN_USERNAME_LENGTH,
-  MAX_DASHBOARD_PASS, MIN_DASHBOARD_PASS
-} from "../limits";
-import { appPasswordRegex, domainRegexCheck } from "./regexCases";
+import { AppPasswordDefinition, PasswordDefinition, UsernameDefinition } from "./sharedDefinitions";
 
 export const AccountUpdateSchema = z.object({
-  username: z.string().trim().toLowerCase()
-    .min(BSKY_MIN_USERNAME_LENGTH, "username too short")
-    .regex(domainRegexCheck, "username must be in the format of a custom domain or USERNAME.bsky.social")
+  username: UsernameDefinition.clone()
     .optional()
     .or(z.literal("")),
-  password: z.string().trim()
-    .min(MIN_DASHBOARD_PASS, "password too short")
-    .max(MAX_DASHBOARD_PASS, "password too long")
+  password: PasswordDefinition.clone()
     .optional()
     .or(z.literal("")),
-  bskyAppPassword: z.string().trim()
-    .max(BSKY_MAX_APP_PASSWORD_LENGTH, "app password too long")
-    .regex(appPasswordRegex, "not a valid bsky app password")
+  bskyAppPassword: AppPasswordDefinition.clone()
     .optional()
     .or(z.literal("")),
   bskyUserPDS: z.url("PDS should be in the format of an URL").trim()

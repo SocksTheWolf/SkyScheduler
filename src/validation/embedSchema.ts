@@ -5,7 +5,7 @@ import { BSKY_VIDEO_LENGTH_LIMIT, MAX_ASSOCIATEDREFS_PER_LINK } from "../limits"
 import { FileContentSchema } from "./mediaSchema";
 import { StrongRecordSchema } from "./recordSchema";
 import { atpRecordURI, domainRegexCheck, httpProtoRecord } from "./regexCases";
-import { AltTextSchema } from "./sharedValidations";
+import { AltTextSchema } from "./sharedSchemas";
 
 export const ImageEmbedSchema = z.object({
   ...FileContentSchema.shape,
