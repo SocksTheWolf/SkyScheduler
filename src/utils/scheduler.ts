@@ -169,7 +169,7 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
       c.executionCtx.waitUntil(scheduleAllContentTasks(c));
       break;*/
-    case "0 * * * *":
+    case "*/30 * * * *":
       c.executionCtx.waitUntil(schedulePostTask(c));
       break;
     case "*/15 * * * *":

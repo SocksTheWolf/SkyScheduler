@@ -86,7 +86,7 @@ export const ALLOW_SPECULATION_RULES: boolean = false;
 // 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
 
 export const POSTING_TIME_INTERVAL: TimeIntervalSettings =
-  TimeIntervalSettings.Hour;
+  TimeIntervalSettings.HalfHour;
 // This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
 // as there's no files that need to be uploaded or change
 export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings =
