@@ -16,7 +16,7 @@ export const USE_INVITE_KEYS: boolean = false;
 /** Render settings **/
 /* ----------------- */
 // if the support bar should be shown or not. Currently is only visible on the dashboard page
-export const SHOW_SUPPORT_PROGRESS_BAR: boolean = false;
+export const SHOW_SUPPORT_PROGRESS_BAR: boolean = true;
 
 /** Storage settings **/
 /* ------------------ */

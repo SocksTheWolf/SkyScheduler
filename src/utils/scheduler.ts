@@ -169,6 +169,7 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
       break;
     case "0 0 1 */1 *":
+      // reset the server status bar every month
       if (SHOW_SUPPORT_PROGRESS_BAR && c.env.FUNDING !== undefined) {
         c.executionCtx.waitUntil(c.env.FUNDING.put(FUNDING_KEY, "0.00"));
       }
