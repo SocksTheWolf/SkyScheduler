@@ -727,7 +727,7 @@ export async function generateOpenAPI() {
           name: "MIT",
         }
       },
-      openapi: "3.0",
+      openapi: "3.0.3",
       servers: [
         { url: SITE_URL, description: 'Production Server'}
       ],
