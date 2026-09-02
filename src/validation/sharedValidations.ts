@@ -41,9 +41,12 @@ export const AltTextSchema = z.object({
 
 export const ScheduledDateSchema = z.object({
   // no matter what the client does end up sending, we floor to the nearest valid time.
-  // these are verified in the superRefnes for the post/repost schemas
+  //
+  // this value is fully verified in the superRefines for the post/repost schemas as there is additional
+  // logic to check for
   scheduledDate: z.string().trim()
     .nonempty("scheduled date is malformed")
     .nonoptional("scheduled date must be provided")
-    .refine((date) => checkValidDateStr(date), {error: "invalid date, please use ISO 8601 format", abort: true, path: ["scheduledDate"]}),
+    .refine((date) => checkValidDateStr(date),
+      {error: "invalid date, please use ISO 8601 format", abort: true, path: ["scheduledDate"]}),
 });
