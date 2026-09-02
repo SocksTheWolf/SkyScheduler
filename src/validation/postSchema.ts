@@ -81,7 +81,7 @@ export const PostSchema = z.object({
     if (repostData.hours < minimumHourValue) {
       ctx.addIssue({
         code: "custom",
-        message: "Hour minimum value is not allowed",
+        message: "Reposting cadance value is not allowed",
         path: ["repostData"]
       });
     }
