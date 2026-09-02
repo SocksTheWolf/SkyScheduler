@@ -22,7 +22,7 @@ import {
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.2.9';
+const CURRENT_OPENAPI_VERSION: string = '1.3.0';
 
 const openapiRoutes = new Hono<HonoBase>();
 
@@ -720,8 +720,7 @@ export async function generateOpenAPI() {
       info: {
         title: `${APP_NAME} API Routes`,
         version: CURRENT_OPENAPI_VERSION,
-        description: `The API Routes for ${APP_NAME} that can be used for providing API access
-          or for the API Shield feature of Cloudflare`,
+        description: `The API Routes for ${APP_NAME} for access or addition to the Cloudflare API Shield`,
         termsOfService: `${SITE_URL}/tos`,
         license: {
           name: "MIT",
