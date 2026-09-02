@@ -18,6 +18,9 @@ const defaultRules: RobotRule[] = [
       "/thumbs",
       "/icons",
       "/fonts",
+      "/funding",
+      "/reset-password",
+      "/setup"
     ],
   },
 ];
