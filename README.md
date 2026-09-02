@@ -42,9 +42,8 @@ Perfect for content creators and social media managers who want to plan their so
 
 ### Prerequisites
 
-- Node.js (v24.18 or later)
-- Package Manager
-- Cloudflare Pro Workers account (you will hit CPU limits due to BetterAuth and egress to ATProto)
+- Node.js
+- Cloudflare Pro Workers account (you will hit CPU limits under the free account due to BetterAuth and egress to ATProto)
 
 ### Installation
 
