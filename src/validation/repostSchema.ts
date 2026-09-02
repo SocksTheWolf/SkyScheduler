@@ -1,6 +1,5 @@
 import { isAfter } from "date-fns";
 import * as z from "zod/v4";
-import { REPOSTING_TIME_INTERVAL } from "../config";
 import { RepostType, TimeShape } from "../enums";
 import { MAX_REPOST_TITLE_LENGTH } from "../limits";
 import { floorGivenTime } from "../utils/helpers";
@@ -41,17 +40,7 @@ export const RepostSchema = z.object({
   ], "invalid repost type"),
   ...RepostDataSchema.shape,
   ...ScheduledDateSchema.shape,
-}).superRefine(({repostData, scheduledDate}, ctx) => {
-  if (repostData !== undefined) {
-    const minimumHourValue = REPOSTING_TIME_INTERVAL / 60;
-    if (repostData.hours < minimumHourValue) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Reposting cadance value is not allowed",
-        path: ["repostData"]
-      });
-    }
-  }
+}).superRefine(({scheduledDate}, ctx) => {
   const scheduleDate = floorGivenTime(new Date(scheduledDate), TimeShape.Repost);
   // Ensure scheduled date is in the future
   if (!isAfter(scheduleDate, new Date())) {

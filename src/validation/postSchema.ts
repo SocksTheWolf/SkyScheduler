@@ -1,7 +1,6 @@
 import { isAfter } from "date-fns";
 import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
-import { REPOSTING_TIME_INTERVAL } from "../config";
 import { EmbedDataType, PostLabel, TimeShape } from "../enums";
 import {
   MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST,
@@ -72,17 +71,6 @@ export const PostSchema = z.object({
         continue: false,
         message: "Scheduled posts must be set in the future",
         path: ["scheduledDate"]
-      });
-    }
-  }
-  // if we have repostData, check that the minimum is acceptable
-  if (repostData !== undefined) {
-    const minimumHourValue = REPOSTING_TIME_INTERVAL / 60;
-    if (repostData.hours < minimumHourValue) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Reposting cadance value is not allowed",
-        path: ["repostData"]
       });
     }
   }
