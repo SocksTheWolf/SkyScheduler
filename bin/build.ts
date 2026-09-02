@@ -228,7 +228,9 @@ if (PUBLIC_OPENAPI_SPEC) {
   buildTriggers.push({
     name: "openapi",
     triggers: ["build:openapi"],
-    match: ["src/validation/**", "src/endpoints/openapi.tsx"],
+    match: ["src/validation/**",
+      "src/endpoints/openapi.tsx",
+      ...siteConfigMatches, aInfo],
     against: "assets/openapi.json",
   });
 }
