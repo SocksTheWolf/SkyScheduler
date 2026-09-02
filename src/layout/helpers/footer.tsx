@@ -1,7 +1,6 @@
 import isEmpty from "just-is-empty";
 import {
   APP_NAME,
-  PROGRESS_MADE, PROGRESS_TOTAL,
   PROJECT_AUTHOR, PROJECT_AUTHOR_SITE,
   SERVICE_TIP_URL
 } from "../../appInfo";
@@ -23,14 +22,12 @@ export default function FooterCopyright(props: FooterCopyrightProps) {
   const projectURL = (<a class="secondary" tabindex={props.removeExcessTab ? -1 : 0} target="_blank" title="Project source repository"
     href="/source">{APP_NAME}</a>);
   const homepageURL = (<a class="secondary" title="Homepage" href="/">{APP_NAME}</a>);
-  const progressBarTooltip = `$${PROGRESS_MADE}/$${PROGRESS_TOTAL} for this month`;
   const tipElement = (<><a class="tipLink secondary" target="_blank" tabindex={props.removeExcessTab ? -1 : 0}
       data-tooltip="Tips are not required as the service is free, but if this helps you, a tip would be appreciated <3"
       title="Tip the dev" href="/tip">Tip</a> -</>);
   return (
     <center><small>
-      {props.showProgressBar ? <div class="serverFunds"><span data-tooltip={progressBarTooltip}>Current Server Costs:</span>
-        <progress value={PROGRESS_MADE} max={PROGRESS_TOTAL} /></div> : null}
+      {props.showProgressBar ? <div class="serverFunds" hx-get="/progress" hx-trigger="load once" hx-target="this" hx-swap="innerHTML"></div> : null}
       {props.showHomepage ? homepageURL : projectURL} &copy; {new Date().getFullYear()}
       <span class="credits">
         <a rel="author" target="_blank" title="Project author" tabindex={props.removeExcessTab ? -1 : 0}

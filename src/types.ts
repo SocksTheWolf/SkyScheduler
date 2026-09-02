@@ -16,6 +16,7 @@ export interface Bindings {
   R2: R2Bucket;
   R2RESIZE: R2Bucket;
   KV: KVNamespace;
+  FUNDING?: KVNamespace;
   IMAGES: ImagesBinding;
   ASSETS?: Fetcher;
   POST_QUEUE: Queue;

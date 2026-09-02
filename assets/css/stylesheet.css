@@ -102,7 +102,7 @@ html {
 
 .serverFunds {
   position: relative;
-  top: -10px;
+  /*top: -10px;*/
 }
 
 [data-tooltip]:before, .pico [data-tooltip]:before {

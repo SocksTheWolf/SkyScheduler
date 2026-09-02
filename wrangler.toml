@@ -36,6 +36,11 @@ id = "0ecd892014ac47eea38c72be94586e7b"
 binding = "INVITE_POOL"
 id = "45e1cff45cad45c28b22c4fbcd30db00"
 
+# Funding table
+[[kv_namespaces]]
+binding = "FUNDING"
+id = "5e8e30e1a13348d9a1eaa4604246bf0a"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "skyposts"
@@ -79,10 +84,12 @@ name = "REPOST_EDITOR_OPEN_LIMITER"
 namespace_id = "5471006"
 simple = { limit = 10, period = 10 }
 
-# Schedule cron triggers for post/repost cadance and @ ~3:37am on sunday for big cleanups:
-# anything less than an hour MUST use queues to process properly.
+# Schedule cron triggers for post/repost cadance, anything less than an hour MUST use queues to process properly.
+# Additionally @:
+#  ~3:37am on sunday for big cleanups
+#  the first of every month to reset server fund stats
 [triggers]
-crons = [ "*/30 * * * *", "37 03 * * sun", "*/15 * * * *" ]
+crons = [ "0 0 1 */1 *", "37 03 * * sun", "*/30 * * * *", "*/15 * * * *" ]
 
 # flags required to run wrangler in linux
 [dev]

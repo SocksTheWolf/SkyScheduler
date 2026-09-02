@@ -1,6 +1,6 @@
 // like the appScripts file, this is used to allow us to cachepunch
 // via a version query string
-const CURRENT_STYLE_VERSION = "2.0.8";
+const CURRENT_STYLE_VERSION = "2.0.9";
 
 export const getAppStyleStr = (styleName: string) =>
   `/css/${styleName}.min.css?v=${CURRENT_STYLE_VERSION}`;

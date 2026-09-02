@@ -1,9 +1,13 @@
 import isEmpty from "just-is-empty";
+import { FUNDING_KEY } from "../appInfo";
 import type { AtProtoAgent } from "../classes/bskyAgents";
 import { AgentMap } from "../classes/bskyAgents";
 import type { Post } from "../classes/post";
 import type { Repost } from "../classes/repost";
-import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL } from "../config";
+import {
+  POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL,
+  SHOW_SUPPORT_PROGRESS_BAR
+} from "../config";
 import { TaskType } from "../enums";
 import type { AllContext } from "../types";
 import { makePost, makeRepost } from "./bsky/bskyApi";
@@ -164,6 +168,11 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
     case "37 03 * * sun":
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
       break;
+    case "0 0 1 */1 *":
+      if (SHOW_SUPPORT_PROGRESS_BAR && c.env.FUNDING !== undefined) {
+        c.executionCtx.waitUntil(c.env.FUNDING.put(FUNDING_KEY, "0.00"));
+      }
+    break;
     /* MODIFY CRONJOBS FROM HERE */
     /*case "0 * * * *":
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.

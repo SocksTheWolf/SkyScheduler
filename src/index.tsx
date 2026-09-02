@@ -10,6 +10,7 @@ import { admin } from "./endpoints/admin";
 import { generateOpenAPI } from "./endpoints/openapi";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
+import { ProgressBar } from "./layout/helpers/progress";
 import { blankAuthEnv } from "./middleware/auth";
 import { cachePrivateMiddleware, cachePublicMiddleware } from "./middleware/cacheControl";
 import { corsHelperMiddleware } from "./middleware/corsHelper";
@@ -49,6 +50,9 @@ app.all("/", cachePublicMiddleware, ssgServe({ page: "index" }), (c) =>
 );
 app.get("/tos", cachePublicMiddleware, ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
 app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
+app.get("/progress", cachePublicMiddleware, disableSSG(), (c) => {
+  return c.html(<ProgressBar ctx={c} />);
+});
 
 ///// Inline Middleware /////
 // Middleware for authentication/sessions
