@@ -94,10 +94,16 @@ buildRules.set("build:types:wrangler", {
   isTypeAction: true
 });
 
+/* Build Commands */
+const buildCommands = new Map<string, BuildCmds>();
+buildCommands.set("lint", {
+  actions: ["build:consts", "build:js:app", "build:js:main",
+    "lint:consts", "lint:all_funcs", "lint:selectHelper"]
+});
+
 // These rules are used in a couple of different places, so cache them out for easy reuse
 const siteConfigMatches = ["src/limits.ts", "src/config.ts"];
-const constScriptMatches = [`${sDir}/constScript.ts`,
-  `src/enums.ts`,
+const constScriptMatches = [`${sDir}/constScript.ts`, `src/enums.ts`,
   `src/validation/regexCases.ts`,
   ...siteConfigMatches];
 const appScriptMatches = [`${sDir}/appScripts.ts`, "bin/configs/minifyOptions.ts"];
@@ -252,4 +258,10 @@ if (!isEmpty(ATPROTO_DID)) {
   });
 }
 
-await buildRunner(buildTriggers, buildRules);
+const buildOptions = {
+  rules: buildRules,
+  triggers: buildTriggers,
+  commands: buildCommands
+} satisfies BuildRunnerOptions;
+
+await buildRunner(buildOptions);

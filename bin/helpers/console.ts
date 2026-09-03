@@ -3,7 +3,8 @@ export enum LogLevel {
   debug,
   log,
   warn,
-  error
+  error,
+  system
 };
 
 let current_log_level: LogLevel = LogLevel.log;
@@ -32,6 +33,7 @@ export const log = (text: string) => { makeLog(LogLevel.log, text); };
 export const debug = (text: string) => { makeLog(LogLevel.debug, text); };
 export const warn = (text: string) => { makeLog(LogLevel.warn, text); };
 export const error = (text: string) => { makeLog(LogLevel.error, text); };
+export const lineBreak = () => { makeLog(LogLevel.system, "----------------------------"); }
 export const setLevel = (setTo: LogLevel) => {
   current_log_level = setTo;
 };

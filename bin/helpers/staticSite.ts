@@ -7,7 +7,7 @@ import path from "path";
 import { USE_STATIC_HTML } from "../../src/config";
 import * as app from "../../src/index";
 import type { HonoBase } from "../../src/types";
-import { debug, error, log } from "./console";
+import { debug, error, lineBreak, log } from "./console";
 
 async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
   const outputDirectory: string = "./assets/pages";
@@ -43,7 +43,8 @@ async function buildStaticSite(app: Hono<HonoBase>): Promise<void> {
     },
   });
   if (response.success) {
-    log(`\nBuilt Static Files:\n${response.files.join("\n")}`);
+    lineBreak();
+    log(`Built Static Files:\n\n${response.files.join("\n")}\n`);
   } else {
     error(`Encountered error when trying to SSG site ${response.error}`);
   }

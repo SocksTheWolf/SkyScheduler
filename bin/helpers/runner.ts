@@ -3,17 +3,18 @@ import { minify } from "minify";
 import { existsSync, statSync } from "node:fs";
 import { glob, mkdir, writeFile } from "node:fs/promises";
 import { minifyOptions } from "../configs/minifyOptions";
-import { debug, error, log, warn } from "./console";
+import { debug, error, lineBreak, log, warn } from "./console";
 import { generateLintRules } from "./lint";
 import { runCommandAsync } from "./subCommand";
 
-export async function buildRunner(buildTriggers: BuildTriggers, buildRules: BuildRules) {
+export async function buildRunner(options: BuildRunnerOptions) {
   // prevent multiple re-entry operations.
   if (process.env.IS_BUILDING !== undefined) {
     debug("recursive re-entry detected, stopping...");
     return;
   }
 
+  lineBreak();
   const fileModMap = new Map<string, number>();
   // eslint-disable-next-line @typescript-eslint/dot-notation
   const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
@@ -21,6 +22,25 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
 
   // set that we are currently building
   process.env.IS_BUILDING = "true";
+
+  // handle any commandline flags
+  if (process.argv.length > 2) {
+    process.argv.forEach((cmd) => {
+      if (cmd.includes("--build=")) {
+        const command = cmd.replace("--build=", "");
+        log(`Adding build rule "${command}"`);
+        buildCommands.push(command);
+      }
+      else if (cmd.includes("--cmd=") && options.commands !== undefined) {
+        const commandStr: string = cmd.replace("--cmd=", "");
+        const command: BuildCmds|undefined = options.commands.get(commandStr);
+        if (command !== undefined) {
+          buildCommands.push(...command.actions);
+          log(`Added build command "${commandStr}"`);
+        }
+      }
+    });
+  }
 
   // create the js output directory if it doesn't exist
   if (!existsSync("assets/js/min")) {
@@ -44,7 +64,7 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
   };
 
   // Check to see if we need to build
-  for (const trigger of buildTriggers) {
+  for (const trigger of options.triggers) {
     debug(`Checking "${trigger.name}" for matches via ${trigger.match.join(",")}`);
     let compareAgainst: number;
 
@@ -95,7 +115,8 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
 
   // Do not print anything if we do not have any build commands at all.
   if (buildCommands.length > 0) {
-    log(`\nRunning Build Rules: ${buildCommands.join(", ")}\n`);
+    lineBreak();
+    log(`Running Build Rules: ${buildCommands.join(", ")}\n`);
   } else {
     log("No Build Necessary");
     return;
@@ -104,7 +125,7 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
   // build anything that exists.
   const lintCommands: BuildRule[] = [];
   for (const command of buildCommands) {
-    const rule: BuildRule | undefined = buildRules.get(command);
+    const rule: BuildRule | undefined = options.rules.get(command);
     if (rule === undefined) {
       warn(`${command} - invalid build command was specified`);
       continue;
@@ -133,6 +154,8 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
 
         if (rule.minify) {
           try {
+            lineBreak();
+            log(`Minifying ${rule.output}...`);
             // @ts-ignore - the types are invalid for the options object, this can be verified by looking at the minify code.
             const data: string = (rule.output.includes(".js")) ? await minify.js(output, minifyOptions) : await minify.css(output);
             await writeFile(rule.output, data);
@@ -146,18 +169,22 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
       await runCommandAsync(rule.buildCommand, callback);
     } else {
       const output: BuildRuleFuncOutput = await rule.buildCommand();
-      debug(`${command} - Was ran`);
       if (typeof output === "string" && rule.output !== undefined) {
+        lineBreak();
+        log(`Created ${rule.output}`);
         await writeFile(rule.output, output);
-        debug(`${command} - Wrote file ${rule.output}`);
+      } else {
+        debug(`Ran ${command}`);
       }
     }
   }
 
   // Generate any lints that are necessary
   if (lintCommands.length > 0) {
-    log("building lint configs");
+    lineBreak();
+    log("Building lint configs");
     await generateLintRules(lintCommands);
   }
+  lineBreak();
   log("Completed build");
 }

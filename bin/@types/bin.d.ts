@@ -23,7 +23,17 @@ interface BuildRule {
   isTypeAction?: boolean;
 };
 
+interface BuildCmds {
+  actions: string[];
+};
+
 type BuildRules = Map<string, BuildRule>;
-type BuildTriggers = BuildTrigger[];
+type BuildCommands = Map<string, BuildCmds>;
+
+interface BuildRunnerOptions {
+  rules: BuildRules,
+  triggers: BuildTrigger[],
+  commands?: BuildCommands
+};
 
 type CommandCallbackFunction = (data: string) => Promise<void>;
