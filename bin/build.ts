@@ -210,7 +210,7 @@ if (USE_STATIC_HTML) {
       aInfo,
       `${sDir}/*.ts`],
     ignores: [`${sDir}/appManifest.ts`, `${sDir}/robots.ts`, `${sDir}/redirects.ts`],
-    against: "assets/pages/index.html",
+    against: "assets/pages/*.html",
   });
 } else {
   // push the sitemap build rules if we aren't doing ssgs

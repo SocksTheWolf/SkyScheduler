@@ -32,24 +32,54 @@ export async function buildRunner(buildTriggers: BuildTriggers, buildRules: Buil
     buildCommands.push(...trigger.triggers);
   };
 
+  const getOrAddTimeForRule = (file: string, modTimeIn?: number) => {
+    // get the modtime of the against and cache it.
+    if (!fileModMap.has(file)) {
+      modTimeIn ??= statSync(file).mtimeMs;
+      fileModMap.set(file, modTimeIn);
+      return modTimeIn;
+    } else {
+      return fileModMap.get(file)!;
+    }
+  };
+
   // Check to see if we need to build
   for (const trigger of buildTriggers) {
     debug(`Checking "${trigger.name}" for matches via ${trigger.match.join(",")}`);
     let compareAgainst: number;
 
-    // Check if the comparison file exists, if it doesn't, make the file.
-    if (!existsSync(trigger.against)) {
-      debug(`${trigger.name} - against file is missing ${trigger.against}, building`);
-      addBuildCommands(trigger);
-      continue;
-    }
-
-    // get the modtime of the against and cache it.
-    if (!fileModMap.has(trigger.against)) {
-      compareAgainst = statSync(trigger.against).mtimeMs;
-      fileModMap.set(trigger.against, compareAgainst);
+    // check if this is a glob rule
+    if (trigger.against.includes("*")) {
+      // check to see if we know about this object already
+      if (!fileModMap.has(trigger.against)) {
+        // we don't, so try to figure out what has the lowest time
+        let lowestTime = Number.POSITIVE_INFINITY;
+        const globResults = await Array.fromAsync(glob(trigger.against, {exclude: trigger.ignores}));
+        if (globResults.length <= 0) {
+          addBuildCommands(trigger);
+          continue;
+        }
+        for (const globbedFile of globResults) {
+          const fileTime = statSync(globbedFile).mtimeMs;
+          if (fileTime < lowestTime) {
+            debug(`${globbedFile} lowest time is ${fileTime}`);
+            lowestTime = fileTime;
+          }
+        }
+        compareAgainst = getOrAddTimeForRule(trigger.against, lowestTime);
+      } else {
+        compareAgainst = fileModMap.get(trigger.against)!;
+      }
     } else {
-      compareAgainst = fileModMap.get(trigger.against)!;
+      // Check if the comparison file exists, if it doesn't, make the file.
+      if (!existsSync(trigger.against)) {
+        debug(`${trigger.name} - against file is missing ${trigger.against}, building`);
+        addBuildCommands(trigger);
+        continue;
+      }
+
+      // get the compare time for the map, or add it to the map if it doesn't exist already
+      compareAgainst = getOrAddTimeForRule(trigger.against);
     }
 
     for await (const matchedFile of glob(trigger.match, {exclude: trigger.ignores})) {
