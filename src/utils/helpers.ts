@@ -1,8 +1,6 @@
 import type { FormatDurationOptions } from "date-fns";
 import { formatDuration, roundToNearestMinutes, startOfHour, subDays } from "date-fns";
-import { drizzle } from "drizzle-orm/d1";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../config";
-import { schema } from "../db/schema";
 import { EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
 import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
 
@@ -131,9 +129,3 @@ export const clearWorkersCache = async (ctx: ExecutionContext, options: CachePur
   }
   return true;
 };
-
-export function getDrizzle(DB: D1Database) {
-  // This is currently separated in a helper function
-  // so that if we get D1 read replicas, we can easily invoke them.
-  return drizzle(DB, { schema, logger: false });
-}

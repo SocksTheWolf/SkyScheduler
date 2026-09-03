@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExecutionContext } from "hono";
 import type { Bindings } from "../types";
-import { getDrizzle } from "../utils/helpers";
+import { getDrizzle } from "../utils/db/get";
 
 export class ScheduledContext {
   executionCtx: ExecutionContext;

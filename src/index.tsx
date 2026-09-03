@@ -27,7 +27,7 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import type { Bindings, HonoBase, QueueTaskData } from "./types";
-import { getDrizzle } from "./utils/helpers";
+import { getDrizzle } from "./utils/db/get";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
 import { setupAccounts } from "./utils/setup";

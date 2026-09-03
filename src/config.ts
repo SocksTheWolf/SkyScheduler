@@ -74,6 +74,9 @@ export const USE_STATIC_HTML: boolean = true;
 // if we should enable chrome speculation rules to speed up the site
 export const ALLOW_SPECULATION_RULES: boolean = false;
 
+// drizzle technically does not support D1 read replicas yet, so feature flag this for now.
+export const USE_READ_REPLICAS: boolean = false;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/
