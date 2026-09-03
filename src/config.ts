@@ -85,15 +85,12 @@ export const USE_NEW_DB_WRAPPER: boolean = USE_READ_REPLICAS;
 /*********************************************************/
 
 // If these are changed from the default value of Hour (or have different values from each other),
-// then you must also do the following:
+// then you must also set the appropriate crontab values in wrangler.toml
 //
-// 1. Set the new crontab values in wrangler.toml
-// 2. Modify handleSchedule in scheduler.ts to add a new switch case for the given action.
-// 3. Add the appropriate call to what interval you would be handling (scheduleRepostTask, etc)
+// It is heavily encouraged to make sure that queues are on and configured if these are not set to Hour
 
 export const POSTING_TIME_INTERVAL: TimeIntervalSettings =
   TimeIntervalSettings.HalfHour;
-// This is a cheaper/safer value to change around as reposts are very "free" in terms of processing power
-// as there's no files that need to be uploaded or change
+
 export const REPOSTING_TIME_INTERVAL: TimeIntervalSettings =
   TimeIntervalSettings.QuarterHour;

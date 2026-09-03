@@ -56,7 +56,7 @@ export class AgentMap {
           await createDMWithUsername(c.env, username, resetAppPasswordMessage());
         }
       } else {
-        console.error(`Unable to login ${userId}, no new violation made, got ${loginResponse}`);
+        console.error(`Unable to login ${username}(${userId}), no new violation made, got ${loginResponse}`);
       }
       return { agent: null, violation: true, violationType: loginResponse };
     }

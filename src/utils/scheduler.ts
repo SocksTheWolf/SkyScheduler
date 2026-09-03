@@ -8,7 +8,7 @@ import {
   POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL,
   SHOW_SUPPORT_PROGRESS_BAR
 } from "../config";
-import { TaskType } from "../enums";
+import { TaskType, TimeIntervalSettings } from "../enums";
 import type { AllContext } from "../types";
 import { makePost, makeRepost } from "./bsky/bskyApi";
 import { pruneBskyPosts } from "./bsky/bskyPrune";
@@ -89,7 +89,8 @@ export const scheduleAllContentTasks = async (c: AllContext) => {
     // If you are going to have different cadances, it's recommended you do not use this function
     // but instead swap over to calling schedulePostTask/scheduleRepostTask individually in the
     // handleSchedule function in this file
-    console.warn("Posting time and Reposting time are on different cadances. Please change!");
+    console.error("Posting time and Reposting time are on different cadances. Please change!");
+    return;
   }
 
   await schedulePostTask(c, agency);
@@ -161,10 +162,27 @@ export const cleanupAbandonedFiles = async (c: AllContext) => {
 };
 
 export const handleSchedule = (c: AllContext, cronTime: string) => {
-  // if any new crontime schedules are added, they should be handled in here
-  // otherwise the default will execute
+  // helper function for writing the appropriate cron tab job
+  const getCronTimeForInterval = (input: TimeIntervalSettings): string => {
+    if (input === TimeIntervalSettings.Hour) {
+      return "0 * * * *"
+    }
+    return `*/${input} * * * *`;
+  };
+
+  // dynamically determine the cron task filter based on settings
+  //
+  // the default strings are garbage to prevent accidental matches
+  // or overlaps
+  let repostTask = "repost", postTask = "post", bothTask = "both";
+  if (POSTING_TIME_INTERVAL != REPOSTING_TIME_INTERVAL) {
+    repostTask = getCronTimeForInterval(REPOSTING_TIME_INTERVAL);
+    postTask = getCronTimeForInterval(POSTING_TIME_INTERVAL);
+  } else {
+    bothTask = getCronTimeForInterval(POSTING_TIME_INTERVAL);
+  }
+
   switch (cronTime) {
-    // Leave this cronjob alone
     case "37 03 * * sun":
       c.executionCtx.waitUntil(cleanUpPostsTask(c));
       break;
@@ -174,18 +192,16 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
         c.executionCtx.waitUntil(c.env.FUNDING.put(FUNDING_KEY, "0.00"));
       }
     break;
-    /* MODIFY CRONJOBS FROM HERE */
-    /*case "0 * * * *":
+    case bothTask:
       // Remember to add scheduleRepostTask or schedulePostTask respectively if these ever change.
       c.executionCtx.waitUntil(scheduleAllContentTasks(c));
-      break;*/
-    case "*/30 * * * *":
+      break;
+    case postTask:
       c.executionCtx.waitUntil(schedulePostTask(c));
       break;
-    case "*/15 * * * *":
+    case repostTask:
       c.executionCtx.waitUntil(scheduleRepostTask(c));
       break;
-    /* END MODIFICATION */
     default:
       console.error(`No tasks have been defined for ${cronTime}`);
       break;
