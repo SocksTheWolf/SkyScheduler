@@ -77,6 +77,9 @@ export const ALLOW_SPECULATION_RULES: boolean = false;
 // drizzle technically does not support D1 read replicas yet, so feature flag this for now.
 export const USE_READ_REPLICAS: boolean = false;
 
+// this has to be true to use the new DB class wrapper
+export const USE_NEW_DB_WRAPPER: boolean = USE_READ_REPLICAS;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/
