@@ -177,7 +177,7 @@ export type CreatePostQueryResponse = CreateObjectResponse & {
 export interface DeleteResponse {
   success: boolean;
   isRepost: boolean;
-  needsRefresh?: boolean;
+  wasThreadRoot?: boolean;
 }
 
 /// MIDDLEWARES

@@ -214,15 +214,16 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
   if (isValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
     if (response.success) {
-      let postRefreshEvent = "";
-      // This is true if this was the root of a thread chain
-      if (response.needsRefresh) {
-        postRefreshEvent = ", refreshPosts, updateTimestamps, scrollTop";
+      let triggerEvents = "resetIfThreading, updateTimestamps, accountViolations";
+      if (response.wasThreadRoot) {
+        triggerEvents += ", scrollTop";
       }
-      const triggerEvents = `resetIfThreading, accountViolations${postRefreshEvent}`;
+      const ThreadDeleteOOB = () => (<div hx-swap-oob={`outerHTML:blockquote:has([data-root='${id}'])`}></div>);
+      // hack enum system lol
+      const postDeleteType = (response.wasThreadRoot) ? 2 : (response.isRepost) ? 1 : 0;
+      c.header("HX-Trigger-After-Settle", `{"postDeletedType": ${postDeleteType}}`);
       c.header("HX-Trigger-After-Swap", triggerEvents);
-      c.header("HX-Trigger-After-Settle", `{"postDeleted": ${response.isRepost}}`);
-      return c.html(<></>, 200);
+      return c.html(<>{response.wasThreadRoot ? <ThreadDeleteOOB /> : null}</>, 200);
     }
   }
   c.header("HX-Trigger-After-Swap", "postFailedDelete");

@@ -127,9 +127,21 @@ document.addEventListener("scrollListToPost", function(ev) {
   scrollToPost(ev.detail);
 });
 
-document.addEventListener("postDeleted", function(ev) {
-  const type = ev.detail.value ? "Retweet" : "Post";
-  pushToast(`${type} deleted`, true);
+document.addEventListener("postDeletedType", function(ev) {
+  let typeStr;
+  switch (ev.detail.value) {
+    default:
+    case 0:
+      typeStr = "Post";
+    break;
+    case 1:
+      typeStr = "Repost";
+    break;
+    case 2:
+      typeStr = "Thread";
+    break;
+  }
+  pushToast(`${typeStr} deleted`, true);
 });
 
 document.addEventListener("postFailedDelete", function() {

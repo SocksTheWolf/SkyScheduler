@@ -157,7 +157,7 @@ export const deletePost = async (c: AllContext, id: string): Promise<DeleteRespo
     queriesToExecute.push(db.delete(posts).where(eq(posts.uuid, id)));
     c.executionCtx.waitUntil(db.batch(queriesToExecute as BatchQuery));
     returnObj.success = true;
-    returnObj.needsRefresh = postObj.isThreadRoot;
+    returnObj.wasThreadRoot = postObj.isThreadRoot;
   }
   return returnObj;
 };
