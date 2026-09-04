@@ -6,8 +6,8 @@ import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
 import { DEFAULT_CHAT_PDS } from "../../config";
 import { AccountStatus } from "../../enums";
 import type { Bindings, UserIdType } from "../../types";
-import { lookupBskyHandle } from "./bskyApi";
 import { loginToBsky } from "./bskyLogin";
+import { lookupBskyHandle } from "./bskyUser";
 
 const chatHeaders = { headers: { "atproto-proxy": "did:web:api.bsky.chat#bsky_chat" } };
 

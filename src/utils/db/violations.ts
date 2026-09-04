@@ -5,7 +5,7 @@ import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus } from "../../enums";
 import type { AllContext, DBProcessor, UserIdType, Violation, ViolationRecordChange } from "../../types";
-import { lookupBskyHandle } from "../bsky/bskyApi";
+import { lookupBskyHandle } from "../bsky/bskyUser";
 import { getUsernameForUserId } from "./userinfo";
 
 const createBanForUser = async(db: DrizzleD1Database, userName: string|null, reason: string) => {

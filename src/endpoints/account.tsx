@@ -12,8 +12,8 @@ import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../types";
-import { lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyApi";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
+import { followBotAccount, lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyUser";
 import { getAllMediaOfUser } from "../utils/db/file";
 import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
 import { removeViolations, userHasBan, userHasViolations } from "../utils/db/violations";
@@ -212,7 +212,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     return c.json({ ok: false, msg: validation.error.toString() }, 400);
   }
 
-  const { signupToken, username, password, bskyAppPassword } = validation.data;
+  const { signupToken, username, password, bskyAppPassword, autoFollow } = validation.data;
   if (await doesUserExist(c, username)) {
     return c.json({ok: false, msg: "user already exists"}, 401);
   }
@@ -265,6 +265,9 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
     if (createUser.token !== null) {
       // Burn the invite key
       c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
+      // If the user asked to auto follow the bot account, then do so.
+      if (autoFollow)
+        c.executionCtx.waitUntil(followBotAccount(userPDS, username, bskyAppPassword));
 
       console.log(`user ${username} created! with code ${signupToken ?? 'none'}`);
       return c.json({ok: true, msg: "signup success"});

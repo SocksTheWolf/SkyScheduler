@@ -7,6 +7,7 @@ export const SignupSchema = z.object({
   ...PasswordSchema.shape,
   ...BSkyAppPasswordSchema.shape,
   signupToken: z.string().trim().toLowerCase().optional(),
+  autoFollow: z.boolean().prefault(false).optional(),
   agreeTerms: z.literal(true, "TOS & Privacy Policy were not agreed to").nonoptional("Missing agreements"),
 }).superRefine(({signupToken}, ctx) => {
   if (USE_INVITE_KEYS && signupToken === undefined) {

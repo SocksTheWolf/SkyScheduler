@@ -12,7 +12,7 @@ import truncate from "just-truncate";
 import type { AtProtoAgent } from "../../classes/bskyAgents";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
-import { DEFAULT_PDS, USE_DEPRECATED_SIZE_PARSE } from "../../config";
+import { USE_DEPRECATED_SIZE_PARSE } from "../../config";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
   BSKY_IMG_SIZE_LIMIT,
@@ -23,7 +23,7 @@ import type {
   BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
   BskyVideoRecordData, BskyWebLinkRecordData,
   PostRecordResponse,
-  PostStatus, ResolveHandleResponse, WebAssociatedRef
+  PostStatus, WebAssociatedRef
 } from "../../types";
 import type { atpRecordURICaptures } from "../../validation/regexCases";
 import { atpRecordURI } from "../../validation/regexCases";
@@ -35,45 +35,9 @@ import { getUsernameForUserId } from "../db/userinfo";
 import { createViolationForUser } from "../db/violations";
 import { has } from "../helpers";
 import { deleteEmbedsFromR2 } from "../r2Query";
+import { getAgentFeedRecord, getAgentListRecord, getAgentPostRecords } from "./bskyRecord";
+import { lookupBskyHandle } from "./bskyUser";
 import { removeOrResolveInvalidFacets } from "./mentions";
-
-export const doesHandleExist = async (user: string) => {
-  try {
-    const checkHandle = await lookupBskyHandle(user);
-    return checkHandle !== null;
-  } catch {
-    return false;
-  }
-};
-
-export const lookupBskyHandle = async (user: string): Promise<string | null> => {
-  return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${user}`, {
-    cf: { cacheTtlByStatus: { "200-299": 600, 404: 1, "500-599": 0 }, cacheEverything: true },
-  }).then((resp) => {
-    if (resp.ok) {
-      return resp.json<ResolveHandleResponse>().then((jsonData) => {
-        return jsonData.did;
-      });
-    }
-    return null;
-  });
-};
-
-export const lookupBskyPDS = async (userDID: string): Promise<string> => {
-  return await fetch(`https://plc.directory/${userDID}`).then((resp) => {
-    return (resp.json<PLCDirectoryResponse>()).then((data) => {
-      if (has(data, "service")) {
-        for (const service of data.service!) {
-          if (service.type === "AtprotoPersonalDataServer") {
-            return service.serviceEndpoint;
-          }
-        }
-      }
-      // Fallback is to always return the bsky pds
-      return DEFAULT_PDS;
-    });
-  });
-};
 
 export const makePost = async (c: AllContext, content: Post | null, usingAgent: AtProtoAgent) => {
   if (content === null) {
@@ -609,40 +573,4 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
   console.log(`posted ${successes}/${expected}, did ${successThisRound} work units`);
 
   return returnObj;
-};
-
-export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]) => {
-  try
-  {
-    const response = await agent.app.bsky.feed.getPosts({uris: records});
-    if (response.success)
-      return response.data.posts;
-  } catch(err) {
-    console.error(`Unable to get post records for ${records.toString()} had error ` + String(err));
-  }
-  return null;
-};
-
-export const getAgentFeedRecord = async (agent: AtProtoAgent, feedURI: string) => {
-  try {
-    const response = await agent.app.bsky.feed.getFeedGenerator({ feed: feedURI });
-    if (response.success && response.data.isValid) {
-      return response.data.view;
-    }
-  } catch (err) {
-    console.error(`Unable to get feed record for ${feedURI} had error ` + String(err));
-  }
-  return null;
-};
-
-export const getAgentListRecord = async (agent: AtProtoAgent, listURI: string) => {
-  try {
-    const response = await agent.app.bsky.graph.getList({ list: listURI, limit: 1 });
-    if (response.success) {
-      return response.data.list;
-    }
-  } catch (err: unknown) {
-    console.error(`Unable to resolve list record for ${listURI} had error ` + String(err));
-  }
-  return null;
 };

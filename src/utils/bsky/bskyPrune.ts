@@ -3,7 +3,7 @@ import split from "just-split";
 import { AtProtoAgent } from "../../classes/bskyAgents";
 import type { AllContext } from "../../types";
 import { getAllPostedPosts, getAllPostedPostsOfUser } from "../db/data";
-import { getAgentPostRecords } from "./bskyApi";
+import { getAgentPostRecords } from "./bskyRecord";
 
 // This looks for a bunch of posts that are posted and determines if the posts
 // are still on the network or not. If they are not, then this prunes the posts from

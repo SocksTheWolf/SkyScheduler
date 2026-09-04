@@ -2,7 +2,7 @@ import type { Facet } from "@atproto/api";
 import { AppBskyRichtextFacet } from "@atproto/api";
 import type { MentionCache } from "../../types";
 import { mentionCaptureRegex } from "../../validation/regexCases";
-import { lookupBskyHandle } from "./bskyApi";
+import { lookupBskyHandle } from "./bskyUser";
 
 function makeMentionMap(updateWith?: MentionCache[]): Map<string, string> {
   // handle, did

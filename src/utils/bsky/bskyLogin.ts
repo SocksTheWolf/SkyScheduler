@@ -21,7 +21,7 @@ const checkAccountStatus = (data: ComAtprotoServerCreateSession.OutputSchema) =>
   return AccountStatus.Ok;
 };
 
-export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: string) => {
+export const loginToBsky = async (agent: AtProtoAgent, user: string, pass: string): Promise<AccountStatus> => {
   try {
     const loginResponse = await agent.login({ identifier: user, password: pass, allowTakendown: true });
     if (!loginResponse.success) {
