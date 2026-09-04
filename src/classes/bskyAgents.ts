@@ -9,6 +9,7 @@ import { loginToBsky } from "../utils/bsky/bskyLogin";
 import { createDMWithUsername } from "../utils/bsky/bskyMessage";
 import { getBskyUserPassForId } from "../utils/db/userinfo";
 import { createViolationForUser, shouldIgnoreViolation } from "../utils/db/violations";
+import { getEnumKeyByValue } from "../utils/helpers";
 import { resetAppPasswordMessage } from "../utils/messages/resetAppPassword";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,12 +52,12 @@ export class AgentMap {
     if (loginResponse != AccountStatus.Ok) {
       // check to see if we should add a violation (will return false if no new violation needed)
       if (await createViolationForUser(c, userId, loginResponse)) {
-        console.error(`Unable to login for ${userId} with violation ${loginResponse}`);
+        console.error(`Unable to login for ${userId} with violation ${getEnumKeyByValue(AccountStatus, loginResponse)}`);
         if (messageOnViolation && loginResponse === AccountStatus.InvalidAccount) {
           await createDMWithUsername(c.env, username, resetAppPasswordMessage());
         }
       } else {
-        console.error(`Unable to login ${username}(${userId}), no new violation made, got ${loginResponse}`);
+        console.error(`Unable to login ${username}(${userId}), no new violation made, got ${getEnumKeyByValue(AccountStatus, loginResponse)}`);
       }
       return { agent: null, violation: true, violationType: loginResponse };
     }

@@ -104,7 +104,7 @@ export const logoutAccount = async (c: BaseContext): Promise<boolean> => {
     console.error("Unable to handle logout properly, redirecting anyways. " + String(err));
   }
   return false;
-};
+}
 
 export const checkValidDateStr = (date: string): boolean => {
   try {
@@ -113,7 +113,7 @@ export const checkValidDateStr = (date: string): boolean => {
   } catch {
     return false;
   }
-};
+}
 
 export const clearWorkersCache = async (ctx: ExecutionContext, options: CachePurgeOptions): Promise<boolean> => {
   if (!ctx.cache)
@@ -128,4 +128,8 @@ export const clearWorkersCache = async (ctx: ExecutionContext, options: CachePur
     return false;
   }
   return true;
-};
+}
+
+export function getEnumKeyByValue<T extends Record<string, unknown>>(inEnum: T, value: unknown): keyof T|null {
+  return Object.keys(inEnum).find((x) => inEnum[x] == value) ?? null;
+}

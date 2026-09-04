@@ -110,7 +110,6 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
 
   // if there are no violations, then give none.
   if (isEmpty(valuesUpdate)) {
-    //console.log("no value change");
     return false;
   }
 
