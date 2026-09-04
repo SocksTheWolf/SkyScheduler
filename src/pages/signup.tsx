@@ -4,6 +4,7 @@ import { PWAutoCompleteSettings } from "../enums";
 import AccountHandler from "../layout/account";
 import BSkyAppPasswordField from "../layout/fields/appPasswordField";
 import DashboardPasswordField from "../layout/fields/dashPasswordField";
+import { AdvancedSignupFields } from "../layout/fields/signupFields";
 import UsernameField from "../layout/fields/usernameField";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
@@ -58,7 +59,7 @@ export default function Signup(props: BaseElementProps) {
           <small>This is an invite key to try to dissuade bots/automated applications. {linkToInvites}.</small>
         </label>
       ) : ''}
-
+      <AdvancedSignupFields />
       <hr />
       <fieldset>
         <legend><label for="agreeTerms">Agree to {APP_NAME} Terms</label></legend>

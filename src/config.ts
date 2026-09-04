@@ -80,6 +80,9 @@ export const USE_READ_REPLICAS: boolean = false;
 // this has to be true to use the new DB class wrapper
 export const USE_NEW_DB_WRAPPER: boolean = USE_READ_REPLICAS;
 
+// if the auto follow option is provided at signup
+export const ALLOW_AUTO_FOLLOW: boolean = false;
+
 /*********************************************************/
 /****          APPLICATION INTERVAL SETTINGS          ****/
 /*********************************************************/
