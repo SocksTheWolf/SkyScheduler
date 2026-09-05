@@ -152,7 +152,9 @@ mode = "smart"
 cpu_ms = 60000
 
 [secrets]
-required=["BETTER_AUTH_SECRET", "DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "RESIZE_SECRET_HEADER"]
+required=["BETTER_AUTH_SECRET",
+  "DEFAULT_ADMIN_USER", "DEFAULT_ADMIN_PASS", "DEFAULT_ADMIN_BSKY_PASS",
+  "RESIZE_SECRET_HEADER", "RESET_BOT_APP_PASS", "TURNSTILE_SECRET_KEY"]
 
 [vars]
 # the domain and protocol that this application is hosted on. note this value is also used for CORS
