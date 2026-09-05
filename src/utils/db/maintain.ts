@@ -83,16 +83,20 @@ export const updateSetDIDForAllUsers = async (c: AllContext) => {
   if (!db) {
     return;
   }
-  const batchedQueries: BatchQueryArray = [];
   const allUsers = await db.select({id: users.id, handle: users.username}).from(users).where(isNull(users.did));
-  console.log("updating handles:\n");
-  for (const user of allUsers) {
-    const userDID = await getUserDID(user.handle);
-    if (userDID !== null) {
-      batchedQueries.push(db.update(users).set({did: userDID}).where(eq(users.id, user.id)));
-      console.log(`${user.id} - ${user.handle} = ${userDID}`);
+  if (allUsers.length > 0) {
+    console.log("updating handles:\n");
+    const batchedQueries: BatchQueryArray = [];
+    for (const user of allUsers) {
+      const userDID = await getUserDID(user.handle);
+      if (userDID !== null) {
+        batchedQueries.push(db.update(users).set({did: userDID}).where(eq(users.id, user.id)));
+        console.log(`${user.id} - ${user.handle} = ${userDID}`);
+      }
     }
+    if (batchedQueries.length > 0)
+      await db.batch(batchedQueries as BatchQuery);
+    return batchedQueries.length;
   }
-  if (batchedQueries.length > 0)
-    await db.batch(batchedQueries as BatchQuery);
+  return 0;
 }

@@ -44,6 +44,6 @@ admin.get("/abandoned", async (c) => {
 });
 
 admin.get("/update", async (c) => {
-  await updateSetDIDForAllUsers(c);
-  return c.text("updated?");
+  const updatedRows = await updateSetDIDForAllUsers(c);
+  return c.text(`Updated ${updatedRows} accounts`);
 })
