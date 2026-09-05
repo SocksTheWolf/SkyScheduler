@@ -102,7 +102,7 @@ npm run deploy -- --secrets-file=.env
 npm run migrate:all
 ```
 
-**NOTE**: If you encounter issues running remotely, you can run `npm run migrate:prod` or `npm run migrate:local` respectively.
+**NOTE**: If you encounter issues running this command, you can run `npm run migrate:remote` or `npm run migrate:local` respectively.
 
 9. Run your application and go to `/setup`. This will create the admin account.
 
