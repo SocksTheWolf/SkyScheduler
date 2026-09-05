@@ -56,7 +56,7 @@ export const getUsernameForUser = async (c: AllContext): Promise<string|null> =>
   if (!userId)
     return null;
 
-  return await getUsernameForUserId(c, userId);
+  return getUsernameForUserId(c, userId);
 };
 
 // This is a super dumb query that's needed to get around better auth's forgot password system

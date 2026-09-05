@@ -8,7 +8,7 @@ import type { AllContext, DBProcessor, UserIdType, Violation, ViolationRecordCha
 import { getUserDID } from "../bsky/bskyUser";
 import { getUsernameForUserId } from "./userinfo";
 
-const createBanForUser = async(db: DrizzleD1Database, userName: string|null, reason: string) => {
+const createBanForUser = async (db: DrizzleD1Database, userName: string|null, reason: string) => {
   if (userName !== null) {
     const didHandle = await getUserDID(userName);
     if (didHandle !== null) {
@@ -20,7 +20,7 @@ const createBanForUser = async(db: DrizzleD1Database, userName: string|null, rea
   }
 };
 
-export const userHasBan = async(c: AllContext, userDid: string|null): Promise<boolean> => {
+export const userHasBan = async (c: AllContext, userDid: string|null): Promise<boolean> => {
   if (userDid === null)
     return false;
 
@@ -32,19 +32,19 @@ export const userHasBan = async(c: AllContext, userDid: string|null): Promise<bo
   return (usersBanned > 0);
 };
 
-export const userHandleHasBan = async(c: AllContext, userName: string|null) => {
+export const userHandleHasBan = async (c: AllContext, userName: string|null) => {
   if (userName !== null) {
-    return await getUserDID(userName).then((didHandle) => userHasBan(c, didHandle));
+    return getUserDID(userName).then((didHandle) => userHasBan(c, didHandle));
   }
   return false;
 };
 
-export const userHasViolationsDB = async(db: DBProcessor, userId: string): Promise<boolean> => {
+export const userHasViolationsDB = async (db: DBProcessor, userId: string): Promise<boolean> => {
   return (await getViolationsForUser(db, userId)) != null;
 };
 
-export const userHasViolations = async(c: AllContext, userId: string): Promise<boolean> => {
-  return await userHasViolationsDB(c.get("db") as DBProcessor, userId);
+export const userHasViolations = async (c: AllContext, userId: string): Promise<boolean> => {
+  return userHasViolationsDB(c.get("db") as DBProcessor, userId);
 };
 
 function createObjForValuesChange(violationType: AccountStatus[], value: boolean) {
@@ -84,7 +84,7 @@ export const shouldIgnoreViolation = (violationType: AccountStatus): boolean => 
   return false;
 };
 
-export const createViolationForUser = async(c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
+export const createViolationForUser = async (c: AllContext, userId: string, violationType: AccountStatus): Promise<boolean> => {
   // if we should ignore the violation, return false to say no violations were added
   if (shouldIgnoreViolation(violationType)) {
     return false;
@@ -122,11 +122,11 @@ export const getViolationDeleteQueryForUser = (db: DrizzleD1Database, userId: st
   ));
 };
 
-export const removeViolation = async(c: AllContext, userId: string, violationType: AccountStatus) => {
+export const removeViolation = async (c: AllContext, userId: string, violationType: AccountStatus) => {
   await removeViolations(c, userId, [violationType]);
 };
 
-export const removeViolations = async(c: AllContext, userId: string, violationType: AccountStatus[]) => {
+export const removeViolations = async (c: AllContext, userId: string, violationType: AccountStatus[]) => {
   const db: DBProcessor = c.get("db");
   if (!db) {
     console.warn(`unable to remove violations for user ${userId}, db was null`);
@@ -135,7 +135,7 @@ export const removeViolations = async(c: AllContext, userId: string, violationTy
   await removeViolationsDB(db, userId, violationType);
 };
 
-export const removeViolationsDB = async(db: DBProcessor, userId: string, violationType: AccountStatus[]) => {
+export const removeViolationsDB = async (db: DBProcessor, userId: string, violationType: AccountStatus[]) => {
   if (!db)
     return;
 
@@ -157,7 +157,7 @@ export const removeViolationsDB = async(db: DBProcessor, userId: string, violati
     )))));
 };
 
-export const getViolationsForUser = async(db: DBProcessor, userId: string) => {
+export const getViolationsForUser = async (db: DBProcessor, userId: string) => {
   if (!db)
     return null;
 
@@ -168,16 +168,16 @@ export const getViolationsForUser = async(db: DBProcessor, userId: string) => {
   return null;
 };
 
-export const getViolationsForCurrentUser = async(c: AllContext): Promise<Violation|null> => {
+export const getViolationsForCurrentUser = async (c: AllContext): Promise<Violation|null> => {
   const userId: UserIdType = c.get("userId");
   const db: DBProcessor = c.get("db");
   if (userId && db) {
-    return await getViolationsForUser(db, userId);
+    return getViolationsForUser(db, userId);
   }
   return null;
 };
 
-export const getAllViolationsAfterTime = async(c: AllContext): Promise<string[]|null> => {
+export const getAllViolationsAfterTime = async (c: AllContext): Promise<string[]|null> => {
   const db: DBProcessor = c.get("db");
   if (db) {
     const results = await db.select({id: violations.userId}).from(violations).where(

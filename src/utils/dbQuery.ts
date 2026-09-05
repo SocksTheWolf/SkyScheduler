@@ -477,7 +477,7 @@ export const updatePostForUser = async (c: AllContext, id: string, newData: Edit
   const userId: UserIdType = c.get("userId");
   if (!userId)
     return false;
-  return await updatePostForGivenUser(c, userId, id, newData);
+  return updatePostForGivenUser(c, userId, id, newData);
 };
 
 export const getPostById = async(c: AllContext|undefined, id: string): Promise<Post|null> => {

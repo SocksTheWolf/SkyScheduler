@@ -20,7 +20,7 @@ export const getUserDID = async (handle: string|null): Promise<string | null> =>
   if (handle === null)
     return null;
 
-  return await fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`, {
+  return fetch(`https://public.bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`, {
     cf: { cacheTtlByStatus: { "200-299": 600, 404: 1, "500-599": 0 }, cacheEverything: true },
   }).then((resp) => {
     if (resp.ok) {
@@ -35,7 +35,7 @@ export const getUserDID = async (handle: string|null): Promise<string | null> =>
 };
 
 export const lookupBskyUserRecord = async (userDID: string): Promise<PLCDirectoryResponse|null> => {
-  return await fetch(`https://plc.directory/${userDID}`)
+  return fetch(`https://plc.directory/${userDID}`)
     .then((resp) => resp.json<PLCDirectoryResponse>())
     .catch((_ex: unknown) => {
       return null;
@@ -43,7 +43,7 @@ export const lookupBskyUserRecord = async (userDID: string): Promise<PLCDirector
 };
 
 export const getUserHandle = async (userDID: string): Promise<string|null> => {
-  return await lookupBskyUserRecord(userDID).then((data) => {
+  return lookupBskyUserRecord(userDID).then((data) => {
     if (has(data, "alsoKnownAs")) {
       for (const handle of data!.alsoKnownAs!) {
         // typescript gets a bit angry about this one
@@ -58,7 +58,7 @@ export const getUserHandle = async (userDID: string): Promise<string|null> => {
 };
 
 export const getUserPDS = async (userDID: string): Promise<string> => {
-  return await lookupBskyUserRecord(userDID).then((data) => {
+  return lookupBskyUserRecord(userDID).then((data) => {
     if (has(data, "service")) {
       for (const service of data!.service!) {
         if (service.type === "AtprotoPersonalDataServer") {

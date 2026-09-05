@@ -251,25 +251,25 @@ const uploadImageToR2 = async (c: AllContext, file: File, userId: string) => {
   };
 
   fileToProcess ??= await file.arrayBuffer();
-  return await rawUploadToR2(c, fileToProcess, fileMetaData);
+  return rawUploadToR2(c, fileToProcess, fileMetaData);
 };
 
 const uploadVideoToR2 = async (c: AllContext, file: File, userId: string) => {
   const fileMetaData: FileMetaData = { name: file.name, size: file.size, type: file.type, user: userId };
-  return await rawUploadToR2(c, file.stream(), fileMetaData);
+  return rawUploadToR2(c, file.stream(), fileMetaData);
 };
 
 export const uploadFileR2 = async (c: AllContext, file: File, userId: UserIdType) => {
   const fileType: string = file.type.toLowerCase();
   if (userId !== null) {
     if (BSKY_IMG_MIME_TYPES.includes(fileType)) {
-      return await uploadImageToR2(c, file, userId);
+      return uploadImageToR2(c, file, userId);
     } else if (BSKY_VIDEO_MIME_TYPES.includes(fileType)) {
-      return await uploadVideoToR2(c, file, userId);
+      return uploadVideoToR2(c, file, userId);
     } else if (GIF_UPLOAD_ALLOWED && BSKY_GIF_MIME_TYPES.includes(fileType)) {
       // TODO: modify this in the future to transform the image to a webm
       // then push to uploadVideo
-      return await uploadVideoToR2(c, file, userId);
+      return uploadVideoToR2(c, file, userId);
     }
   }
   return { success: false, error: "unable to push to R2" };

@@ -728,7 +728,7 @@ openapiRoutes.get("/funding", describeRoute({
 
 
 export async function generateOpenAPI() {
-  return await generateSpecs(openapiRoutes, {
+  return generateSpecs(openapiRoutes, {
     documentation: {
       info: {
         title: `${APP_NAME} API Routes`,

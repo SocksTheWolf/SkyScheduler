@@ -69,7 +69,7 @@ export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date):
 };
 
 export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost[]> => {
-  return await getAllRepostsForGivenTime(c, floorCurrentTime(TimeShape.Repost));
+  return getAllRepostsForGivenTime(c, floorCurrentTime(TimeShape.Repost));
 };
 
 export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
@@ -177,7 +177,7 @@ export const updatePostForGivenUser = async (c: AllContext, userId: string, id: 
   return success;
 };
 
-export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Promise<GetAllPostedBatch[]> => {
+export const getAllPostedPostsOfUser = async (c: AllContext, userId: string): Promise<GetAllPostedBatch[]> => {
   const db: DBProcessor = c.get("db");
   if (isEmpty(userId))
     return [];
@@ -187,7 +187,7 @@ export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Pro
     return [];
   }
 
-  return await db.select({id: posts.uuid, uri: posts.uri})
+  return db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
     .where(and(eq(posts.userId, userId), eq(posts.posted, true)))
     .all();
@@ -198,7 +198,7 @@ export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatc
   if (!db) {
     return [];
   }
-  return await db.select({id: posts.uuid, uri: posts.uri})
+  return db.select({id: posts.uuid, uri: posts.uri})
     .from(posts)
     .where(eq(posts.posted, true))
     .all();
@@ -245,7 +245,7 @@ export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, 
   if (!uuidValid(rootId))
     return 0;
 
-  return await db.$count(posts, and(
+  return db.$count(posts, and(
     eq(posts.rootPost, rootId),
     eq(posts.userId, userId)));
 };
@@ -302,7 +302,7 @@ export const purgePostedPosts = async (c: AllContext): Promise<number> => {
   if (isEmpty(postsToDelete))
     return 0;
 
-  return await deletePosts(c, postsToDelete);
+  return deletePosts(c, postsToDelete);
 };
 
 export const getPostByCID = async(db: DrizzleD1Database, userId: string, cid: string): Promise<Post|null> => {

@@ -22,7 +22,7 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
     return null;
   }
 
-  return await agent.chat.bsky.convo.getConvoForMembers({members: [user]}, chatHeaders).then((resp) => {
+  return agent.chat.bsky.convo.getConvoForMembers({members: [user]}, chatHeaders).then((resp) => {
     if (resp.success)
       return new BSkyConvoInfo(resp.data.convo);
     return null;
@@ -43,7 +43,7 @@ export const createDMWithAccount = async (env: Bindings, to: DestinationLetter, 
 }
 
 export const createDMWithUsername = async (env: Bindings, username: string, msg: string): Promise<boolean> => {
-  return await getUserDID(username).then((resp) => createDMWithUser(env, resp, msg));
+  return getUserDID(username).then((resp) => createDMWithUser(env, resp, msg));
 };
 
 const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
@@ -95,7 +95,7 @@ const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): P
         console.error(`failed to execute message send for ${user}, got error ` + String(err));
         return false;
       });
-    return await messageChain;
+    return messageChain;
   }
   console.warn(`could not get the dm convo with ${user}`);
   return false;
