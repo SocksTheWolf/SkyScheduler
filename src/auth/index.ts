@@ -8,8 +8,8 @@ import {
   BSKY_MIN_USERNAME_LENGTH,
   CF_KV_MIN_TTL,
 } from "../limits";
-import type { AllContext, BaseContext, Bindings, DBProcessor } from "../types";
-import { createDMWithUsername } from "../utils/bsky/bskyMessage";
+import type { AllContext, BaseContext, Bindings, DBProcessor, DestinationLetter } from "../types";
+import { createDMWithAccount } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
 
@@ -80,9 +80,13 @@ function createAuth(c?: AllContext) {
       enabled: true,
       requireEmailVerification: false,
       sendResetPassword: async ({user, url, token}, _request) => {
-        // @ts-expect-error: username is not existent on user object
-        const userName: string = user.username;
-        await createDMWithUsername(env!, userName, createPasswordResetMessage(url, token))
+        const sendLocation: DestinationLetter = {
+          // @ts-expect-error: username is not existent on user object
+          handle: user.username,
+          // @ts-expect-error: did doesn't exist on user object
+          did: user.did
+        };
+        await createDMWithAccount(env!, sendLocation, createPasswordResetMessage(url, token))
           .then((resp) => {
             if (!resp)
               throw new Error("FAILED_MESSAGE");

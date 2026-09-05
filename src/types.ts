@@ -245,11 +245,15 @@ export interface GetAllPostedBatch {
   uri: string | null;
 }
 
-export interface DBServiceLogin {
+export interface DBServiceData {
   user: string | null;
-  pass: string;
   pds: string;
   did: string | null;
+  email?: string;
+}
+
+export interface DBServiceLogin extends DBServiceData {
+  pass: string;
 }
 
 // Used for the file upload table so we can keep track of

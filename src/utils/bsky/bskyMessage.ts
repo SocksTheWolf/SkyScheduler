@@ -30,21 +30,17 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
 }
 
 // This is very slow, but probably good to check?
-export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boolean> => {
+export const checkIfCanDMUser = async (env: Bindings, userDid: string): Promise<boolean> => {
   const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
-  return (await getDMConvo(agent, env, user)) !== null;
+  return (await getDMConvo(agent, env, userDid)) !== null;
 };
 
 export const createDMWithAccount = async (env: Bindings, to: DestinationLetter, msg: string): Promise<boolean> => {
   if (to.did === null) {
-    return createDMWithUsername(env, to.handle, msg);
+    return getUserDID(to.handle).then((resp) => createDMWithUser(env, resp, msg))
   }
   return createDMWithUser(env, to.did, msg);
 }
-
-export const createDMWithUsername = async (env: Bindings, username: string, msg: string): Promise<boolean> => {
-  return getUserDID(username).then((resp) => createDMWithUser(env, resp, msg));
-};
 
 const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
   if (user === null)

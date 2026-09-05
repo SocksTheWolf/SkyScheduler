@@ -7,7 +7,7 @@ import { AccountStatus, TaskType } from "../enums";
 import type { AllContext, DestinationLetter } from "../types";
 import { loginToBsky } from "../utils/bsky/bskyLogin";
 import { createDMWithAccount } from "../utils/bsky/bskyMessage";
-import { getBskyUserPassForId } from "../utils/db/userinfo";
+import { getBskyCredentialsForId } from "../utils/db/userinfo";
 import { createViolationForUser, shouldIgnoreViolation } from "../utils/db/violations";
 import { getEnumKeyByValue } from "../utils/helpers";
 import { resetAppPasswordMessage } from "../utils/messages/resetAppPassword";
@@ -39,7 +39,7 @@ export class AgentMap {
     return mappedAgent;
   }
   static async getAgentDirect(c: AllContext, userId: string, messageOnViolation: boolean): Promise<AgentLoginResponse> {
-    const loginCreds = await getBskyUserPassForId(c, userId);
+    const loginCreds = await getBskyCredentialsForId(c, userId);
     if (!loginCreds.valid) {
       console.error(`credentials for user ${userId} were invalid`);
       return { agent: null, violation: false };

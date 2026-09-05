@@ -15,7 +15,7 @@ import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../t
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
 import { followBotAccount, getUserDID, getUserPDS } from "../utils/bsky/bskyUser";
 import { getAllMediaOfUser } from "../utils/db/file";
-import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
+import { doesUserExist, getBskyUserDataForHandle, getUsernameForUser } from "../utils/db/userinfo";
 import { removeViolations, userHasBan, userHasViolations } from "../utils/db/violations";
 import { updateUserData } from "../utils/dbQuery";
 import { isInDev, logoutAccount } from "../utils/helpers";
@@ -301,19 +301,17 @@ account.post("/forgot", verifyTurnstile, async (c) => {
     return c.json({ok: false, msg: "user doesn't exist"}, 401);
   }
 
-  const userEmail = await getUserEmailForHandle(c, username);
-  if (isEmpty(userEmail)) {
+  const userData = await getBskyUserDataForHandle(c, username);
+  if (userData === null) {
     return c.json({ok: false, msg: "user data is missing"}, 401);
   }
 
-  // Look up handle
-  const bskyUserId = await getUserDID(username);
-  if (bskyUserId === null) {
-    return c.json({ok: false, msg: "invalid user id"}, 401);
+  if (userData.did === null) {
+    return c.json({ok: false, msg: "user did is missing"}, 401);
   }
 
   // There has to be a better method for this tbh.
-  const canMessageUser = await checkIfCanDMUser(c.env, bskyUserId);
+  const canMessageUser = await checkIfCanDMUser(c.env, userData.did);
   if (!canMessageUser) {
     return c.json({ok: false, msg:
       `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${SERVICE_ACCOUNT} and your DM permissions`}, 401);
@@ -322,7 +320,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   const auth = c.get("auth");
   const { status, message } = await auth.api.requestPasswordReset({
     body: {
-      email: userEmail!,
+      email: userData.email!,
       redirectTo: "/reset",
     }
   });
