@@ -26,8 +26,9 @@ import {
   updatePostForGivenUser
 } from "./db/data";
 import { getViolationsForUser, removeViolationsDB } from "./db/violations";
-import { floorGivenTime, has, isAltEditableType } from "./helpers";
+import { has, isAltEditableType } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
+import { floorGivenTime } from "./time";
 
 export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
   try {

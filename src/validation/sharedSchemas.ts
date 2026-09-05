@@ -1,6 +1,6 @@
 import * as z from "zod/v4";
 import { MAX_ALT_TEXT } from "../limits";
-import { checkValidDateStr } from "../utils/helpers";
+import { checkValidDateStr } from "../utils/time";
 import { AppPasswordDefinition, PasswordDefinition, UsernameDefinition } from "./sharedDefinitions";
 
 export const UsernameSchema = z.object({

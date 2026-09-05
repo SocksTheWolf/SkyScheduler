@@ -3,7 +3,7 @@ import isEmpty from "just-is-empty";
 import type { RepostInfo } from "../../classes/repost";
 import { CAN_EDIT_REPOST_RULES } from "../../config";
 import type { BaseElementProps } from "../../types";
-import { formatTimeFromHours } from "../../utils/helpers";
+import { formatTimeFromHours } from "../../utils/time";
 
 type RepostStatusIconProps = BaseElementProps & {
   isRepost?: boolean;

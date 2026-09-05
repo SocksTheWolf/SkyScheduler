@@ -7,7 +7,7 @@ import {
   MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST,
   MIN_LENGTH
 } from "../limits";
-import { isDateValid } from "../utils/helpers";
+import { isDateValid } from "../utils/time";
 import {
   ImageEmbedSchema, LinkEmbedSchema,
   PostRecordSchema, VideoEmbedSchema

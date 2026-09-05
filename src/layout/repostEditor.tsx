@@ -3,7 +3,7 @@ import type { Post } from "../classes/post";
 import type { RepostInfo } from "../classes/repost";
 import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
-import { formatTimeFromHours } from "../utils/helpers";
+import { formatTimeFromHours } from "../utils/time";
 
 type RepostEditorTableProps = BaseElementProps & {
   id: string;

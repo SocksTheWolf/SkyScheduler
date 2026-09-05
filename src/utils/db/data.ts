@@ -21,7 +21,7 @@ import type {
   GetAllPostedBatch,
   PostRecordResponse
 } from "../../types";
-import { floorCurrentTime } from "../helpers";
+import { floorCurrentTime } from "../time";
 
 export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {
   // Get all scheduled posts for current time

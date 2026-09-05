@@ -3,7 +3,7 @@ import { REPOSTING_TIME_INTERVAL } from "../../config";
 import { TimeIntervalSettings } from "../../enums";
 import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../../limits";
 import type { BaseElementProps } from "../../types";
-import { formatTime } from "../../utils/helpers";
+import { formatTime } from "../../utils/time";
 
 type RepostOptionsProps = BaseElementProps & {
   id: string;

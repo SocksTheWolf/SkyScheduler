@@ -2,7 +2,8 @@ import { and, eq, inArray, lte } from "drizzle-orm";
 import flatten from "just-flatten-it";
 import { mediaFiles, posts } from "../../db/app.schema";
 import type { AllContext, DBProcessor, FileListingRecord, UserIdType } from "../../types";
-import { daysAgo, isAltEditableType } from "../helpers";
+import { isAltEditableType } from "../helpers";
+import { getDateDaysAgo } from "../time";
 
 export const isMediaOwnedByUser = async (c: AllContext, file: string): Promise<boolean> => {
   const db: DBProcessor = c.get("db");
@@ -60,7 +61,7 @@ export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
   if (c.env.R2_SETTINGS.prune_days === undefined) {
     return [];
   }
-  const numDaysAgo = daysAgo(c.env.R2_SETTINGS.prune_days);
+  const numDaysAgo = getDateDaysAgo(c.env.R2_SETTINGS.prune_days);
 
   const results = await db.select().from(mediaFiles)
     .where(

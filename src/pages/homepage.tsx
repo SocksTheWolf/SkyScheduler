@@ -7,7 +7,7 @@ import {
   MAX_REPOST_INTERVAL, R2_FILE_SIZE_LIMIT_IN_MB
 } from "../limits";
 import type { BaseElementProps } from "../types";
-import { explainPostingTimeInterval, explainRepostTimeInterval } from "../utils/helpers";
+import { explainPostingTimeInterval, explainRepostTimeInterval } from "../utils/time";
 
 export default function Homepage(props?: BaseElementProps) {
   return (<BaseLayout title="Home" nonce={props?.ctx?.get("secureHeadersNonce")} mainClass="homepage">

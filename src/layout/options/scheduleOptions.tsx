@@ -1,7 +1,7 @@
 import isEmpty from "just-is-empty";
 import type { TimeIntervalSettings } from "../../enums";
 import type { BaseElementProps } from "../../types";
-import { explainTimeInterval } from "../../utils/helpers";
+import { explainTimeInterval } from "../../utils/time";
 
 type ScheduleOptionsProps = BaseElementProps & {
   timeID: string;

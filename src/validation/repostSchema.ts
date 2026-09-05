@@ -1,7 +1,7 @@
 import * as z from "zod/v4";
 import { DateValidCheck, RepostType, TimeShape } from "../enums";
 import { MAX_FUTURE_DATE_VALUE, MAX_REPOST_TITLE_LENGTH } from "../limits";
-import { isDateValid } from "../utils/helpers";
+import { isDateValid } from "../utils/time";
 import { PostRecordSchema } from "./recordSchema";
 import {
   domainRegexCheck, httpProtoRecord,
