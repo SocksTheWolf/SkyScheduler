@@ -1,4 +1,5 @@
 import { APP_NAME } from "../appInfo";
+import { DEFAULT_PDS } from "../config";
 import { ScriptInclusionLevel } from "../enums";
 import FooterCopyright from "../layout/helpers/footer";
 import NavTags from "../layout/helpers/navTags";
@@ -30,13 +31,13 @@ export default function TermsOfService(props?: BaseElementProps) {
             <li>Not hold the software nor its developers at fault for any damages, neither perceived nor tangible</li>
             <li>Grant {APP_NAME} a temporary, non-exclusive, royalty-free license to the content that you schedule
               for the sole purpose of transmitting it on your behalf via the ATProtocol
-              to the PDS of your choosing (default: Bluesky).</li>
+              to the PDS of your choosing (default: Bluesky [located at <code>{DEFAULT_PDS}</code>]).</li>
             <ul>
               <li>Upon successful transmission, content will be deleted from our temporary holding storage.</li>
             </ul>
           </ol>
           <hr />
-          Violations of these agreements will allow {APP_NAME} to terminate your access to the website. Upon account deletion/termination, all temporarily stored content will be deleted.<br />
+          Violations of these agreements will allow {APP_NAME} to terminate your access to the website. Upon account deletion/termination, all temporarily stored content will be deleted.<br /><br />
           Deletions may take up to 30 days to fully cycle out of backups.
         </p>
         <h4>Disclaimer/Limitations</h4>

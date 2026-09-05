@@ -20,7 +20,7 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
           <ul>
             <li>Anything you explicitly provide to {APP_NAME} (post content, app password, attached media, etc)</li>
             <li>Anything you upload for processing in order to deliver your posts to the BlueSky network</li>
-            <li>Application error reports - security violations, web crashes, etc</li>
+            <li>Application error reports - security violations, application crashes, etc</li>
           </ul>
         </p>
         <h4>Who {APP_NAME} Shares Data With</h4>
@@ -36,10 +36,10 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
                 &nbsp;Said media is not allowed on this service and violators will be banned.</li>
               </ul>
             </li>
-            <li>Bluesky/Custom PDS
+            <li>Bluesky/Custom Personal Data Store (PDS)
               <ul>
-                <li>To determine what PDS your account is located on (via <a href="https://plc.directory" rel="nofollow" class="secondary">plc.directory</a>)</li>
-                <li>To transfer your content to the PDS your account is located on at the time you choose</li>
+                <li>To determine what PDS your account is located on (via <a title="PDS Lookup Service" href="https://plc.directory" rel="nofollow" class="secondary">plc.directory</a>)</li>
+                <li>To transfer your content to the PDS your account is attached to at the scheduled time you choose</li>
               </ul>
             </li>
           </ol>
@@ -49,7 +49,7 @@ export default function PrivacyPolicy(props?: BaseElementProps) {
           <div class="privacy-note-container">
             <strong>Note that</strong>:
             <ul>
-              <li>Data is not accessible to the maintainers of {APP_NAME}</li>
+              <li>Data is not accessible to the owners/maintainers of {APP_NAME}</li>
               <li>{APP_NAME} does not sell your data to any third party</li>
               <li>No data is used for genAI purposes nor for training any models</li>
               <li>You can verify this by just looking at <a href="/source" class="secondary" ref="noopener nofollow">the source code</a></li>

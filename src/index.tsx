@@ -20,7 +20,7 @@ import { secureHeadersMiddleware } from "./middleware/secureHeaders";
 import { ssgGenMiddleware, ssgServe } from "./middleware/ssg";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
-import Homepage from "./pages/homepage";
+import Homepage from "./pages/index";
 import Login from "./pages/login";
 import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
