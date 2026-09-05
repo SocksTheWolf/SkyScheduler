@@ -108,6 +108,8 @@ function createAuth(c?: AllContext) {
         displayUsernameNormalization: false,
         minUsernameLength: BSKY_MIN_USERNAME_LENGTH,
         maxUsernameLength: BSKY_MAX_USERNAME_LENGTH,
+        // turn off display username
+        displayUsername: false,
       }),
     ],
     rateLimit: {
