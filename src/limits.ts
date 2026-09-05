@@ -17,7 +17,7 @@ export const MAX_REPOST_RULES_PER_POST: number = 10;
 // Max length of a repost title
 export const MAX_REPOST_TITLE_LENGTH: number = 100;
 // How far in the future can a post be scheduled in years.
-export const MAX_FUTURE_DATE_VALUE: number = 1.5;
+export const MAX_FUTURE_DATE_VALUE: number = 2.1;
 
 /** Storage settings **/
 /* ------------------ */
