@@ -75,7 +75,6 @@ export const getAllRepostsForCurrentTime = async (c: AllContext): Promise<Repost
 export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to delete all reposts before current time, db was null");
     return;
   }
   const currentTime = floorCurrentTime(TimeShape.Repost);

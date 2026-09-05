@@ -59,7 +59,6 @@ export const updateUserData = async (c: AllContext, newData: AccountUpdatePayloa
   const db: DBProcessor = c.get("db");
   try {
     if (!db) {
-      console.error("Unable to update user data, missing database object");
       return false;
     }
     if (userId) {
@@ -170,7 +169,6 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
     return { ok: false, msg: "Your user session has expired, please login again"};
 
   if (!db) {
-    console.error("unable to create post, db became null");
     return { ok: false, msg: "An application error has occurred please refresh" };
   }
 
@@ -328,7 +326,6 @@ export const createRepost = async (c: AllContext, body: unknown): Promise<Create
     return { ok: false, msg: "Your user session has expired, please login again"};
 
   if (!db) {
-    console.error("unable to create repost db became null");
     return {ok: false, msg: "Invalid server operation occurred, please refresh"};
   }
 
