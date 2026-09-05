@@ -307,7 +307,10 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   }
 
   if (userData.did === null) {
-    return c.json({ok: false, msg: "user did is missing"}, 401);
+    userData.did = await getUserDID(userData.user);
+    // if we still do not have data after a force lookup, then print an error
+    if (userData.did === null)
+      return c.json({ok: false, msg: "user did is missing"}, 401);
   }
 
   // There has to be a better method for this tbh.
