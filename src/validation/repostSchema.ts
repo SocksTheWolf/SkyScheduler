@@ -1,8 +1,7 @@
-import { isAfter } from "date-fns";
 import * as z from "zod/v4";
-import { RepostType, TimeShape } from "../enums";
-import { MAX_REPOST_TITLE_LENGTH } from "../limits";
-import { floorGivenTime } from "../utils/helpers";
+import { DateValidCheck, RepostType, TimeShape } from "../enums";
+import { MAX_FUTURE_DATE_VALUE, MAX_REPOST_TITLE_LENGTH } from "../limits";
+import { isDateValid } from "../utils/helpers";
 import { PostRecordSchema } from "./recordSchema";
 import {
   domainRegexCheck, httpProtoRecord,
@@ -41,12 +40,18 @@ export const RepostSchema = z.object({
   ...RepostDataSchema.shape,
   ...ScheduledDateSchema.shape,
 }).superRefine(({scheduledDate}, ctx) => {
-  const scheduleDate = floorGivenTime(new Date(scheduledDate), TimeShape.Repost);
+  const dateResult: DateValidCheck = isDateValid(new Date(scheduledDate), TimeShape.Repost);
   // Ensure scheduled date is in the future
-  if (!isAfter(scheduleDate, new Date())) {
+  if (dateResult === DateValidCheck.IsPastDate) {
     ctx.addIssue({
       code: "custom",
       message: "Scheduled repost date must be in the future",
+      path: ["scheduledDate"]
+    });
+  } else if (dateResult === DateValidCheck.TooFutureDate) {
+    ctx.addIssue({
+      code: "custom",
+      message: `Reposts can only be scheduled at a max of ${MAX_FUTURE_DATE_VALUE} years from now`,
       path: ["scheduledDate"]
     });
   }

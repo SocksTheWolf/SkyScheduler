@@ -1,14 +1,13 @@
-import { isAfter } from "date-fns";
 import isEmpty from "just-is-empty";
 import * as z from "zod/v4";
-import { EmbedDataType, PostLabel, TimeShape } from "../enums";
+import { DateValidCheck, EmbedDataType, PostLabel, TimeShape } from "../enums";
 import {
-  MAX_EMBEDS_PER_POST, MAX_IMAGES_PER_POST,
+  MAX_EMBEDS_PER_POST, MAX_FUTURE_DATE_VALUE, MAX_IMAGES_PER_POST,
   MAX_LENGTH, MAX_RECORDS_PER_POST,
   MAX_VIDEOS_PER_POST, MAX_WEBLINKS_PER_POST,
   MIN_LENGTH
 } from "../limits";
-import { floorGivenTime } from "../utils/helpers";
+import { isDateValid } from "../utils/helpers";
 import {
   ImageEmbedSchema, LinkEmbedSchema,
   PostRecordSchema, VideoEmbedSchema
@@ -65,11 +64,19 @@ export const PostSchema = z.object({
   } else if (!makePostNow) {
     // If this is not a threaded post, and we are not doing a post now,
     // check that the post time is in the future
-    if (!isAfter(floorGivenTime(new Date(scheduledDate), TimeShape.Post), new Date())) {
+    const dateResult: DateValidCheck = isDateValid(new Date(scheduledDate), TimeShape.Post);
+    if (dateResult === DateValidCheck.IsPastDate) {
       ctx.addIssue({
         code: "custom",
         continue: false,
         message: "Scheduled posts must be set in the future",
+        path: ["scheduledDate"]
+      });
+    } else if (dateResult === DateValidCheck.TooFutureDate) {
+      ctx.addIssue({
+        code: "custom",
+        continue: false,
+        message: `Scheduled posts can only be set a max of ${MAX_FUTURE_DATE_VALUE} years from the current date`,
         path: ["scheduledDate"]
       });
     }

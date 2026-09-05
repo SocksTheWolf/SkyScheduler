@@ -1,8 +1,20 @@
 import type { FormatDurationOptions } from "date-fns";
-import { formatDuration, roundToNearestMinutes, startOfHour, subDays } from "date-fns";
+import { addYears, formatDuration, isAfter, isBefore, roundToNearestMinutes, startOfHour, subDays } from "date-fns";
 import { POSTING_TIME_INTERVAL, REPOSTING_TIME_INTERVAL, USE_CAPTCHA } from "../config";
-import { EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
+import { DateValidCheck, EmbedDataType, TimeIntervalSettings, TimeShape } from "../enums";
+import { MAX_FUTURE_DATE_VALUE } from "../limits";
 import type { AllContext, BaseContext, Bindings, LooseObj } from "../types";
+
+export function isDateValid(given: Date, shape: TimeShape): DateValidCheck {
+  const currentDate = new Date();
+  const wantedDate = floorGivenTime(given, shape);
+  const futureDateClamp = addYears(currentDate, MAX_FUTURE_DATE_VALUE);
+  if (!isAfter(wantedDate, currentDate))
+    return DateValidCheck.IsPastDate;
+  else if (!isBefore(wantedDate, futureDateClamp))
+    return DateValidCheck.TooFutureDate;
+  return DateValidCheck.Ok;
+}
 
 export function floorCurrentTime(shape: TimeShape = TimeShape.Post): Date {
   return floorGivenTime(new Date(), shape);

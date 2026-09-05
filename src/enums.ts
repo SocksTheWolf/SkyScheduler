@@ -79,3 +79,9 @@ export enum CaptureType {
   CONSTS,
   FUNCS
 }
+
+export enum DateValidCheck {
+  IsPastDate,
+  TooFutureDate,
+  Ok
+}
