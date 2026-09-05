@@ -4,9 +4,9 @@
 import type { ComAtprotoServerCreateSession } from "@atproto/api";
 import { Agent, CredentialSession } from "@atproto/api";
 import { AccountStatus, TaskType } from "../enums";
-import type { AllContext } from "../types";
+import type { AllContext, DestinationLetter } from "../types";
 import { loginToBsky } from "../utils/bsky/bskyLogin";
-import { createDMWithUsername } from "../utils/bsky/bskyMessage";
+import { createDMWithAccount } from "../utils/bsky/bskyMessage";
 import { getBskyUserPassForId } from "../utils/db/userinfo";
 import { createViolationForUser, shouldIgnoreViolation } from "../utils/db/violations";
 import { getEnumKeyByValue } from "../utils/helpers";
@@ -44,20 +44,25 @@ export class AgentMap {
       console.error(`credentials for user ${userId} were invalid`);
       return { agent: null, violation: false };
     }
-    const { username, password, pds } = loginCreds;
+    const { username, password, pds, did } = loginCreds;
     // Login to bsky
     const agent = new AtProtoAgent(pds);
 
     const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
     if (loginResponse != AccountStatus.Ok) {
+      const loginResponseKey: string = getEnumKeyByValue(AccountStatus, loginResponse) ?? "None";
       // check to see if we should add a violation (will return false if no new violation needed)
       if (await createViolationForUser(c, userId, loginResponse)) {
-        console.error(`Unable to login for ${userId} with violation ${getEnumKeyByValue(AccountStatus, loginResponse)}`);
+        console.error(`Unable to login for ${userId} with violation ${loginResponseKey}`);
         if (messageOnViolation && loginResponse === AccountStatus.InvalidAccount) {
-          await createDMWithUsername(c.env, username, resetAppPasswordMessage());
+          const addr: DestinationLetter = {
+            handle: username,
+            did: did
+          }
+          await createDMWithAccount(c.env, addr, resetAppPasswordMessage());
         }
       } else {
-        console.error(`Unable to login ${username}(${userId}), no new violation made, got ${getEnumKeyByValue(AccountStatus, loginResponse)}`);
+        console.error(`Unable to login ${username}(${userId}), no new violation made, got ${loginResponseKey}`);
       }
       return { agent: null, violation: true, violationType: loginResponse };
     }

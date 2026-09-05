@@ -5,7 +5,7 @@ import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
 import { DEFAULT_CHAT_PDS } from "../../config";
 import { AccountStatus } from "../../enums";
-import type { Bindings, UserIdType } from "../../types";
+import type { Bindings, DestinationLetter, UserIdType } from "../../types";
 import { loginToBsky } from "./bskyLogin";
 import { getUserDID } from "./bskyUser";
 
@@ -35,11 +35,18 @@ export const checkIfCanDMUser = async (env: Bindings, user: string): Promise<boo
   return (await getDMConvo(agent, env, user)) !== null;
 };
 
+export const createDMWithAccount = async (env: Bindings, to: DestinationLetter, msg: string): Promise<boolean> => {
+  if (to.did === null) {
+    return createDMWithUsername(env, to.handle, msg);
+  }
+  return createDMWithUser(env, to.did, msg);
+}
+
 export const createDMWithUsername = async (env: Bindings, username: string, msg: string): Promise<boolean> => {
   return await getUserDID(username).then((resp) => createDMWithUser(env, resp, msg));
 };
 
-export const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
+const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
   if (user === null)
     return false;
 

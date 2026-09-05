@@ -80,7 +80,7 @@ function createAuth(c?: AllContext) {
       enabled: true,
       requireEmailVerification: false,
       sendResetPassword: async ({user, url, token}, _request) => {
-        // @ts-ignore
+        // @ts-expect-error: username is not existent on user object
         const userName: string = user.username;
         await createDMWithUsername(env!, userName, createPasswordResetMessage(url, token))
           .then((resp) => {

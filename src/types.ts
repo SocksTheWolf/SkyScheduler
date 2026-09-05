@@ -227,6 +227,12 @@ export type Violation = ViolationRecordChange & {
   createdAt: string;
 };
 
+/// INTERNAL SERVICE HANDLING
+export interface DestinationLetter {
+  did: string|null;
+  handle: string;
+}
+
 /// DATABASE
 export type DBProcessor = DrizzleD1Database | null;
 export type BatchQueryItem = BatchItem<"sqlite">;
