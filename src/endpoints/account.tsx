@@ -13,7 +13,7 @@ import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../types";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
-import { followBotAccount, lookupBskyHandle, lookupBskyPDS } from "../utils/bsky/bskyUser";
+import { followBotAccount, getUserDID, getUserPDS } from "../utils/bsky/bskyUser";
 import { getAllMediaOfUser } from "../utils/db/file";
 import { doesUserExist, getUserEmailForHandle, getUsernameForUser } from "../utils/db/userinfo";
 import { removeViolations, userHasBan, userHasViolations } from "../utils/db/violations";
@@ -231,7 +231,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   }
 
   // Check bsky handle existing
-  const profileDID: string|null = await lookupBskyHandle(username);
+  const profileDID: string|null = await getUserDID(username);
   if (profileDID === null) {
     return c.json({ok: false, msg: "bsky handle could not be resolved, please check input"}, 400);
   }
@@ -242,7 +242,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   }
 
   // Grab the user's pds as well
-  const userPDS: string = await lookupBskyPDS(profileDID);
+  const userPDS: string = await getUserPDS(profileDID);
 
   // grab our auth object
   const auth = c.get("auth");
@@ -300,9 +300,8 @@ account.post("/forgot", verifyTurnstile, async (c) => {
     return c.json({ok: false, msg: "user data is missing"}, 401);
   }
 
-  const auth = c.get("auth");
   // Look up handle
-  const bskyUserId = await lookupBskyHandle(username);
+  const bskyUserId = await getUserDID(username);
   if (bskyUserId === null) {
     return c.json({ok: false, msg: "invalid user id"}, 401);
   }
@@ -314,6 +313,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
       `Could not send a direct message to your bsky account.\nPlease check to see if you are following @${SERVICE_ACCOUNT} and your DM permissions`}, 401);
   }
 
+  const auth = c.get("auth");
   const { status, message } = await auth.api.requestPasswordReset({
     body: {
       email: userEmail!,

@@ -5,12 +5,12 @@ import isEmpty from "just-is-empty";
 import { bannedUsers, violations } from "../../db/enforcement.schema";
 import { AccountStatus } from "../../enums";
 import type { AllContext, DBProcessor, UserIdType, Violation, ViolationRecordChange } from "../../types";
-import { lookupBskyHandle } from "../bsky/bskyUser";
+import { getUserDID } from "../bsky/bskyUser";
 import { getUsernameForUserId } from "./userinfo";
 
 const createBanForUser = async(db: DrizzleD1Database, userName: string|null, reason: string) => {
   if (userName !== null) {
-    const didHandle = await lookupBskyHandle(userName);
+    const didHandle = await getUserDID(userName);
     if (didHandle !== null) {
       await db.insert(bannedUsers).values({did: didHandle, reason: reason}).onConflictDoNothing();
       console.log(`ban inserted for user ${userName}`);
@@ -34,7 +34,7 @@ export const userHasBan = async(c: AllContext, userDid: string|null): Promise<bo
 
 export const userHandleHasBan = async(c: AllContext, userName: string|null) => {
   if (userName !== null) {
-    return await lookupBskyHandle(userName).then((didHandle) => userHasBan(c, didHandle));
+    return await getUserDID(userName).then((didHandle) => userHasBan(c, didHandle));
   }
   return false;
 };

@@ -2,7 +2,7 @@ import type { Facet } from "@atproto/api";
 import { AppBskyRichtextFacet } from "@atproto/api";
 import type { MentionCache } from "../../types";
 import { mentionCaptureRegex } from "../../validation/regexCases";
-import { lookupBskyHandle } from "./bskyUser";
+import { getUserDID } from "./bskyUser";
 
 function makeMentionMap(updateWith?: MentionCache[]): Map<string, string> {
   // handle, did
@@ -23,7 +23,7 @@ export async function getMentionsFromContent(input: string, updateWith?: Mention
     if (mentionMap.has(match))
       continue;
     // make sure to remove the @ character
-    const didHandle: string|null = await lookupBskyHandle(match.slice(1));
+    const didHandle: string|null = await getUserDID(match.slice(1));
     // only set if we can lookup
     if (didHandle !== null) {
       console.log(`Adding ${match} (${didHandle}) to mentionMap`);

@@ -36,7 +36,7 @@ import { createViolationForUser } from "../db/violations";
 import { getEnumKeyByValue, has } from "../helpers";
 import { deleteEmbedsFromR2 } from "../r2Query";
 import { getAgentFeedRecord, getAgentListRecord, getAgentPostRecords } from "./bskyRecord";
-import { lookupBskyHandle } from "./bskyUser";
+import { getUserDID } from "./bskyUser";
 import { removeOrResolveInvalidFacets } from "./mentions";
 
 export const makePost = async (c: AllContext, content: Post | null, usingAgent: AtProtoAgent) => {
@@ -263,7 +263,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
           // also check to see if the link had a did in it already.
           if (account !== username && account !== resolvedDID) {
             console.log(`need to resolve did for ${account}`);
-            const didResponse = await lookupBskyHandle(account);
+            const didResponse = await getUserDID(account);
             if (didResponse === null) {
               console.error(`Unable to resolve did for user ${account}`);
               // Change the record back.
