@@ -226,7 +226,8 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
       return c.html(<>{response.wasThreadRoot ? <ThreadDeleteOOB /> : null}</>, 200);
     }
   }
-  c.header("HX-Trigger-After-Swap", "postFailedDelete");
+  c.header("HX-Trigger", "postFailedDelete");
+  // mark the item as invisible anyways
   return c.html(<></>, 403);
 });
 

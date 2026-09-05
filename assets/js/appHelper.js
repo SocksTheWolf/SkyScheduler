@@ -146,7 +146,6 @@ document.addEventListener("postDeletedType", function(ev) {
 
 document.addEventListener("postFailedDelete", function() {
   pushToast("Post failed to delete, try again", false);
-  refreshPosts();
 });
 
 function sidebarButtonListener(className, eventName) {
