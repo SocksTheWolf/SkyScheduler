@@ -92,6 +92,8 @@ export const updateSetDIDForAllUsers = async (c: AllContext) => {
       if (userDID !== null) {
         batchedQueries.push(db.update(users).set({did: userDID}).where(eq(users.id, user.id)));
         console.log(`${user.id} - ${user.handle} = ${userDID}`);
+      } else {
+        console.log(`${user.id} - skipped ${user.handle}, got return of null`);
       }
     }
     if (batchedQueries.length > 0)
