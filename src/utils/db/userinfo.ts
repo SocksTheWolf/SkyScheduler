@@ -7,8 +7,7 @@ import type { AllContext, DBProcessor, DBServiceLogin, UserIdType } from "../../
 export const doesUserExist = async (c: AllContext, username: string): Promise<boolean> => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("Unable to check database for user existence");
-    return true;
+    return false;
   }
   const result = await db.select().from(users)
     .where(eq(users.username, username))
@@ -19,7 +18,6 @@ export const doesUserExist = async (c: AllContext, username: string): Promise<bo
 export const doesAdminExist = async (c: AllContext) => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to check database for admin account");
     return false;
   }
 

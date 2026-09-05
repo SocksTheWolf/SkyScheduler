@@ -11,7 +11,6 @@ import { addFileListing, getAllMediaOfUser } from "./file";
 export const runMaintenanceUpdates = async (c: AllContext) => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to get database to run maintenance");
     return;
   }
   // Create a posted query that also checks for valid json and content length

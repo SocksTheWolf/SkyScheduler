@@ -30,7 +30,7 @@ export const getAgentPostRecords = async (agent: AtProtoAgent, records: string[]
     if (response.success)
       return response.data.posts;
   } catch (err) {
-    console.error(`Unable to get post records for ${records.toString()} had error ` + String(err));
+    console.error(`Unable to get post records for ${JSON.stringify(records)} had error ` + String(err));
   }
   return null;
 };

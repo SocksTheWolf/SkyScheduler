@@ -26,7 +26,6 @@ export const userHasBan = async(c: AllContext, userDid: string|null): Promise<bo
 
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to check if user has ban, db was null");
     return false;
   }
   const usersBanned = await db.$count(bannedUsers, eq(bannedUsers.did, userDid));
@@ -93,7 +92,6 @@ export const createViolationForUser = async(c: AllContext, userId: string, viola
 
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to get database to create violations for");
     return false;
   }
 

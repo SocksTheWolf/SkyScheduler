@@ -55,7 +55,6 @@ export const deleteFileListings = async (c: AllContext, files: string|string[]) 
 export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("could not get all abandoned media, db was null");
     return [];
   }
   if (c.env.R2_SETTINGS.prune_days === undefined) {

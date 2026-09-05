@@ -6,7 +6,7 @@ import { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
 import type { Bindings, QueueTaskData } from "../../types";
 import { userHasViolations } from "../db/violations";
-import { has } from "../helpers";
+import { getEnumKeyByValue, has } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
 import { enqueueEmptyWork } from "./queuePublisher";
 
@@ -30,7 +30,7 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
     const taskType: TaskType = message.body.type;
     if (taskType == TaskType.Post || taskType == TaskType.Repost) {
       if (message.body.data == null) {
-        console.error(`got a task type of ${taskType} but the message body has no data. cannot be processed!`);
+        console.error(`task type ${getEnumKeyByValue(TaskType, taskType)} with no message body. cannot be processed!`);
         // maybe this was a bad send, so try it again later. Do not backblast as it was not an upstream failure.
         message.retry();
         continue;
@@ -69,7 +69,6 @@ export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bind
       console.log(`Got a blast message with ${batch.messages.length} messages in batch`);
       wasSuccess = true;
     } else {
-      console.error("Got a message queue task type that was invalid");
       message.ack();
       return;
     }

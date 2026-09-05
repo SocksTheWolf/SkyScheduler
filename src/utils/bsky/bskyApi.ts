@@ -33,7 +33,7 @@ import {
 } from "../db/data";
 import { getUsernameForUserId } from "../db/userinfo";
 import { createViolationForUser } from "../db/violations";
-import { has } from "../helpers";
+import { getEnumKeyByValue, has } from "../helpers";
 import { deleteEmbedsFromR2 } from "../r2Query";
 import { getAgentFeedRecord, getAgentListRecord, getAgentPostRecords } from "./bskyRecord";
 import { lookupBskyHandle } from "./bskyUser";
@@ -41,7 +41,6 @@ import { removeOrResolveInvalidFacets } from "./mentions";
 
 export const makePost = async (c: AllContext, content: Post | null, usingAgent: AtProtoAgent) => {
   if (content === null) {
-    console.warn("Dropping invocation of makePost, content was null");
     return false;
   }
 
@@ -169,7 +168,8 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
         // If we have encountered a record violation (illegal mixed media types), then we should stop processing further.
         if (isRecordViolation(currentEmbedType)) {
-          console.error(`${postData.uuid} had a mixed media type of ${mediaEmbeds.type}. trying to write ${currentEmbedType}`);
+          console.error(`Mixed Media! ${postData.uuid} is at ${getEnumKeyByValue(EmbedDataType, mediaEmbeds.type)} but
+            trying to write ${getEnumKeyByValue(EmbedDataType, currentEmbedType)}`);
           break;
         }
 
@@ -505,7 +505,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       return true;
     } catch (err: unknown) {
       // This will try again in the future, next roundabout.
-      console.error(`encountered error while trying to push post ${postData.uuid} up to bsky ` + String(err));
+      console.error(`encountered error pushing post ${postData.uuid} up to bsky ` + String(err));
     }
     return false;
   };
@@ -554,7 +554,7 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
       }
       // This is the first child post we haven't handled yet, oof.
       if (!(await postSegment(child))) {
-        console.error(`We encountered errors attempting to post child ${child.uuid}, returning what did get posted`);
+        console.error(`Could not post child ${child.uuid}, returning what did get posted`);
         break;
       }
       ++successes;

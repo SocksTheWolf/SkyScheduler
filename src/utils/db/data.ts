@@ -27,7 +27,6 @@ export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: bo
   // Get all scheduled posts for current time
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("Could not get all posts for current time, db was null");
     return [];
   }
   const currentTime: Date = floorCurrentTime(TimeShape.Post);
@@ -56,7 +55,6 @@ export const getAllRepostsForGivenTime = async (c: AllContext, givenDate: Date):
   // Get all scheduled posts for the given time
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("could not get all reposts for given timeframe, db was null");
     return [];
   }
   const query = db.select({uuid: reposts.uuid}).from(reposts)
@@ -129,7 +127,6 @@ export const deleteAllRepostsBeforeCurrentTime = async (c: AllContext) => {
 export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordResponse[], allPosted: boolean) => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to bulk update posted data, db was null");
     return;
   }
   const dbOperations: BatchQueryArray = [];
@@ -200,7 +197,6 @@ export const getAllPostedPostsOfUser = async(c: AllContext, userId: string): Pro
 export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatch[]> => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("unable to get all posted posts, db was null");
     return [];
   }
   return await db.select({id: posts.uuid, uri: posts.uri})
@@ -288,7 +284,6 @@ export const deletePosts = async (c: AllContext, postsToDelete: string[]): Promi
 export const purgePostedPosts = async (c: AllContext): Promise<number> => {
   const db: DBProcessor = c.get("db");
   if (!db) {
-    console.error("could not purge posted posts, got error");
     return 0;
   }
   const positiveDays: number = Math.abs(MAX_HOLD_DAYS_BEFORE_PURGE);

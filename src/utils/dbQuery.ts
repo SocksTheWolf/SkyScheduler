@@ -59,7 +59,7 @@ export const updateUserData = async (c: AllContext, newData: AccountUpdatePayloa
   const db: DBProcessor = c.get("db");
   try {
     if (!db) {
-      console.error("Unable to update user data, no database object");
+      console.error("Unable to update user data, missing database object");
       return false;
     }
     if (userId) {
