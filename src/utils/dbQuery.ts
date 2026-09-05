@@ -15,6 +15,7 @@ import type {
   BatchQueryArray,
   CreateObjectResponse, CreatePostQueryResponse,
   DBProcessor, DeleteResponse,
+  DeleteScheduleResponse,
   EditPostChanges, UserIdType
 } from "../types";
 import { PostSchema } from "../validation/postSchema";
@@ -528,14 +529,14 @@ export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<
   return null;
 };
 
-export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: string) => {
+export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: string): Promise<DeleteScheduleResponse> => {
   const db: DBProcessor = c.get("db");
   if (!db) {
     console.error(`unable to delete schedule id ${scheduleId} from post ${id}, db was null`);
-    return false;
+    return { success: false };
   }
-  if (!uuidValid(id) || !uuidValid(scheduleId)) {
-    return false;
+  if (!uuidValid(scheduleId)) {
+    return { success: false };
   }
 
   // Get the post to make sure it's valid and update post json
@@ -550,7 +551,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     // Was this schedule id in the repostInfo array originally?
     if (newRepostInfo.length == originalRuleLength) {
       // It was not, so don't do anything more.
-      return false;
+      return {success: false };
     }
 
     const queriesToExecute: BatchQueryArray = [];
@@ -562,18 +563,25 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     // we don't bundle this one because we want to get a count to make the operation below it, better
     const deletedItems = await db.delete(reposts).where(eq(reposts.scheduleGuid, scheduleId)).returning({date: reposts.scheduledDate});
 
+    const newRepostCount: number = currentPost.repostCount! - deletedItems.length;
     // did we delete anything at all?
     if (deletedItems.length <= 0) {
       // Log this out, but allow for the bad data to be deleted anyways
       console.warn(`When trying to delete reposts for ${currentPost.uuid}, schedule id ${scheduleId} had empty items`);
     } else {
       // Force update the repost count :)
-      queriesToExecute.push(getRepostCountQuery(db, id, currentPost.repostCount! - deletedItems.length));
+      queriesToExecute.push(getRepostCountQuery(db, id, newRepostCount));
     }
 
     // Batch push up everything
     const batchResponse: ProperD1Result[] = await db.batch(queriesToExecute as BatchQuery);
-    return batchResponse.every((el) => el.success);
+    if (batchResponse.every((el) => el.success)) {
+      // This was successful, so we should write the new post data into our current object
+      // and return it, so that it can be used for rendering
+      currentPost.repostCount = newRepostCount;
+      currentPost.repostInfo = newRepostInfo;
+      return { success: true, postData: currentPost };
+    }
   }
-  return false;
+  return { success: false };
 };

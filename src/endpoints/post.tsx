@@ -3,6 +3,7 @@ import isEmpty from "just-is-empty";
 import { validate as isValid } from "uuid";
 import type { Post } from "../classes/post";
 import { CAN_EDIT_REPOST_RULES } from "../config";
+import { PostOOBSwapOption } from "../enums";
 import { PostEdit } from "../layout/editPost";
 import { PostHTML } from "../layout/post";
 import { ScheduledPostList } from "../layout/postList";
@@ -184,7 +185,7 @@ post.post("/edit/:id", authMiddlewareHTML, async (c) => {
     originalPost.content = content;
     c.header("HX-Trigger-After-Settle", `{"scrollListToPost": "${id}"}`);
     c.header("HX-Trigger-After-Swap", "postUpdatedNotice, updateTimestamps, sidebarButtons, scrollTop");
-    return c.html(<PostHTML post={originalPost} dynamic={true} />);
+    return c.html(<PostHTML post={originalPost} oobSwap={PostOOBSwapOption.Full} />);
   }
 
   c.header("HX-Trigger-After-Settle", swapErrEvents);
@@ -200,7 +201,7 @@ post.get("/edit/:id/cancel", authMiddlewareHTML, async (c) => {
   // Get the original post to replace with
   if (postInfo !== null) {
     c.header("HX-Trigger-After-Swap", "updateTimestamps, sidebarButtons, scrollListTop, scrollTop");
-    return c.html(<PostHTML post={postInfo} dynamic={true} />);
+    return c.html(<PostHTML post={postInfo} oobSwap={PostOOBSwapOption.Full} />);
   }
 
   // Refresh sidebar otherwise
@@ -250,9 +251,12 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, rateLimit({limiter: "
   if (CAN_EDIT_REPOST_RULES) {
     const { id, scheduleId } = c.req.param();
     if (isValid(id) && isValid(scheduleId)) {
-      if (await deleteRepostRule(c, id, scheduleId)) {
-        c.header("HX-Trigger-After-Swap", "repostScheduleDeleted");
-        return c.html(<></>, 200);
+      const { success, postData } = await deleteRepostRule(c, id, scheduleId);
+      if (success) {
+        c.header("HX-Trigger-After-Swap", "repostScheduleDeleted, updateTimestamps, sidebarButtons");
+        return c.html(<>
+          <PostHTML post={postData!} oobSwap={PostOOBSwapOption.Full} />;
+        </>, 200);
       }
     }
   }

@@ -142,6 +142,11 @@ export interface DeleteResponse {
   wasThreadRoot?: boolean;
 }
 
+export interface DeleteScheduleResponse {
+  success: boolean;
+  postData?: Post;
+}
+
 /// MIDDLEWARES
 export interface RequireAuthMiddlewareProps {
   returnHTML?: boolean;

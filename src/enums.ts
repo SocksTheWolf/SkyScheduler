@@ -85,3 +85,8 @@ export enum DateValidCheck {
   TooFutureDate,
   Ok
 }
+
+export enum PostOOBSwapOption {
+  Full,
+  InsertAfterParent,
+}

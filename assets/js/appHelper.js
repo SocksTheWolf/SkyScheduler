@@ -197,7 +197,6 @@ document.addEventListener("showRepostPopover", function() {
     document.querySelectorAll("#repostDataPopoverHolder").forEach((el) => {
       document.body.removeChild(el);
     });
-    refreshPosts();
   });
 });
 

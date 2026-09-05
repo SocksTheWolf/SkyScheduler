@@ -368,12 +368,12 @@ postForm.addEventListener('submit', async (e) => {
   // if it is, then go about getting all the data for the form
   try {
     const postObject = {
-        content: contentVal,
-        scheduledDate: dateTime,
-        makePostNow: postNow,
-        repostData: undefined,
-        rootPost: undefined,
-        parentPost: undefined,
+      content: contentVal,
+      scheduledDate: dateTime,
+      makePostNow: postNow,
+      repostData: undefined,
+      rootPost: undefined,
+      parentPost: undefined,
     };
 
     // Add repost data if we should be making reposts
