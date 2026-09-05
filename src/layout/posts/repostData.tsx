@@ -5,7 +5,7 @@ import { CAN_EDIT_REPOST_RULES } from "../../config";
 import type { BaseElementProps } from "../../types";
 import { formatTimeFromHours } from "../../utils/time";
 
-type RepostStatusIconProps = BaseElementProps & {
+interface RepostStatusIconProps extends BaseElementProps {
   isRepost?: boolean;
 };
 
@@ -21,7 +21,7 @@ export function RepostStatusIcon(props: RepostStatusIconProps) {
   return null;
 };
 
-type RepostCountProps = BaseElementProps & {
+interface RepostCountProps extends BaseElementProps {
   id: string;
   count?: number;
   repostInfo?: RepostInfo[];
@@ -58,7 +58,7 @@ export function RepostCountElement(props: RepostCountProps) {
   </>);
 };
 
-type RepostEditorLinkProps = BaseElementProps & {
+interface RepostEditorLinkProps extends BaseElementProps {
   id: string;
 }
 

@@ -6,7 +6,7 @@ import { LoadFundingProgress } from "./fundProgress";
 import { TipLink } from "./tipLink";
 
 // Helper footer for various pages
-type FooterCopyrightProps = BaseElementProps & {
+interface FooterCopyrightProps extends BaseElementProps {
   inNewWindow?: boolean;
   showHomepage?: boolean;
   showProgressBar?: boolean;

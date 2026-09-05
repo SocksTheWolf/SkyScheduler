@@ -1,6 +1,6 @@
 import type { BaseElementProps } from "../../types";
 
-type ContentLabelProps = BaseElementProps & {
+interface ContentLabelProps extends BaseElementProps {
   id: string;
 };
 

@@ -5,7 +5,7 @@ import type { BaseElementProps } from "../types";
 import { isAltEditableType } from "../utils/helpers";
 import { PostContent } from "./post";
 
-type EditedPostProps = BaseElementProps & {
+interface EditedPostProps extends BaseElementProps {
   post: Post;
 };
 

@@ -1,6 +1,6 @@
 import type { NoncePropType, PreloadRules } from "../../types";
 
-type DepTagsType = NoncePropType & {
+interface DepTagsType extends NoncePropType {
   scripts?: PreloadRules[]
 };
 

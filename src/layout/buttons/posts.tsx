@@ -19,7 +19,7 @@ export function AddRepostsButton(_props?: BaseElementProps) {
   </button>);
 }
 
-type PostIDProps = BaseElementProps & {
+interface PostIDProps extends BaseElementProps {
   id: string;
 }
 
@@ -37,7 +37,7 @@ export function EditPostButton(props: PostIDProps) {
   </button>);
 }
 
-type DeletePostProps = PostIDProps & {
+interface DeletePostProps extends PostIDProps {
   child: boolean;
   isRepost?: boolean;
 }

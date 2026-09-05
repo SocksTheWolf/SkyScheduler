@@ -13,12 +13,8 @@ import { violations } from "../../db/enforcement.schema";
 import { TimeShape } from "../../enums";
 import { MAX_HOLD_DAYS_BEFORE_PURGE, MAX_POSTED_LENGTH } from "../../limits";
 import type {
-  AllContext,
-  BatchQuery,
-  BatchQueryArray,
-  DBProcessor,
-  EditPostChanges,
-  GetAllPostedBatch,
+  AllContext, BatchQuery, BatchQueryArray, DBProcessor,
+  EditPostChanges, GetAllPostedBatch,
   PostRecordResponse
 } from "../../types";
 import { floorCurrentTime } from "../time";

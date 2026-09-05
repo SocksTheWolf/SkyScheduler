@@ -5,7 +5,7 @@ import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
 import { formatTimeFromHours } from "../utils/time";
 
-type RepostEditorTableProps = BaseElementProps & {
+interface RepostEditorTableProps extends BaseElementProps {
   id: string;
   data?: RepostInfo[];
 };
@@ -45,7 +45,7 @@ function RepostEditorTable(props: RepostEditorTableProps) {
   </table>);
 }
 
-type RepostDataPopoverProps = BaseElementProps & {
+interface RepostDataPopoverProps extends BaseElementProps {
   id: string;
 };
 

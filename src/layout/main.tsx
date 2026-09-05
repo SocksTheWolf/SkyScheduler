@@ -9,7 +9,7 @@ import { IncludeDependencyTags, PreloadDependencyTags } from "./helpers/includes
 import { MetaTags, PersonaTags } from "./helpers/metaTags";
 import { SpeculationRulesTag } from "./helpers/speculation";
 
-type BaseLayoutProps = BaseElementProps & {
+interface BaseLayoutProps extends BaseElementProps {
   children: Child;
   title: string;
   noIndex?: boolean;

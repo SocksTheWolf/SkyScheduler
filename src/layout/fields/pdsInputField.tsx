@@ -1,6 +1,6 @@
 import type { BaseElementProps } from "../../types";
 
-type PDSInputFieldProps = BaseElementProps & {
+interface PDSInputFieldProps extends BaseElementProps {
   pds?: string;
   swap: boolean;
 };

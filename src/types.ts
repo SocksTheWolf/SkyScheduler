@@ -80,7 +80,7 @@ export interface StrongRecordObject {
   uri: string;
   cid: string;
 }
-export type WebAssociatedRef = StrongRecordObject & {
+export interface WebAssociatedRef extends StrongRecordObject {
   $type: "com.atproto.repo.strongRef";
 };
 
@@ -145,10 +145,8 @@ export interface ResolveHandleResponse {
   did: string;
 }
 
-// These are bsky responses to making posts
-export type PostResponseObject = StrongRecordObject;
-
-export type PostRecordResponse = PostResponseObject & {
+// Bsky response to making posts
+export interface PostRecordResponse extends StrongRecordObject {
   postID: string|null;
   embeds?: EmbedData[];
 };
@@ -170,7 +168,7 @@ export interface CreateObjectResponse {
   rate_limited?: boolean;
 }
 
-export type CreatePostQueryResponse = CreateObjectResponse & {
+export interface CreatePostQueryResponse extends CreateObjectResponse {
   postNow?: boolean;
 };
 
@@ -222,7 +220,7 @@ export interface ViolationRecordChange {
   accountGone?: boolean;
 }
 
-export type Violation = ViolationRecordChange & {
+export interface Violation extends ViolationRecordChange {
   userId: string;
   createdAt: string;
 };

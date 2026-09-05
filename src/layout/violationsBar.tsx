@@ -3,7 +3,7 @@ import { APP_NAME } from "../appInfo";
 import type { AllContext, BaseElementProps } from "../types";
 import { getViolationsForCurrentUser } from "../utils/db/violations";
 
-type ViolationNoticeBarProps = BaseElementProps & {
+interface ViolationNoticeBarProps extends BaseElementProps {
   // skip the db query and instead fetch that later
   forceLoad?: boolean;
 };

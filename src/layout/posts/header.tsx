@@ -6,7 +6,7 @@ import {
 } from "../buttons/posts";
 import { RepostStatusIcon } from "./repostData";
 
-type PostDataHeaderOptions = BaseElementProps & {
+interface PostDataHeaderOptions extends BaseElementProps {
   content: Post;
   posted: boolean;
 };

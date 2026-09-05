@@ -3,7 +3,7 @@ import type { Post } from "../../classes/post";
 import type { BaseElementProps } from "../../types";
 import { RepostCountElement } from "./repostData";
 
-type PostDataFooterOptions = BaseElementProps & {
+interface PostDataFooterOptions extends BaseElementProps {
   content: Post;
   posted: boolean;
 };

@@ -5,7 +5,7 @@ import { MAX_REPOST_IN_HOURS, MAX_REPOST_INTERVAL_LIMIT } from "../../limits";
 import type { BaseElementProps } from "../../types";
 import { formatTime } from "../../utils/time";
 
-type RepostOptionsProps = BaseElementProps & {
+interface RepostOptionsProps extends BaseElementProps {
   id: string;
   contentType?: string;
   checked?: boolean;

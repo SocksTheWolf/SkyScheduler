@@ -19,7 +19,7 @@ export function PostContent(props: PostContentProps) {
   return (<p class="postText">{post.content}{ellipses}</p>);
 };
 
-type ScheduledPostOptions = BaseElementProps & {
+interface ScheduledPostOptions extends BaseElementProps {
   post: Post;
   // if the object should be dynamically replaced.
   // usually in edit/cancel edit settings.

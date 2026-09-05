@@ -3,7 +3,7 @@ import type { TimeIntervalSettings } from "../../enums";
 import type { BaseElementProps } from "../../types";
 import { explainTimeInterval } from "../../utils/time";
 
-type ScheduleOptionsProps = BaseElementProps & {
+interface ScheduleOptionsProps extends BaseElementProps {
   timeID: string;
   checkboxID?: string;
   type: string;

@@ -1,7 +1,7 @@
 import { BSKY_MAX_APP_PASSWORD_LENGTH } from "../../limits";
 import type { BaseElementProps } from "../../types";
 
-export type PasswordFieldSettings = BaseElementProps & {
+interface PasswordFieldSettings extends BaseElementProps {
   required?: boolean
 }
 
