@@ -219,7 +219,7 @@ post.delete("/delete/:id", authMiddlewareHTML, async (c) => {
       if (response.wasThreadRoot) {
         triggerEvents += ", scrollTop";
       }
-      const ThreadDeleteOOB = () => (<div hx-swap-oob={`outerHTML:blockquote:has([data-root='${id}'])`}></div>);
+      const ThreadDeleteOOB = () => (<div hx-swap-oob={`delete:blockquote:has([data-root='${id}'])`}></div>);
       // hack enum system lol
       const postDeleteType = (response.wasThreadRoot) ? 2 : (response.isRepost) ? 1 : 0;
       c.header("HX-Trigger-After-Settle", `{"postDeletedType": ${postDeleteType}}`);
