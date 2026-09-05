@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
 import type { HonoBase } from "../types";
 import { getAllAbandonedMedia } from "../utils/db/file";
-import { runMaintenanceUpdates } from "../utils/db/maintain";
+import { runMaintenanceUpdates, updateSetDIDForAllUsers } from "../utils/db/maintain";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 
 export const admin = new Hono<HonoBase>();
@@ -42,3 +42,8 @@ admin.get("/abandoned", async (c) => {
 
   return c.text(returnHTML);
 });
+
+admin.get("/update", async (c) => {
+  await updateSetDIDForAllUsers(c);
+  return c.text("updated?");
+})

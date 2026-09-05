@@ -4,6 +4,7 @@ import { mediaFiles, posts, repostCounts, reposts } from "../../db/app.schema";
 import { users } from "../../db/auth.schema";
 import { MAX_POSTED_LENGTH } from "../../limits";
 import type { AllContext, BatchQuery, BatchQueryArray, DBProcessor, R2BucketObject } from "../../types";
+import { getUserDID } from "../bsky/bskyUser";
 import { getAllFilesList } from "../r2Query";
 import { addFileListing, getAllMediaOfUser } from "./file";
 
@@ -76,3 +77,22 @@ export const runMaintenanceUpdates = async (c: AllContext) => {
   if (batchedQueries.length > 0)
     await db.batch(batchedQueries as BatchQuery);
 };
+
+export const updateSetDIDForAllUsers = async (c: AllContext) => {
+  const db: DBProcessor = c.get("db");
+  if (!db) {
+    return;
+  }
+  const batchedQueries: BatchQueryArray = [];
+  const allUsers = await db.select({id: users.id, handle: users.username}).from(users).where(isNull(users.did));
+  console.log("updating handles:\n");
+  for (const user of allUsers) {
+    const userDID = await getUserDID(user.handle);
+    if (userDID !== null) {
+      batchedQueries.push(db.update(users).set({did: userDID}).where(eq(users.id, user.id)));
+      console.log(`${user.id} - ${user.handle} = ${userDID}`);
+    }
+  }
+  if (batchedQueries.length > 0)
+    await db.batch(batchedQueries as BatchQuery);
+}
