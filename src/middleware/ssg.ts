@@ -41,7 +41,7 @@ const serveStaticPage = async (c: BaseContext, page?: string): Promise<Response>
   page ??= new URL(c.req.url).pathname.replace(/^\//, "");
 
   // domain doesn't matter, so make this whatever
-  const staticFile: Response = await c.env.ASSETS!.fetch(`https://1.1.1.1/pages/${page}.html`);
+  const staticFile: Response = await c.env.ASSETS.fetch(`https://1.1.1.1/pages/${page}.html`);
   if (staticFile.ok) {
     if (USE_GRANULAR_CSP_SETTINGS) {
       // write the nonce into the static page, dynamically. Saves on render paint processing.
@@ -98,9 +98,11 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
       try {
         const envFile = (await readFile(".env")).toString();
         const inDev: boolean = envFile.search("IN_DEV=true") >= 0;
+        // @ts-expect-error: more wrangler true/false values
         c.env["IN_DEV"] = inDev ? "true" : "false";
       } catch (_err) {
         // file doesn't exist, but drop this anyways.
+        // @ts-expect-error: more wrangler true/false values
         c.env["IN_DEV"] = "false";
       }
     }

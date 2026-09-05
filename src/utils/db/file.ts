@@ -57,6 +57,7 @@ export const getAllAbandonedMedia = async(c: AllContext): Promise<string[]> => {
   if (!db) {
     return [];
   }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (c.env.R2_SETTINGS.prune_days === undefined) {
     return [];
   }

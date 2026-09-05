@@ -46,6 +46,7 @@ export const handlePostTask = async (runtime: AllContext, postData: Post, agent:
 
 export const handlePostNowTask = async (c: AllContext, postData: Post) => {
   let postStatus;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (shouldPostNowQueue(c.env)) {
     try {
       c.executionCtx.waitUntil(enqueuePost(c, postData));
@@ -148,6 +149,7 @@ export const cleanUpPostsTask = async (c: AllContext) => {
     const deletedItems: number = await deletePosts(c, removedIds);
     console.log(`Deleted ${deletedItems} missing posts from the db`);
   }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (c.env.R2_SETTINGS.auto_prune) {
     console.log("Cleaning up abandoned files...");
     await cleanupAbandonedFiles(c);
@@ -188,7 +190,7 @@ export const handleSchedule = (c: AllContext, cronTime: string) => {
       break;
     case "0 0 1 */1 *":
       // reset the server status bar every month
-      if (SHOW_SUPPORT_PROGRESS_BAR && c.env.FUNDING !== undefined) {
+      if (SHOW_SUPPORT_PROGRESS_BAR) {
         c.executionCtx.waitUntil(c.env.FUNDING.put(SERVICE_DOMAIN, "0.00"));
       }
     break;

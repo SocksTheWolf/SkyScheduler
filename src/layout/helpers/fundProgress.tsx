@@ -8,7 +8,7 @@ export function LoadFundingProgress() {
 
 export async function FundingProgress(props: BaseElementProps) {
   const ctx: AllContext = props.ctx!;
-  const curProgress: string = await ctx.env.FUNDING?.get(SERVICE_DOMAIN) ?? "0.00";
+  const curProgress: string = await ctx.env.FUNDING.get(SERVICE_DOMAIN) ?? "0.00";
   const totalAmount: string = PROGRESS_TOTAL.toFixed(2);
   const progressBarTooltip = `$${curProgress}/$${totalAmount} for this month`;
   return (<div class="fundsBox">

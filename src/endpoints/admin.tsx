@@ -31,6 +31,7 @@ admin.get("/abandoned", async (c) => {
   for (const file of abandonedFiles) {
     returnHTML += `${file}\n`;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (c.env.R2_SETTINGS.auto_prune) {
     console.log("pruning abandoned files...");
     await cleanupAbandonedFiles(c);

@@ -139,6 +139,7 @@ const uploadImageToR2 = async (c: AllContext, file: File, userId: string) => {
     fileProcessData.height = fileProcessData.width = 0;
     let resizeResult: ImageResizeResult = ImageResizeResult.TooLarge;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (c.env.IMAGE_SETTINGS.enabled && c.env.IMAGE_SETTINGS.steps !== undefined) {
       // Randomly generated id to be used during the resize process
       const resizeFilename = uuidv4();
