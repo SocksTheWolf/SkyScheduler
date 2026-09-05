@@ -22,7 +22,7 @@ import {
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.3.1';
+const CURRENT_OPENAPI_VERSION: string = '1.3.2';
 
 const openapiRoutes = new Hono<HonoBase>();
 
@@ -711,7 +711,12 @@ openapiRoutes.get("/reset-password/:token", describeRoute({
 }), validator("param", ResetTokenValid));
 
 openapiRoutes.get("/api/auth/reset-password/:token", describeRoute({
-  description: "Validates password reset tokens"
+  description: "Validates password reset tokens",
+  responses: {
+    302: {
+      description: "handed off"
+    }
+  }
 }), validator("param", ResetTokenValid), validator("query", ResetCallbackQuery));
 
 openapiRoutes.get("/funding", describeRoute({

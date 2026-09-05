@@ -1,7 +1,7 @@
 # SkyScheduler
 
 [![Deploy Cloudflare Workers](https://img.shields.io/badge/cloudflare_workers-deploy-F38020?logo=cloudflareworkers)](https://deploy.workers.cloudflare.com/?url=https://github.com/socksthewolf/skyscheduler)
-[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support&color=orange&logoColor=white)](https://skyscheduler.work/tip)
+[![Tip](https://img.shields.io/badge/tip-KoFi?style=flat&logo=ko-fi&label=Support&color=orange&logoColor=orange)](https://skyscheduler.work/tip)
 [![Bluesky followers](https://img.shields.io/bluesky/followers/skyscheduler.work)](https://skyscheduler.work/bsky)
 
 
@@ -11,6 +11,7 @@
 [![Mozilla HTTP Grade](https://img.shields.io/mozilla-observatory/grade/skyscheduler.work?logo=firefox&color=purple)](https://developer.mozilla.org/en-US/observatory/analyze?host=skyscheduler.work)
 
 [![GitHub Runs](https://img.shields.io/github/check-runs/socksthewolf/skyscheduler/main?logo=github)](https://github.com/SocksTheWolf/SkyScheduler/actions)
+[![ESLint Checks](https://img.shields.io/github/actions/workflow/status/socksthewolf/skyscheduler/eslint.yml?label=ESLint&logo=eslint&logoColor=blue&color=darkblue)](https://github.com/SocksTheWolf/SkyScheduler/actions)
 [![GitHub code size](https://img.shields.io/github/languages/code-size/socksthewolf/skyscheduler?logo=vscodium&color=blue)](./)
 [![GitHub repo size](https://img.shields.io/github/repo-size/socksthewolf/skyscheduler?color=lightblue)](./)
 
@@ -18,7 +19,8 @@
 
 ## Overview
 
-[![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](./)
+[![Project Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](./)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/socksthewolf/skyscheduler?logo=git&color=blue)](./)
 
 SkyScheduler is a fully-fledged Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly.
 
