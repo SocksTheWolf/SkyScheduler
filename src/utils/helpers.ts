@@ -1,12 +1,13 @@
 import { USE_CAPTCHA } from "../config";
 import { EmbedDataType } from "../enums";
-import type { AllContext, BaseContext, Bindings } from "../types";
+import type { AllContext, BaseContext } from "../types";
 
-export function isInDev(env?: Bindings) {
+export function isInDev(env?: Env) {
   if (env === undefined)
     return false;
 
-  // eslint-disable-next-line @typescript-eslint/dot-notation
+  // @ts-expect-error: overlap bs because of wrangler typegen
+  // eslint-disable-next-line @typescript-eslint/dot-notation, @typescript-eslint/no-unnecessary-condition
   return env["IN_DEV"] === "true";
 }
 

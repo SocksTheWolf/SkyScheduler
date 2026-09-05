@@ -26,7 +26,7 @@ import PrivacyPolicy from "./pages/privacy";
 import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
-import type { Bindings, HonoBase, QueueTaskData } from "./types";
+import type { HonoBase, QueueTaskData } from "./types";
 import { getDrizzle } from "./utils/db/get";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
@@ -115,13 +115,13 @@ app.get("/setup", async (c) => await setupAccounts(c));
 ///// Internal Application Exports /////
 
 export default {
-  scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
+  scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     handleSchedule(new ScheduledContext(env, ctx), event.cron);
   },
-  async queue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
+  async queue(batch: MessageBatch<QueueTaskData>, env: Env, ctx: ExecutionContext) {
     await processQueue(batch, env, ctx);
   },
-  fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
+  fetch(request: Request, env: Env, ctx: ExecutionContext) {
     // to clear the cache, call clearWorkersCache
     return app.fetch(request, env, ctx);
   },

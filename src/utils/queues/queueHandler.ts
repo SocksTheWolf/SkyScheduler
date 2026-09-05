@@ -4,7 +4,7 @@ import { ScheduledContext } from "../../classes/context";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
-import type { Bindings, QueueTaskData } from "../../types";
+import type { QueueTaskData } from "../../types";
 import { userHasViolations } from "../db/violations";
 import { getEnumKeyByValue, has } from "../helpers";
 import { handlePostTask, handleRepostTask } from "../scheduler";
@@ -15,7 +15,7 @@ interface BufferBlast {
   time: number;
 }
 
-export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Bindings, ctx: ExecutionContext) {
+export async function processQueue(batch: MessageBatch<QueueTaskData>, env: Env, ctx: ExecutionContext) {
   // runtime overhead
   const runtimeWrapper = new ScheduledContext(env, ctx);
   const agency = new AgentMap(env.TASK_SETTINGS);

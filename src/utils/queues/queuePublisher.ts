@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import isEmpty from "just-is-empty";
 import random from "just-random";
 import get from "just-safe-get";
 import type { Post } from "../../classes/post";
 import type { Repost } from "../../classes/repost";
 import { TaskType } from "../../enums";
-import type { AllContext, Bindings } from "../../types";
+import type { AllContext } from "../../types";
 import { isInDev } from "../helpers";
 
 // picks a random queue to publish data to
-const getRandomQueue = (env: Bindings, listName: string): Queue | null => {
+const getRandomQueue = (env: Env, listName: string): Queue | null => {
   const queueListNames: string[] = get(env.QUEUE_SETTINGS, listName, []);
   if (isEmpty(queueListNames))
     return null;
@@ -31,11 +32,11 @@ async function pushToQueue(queueConsumer: Queue | null, data: Post | Repost | nu
   }
 }
 
-const hasPostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && !isInDev(env);
-const hasRepostQueue = (env: Bindings) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && !isInDev(env);
-export const isQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
-export const isRepostQueueEnabled = (env: Bindings) => env.QUEUE_SETTINGS.enabled && hasRepostQueue(env);
-export const shouldPostNowQueue = (env: Bindings) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
+const hasPostQueue = (env: Env) => !isEmpty(env.QUEUE_SETTINGS.post_queues) && !isInDev(env);
+const hasRepostQueue = (env: Env) => !isEmpty(env.QUEUE_SETTINGS.repost_queues) && !isInDev(env);
+export const isQueueEnabled = (env: Env) => env.QUEUE_SETTINGS.enabled && hasPostQueue(env);
+export const isRepostQueueEnabled = (env: Env) => env.QUEUE_SETTINGS.enabled && hasRepostQueue(env);
+export const shouldPostNowQueue = (env: Env) => env.QUEUE_SETTINGS.postNowEnabled && isQueueEnabled(env);
 
 export async function enqueuePost(c: AllContext, data: Post, delay: number = -1) {
   if (!isQueueEnabled(c.env))

@@ -5,18 +5,20 @@ import { AtProtoAgent } from "../../classes/bskyAgents";
 import { BSkyConvoInfo } from "../../classes/bskyConvoInfo";
 import { DEFAULT_CHAT_PDS } from "../../config";
 import { AccountStatus } from "../../enums";
-import type { Bindings, DestinationLetter, UserIdType } from "../../types";
+import type { DestinationLetter, UserIdType } from "../../types";
 import { loginToBsky } from "./bskyLogin";
 import { getUserDID } from "./bskyUser";
 
 const chatHeaders = { headers: { "atproto-proxy": "did:web:api.bsky.chat#bsky_chat" } };
 
-async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Promise<BSkyConvoInfo | null> {
-  if (isEmpty(env.RESET_BOT_APP_PASS)) {
+async function getDMConvo(agent: AtProtoAgent, env: Env, user: string): Promise<BSkyConvoInfo | null> {
+  // this has to be its own variable otherwise eslint can't do deep enough type inference
+  const botPass: string = env.RESET_BOT_APP_PASS;
+  if (isEmpty(botPass)) {
     console.warn("The bot app reset pass is not defined!");
     return null;
   }
-  const loginResponse = await loginToBsky(agent, SERVICE_ACCOUNT, env.RESET_BOT_APP_PASS);
+  const loginResponse = await loginToBsky(agent, SERVICE_ACCOUNT, botPass);
   if (loginResponse !== AccountStatus.Ok) {
     console.error("Unable to login to the bot to send reset password messages");
     return null;
@@ -30,19 +32,19 @@ async function getDMConvo(agent: AtProtoAgent, env: Bindings, user: string): Pro
 }
 
 // This is very slow, but probably good to check?
-export const checkIfCanDMUser = async (env: Bindings, userDid: string): Promise<boolean> => {
+export const checkIfCanDMUser = async (env: Env, userDid: string): Promise<boolean> => {
   const agent = new AtProtoAgent(DEFAULT_CHAT_PDS);
   return (await getDMConvo(agent, env, userDid)) !== null;
 };
 
-export const createDMWithAccount = async (env: Bindings, to: DestinationLetter, msg: string): Promise<boolean> => {
+export const createDMWithAccount = async (env: Env, to: DestinationLetter, msg: string): Promise<boolean> => {
   if (to.did === null) {
     return getUserDID(to.handle).then((resp) => createDMWithUser(env, resp, msg))
   }
   return createDMWithUser(env, to.did, msg);
 }
 
-const createDMWithUser = async (env: Bindings, user: UserIdType, msg: string): Promise<boolean> => {
+const createDMWithUser = async (env: Env, user: UserIdType, msg: string): Promise<boolean> => {
   if (user === null)
     return false;
 

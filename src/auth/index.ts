@@ -8,7 +8,7 @@ import {
   BSKY_MIN_USERNAME_LENGTH,
   CF_KV_MIN_TTL,
 } from "../limits";
-import type { AllContext, BaseContext, Bindings, DBProcessor, DestinationLetter } from "../types";
+import type { AllContext, BaseContext, DBProcessor, DestinationLetter } from "../types";
 import { createDMWithAccount } from "../utils/bsky/bskyMessage";
 import { isInDev } from "../utils/helpers";
 import { createPasswordResetMessage } from "../utils/messages/accountReset";
@@ -26,7 +26,7 @@ if (process.env["IS_SSG"] === "true") {
 }
 
 function adjustTTL(inTTL?: number) {
-  let useTTL: number | undefined = undefined;
+  let useTTL: number|undefined = undefined;
   if (inTTL !== undefined) {
     useTTL = (inTTL < CF_KV_MIN_TTL) ? CF_KV_MIN_TTL : inTTL;
   }
@@ -35,7 +35,7 @@ function adjustTTL(inTTL?: number) {
 
 // Single auth configuration that handles both CLI and runtime scenarios
 function createAuth(c?: AllContext) {
-  const env: Bindings | undefined = c?.env;
+  const env: Env|undefined = c?.env;
   // Use actual DB for runtime, empty object for CLI
   const db: DBProcessor = c ? c.get("db") : ({} as DBProcessor);
   return betterAuth({

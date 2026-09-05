@@ -11,42 +11,6 @@ import type { Repost } from "./classes/repost";
 import type { EmbedDataType, TaskType } from "./enums";
 
 /** Types, types, types **/
-export interface Bindings {
-  DB: D1Database;
-  R2: R2Bucket;
-  R2RESIZE: R2Bucket;
-  KV: KVNamespace;
-  FUNDING?: KVNamespace;
-  IMAGES: ImagesBinding;
-  ASSETS?: Fetcher;
-  POST_QUEUE: Queue;
-  POST_QUEUE2: Queue;
-  REPOST_QUEUE: Queue;
-  QUEUE_SETTINGS: QueueConfigSettings;
-  INVITE_POOL?: KVNamespace;
-  IMAGE_SETTINGS: ImageConfigSettings;
-  TASK_SETTINGS: AgentConfigSettings;
-  R2_SETTINGS: R2ConfigSettings;
-  POST_LIMITER: RateLimit;
-  REPOST_LIMITER: RateLimit;
-  ACCOUNT_UPDATE_LIMITER: RateLimit;
-  ACCOUNT_LIMITER: RateLimit;
-  REPOST_EDIT_LIMITER: RateLimit;
-  REPOST_EDITOR_OPEN_LIMITER: RateLimit;
-  DEFAULT_ADMIN_USER: string;
-  DEFAULT_ADMIN_PASS: string;
-  DEFAULT_ADMIN_BSKY_PASS: string;
-  BETTER_AUTH_SECRET: string;
-  BETTER_AUTH_URL: string;
-  TURNSTILE_PUBLIC_KEY: string;
-  TURNSTILE_SECRET_KEY: string;
-  RESIZE_SECRET_HEADER: string;
-  RESET_BOT_APP_PASS: string;
-  IN_DEV: "true" | "false" | undefined;
-  CSP_REPORT_URL: string;
-  IS_SSG: "true" | "false" | undefined;
-}
-
 export interface EmbedData {
   content: string;
   alt?: string;
@@ -284,7 +248,7 @@ export interface NoncePropType {
 }
 
 export interface HonoBase {
-  Bindings: Bindings;
+  Bindings: Env;
   Variables: ContextVariables;
 }
 

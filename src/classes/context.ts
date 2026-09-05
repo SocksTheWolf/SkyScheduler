@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExecutionContext } from "hono";
-import type { Bindings } from "../types";
 import { getDrizzle } from "../utils/db/get";
 
 export class ScheduledContext {
   executionCtx: ExecutionContext;
-  env: Bindings;
+  env: Env;
   // used for parameters wrappings such as "isAdmin" or "session"
   // as a proxy for Context
   #map: Map<string, any>;
-  constructor(env: Bindings, executionCtx: ExecutionContext) {
+  constructor(env: Env, executionCtx: ExecutionContext) {
     this.#map = new Map<string, any>();
     this.env = env;
     this.executionCtx = executionCtx;
