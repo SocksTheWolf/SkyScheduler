@@ -20,7 +20,7 @@
 
 [![GitHub Created At](https://img.shields.io/github/created-at/socksthewolf/skyscheduler)](./)
 
-SkyScheduler is a lightweight Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly.
+SkyScheduler is a fully-fledged Cloudflare Workers-based microservice application that allows you and/or your team to schedule/repost posts to a Bluesky account effortlessly.
 
 Perfect for content creators and social media managers who want to plan their social media content in advance.
 
@@ -49,7 +49,7 @@ Perfect for content creators and social media managers who want to plan their so
 
 Clicking the Cloudflare Badge should get you a mostly one-click install. Manual instructions are provided below.
 
-1. Clone the repository
+1. Clone the repo
 
 ```bash
 git clone https://github.com/socksthewolf/skyscheduler.git
