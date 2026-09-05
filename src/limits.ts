@@ -71,6 +71,10 @@ export const BSKY_NAME_TYPE_AHEAD_CHARS: number = 2;
 export const MAX_REPOST_INTERVAL_LIMIT: number = MAX_REPOST_INTERVAL + 1;
 export const MAX_REPOST_IN_HOURS: number = (MAX_REPOST_DAYS * 24) + 1;
 
+// used in rendering the value so that it looks nice for the user
+// not used in the actual calculations.
+export const FUZZY_MAX_FUTURE_DATE: number = MAX_FUTURE_DATE_VALUE > 1 ? Math.floor(MAX_FUTURE_DATE_VALUE) : MAX_FUTURE_DATE_VALUE;
+
 // Helper conversion math
 export const MB_TO_BYTES: number = 1000 * 1000;
 export const TO_SEC: number = 60;

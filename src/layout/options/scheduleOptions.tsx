@@ -1,5 +1,6 @@
 import isEmpty from "just-is-empty";
 import type { TimeIntervalSettings } from "../../enums";
+import { FUZZY_MAX_FUTURE_DATE } from "../../limits";
 import type { BaseElementProps } from "../../types";
 import { explainTimeInterval } from "../../utils/time";
 
@@ -33,7 +34,7 @@ export default function ScheduleOptions(props: ScheduleOptionsProps) {
       {postNowHTML}
       <footer>
         <small>
-          <i>You can schedule {props.type}s in the future, at every {postingScheduleStr}. Time is rounded down to the nearest {postingScheduleStr}.</i>
+          <i>You can schedule {props.type}s up to {FUZZY_MAX_FUTURE_DATE} years in the future, at a cadence of every {postingScheduleStr}. Time is rounded down to the nearest {postingScheduleStr}.</i>
         </small>
       </footer>
     </article>
