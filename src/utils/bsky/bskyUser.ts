@@ -71,13 +71,13 @@ export const getUserPDS = async (userDID: string): Promise<string> => {
   });
 };
 
-export const followBotAccount = async (pds: string, username: string, password: string) => {
+export const followBotAccount = async (pds: string, usernameOrDID: string, password: string) => {
   if (isEmpty(ATPROTO_DID))
     return;
 
   try {
     const agent = new AtProtoAgent(pds);
-    const loginResult: AccountStatus = await loginToBsky(agent, username, password);
+    const loginResult: AccountStatus = await loginToBsky(agent, usernameOrDID, password);
     if (loginResult === AccountStatus.Ok) {
       await agent.follow(ATPROTO_DID);
     }

@@ -273,7 +273,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
       c.executionCtx.waitUntil(consumeInviteKey(c, signupToken));
       // If the user asked to auto follow the bot account, then do so.
       if (autoFollow)
-        c.executionCtx.waitUntil(followBotAccount(userPDS, username, bskyAppPassword));
+        c.executionCtx.waitUntil(followBotAccount(userPDS, profileDID, bskyAppPassword));
 
       console.log(`user ${username} created! with code ${signupToken ?? 'none'}`);
       return c.json({ok: true, msg: "signup success"});

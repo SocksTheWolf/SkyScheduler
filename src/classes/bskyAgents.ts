@@ -48,7 +48,7 @@ export class AgentMap {
     // Login to bsky
     const agent = new AtProtoAgent(pds);
 
-    const loginResponse: AccountStatus = await loginToBsky(agent, username, password);
+    const loginResponse: AccountStatus = await loginToBsky(agent, did ?? username, password);
     if (loginResponse != AccountStatus.Ok) {
       const loginResponseKey: string = getEnumKeyByValue(AccountStatus, loginResponse) ?? "None";
       // check to see if we should add a violation (will return false if no new violation needed)
