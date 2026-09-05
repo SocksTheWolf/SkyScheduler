@@ -20,6 +20,7 @@ export const users = sqliteTable("users", {
   displayUsername: text("display_username"),
   bskyAppPass: text("bsky_app_pass").notNull(),
   pds: text("pds").default(DEFAULT_PDS).notNull(),
+  did: text("did")
 }, (table) => [
   // doing operations based on username
   index("users_username_idx").on(table.username),

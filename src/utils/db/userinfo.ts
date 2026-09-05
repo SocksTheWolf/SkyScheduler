@@ -32,7 +32,7 @@ export const getBskyUserPassForId = async (c: AllContext, userid: UserIdType): P
   if (!db || !userid)
     return new BskyAPILoginCreds(null);
 
-  const response: DBServiceLogin[] = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds})
+  const response: DBServiceLogin[] = await db.select({user: users.username, pass: users.bskyAppPass, pds: users.pds, did: users.did})
     .from(users)
     .where(eq(users.id, userid))
     .limit(1).all();

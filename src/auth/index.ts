@@ -129,6 +129,11 @@ function createAuth(c?: AllContext) {
           defaultValue: DEFAULT_PDS,
           required: true,
         },
+        did: {
+          type: "string",
+          defaultValue: null,
+          required: true
+        }
       },
       changeEmail: {
         enabled: false,

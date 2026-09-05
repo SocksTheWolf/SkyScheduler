@@ -243,6 +243,7 @@ export interface DBServiceLogin {
   user: string | null;
   pass: string;
   pds: string;
+  did: string | null;
 }
 
 // Used for the file upload table so we can keep track of

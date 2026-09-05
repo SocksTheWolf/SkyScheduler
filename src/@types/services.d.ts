@@ -5,6 +5,7 @@ interface PDSService {
 }
 
 interface PLCDirectoryResponse {
+  id?: string;
   alsoKnownAs?: string[];
   service?: PDSService[];
 }

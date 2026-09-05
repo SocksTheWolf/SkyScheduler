@@ -83,29 +83,34 @@ account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_
   const auth = c.get("auth");
   const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
   const newObject: AccountUpdatePayload = {};
-  if (!isEmpty(username)) {
+  const hasNewName = !isEmpty(username);
+  let usernameToUse: string|null;
+  // validate and query username information
+  if (hasNewName) {
     if ((username === SERVICE_ACCOUNT || username === c.env.DEFAULT_ADMIN_USER) &&
       !c.get("isAdmin")) {
         return c.html(<b class="btn-error">Invalid username provided</b>, 422);
     } else {
-      newObject.username = username!;
+      // new username information is valid
+      usernameToUse = newObject.username = username!;
     }
+  } else {
+    // pull up the existing username information
+    usernameToUse = await getUsernameForUser(c);
   }
 
   // we have to write user data a little differently
   const hasNewPDS = !isEmpty(bskyUserPDS), newAppPass = !isEmpty(bskyAppPassword);
-  if (hasNewPDS || newAppPass) {
+  if (hasNewPDS || newAppPass || hasNewName) {
     const updateUsrObj: LooseObj = {
       pds: (hasNewPDS) ? bskyUserPDS : undefined,
-      bskyAppPass: (newAppPass) ? bskyAppPassword : undefined
+      bskyAppPass: (newAppPass) ? bskyAppPassword : undefined,
+      did: (hasNewPDS || hasNewName) ? await getUserDID(usernameToUse) : undefined
     };
-    // if we didn't update the pds, remove the field from the object
-    if (!hasNewPDS)
-      delete updateUsrObj.pds;
 
-    // same with the app pass if it has not been updated
-    if (!newAppPass)
-      delete updateUsrObj.bskyAppPass;
+    // delete any undefined value fields here
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    Object.keys(updateUsrObj).forEach((key) => updateUsrObj[key] === undefined && delete updateUsrObj[key]);
 
     try {
       const {status} = await auth.api.updateUser({
@@ -246,7 +251,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
 
   // grab our auth object
   const auth = c.get("auth");
-  console.log(`attempting to create an account for ${username} with pds ${userPDS}`);
+  console.log(`attempting to create an account for ${username}(${profileDID}) with pds ${userPDS}`);
   // create the user
   try {
     const createUser = await auth.api.signUpEmail({
@@ -257,7 +262,8 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
         username: username,
         password: password,
         bskyAppPass: bskyAppPassword,
-        pds: userPDS
+        pds: userPDS,
+        did: profileDID
       }
     });
 
