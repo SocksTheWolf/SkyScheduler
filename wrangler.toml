@@ -184,4 +184,4 @@ TASK_SETTINGS={use_posts=true, use_reposts=true}
 IN_DEV=false
 
 # If the site should be locked down from any write operations (such as db upgrades)
-MAINTAIN_LOCKDOWN=false
+MAINTAIN_LOCKDOWN="false"
