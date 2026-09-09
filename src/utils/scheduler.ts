@@ -21,6 +21,7 @@ import {
   setPostNowOffForPost,
 } from "./db/data";
 import { getAllAbandonedMedia } from "./db/file";
+import { isInMaintenance } from "./helpers";
 import {
   enqueuePost,
   enqueueRepost,
@@ -170,6 +171,11 @@ export const cleanupAbandonedFiles = async (c: AllContext) => {
 };
 
 export const handleSchedule = (c: AllContext, cronTime: string) => {
+  // check to see if we should be doing any operations at all
+  if (isInMaintenance(c.env)) {
+    return;
+  }
+
   // helper function for writing the appropriate cron tab job
   const getCronTimeForInterval = (input: TimeIntervalSettings): string => {
     if (input === TimeIntervalSettings.Hour) {

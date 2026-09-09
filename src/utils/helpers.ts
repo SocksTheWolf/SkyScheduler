@@ -11,6 +11,15 @@ export function isInDev(env?: Env) {
   return env["IN_DEV"] === "true";
 }
 
+export function isInMaintenance(env?: Env) {
+  if (env === undefined)
+    return false;
+
+  // @ts-expect-error: overlap bs because of wrangler typegen
+  // eslint-disable-next-line @typescript-eslint/dot-notation
+  return env["MAINTAIN_LOCKDOWN"] === "true";
+}
+
 export function useCFTurnstile(ctx: AllContext|undefined): boolean {
   if (isInDev(ctx?.env))
     return false;

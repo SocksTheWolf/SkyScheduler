@@ -182,3 +182,6 @@ TASK_SETTINGS={use_posts=true, use_reposts=true}
 
 # set this to true in your .env to turn off turnstile
 IN_DEV=false
+
+# If the site should be locked down from any write operations (such as db upgrades)
+MAINTAIN_LOCKDOWN=false

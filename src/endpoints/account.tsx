@@ -9,6 +9,7 @@ import { AccountStatus } from "../enums";
 import PDSInputField from "../layout/fields/pdsInputField";
 import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
+import { maintainMiddleware, maintainMiddlewareHTML } from "../middleware/maintenanceMode";
 import { rateLimit } from "../middleware/rateLimit";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../types";
@@ -48,7 +49,7 @@ const serverParseValidationErr = (c: Context, errorJson: string, errCode: Conten
 }
 
 // wrapper to login
-account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
+account.post("/login", maintainMiddleware, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const body = await c.req.json();
   const auth = c.get("auth");
   const validation = LoginSchema.safeParse(body);
@@ -73,88 +74,91 @@ account.post("/login", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   }
 });
 
-account.post("/update", authMiddlewareHTML, rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}), async (c: BaseContext) => {
-  const body = await c.req.parseBody();
-  const validation = AccountUpdateSchema.safeParse(body);
-  if (!validation.success) {
-    return serverParseValidationErr(c, validation.error.message, 403);
-  }
-
-  const auth = c.get("auth");
-  const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
-  const newObject: AccountUpdatePayload = {};
-  const hasNewName = !isEmpty(username);
-  let usernameToUse: string|null;
-  // validate and query username information
-  if (hasNewName) {
-    if ((username === SERVICE_ACCOUNT || username === c.env.DEFAULT_ADMIN_USER) &&
-      !c.get("isAdmin")) {
-        return c.html(<b class="btn-error">Invalid username provided</b>, 422);
-    } else {
-      // new username information is valid
-      usernameToUse = newObject.username = username!;
+account.post("/update", authMiddlewareHTML,
+  maintainMiddlewareHTML,
+  rateLimit({limiter: "ACCOUNT_UPDATE_LIMITER", html: true}),
+  async (c: BaseContext) => {
+    const body = await c.req.parseBody();
+    const validation = AccountUpdateSchema.safeParse(body);
+    if (!validation.success) {
+      return serverParseValidationErr(c, validation.error.message, 403);
     }
-  } else {
-    // pull up the existing username information
-    usernameToUse = await getUsernameForUser(c);
-  }
 
-  // we have to write user data a little differently
-  const hasNewPDS = !isEmpty(bskyUserPDS), newAppPass = !isEmpty(bskyAppPassword);
-  if (hasNewPDS || newAppPass || hasNewName) {
-    const updateUsrObj: LooseObj = {
-      pds: (hasNewPDS) ? bskyUserPDS : undefined,
-      bskyAppPass: (newAppPass) ? bskyAppPassword : undefined,
-      did: (hasNewPDS || hasNewName) ? await getUserDID(usernameToUse) : undefined
-    };
-
-    // delete any undefined value fields here
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    Object.keys(updateUsrObj).forEach((key) => updateUsrObj[key] === undefined && delete updateUsrObj[key]);
-
-    try {
-      const {status} = await auth.api.updateUser({
-        body: updateUsrObj,
-        headers: c.req.raw.headers
-      });
-      if (!status) {
-        return await c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
+    const auth = c.get("auth");
+    const { username, password, bskyAppPassword, bskyUserPDS } = validation.data;
+    const newObject: AccountUpdatePayload = {};
+    const hasNewName = !isEmpty(username);
+    let usernameToUse: string|null;
+    // validate and query username information
+    if (hasNewName) {
+      if ((username === SERVICE_ACCOUNT || username === c.env.DEFAULT_ADMIN_USER) &&
+        !c.get("isAdmin")) {
+          return c.html(<b class="btn-error">Invalid username provided</b>, 422);
+      } else {
+        // new username information is valid
+        usernameToUse = newObject.username = username!;
       }
-      newObject.updatedSession = true;
-    } catch (err: unknown) {
-      console.warn("failed to update session pds: " + String(err));
-      // this is technically not true, but w/e
-      return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>, 401);
+    } else {
+      // pull up the existing username information
+      usernameToUse = await getUsernameForUser(c);
     }
-  }
 
-  // check if we updated our password
-  const updatedPassword = !isEmpty(password);
-  if (updatedPassword) {
-    // attempt to rehash the password (ugh slow.)
-    const authCtx = await auth.$context;
-    // this is a dumb workaround because all other password update methods
-    // get really upset (bc of emails [we don't use]), which seems to be a bug in better auth
-    newObject.password = await authCtx.password.hash(password!);
-  }
+    // we have to write user data a little differently
+    const hasNewPDS = !isEmpty(bskyUserPDS), newAppPass = !isEmpty(bskyAppPassword);
+    if (hasNewPDS || newAppPass || hasNewName) {
+      const updateUsrObj: LooseObj = {
+        pds: (hasNewPDS) ? bskyUserPDS : undefined,
+        bskyAppPass: (newAppPass) ? bskyAppPassword : undefined,
+        did: (hasNewPDS || hasNewName) ? await getUserDID(usernameToUse) : undefined
+      };
 
-  // Check to see if we made any changes at all
-  if (isEmpty(newObject)) {
-    return c.html(<b class="btn-error">No Changes Made</b>, 201);
-  }
+      // delete any undefined value fields here
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      Object.keys(updateUsrObj).forEach((key) => updateUsrObj[key] === undefined && delete updateUsrObj[key]);
 
-  // push changes to db
-  const userUpdated = await updateUserData(c, newObject);
-  if (userUpdated) {
-    // revoke other sessions that may be active
+      try {
+        const {status} = await auth.api.updateUser({
+          body: updateUsrObj,
+          headers: c.req.raw.headers
+        });
+        if (!status) {
+          return await c.html(<b class="btn-error">Failed to update user data, try again</b>, 409);
+        }
+        newObject.updatedSession = true;
+      } catch (err: unknown) {
+        console.warn("failed to update session pds: " + String(err));
+        // this is technically not true, but w/e
+        return c.html(<b class="btn-error">Your session has expired, please relogin to try again</b>, 401);
+      }
+    }
+
+    // check if we updated our password
+    const updatedPassword = !isEmpty(password);
     if (updatedPassword) {
-      await auth.api.revokeOtherSessions({headers: c.req.raw.headers});
+      // attempt to rehash the password (ugh slow.)
+      const authCtx = await auth.$context;
+      // this is a dumb workaround because all other password update methods
+      // get really upset (bc of emails [we don't use]), which seems to be a bug in better auth
+      newObject.password = await authCtx.password.hash(password!);
     }
-    c.header("HX-Trigger", "accountUpdated");
-    c.header("HX-Trigger-After-Swap", "accountViolations");
-    return c.html(<></>, 200);
-  }
-  return c.html(<b class="btn-error">Unknown error occurred</b>, 409);
+
+    // Check to see if we made any changes at all
+    if (isEmpty(newObject)) {
+      return c.html(<b class="btn-error">No Changes Made</b>, 201);
+    }
+
+    // push changes to db
+    const userUpdated = await updateUserData(c, newObject);
+    if (userUpdated) {
+      // revoke other sessions that may be active
+      if (updatedPassword) {
+        await auth.api.revokeOtherSessions({headers: c.req.raw.headers});
+      }
+      c.header("HX-Trigger", "accountUpdated");
+      c.header("HX-Trigger-After-Swap", "accountViolations");
+      return c.html(<></>, 200);
+    }
+    return c.html(<b class="btn-error">Unknown error occurred</b>, 409);
 });
 
 account.get("/data", authMiddlewareHTML, async (c) => {
@@ -177,7 +181,7 @@ account.get("/violations", authMiddlewareHTML, async (c) => {
 
 // endpoint that allows the user to resolve conflicts.
 // We'll validate they are actually fixed bsky action is performed
-account.post("/violations/resolve", authMiddlewareHTML, async (c: BaseContext) => {
+account.post("/violations/resolve", authMiddlewareHTML, maintainMiddlewareHTML, async (c: BaseContext) => {
   const userId = c.get("userId");
   if (userId !== null) {
     const context = new ScheduledContext(c.env, c.executionCtx);
@@ -210,7 +214,7 @@ account.get("/logout", pullAuthData, async (c) => {
   return c.redirect("/?logout");
 });
 
-account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
+account.post("/signup", verifyTurnstile, maintainMiddleware, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c) => {
   const body = await c.req.json();
   const validation = SignupSchema.safeParse(body);
   if (!validation.success) {
@@ -288,7 +292,7 @@ account.post("/signup", verifyTurnstile, rateLimit({limiter: "ACCOUNT_LIMITER"})
   return c.json({ok: false, msg: "unknown error occurred, please try again"}, 500);
 });
 
-account.post("/forgot", verifyTurnstile, async (c) => {
+account.post("/forgot", verifyTurnstile, maintainMiddleware, async (c) => {
   const body = await c.req.json();
 
   const validation = AccountForgotSchema.safeParse(body);
@@ -334,7 +338,7 @@ account.post("/forgot", verifyTurnstile, async (c) => {
   return c.json({ok: true, msg: "request processed"});
 });
 
-account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseContext) => {
+account.post("/reset", maintainMiddleware, rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseContext) => {
   const body = await c.req.json();
 
   const validation = AccountResetSchema.safeParse(body);
@@ -359,7 +363,7 @@ account.post("/reset", rateLimit({limiter: "ACCOUNT_LIMITER"}), async (c: BaseCo
   return c.json({ok: false, msg: "invalid token/password"}, 401);
 });
 
-account.post("/delete", authMiddlewareHTML, async (c) => {
+account.post("/delete", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => {
   const body = await c.req.parseBody();
   const validation = AccountDeleteSchema.safeParse(body);
 

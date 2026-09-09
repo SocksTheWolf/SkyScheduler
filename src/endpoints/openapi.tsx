@@ -22,7 +22,7 @@ import {
 import { SignupSchema } from "../validation/signupSchema";
 
 // Easy access change for the openapi string version
-const CURRENT_OPENAPI_VERSION: string = '1.3.2';
+const CURRENT_OPENAPI_VERSION: string = '1.3.3';
 
 const openapiRoutes = new Hono<HonoBase>();
 
@@ -52,7 +52,13 @@ openapiRoutes.post("/post/create", describeRoute({
       content: {
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
   },
 }),
 validator('json', PostSchema));
@@ -77,7 +83,13 @@ openapiRoutes.post("/post/create/repost", describeRoute({
       content: {
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
   },
 }),
 validator('json', RepostSchema));
@@ -164,7 +176,13 @@ openapiRoutes.get("/post/edit/:id", describeRoute({
       content: {
         'text/html': {}
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'text/html': {}
+      }
+    },
   }
 }), validator('param', CheckGUIDSchema));
 
@@ -191,6 +209,12 @@ openapiRoutes.post("/post/edit/:id", describeRoute({
     },
     404: {
       description: "post does not exist on your account",
+      content: {
+        'text/html': {}
+      }
+    },
+    429: {
+      description: 'In maintenance',
       content: {
         'text/html': {}
       }
@@ -225,6 +249,12 @@ openapiRoutes.get("/post/edit/:id/cancel", describeRoute({
         'text/html': {}
       }
     },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'text/html': {}
+      }
+    },
     500: {
       description: "internal error",
       content: {
@@ -246,6 +276,12 @@ openapiRoutes.delete("/post/delete/:id", describeRoute({
     },
     403: {
       description: "an error occurred or the post doesn't exist",
+      content: {
+        'text/html': {}
+      }
+    },
+    429: {
+      description: 'In maintenance',
       content: {
         'text/html': {}
       }
@@ -281,7 +317,7 @@ openapiRoutes.get("/post/:id/repost", describeRoute({
       }
     },
     429: {
-      description: "rate limited",
+      description: "rate limited/maintenance mode",
       content: {
         'text/html': {}
       }
@@ -311,7 +347,7 @@ openapiRoutes.delete("/post/:id/repost/:schedule", describeRoute({
       }
     },
     429: {
-      description: "rate limited",
+      description: "rate limited/maintenance mode",
       content: {
         'text/html': {}
       }
@@ -340,7 +376,13 @@ openapiRoutes.post("/post/upload", describeRoute({
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
   }
 }), validator("form", FileUploadSchema));
 
@@ -371,7 +413,13 @@ openapiRoutes.delete("/post/upload", describeRoute({
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
   }
 }), validator("json", FileDeleteSchema));
 
@@ -398,7 +446,7 @@ openapiRoutes.post("/account/login", describeRoute({
       }
     },
     429: {
-      description: "rate limited",
+      description: "rate limited/maintenance mode",
       content: {
         "application/json": { schema: resolver(GenericResponseSchema)}
       }
@@ -446,7 +494,7 @@ openapiRoutes.post("/account/update", describeRoute({
       }
     },
     429: {
-      description: "rate limited",
+      description: "rate limited/maintenance mode",
       content: {
         'text/html': { },
       }
@@ -513,7 +561,13 @@ openapiRoutes.post("/account/violations/resolve", describeRoute({
       content: {
         'text/html': { },
       }
-    }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'text/html': {}
+      }
+    },
   }
 }));
 
@@ -575,6 +629,12 @@ openapiRoutes.post("/account/signup", describeRoute({
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
     },
+    429: {
+      description: 'rate limit/in maintenance',
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
     500: {
       description: "internal error",
       content: {
@@ -601,6 +661,12 @@ openapiRoutes.post("/account/forgot", describeRoute({
     },
     401: {
       description: "failed turnstile",
+      content: {
+        'application/json': { schema: resolver(GenericResponseSchema) },
+      }
+    },
+    429: {
+      description: 'In maintenance',
       content: {
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
@@ -636,7 +702,7 @@ openapiRoutes.post("/account/reset", describeRoute({
       }
     },
     429: {
-      description: "rate limited",
+      description: "rate limited/in maintenance",
       content: {
         'application/json': { schema: resolver(GenericResponseSchema) },
       }
@@ -669,6 +735,12 @@ openapiRoutes.post("/account/delete", describeRoute({
       description: "invalid data",
       content: {
         'text/html': { },
+      }
+    },
+    429: {
+      description: 'In maintenance',
+      content: {
+        'text/html': {}
       }
     },
     500: {
