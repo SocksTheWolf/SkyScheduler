@@ -75,6 +75,12 @@ export const handleRepostTask = async (c: AllContext, postData: Repost, agent: A
     console.error(`Unable to make agent to repost ${postData.uuid}`);
     return false;
   }
+
+  if (isEmpty(postData.uri) || isEmpty(postData.cid)) {
+    console.error(`${postData.uuid} had a repost rule with no valid post data`);
+    return false;
+  }
+
   const madeRepost = await makeRepost(c, postData, agent);
   if (madeRepost) {
     console.log(`Reposted ${postData.uri} successfully!`);
