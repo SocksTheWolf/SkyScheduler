@@ -16,7 +16,7 @@ export function isInMaintenance(env?: Env) {
     return false;
 
   // @ts-expect-error: overlap bs because of wrangler typegen
-  // eslint-disable-next-line @typescript-eslint/dot-notation
+  // eslint-disable-next-line @typescript-eslint/dot-notation, @typescript-eslint/no-unnecessary-condition
   return env["MAINTAIN_LOCKDOWN"] === "true";
 }
 
