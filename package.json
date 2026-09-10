@@ -86,7 +86,7 @@
     "toml": "^5.0.0",
     "tsx": "^4.23.13",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.129.0"
+    "wrangler": "^4.130.0"
   },
   "overrides": {
     "hono-openapi": {
@@ -100,6 +100,9 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
+    },
+    "miniflare": {
+      "sharp": "^0.35.4"
     }
   },
   "optionalDependencies": {
@@ -108,6 +111,6 @@
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "jiti": "^2.7.0",
-    "typescript-eslint": "^8.69.0"
+    "typescript-eslint": "^8.70.0"
   }
 }
