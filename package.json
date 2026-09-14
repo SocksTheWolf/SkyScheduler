@@ -38,7 +38,7 @@
     "openapi": "node ./bin/dist/openapi.js",
     "types": "wrangler types src/@types/wrangler.d.ts",
     "preopenapi": "npm run prebuild",
-    "prebuild": "npx esbuild bin/*.ts --bundle --platform=node --target=esnext --outdir=bin/dist --format=esm --external:cloudflare:workers --external:@swc --external:debug --external:clean-css --external:better-auth --external:relateurl"
+    "prebuild": "npx esbuild bin/*.ts --bundle --platform=node --target=esnext --outdir=bin/dist --format=esm --external:cloudflare:workers --external:@swc --external:debug --external:clean-css --external:better-auth --external:relateurl --external:child_process --external:minify"
   },
   "scriptsComments": {
     "build": "builds files for the website",
