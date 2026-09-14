@@ -16,6 +16,7 @@
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
     "base:addinvitekey": "wrangler kv key put --binding INVITE_POOL",
     "build": "node --env-file-if-exists=.env --env-file=bin/.env.build ./bin/dist/build.js",
+    "build:all": "npm run build -- --all",
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",

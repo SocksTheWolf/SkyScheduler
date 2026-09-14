@@ -2,7 +2,6 @@ import { statSync } from "node:fs";
 import { glob } from "node:fs/promises";
 import { SITE_URL } from "../../src/appInfo";
 import { sitemapIgnoreFiles } from "../configs/sitemapIgnore";
-import { lineBreak, log } from "./console";
 
 export async function buildSitemap() {
   const page: SitemapPageInfo[] = [];
@@ -15,8 +14,6 @@ export async function buildSitemap() {
     });
   }
 
-  lineBreak();
-  log("Building sitemap");
   // dump out the entire sitemap file.
   return (`<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

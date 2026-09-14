@@ -15,18 +15,23 @@ export async function buildRunner(options: BuildRunnerOptions) {
   }
 
   lineBreak();
+  log("SkyScheduler Builder")
   const fileModMap = new Map<string, number>();
   // eslint-disable-next-line @typescript-eslint/dot-notation
   const canMakeLint: boolean = (process.env["NO_LINT"] !== "true");
   let buildCommands: string[] = [];
+  let buildAll: boolean = false;
 
   // set that we are currently building
   process.env.IS_BUILDING = "true";
 
   // handle any commandline flags
-  if (process.argv.length > 2) {
+  if (process.argv.length >= 2) {
     process.argv.forEach((cmd) => {
-      if (cmd.includes("--build=")) {
+      if (cmd === "--all") {
+        buildAll = true;
+      }
+      else if (cmd.includes("--build=")) {
         const command = cmd.replace("--build=", "");
         log(`Adding build rule "${command}"`);
         buildCommands.push(command);
@@ -67,6 +72,12 @@ export async function buildRunner(options: BuildRunnerOptions) {
   for (const trigger of options.triggers) {
     debug(`Checking "${trigger.name}" for matches via ${trigger.match.join(",")}`);
     let compareAgainst: number;
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (buildAll) {
+      addBuildCommands(trigger);
+      continue;
+    }
 
     // check if this is a glob rule
     if (trigger.against.includes("*")) {
@@ -116,9 +127,11 @@ export async function buildRunner(options: BuildRunnerOptions) {
   // Do not print anything if we do not have any build commands at all.
   if (buildCommands.length > 0) {
     lineBreak();
-    log(`Running Build Rules: ${buildCommands.join(", ")}\n`);
+    log(`Running Build Rules:\n\n${buildCommands.join("\n")}\n`);
   } else {
+    lineBreak();
     log("No Build Necessary");
+    lineBreak();
     return;
   }
 
@@ -155,7 +168,7 @@ export async function buildRunner(options: BuildRunnerOptions) {
         if (rule.minify) {
           try {
             lineBreak();
-            log(`Minifying ${rule.output}...`);
+            log(`Minifying ${rule.output}...\n`);
             // @ts-ignore - the types are invalid for the options object, this can be verified by looking at the minify code.
             const data: string = (rule.output.includes(".js")) ? await minify.js(output, minifyOptions) : await minify.css(output);
             await writeFile(rule.output, data);
@@ -171,7 +184,7 @@ export async function buildRunner(options: BuildRunnerOptions) {
       const output: BuildRuleFuncOutput = await rule.buildCommand();
       if (typeof output === "string" && rule.output !== undefined) {
         lineBreak();
-        log(`Created ${rule.output}`);
+        log(`Created ${rule.output}\n`);
         await writeFile(rule.output, output);
       } else {
         debug(`Ran ${command}`);
@@ -182,9 +195,10 @@ export async function buildRunner(options: BuildRunnerOptions) {
   // Generate any lints that are necessary
   if (lintCommands.length > 0) {
     lineBreak();
-    log("Building lint configs");
     await generateLintRules(lintCommands);
+    log("Built lint configs\n");
   }
   lineBreak();
-  log("Completed build");
+  log("Completed build!");
+  lineBreak();
 }
