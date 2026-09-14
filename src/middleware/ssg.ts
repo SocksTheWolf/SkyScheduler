@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 import { createMiddleware } from "hono/factory";
 import { isSSGContext } from "hono/ssg";
+import type { TomlTable } from 'smol-toml';
+import { parse } from 'smol-toml';
 import { readFile } from "fs/promises";
 import { USE_GRANULAR_CSP_SETTINGS, USE_STATIC_HTML } from "../config";
 import { getHTMXConfigStr } from "../layout/helpers/htmxConfig";
@@ -80,9 +82,9 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
     // If we need to build up missing flags, do so.
     if (needsEnvFlags) {
       // Load up toml
-      const toml = await import("toml");
-      const wranglerFile = (await readFile("wrangler.toml")).toString();
-      const wranglerSettings = toml.parse(wranglerFile);
+      const wranglerFile: string = (await readFile("wrangler.toml")).toString();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const wranglerSettings: TomlTable = parse(wranglerFile);
       // Set the various vars that are needed
       for (const flag of IMPORTANT_ENV_FLAGS) {
         if (flag === "IN_DEV")

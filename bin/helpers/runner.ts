@@ -80,7 +80,7 @@ export async function buildRunner(options: BuildRunnerOptions) {
           continue;
         }
         for (const globbedFile of globResults) {
-          const fileTime = statSync(globbedFile).mtimeMs;
+          const fileTime = getOrAddTimeForRule(globbedFile);
           if (fileTime < lowestTime) {
             debug(`${globbedFile} lowest time is ${fileTime}`);
             lowestTime = fileTime;
@@ -103,7 +103,7 @@ export async function buildRunner(options: BuildRunnerOptions) {
     }
 
     for await (const matchedFile of glob(trigger.match, {exclude: trigger.ignores})) {
-      if (compareAgainst < statSync(matchedFile).mtimeMs) {
+      if (compareAgainst < getOrAddTimeForRule(matchedFile)) {
         addBuildCommands(trigger);
         break;
       }
