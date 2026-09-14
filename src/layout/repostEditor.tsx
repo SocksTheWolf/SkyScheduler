@@ -1,8 +1,8 @@
-import { validate as isValid } from "uuid";
 import type { Post } from "../classes/post";
 import type { RepostInfo } from "../classes/repost";
 import type { BaseElementProps } from "../types";
 import { getPostById } from "../utils/dbQuery";
+import { isUUIDValid } from "../utils/helpers";
 import { formatTimeFromHours } from "../utils/time";
 
 interface RepostEditorTableProps extends BaseElementProps {
@@ -11,7 +11,7 @@ interface RepostEditorTableProps extends BaseElementProps {
 };
 
 function RepostEditorTable(props: RepostEditorTableProps) {
-  if (props.data === undefined || !isValid(props.id)) {
+  if (props.data === undefined || !isUUIDValid(props.id)) {
     return (<>No Reposts To Edit</>);
   }
   const sortedData = props.data.toSorted((a, b) => {

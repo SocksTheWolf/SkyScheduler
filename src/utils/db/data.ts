@@ -4,7 +4,6 @@ import {
 } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import isEmpty from "just-is-empty";
-import { validate as uuidValid } from "uuid";
 import { Post } from "../../classes/post";
 import { Repost } from "../../classes/repost";
 import { TRUNCATE_POSTED_CONTENT } from "../../config";
@@ -17,6 +16,7 @@ import type {
   EditPostChanges, GetAllPostedBatch,
   PostRecordResponse
 } from "../../types";
+import { isUUIDValid } from "../helpers";
 import { floorCurrentTime } from "../time";
 
 export const getAllPostsForCurrentTime = async (c: AllContext, removeThreads: boolean = false): Promise<Post[]> => {
@@ -145,7 +145,7 @@ export const bulkUpdatePostedData = async (c: AllContext, records: PostRecordRes
 
 export const setPostNowOffForPost = async (c: AllContext, id: string) => {
   const db: DBProcessor = c.get("db");
-  if (!uuidValid(id))
+  if (!isUUIDValid(id))
     return false;
 
   if (!db) {
@@ -154,13 +154,13 @@ export const setPostNowOffForPost = async (c: AllContext, id: string) => {
   }
 
   const result = await db.update(posts).set({postNow: false}).where(eq(posts.uuid, id)).limit(1).returning({updated_id: posts.uuid});
-  if (!uuidValid(result[0].updated_id))
+  if (!isUUIDValid(result[0].updated_id))
     console.error(`Unable to set PostNow to off for post ${id}`);
 };
 
 export const updatePostForGivenUser = async (c: AllContext, userId: string, id: string, newData: EditPostChanges) => {
   const db: DBProcessor = c.get("db");
-  if (isEmpty(userId) || !uuidValid(id))
+  if (isEmpty(userId) || !isUUIDValid(id))
     return false;
 
   if (!db) {
@@ -202,7 +202,7 @@ export const getAllPostedPosts = async (c: AllContext): Promise<GetAllPostedBatc
 
 export const isPostAlreadyPosted = async (c: AllContext, postId: string): Promise<boolean> => {
   const db: DBProcessor = c.get("db");
-  if (!uuidValid(postId))
+  if (!isUUIDValid(postId))
     return true;
 
   if (!db) {
@@ -220,7 +220,7 @@ export const isPostAlreadyPosted = async (c: AllContext, postId: string): Promis
 
 export const getChildPostsOfThread = async (c: AllContext, rootId: string): Promise<Post[]|null> => {
   const db: DBProcessor = c.get("db");
-  if (!uuidValid(rootId))
+  if (!isUUIDValid(rootId))
     return null;
 
   if (!db) {
@@ -238,7 +238,7 @@ export const getChildPostsOfThread = async (c: AllContext, rootId: string): Prom
 };
 
 export const getPostThreadCount = async (db: DrizzleD1Database, userId: string, rootId: string): Promise<number> => {
-  if (!uuidValid(rootId))
+  if (!isUUIDValid(rootId))
     return 0;
 
   return db.$count(posts, and(

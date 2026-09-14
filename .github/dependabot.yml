@@ -43,8 +43,7 @@ updates:
           - "@atproto/*"
       dev:
         patterns:
-          - "toml"
-          - "tsx"
+          - "smol-toml"
           - "minify"
       auth:
         patterns:
@@ -65,9 +64,5 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - "version-update:semver-major"
-      # Ignore TSX's patches
-      - dependency-name: "tsx"
-        update-types:
-          - "version-update:semver-patch"
       # We only use prettier for some nice formatting, ignore otherwise.
       - dependency-name: "prettier"

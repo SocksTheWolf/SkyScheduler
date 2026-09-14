@@ -1,7 +1,7 @@
 import { addHours, isAfter, isEqual } from "date-fns";
 import { and, asc, desc, eq, getTableColumns, gt, gte, ne, sql } from "drizzle-orm";
 import isEmpty from "just-is-empty";
-import { v4 as uuidv4, validate as uuidValid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { APP_NAME } from "../appInfo";
 import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
@@ -27,7 +27,7 @@ import {
   updatePostForGivenUser
 } from "./db/data";
 import { getViolationsForUser, removeViolationsDB } from "./db/violations";
-import { has, isAltEditableType } from "./helpers";
+import { has, isAltEditableType, isUUIDValid } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 import { floorGivenTime } from "./time";
 
@@ -196,7 +196,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
   let parentPostID:string|undefined = undefined;
   let rootPostData: Post|null = null;
   let parentPostOrder: number = 0;
-  if (uuidValid(rootPost)) {
+  if (isUUIDValid(rootPost)) {
     // returns null if the post doesn't appear on this account
     rootPostData = await getPostById(c, rootPost!);
     if (rootPostData !== null) {
@@ -212,7 +212,7 @@ export const createPost = async (c: AllContext, body: unknown): Promise<CreatePo
       rootPostID = rootPostData.rootPost ?? rootPostData.uuid;
       // If this isn't a direct reply, check directly underneath it
       if (rootPost !== parentPost) {
-        if (uuidValid(parentPost)) {
+        if (isUUIDValid(parentPost)) {
           const parentPostData = await getPostById(c, parentPost!);
           if (parentPostData !== null) {
             parentPostID = parentPost!;
@@ -486,7 +486,7 @@ export const getPostById = async(c: AllContext|undefined, id: string): Promise<P
     return null;
 
   const userId: UserIdType = c.get("userId");
-  if (!userId || !uuidValid(id))
+  if (!userId || !isUUIDValid(id))
     return null;
 
   const db: DBProcessor = c.get("db");
@@ -507,7 +507,7 @@ export const getPostById = async(c: AllContext|undefined, id: string): Promise<P
 // used for post editing, acts very similar to getPostsForUser
 export const getPostByIdWithReposts = async(c: AllContext, id: string): Promise<Post|null> => {
   const userId: UserIdType = c.get("userId");
-  if (!userId || !uuidValid(id))
+  if (!userId || !isUUIDValid(id))
     return null;
 
   const db: DBProcessor = c.get("db");
@@ -535,7 +535,7 @@ export const deleteRepostRule = async(c: AllContext, id: string, scheduleId: str
     console.error(`unable to delete schedule id ${scheduleId} from post ${id}, db was null`);
     return { success: false };
   }
-  if (!uuidValid(scheduleId)) {
+  if (!isUUIDValid(scheduleId)) {
     return { success: false };
   }
 

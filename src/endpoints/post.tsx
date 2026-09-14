@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import isEmpty from "just-is-empty";
-import { validate as isValid } from "uuid";
 import type { Post } from "../classes/post";
 import { CAN_EDIT_REPOST_RULES } from "../config";
 import { PostOOBSwapOption } from "../enums";
@@ -25,7 +24,7 @@ import {
   getPostByIdWithReposts,
   updatePostForUser,
 } from "../utils/dbQuery";
-import { isAltEditableType } from "../utils/helpers";
+import { isAltEditableType, isUUIDValid } from "../utils/helpers";
 import { requestDeleteFromR2, uploadFileR2 } from "../utils/r2Query";
 import { handlePostNowTask } from "../utils/scheduler";
 import { FileUploadSchema } from "../validation/fileUploadSchema";
@@ -105,7 +104,7 @@ post.all("/all", authMiddlewareHTML, async (c) => {
 // Edit posts
 post.get("/edit/:id", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
-  if (isValid(id)) {
+  if (isUUIDValid(id)) {
     const postInfo = await getPostById(c, id);
     if (postInfo !== null) {
       c.header("HX-Trigger-After-Swap", `{"editPost": "${id}"}`);
@@ -120,7 +119,7 @@ post.post("/edit/:id", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => 
   const { id } = c.req.param();
   const swapErrEvents: string = "refreshPosts, scrollTop, scrollListTop";
   const postMissingEvent: string = swapErrEvents + ", postMissing";
-  if (!isValid(id)) {
+  if (!isUUIDValid(id)) {
     c.header("HX-Trigger-After-Swap", postMissingEvent);
     return c.html(<b class="btn-error">Post was invalid</b>, 403);
   }
@@ -195,7 +194,7 @@ post.post("/edit/:id", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => 
 
 post.get("/edit/:id/cancel", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
-  if (!isValid(id))
+  if (!isUUIDValid(id))
     return c.html(<></>, 403);
 
   const postInfo = await getPostByIdWithReposts(c, id);
@@ -213,7 +212,7 @@ post.get("/edit/:id/cancel", authMiddlewareHTML, maintainMiddlewareHTML, async (
 // delete a post
 post.delete("/delete/:id", authMiddlewareHTML, maintainMiddlewareHTML, async (c) => {
   const { id } = c.req.param();
-  if (isValid(id)) {
+  if (isUUIDValid(id)) {
     const response: DeleteResponse = await deletePost(c, id);
     if (response.success) {
       let triggerEvents = "resetIfThreading, updateTimestamps, accountViolations";
@@ -237,7 +236,7 @@ post.delete("/delete/:id", authMiddlewareHTML, maintainMiddlewareHTML, async (c)
 post.get("/:id/repost", authMiddlewareHTML, maintainMiddlewareHTML, rateLimit({ limiter: "REPOST_EDITOR_OPEN_LIMITER", toast: true }), async (c) => {
   if (CAN_EDIT_REPOST_RULES) {
     const { id } = c.req.param();
-    if (isValid(id)) {
+    if (isUUIDValid(id)) {
       c.header("HX-Trigger-After-Swap", "updateTimestamps, showRepostPopover");
       return c.html(<RepostDataPopover ctx={c} id={id} />);
     }
@@ -253,7 +252,7 @@ post.delete("/:id/repost/:scheduleId", authMiddlewareHTML, maintainMiddlewareHTM
   async (c) => {
     if (CAN_EDIT_REPOST_RULES) {
       const { id, scheduleId } = c.req.param();
-      if (isValid(id) && isValid(scheduleId)) {
+      if (isUUIDValid(id) && isUUIDValid(scheduleId)) {
         const { success, postData } = await deleteRepostRule(c, id, scheduleId);
         if (success) {
           c.header("HX-Trigger-After-Swap", "repostScheduleDeleted, updateTimestamps, sidebarButtons");

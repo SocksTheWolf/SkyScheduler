@@ -27,3 +27,5 @@ export const atProtoRecordURI = /at\:\/\/(?:[0-9a-z\-\.\:]+)\/(?:[a-z0-9\.\#]+)\
 export const repostContentRecord = /Repost of (?:.*\/profile\/)(?<account>[0-9a-zA-Z\-\.\:]+)\/post\/(?<postid>[a-z0-9]+)(?:\/)?$/i;
 // mention capture regex
 export const mentionCaptureRegex = /@((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,})/g;
+// invalid uuids
+export const invalidUUID = /(?:00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)/i;

@@ -1,6 +1,8 @@
+import { validate as isValid } from "uuid";
 import { USE_CAPTCHA } from "../config";
 import { EmbedDataType } from "../enums";
 import type { AllContext, BaseContext } from "../types";
+import { invalidUUID } from "../validation/regexCases";
 
 export function isInDev(env?: Env) {
   if (env === undefined)
@@ -71,4 +73,15 @@ export const clearWorkersCache = async (ctx: ExecutionContext, options: CachePur
 
 export function getEnumKeyByValue<T extends Record<string, unknown>>(inEnum: T, value: unknown): keyof T|null {
   return Object.keys(inEnum).find((x) => inEnum[x] == value) ?? null;
+}
+
+export function isUUIDValid(input: unknown): boolean {
+  if (typeof input !== 'string' )
+    return false;
+
+  // drop invalid uuids
+  if (invalidUUID.test(input))
+    return false;
+
+  return isValid(input);
 }
