@@ -29,5 +29,8 @@ assets/js/*.min.js
 assets/js/min/*.min.js
 assets/css/*.min.css
 
+# build bin dist
+bin/dist
+
 # misc
 *.db

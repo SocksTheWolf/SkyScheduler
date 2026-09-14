@@ -15,7 +15,7 @@
     "base:db:optimize": "wrangler d1 execute skyposts --command \"PRAGMA optimize\"",
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
     "base:addinvitekey": "wrangler kv key put --binding INVITE_POOL",
-    "build": "tsx --env-file-if-exists=.env --env-file=bin/.env.build ./bin/build.ts",
+    "build": "node --env-file-if-exists=.env --env-file=bin/.env.build ./bin/dist/build.js",
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
@@ -35,8 +35,10 @@
     "invite:generate": "npx human-id lowercase -",
     "invite:local": "npm run base:addinvitekey -- --local",
     "invite:remote": "npm run base:addinvitekey -- --remote",
-    "openapi": "tsx ./bin/openapi.ts",
-    "types": "wrangler types src/@types/wrangler.d.ts"
+    "openapi": "node ./bin/dist/openapi.js",
+    "types": "wrangler types src/@types/wrangler.d.ts",
+    "preopenapi": "npm run prebuild",
+    "prebuild": "npx esbuild bin/*.ts --bundle --platform=node --target=esnext --outdir=bin/dist --format=esm --external:cloudflare:workers --external:@swc --external:debug --external:clean-css --external:better-auth --external:relateurl"
   },
   "scriptsComments": {
     "build": "builds files for the website",
@@ -84,7 +86,6 @@
     "minify": "^14.1.0",
     "prettier": "^3.9.6",
     "smol-toml": "^1.8.0",
-    "tsx": "^4.23.13",
     "typed-htmx": "^0.3.1",
     "wrangler": "^4.130.0"
   },
