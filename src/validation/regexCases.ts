@@ -6,7 +6,7 @@ export const httpProtoRecord = /^https?$/;
 // this is also the same regex we used for bsky handles
 export const domainRegexCheck = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 // GUID + file extensions
-export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|webp|heic|svg|mp4|gif|webm|mpeg|mov)$/i;
+export const fileKeyRegex = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})\.(png|jp[e]?g|bmp|webp|heic|svg|mp4|gif)$/i;
 // Given a link to a post/feed/list/profile record
 export interface atpRecordURICaptures {
   account?: string;
