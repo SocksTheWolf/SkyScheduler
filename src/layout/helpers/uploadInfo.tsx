@@ -34,7 +34,7 @@ export default function UploadInfo(_props: BaseElementProps) {
         <ul>
           <li>must be shorter than {BSKY_VIDEO_MAX_DURATION} minutes</li>
           <li>must be smaller than {R2_FILE_SIZE_LIMIT_IN_MB}MB</li>
-          <li>are more likely to succeed if they are in h.264 (mp4) or webm format</li>
+          <li>must be in h.264 format</li>
           <li>will be processed on your PDS after they're posted. This may show a temporary <i>"Video not Found"</i> message for a bit after posting.</li>
         </ul>
       </li>

@@ -134,9 +134,12 @@ export const BSKY_VIDEO_MAX_DURATION: number = 3; // in minutes
 // NOTE: this is still at 100MB due to reliability concerns, also we have no multipart upload support atm
 // but dropzone technically could support it.
 export const BSKY_VIDEO_MAX_SIZE_IN_MB: number = 100;
-export const BSKY_VIDEO_MIME_TYPES: string[] = ["video/mp4", "video/mpeg", "video/webm", "video/quicktime"];
 
-export const BSKY_VIDEO_FILE_EXTS: string[] = ["mp4", "mpeg", "mov", "webm"];
+// At some point in time, bsky made it so that video blob refs can only ever reference MP4.
+// no backwards compatibility, no notice. Awesome. Super.
+export const BSKY_VIDEO_MIME_TYPES: string[] = ["video/mp4"];
+
+export const BSKY_VIDEO_FILE_EXTS: string[] = ["mp4"];
 
 // Used for human readable display
 export const BSKY_GIF_MIME_TYPES: string[] = ["image/gif"];
