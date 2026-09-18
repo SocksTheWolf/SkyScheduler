@@ -12,7 +12,9 @@ export const APP_HOSTNAME_INFO = {
     "skyscheduler.app"
   ],
   // the main application hostname
-  main: "skyscheduler.work"
+  main: "skyscheduler.work",
+  // the csp reporting hostname
+  csp: "report.skyscheduler.work"
 };
 
 // Service account, this should be the handle of the bsky account that sends

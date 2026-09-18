@@ -1,12 +1,12 @@
 import { NONCE } from "hono/secure-headers";
 import isEmpty from "just-is-empty";
+import { APP_HOSTNAME_INFO } from "../appInfo";
 import { USE_CSP_REPORT_ONLY, USE_GRANULAR_CSP_SETTINGS } from "../config";
 import type { BaseContext, NextMiddleware } from "../types";
 import { isInDev } from "../utils/helpers";
 
 export async function cspHelper(c: BaseContext, next: NextMiddleware) {
-  const cspReportURL: string = c.env.CSP_REPORT_URL;
-  const hasReportURL = !isEmpty(cspReportURL);
+  const hasReportURL = !isEmpty(APP_HOSTNAME_INFO.csp);
 
   if ((USE_GRANULAR_CSP_SETTINGS || USE_CSP_REPORT_ONLY) && !c.get("ssg")) {
     // note: the directive parameter is not actually used.
@@ -17,7 +17,6 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
       "default-src": ["'none'"],
       "connect-src": [
         "'self'",
-        cspReportURL,
         "https://challenges.cloudflare.com",
         "https://plc.directory",
         "https://cardyb.bsky.app",
@@ -53,13 +52,15 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
     };
 
     let CSPDefinitionHeader = "";
-    for (const [directive, value] of Object.entries(secPolicy)) {
-      CSPDefinitionHeader += `${directive} ${value.join(" ")}; `;
-    }
 
     if (hasReportURL) {
-      CSPDefinitionHeader += `report-to report-csp; report-uri ${cspReportURL}`;
-      c.res.headers.set("Reporting-Endpoints", `report-csp=${cspReportURL}`);
+      secPolicy["connect-src"].push(`https://${APP_HOSTNAME_INFO.csp}`);
+      CSPDefinitionHeader += `report-to report-csp; report-uri ${APP_HOSTNAME_INFO.csp} `;
+      c.res.headers.set("Reporting-Endpoints", `report-csp=${APP_HOSTNAME_INFO.csp}`);
+    }
+
+    for (const [directive, value] of Object.entries(secPolicy)) {
+      CSPDefinitionHeader += `${directive} ${value.join(" ")}; `;
     }
 
     // Manually inject the CSP headers
