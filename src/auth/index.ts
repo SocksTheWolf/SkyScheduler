@@ -1,7 +1,7 @@
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { username } from "better-auth/plugins";
-import { APP_NAME } from "../appInfo";
+import { APP_HOSTNAME_INFO, APP_NAME } from "../appInfo";
 import { DEFAULT_PDS } from "../config";
 import {
   BSKY_MAX_USERNAME_LENGTH,
@@ -123,7 +123,12 @@ function createAuth(c?: AllContext) {
     },
     appName: APP_NAME,
     secret: env?.BETTER_AUTH_SECRET,
-    baseURL: isInDev(env) ? undefined : env?.BETTER_AUTH_URL,
+    baseURL: isInDev(env) ? undefined :
+    {
+      allowedHosts: APP_HOSTNAME_INFO.hostnames,
+      protocol: "https",
+      fallback: `https://${APP_HOSTNAME_INFO.main}`,
+	  },
     user: {
       additionalFields: {
         bskyAppPass: {

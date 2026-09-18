@@ -1,4 +1,5 @@
 import { cors } from "hono/cors";
+import { APP_HOSTNAME_INFO } from "../appInfo";
 import { ALLOW_CORS_ALL } from "../config";
 import type { BaseContext, NextMiddleware } from "../types";
 
@@ -10,7 +11,8 @@ export const corsHelperMiddleware = async (c: BaseContext, next: NextMiddleware)
   const middleware = cors({
     // if cors is allowing all, since we do require auth credentials, mirror
     // the requesting origin flag if it exists. The default is to not allow cors
-    origin: (ALLOW_CORS_ALL ? (c.req.header("Origin") ?? "") : c.env.BETTER_AUTH_URL),
+    origin: (ALLOW_CORS_ALL ? (c.req.header("Origin") ?? "") :
+      APP_HOSTNAME_INFO.hostnames.map((hostname) => `https://${hostname}`)),
     allowHeaders: ["Content-Type", "Authorization", "X-CSRF-TOKEN"],
     allowMethods: ["POST", "GET", "OPTIONS", "DELETE"],
     exposeHeaders: [

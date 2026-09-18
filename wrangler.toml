@@ -15,7 +15,8 @@ preview_urls = false
 
 assets = { binding = "ASSETS", run_worker_first = false, directory = "./assets/", not_found_handling = "single-page-application" }
 routes = [
-  { pattern = "skyscheduler.work", custom_domain = true }
+  { pattern = "skyscheduler.work", custom_domain = true },
+  { pattern = "skyscheduler.application", custom_domain = true },
 ]
 
 [build]
@@ -157,9 +158,6 @@ required=["BETTER_AUTH_SECRET",
   "RESIZE_SECRET_HEADER", "RESET_BOT_APP_PASS", "TURNSTILE_SECRET_KEY"]
 
 [vars]
-# the domain and protocol that this application is hosted on. note this value is also used for CORS
-BETTER_AUTH_URL="https://skyscheduler.work"
-
 # The turnstile captcha public key
 TURNSTILE_PUBLIC_KEY="0x4AAAAAABkTE_9TV_bUnLGK"
 

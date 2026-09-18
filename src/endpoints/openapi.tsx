@@ -2,7 +2,7 @@
 // Cloudflare WAF to protect/log against abuse
 import { Hono } from "hono";
 import { describeRoute, generateSpecs, resolver, validator } from "hono-openapi";
-import { APP_NAME, SITE_URL } from "../appInfo";
+import { APP_HOSTNAME_INFO, APP_NAME, SITE_URL } from "../appInfo";
 import type { HonoBase } from "../types";
 import { AccountDeleteSchema, AccountForgotSchema } from "../validation/accountForgotDeleteSchema";
 import { AccountResetSchema } from "../validation/accountResetSchema";
@@ -817,9 +817,9 @@ export async function generateOpenAPI() {
         }
       },
       openapi: "3.0.3",
-      servers: [
-        { url: SITE_URL, description: 'Production Server'}
-      ],
+      servers: APP_HOSTNAME_INFO.hostnames.map((itm) => {
+        return {url: `https://${itm}`, description: "Server"}
+      })
     },
   });
 };

@@ -72,7 +72,6 @@ _Alternatively_, make a file like `.env.prod` and use `npx wrangler secret bulk 
 
 4. Update your `wrangler.toml` with changes that reflect your account.
    - You'll need to update the values for the KV, R2, Queues, D1 to reflect the bindings on your account.
-   - Also make sure you update the `BETTER_AUTH_URL` to your working URL as well.
    - If you allow image resizing, you should also modify `IMAGE_SETTINGS`'s `bucket_url` to the correct host.
    - Do remember to update/remove the domain bindings!
 

@@ -5,20 +5,26 @@
 
 // Name of the application
 export const APP_NAME: string = "SkyScheduler";
-
-// Site hostname, this should also be the handle of your bsky account for this service.
-export const SERVICE_DOMAIN: string = "skyscheduler.work";
+export const APP_HOSTNAME_INFO = {
+  // all the hostnames the site can be accessed from
+  hostnames: [
+    "skyscheduler.work",
+    "skyscheduler.app"
+  ],
+  // the main application hostname
+  main: "skyscheduler.work"
+};
 
 // Service account, this should be the handle of the bsky account that sends
 // things like password resets and be a general point of contact.
-export const SERVICE_ACCOUNT: string = SERVICE_DOMAIN;
-export const BSKY_ACCOUNT_LINK: string = `https://bsky.app/profile/${SERVICE_DOMAIN}`;
+export const SERVICE_ACCOUNT: string = "skyscheduler.work";
+export const BSKY_ACCOUNT_LINK: string = `https://bsky.app/profile/${SERVICE_ACCOUNT}`;
 // The atproto did for the /.well-known/ path. Leave blank for no injection.
 // This should reflect the did for your service account.
 export const ATPROTO_DID: string = "did:plc:ecfcvvlqmadysyik3thlbs3c";
 
 // Site URL, used in places where we won't have the CF env bindings (most static rendered assets)
-export const SITE_URL: string = `https://${SERVICE_DOMAIN}`;
+export const SITE_URL: string = `https://${APP_HOSTNAME_INFO.main}`;
 
 // Description of the website, used for meta tags and social cards.
 export const SITE_DESCRIPTION: string =
@@ -53,4 +59,5 @@ export const SOURCE_URL: string = "https://github.com/SocksTheWolf/skyscheduler"
 
 // leave blank to not expose a tipping url.
 export const SERVICE_TIP_URL: string = "https://ko-fi.com/socksthewolf/tip";
+export const FUNDING_STATS_KEY: string = "skyscheduler.work";
 export const PROGRESS_TOTAL: number = 10;
