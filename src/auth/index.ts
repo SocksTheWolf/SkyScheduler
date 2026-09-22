@@ -207,6 +207,11 @@ function createAuth(c?: AllContext) {
         validateSchema: false
       }
     },
+    experimental: {
+      instrumentation: {
+        enabled: false
+      }
+    }
   });
 }
 
