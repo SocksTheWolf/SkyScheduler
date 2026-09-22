@@ -99,9 +99,6 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
-    },
-    "miniflare": {
-      "sharp": "^0.35.4"
     }
   },
   "optionalDependencies": {
