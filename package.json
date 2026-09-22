@@ -64,7 +64,7 @@
     "@atproto/api": "^0.20.42",
     "@atproto/xrpc": "^0.8.11",
     "@hono/standard-validator": "^0.4.0",
-    "better-auth": "^1.7.2",
+    "better-auth": "^1.7.3",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.13.7",
@@ -78,22 +78,19 @@
     "just-truncate": "^2.2.0",
     "just-unique": "^4.2.0",
     "uuid": "^14.0.2",
-    "zod": "^4.5.4"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/minify": "^9.1.4",
     "@types/node": "^24.13.3",
     "drizzle-kit": "^0.31.10",
     "minify": "^14.1.0",
-    "prettier": "^3.9.6",
+    "prettier": "3.9.6",
     "smol-toml": "^1.8.0",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.130.0"
+    "wrangler": "^4.136.1"
   },
   "overrides": {
-    "hono-openapi": {
-      "@hono/standard-validator": "latest"
-    },
     "@actions/github": {
       "undici": "^7.29.0"
     },
@@ -102,9 +99,6 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
-    },
-    "miniflare": {
-      "sharp": "^0.35.4"
     }
   },
   "optionalDependencies": {

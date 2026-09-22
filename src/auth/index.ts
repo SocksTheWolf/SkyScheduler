@@ -203,6 +203,9 @@ function createAuth(c?: AllContext) {
       backgroundTasks: {
         handler: waitUntil,
       },
+      database: {
+        validateSchema: false
+      }
     },
   });
 }
