@@ -67,7 +67,7 @@
     "better-auth": "^1.7.3",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.13.7",
+    "hono": "^4.13.8",
     "hono-openapi": "^1.3.1",
     "image-dimensions": "^2.5.1",
     "just-flatten-it": "^5.2.0",
@@ -99,14 +99,17 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
+    },
+    "miniflare": {
+      "sharp": "^0.35.4"
     }
   },
   "optionalDependencies": {
     "@eslint/js": "^10.0.1",
     "@hono/eslint-config": "^2.1.1",
-    "eslint": "^10.10.0",
+    "eslint": "^10.11.0",
     "globals": "^17.12.0",
     "jiti": "^2.7.0",
-    "typescript-eslint": "^8.70.0"
+    "typescript-eslint": "^8.70.1"
   }
 }
