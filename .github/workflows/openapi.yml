@@ -3,6 +3,7 @@ on:
   push:
     branches: ["main"]
     paths:
+      - ".github/workflows/openapi.yml"
       - "src/endpoints/openapi.tsx"
       - "src/limits.ts"
       - "src/enums.ts"
