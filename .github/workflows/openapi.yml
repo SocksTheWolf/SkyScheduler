@@ -19,10 +19,19 @@ permissions:
   deployments: write
 
 jobs:
-  build_spec:
+  build_spec_main:
     uses: socksthewolf/workflows/.github/workflows/build_openapi.yml@main
     secrets: inherit
     with:
       ref: ${{ github.ref }}
       needs_node: true
       clean_deploys: true
+
+  build_spec_alt:
+    uses: socksthewolf/workflows/.github/workflows/build_openapi.yml@main
+    secrets: inherit
+    with:
+      ref: ${{ github.ref }}
+      needs_node: true
+      clean_deploys: true
+      zone_id: ${{ vars.CLOUDFLARE_ALT_ZONE }}
