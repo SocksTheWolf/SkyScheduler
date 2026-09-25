@@ -11,6 +11,7 @@ export default defineConfig([
     ".wrangler/**",
     ".github/**",
     ".vscode/**",
+    "bin/dist/**",
     "dist/**",
     "migrations/**",
     "src/@types/**",

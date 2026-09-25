@@ -83,7 +83,6 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
     if (needsEnvFlags) {
       // Load up toml
       const wranglerFile: string = (await readFile("wrangler.toml")).toString();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const wranglerSettings: TomlTable = parse(wranglerFile);
       // Set the various vars that are needed
       for (const flag of IMPORTANT_ENV_FLAGS) {
@@ -91,7 +90,6 @@ export async function ssgGenMiddleware(c: BaseContext, next: NextMiddleware) {
           continue;
 
         // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         c.env[flag] = wranglerSettings.vars[flag] ?? "";
       }
 
