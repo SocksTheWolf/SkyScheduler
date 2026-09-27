@@ -29,6 +29,7 @@ function makeLog(l: LogLevel, text: string) {
   }
 }
 
+export const sys = (text: string) => { makeLog(LogLevel.system, text); };
 export const log = (text: string) => { makeLog(LogLevel.log, text); };
 export const debug = (text: string) => { makeLog(LogLevel.debug, text); };
 export const warn = (text: string) => { makeLog(LogLevel.warn, text); };
