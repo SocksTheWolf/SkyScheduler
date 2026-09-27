@@ -16,15 +16,15 @@
     "base:db:migrate": "wrangler d1 migrations apply skyposts",
     "base:addinvitekey": "wrangler kv key put --binding INVITE_POOL",
     "build": "node --env-file-if-exists=.env --env-file=bin/.env.build ./bin/dist/build.js",
-    "build:all": "npm run build -- --all",
+    "build:all": "npm --silent run build -- --all",
     "dev": "wrangler dev --live-reload",
     "dev:queue": "wrangler dev -c wrangler.toml --persist-to .wrangler/state --live-reload",
     "deploy": "wrangler deploy --minify",
     "auth": "npx auth@latest generate --config auth.config.ts --output src/db/auth.schema.ts -y && npx prettier src/db/auth.schema.ts --write",
-    "optimize": "npm run migrate:local:pragma && npm run migrate:prod:pragma",
+    "optimize": "npm --silent run migrate:local:pragma && npm --silent run migrate:prod:pragma",
     "generate": "drizzle-kit generate",
-    "eslint": "npm run lint",
-    "lint": "npm run build -- --cmd=lint && eslint --stats --concurrency auto",
+    "eslint": "npm --silent run lint",
+    "lint": "npm --silent run build -- --cmd=lint && eslint --stats --concurrency auto",
     "migrate:local:db": "npm run base:db:migrate -- --local",
     "migrate:local:pragma": "npm run base:db:optimize -- --local -y",
     "migrate:prod:db": "npm run base:db:migrate -- --remote",
@@ -37,11 +37,15 @@
     "invite:local": "npm run base:addinvitekey -- --local",
     "invite:remote": "npm run base:addinvitekey -- --remote",
     "openapi": "node ./bin/dist/openapi.js",
+    "help": "node ./bin/dist/help.js",
     "types": "wrangler types src/@types/wrangler.d.ts",
-    "preopenapi": "npm run prebuild",
-    "prebuild": "npx esbuild bin/*.ts --bundle --platform=node --target=esnext --outdir=bin/dist --format=esm --external:cloudflare:workers --external:@swc --external:debug --external:clean-css --external:better-auth --external:relateurl --external:child_process --external:minify"
+    "prehelp": "npm --silent run compile",
+    "preopenapi": "npm --silent run compile",
+    "prebuild": "npm --silent run compile",
+    "compile": "npx --silent esbuild bin/*.ts --bundle --platform=node --target=esnext --outdir=bin/dist --format=esm --external:cloudflare:workers --external:@swc --external:debug --external:clean-css --external:better-auth --external:relateurl --external:child_process --external:minify"
   },
   "scriptsComments": {
+    "help": "shows help documentation for this app",
     "build": "builds files for the website",
     "dev": "run this application in development locally",
     "dev:queue": "runs the application in development but with queue support",
@@ -66,8 +70,7 @@
     "@hono/standard-validator": "^0.4.0",
     "better-auth": "^1.7.4",
     "date-fns": "^4.4.0",
-    "drizzle-orm": "^0.45.2",
-    "hono": "^4.13.8",
+    "hono": "^4.13.9",
     "hono-openapi": "^1.3.1",
     "image-dimensions": "^2.5.1",
     "just-flatten-it": "^5.2.0",
@@ -82,9 +85,10 @@
   },
   "devDependencies": {
     "@types/minify": "^9.1.4",
-    "@types/node": "^24.13.3",
-    "drizzle-kit": "^0.31.10",
-    "minify": "^14.1.0",
+    "@types/node": "24.19.x",
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.3",
+    "minify": "^15.3.1",
     "prettier": "3.9.6",
     "smol-toml": "^1.9.0",
     "typed-htmx": "^0.3.1",
@@ -108,5 +112,9 @@
     "globals": "^17.12.0",
     "jiti": "^2.7.0",
     "typescript-eslint": "^8.70.1"
+  },
+  "allowScripts": {
+    "workerd@*": true,
+    "esbuild@*": true
   }
 }
