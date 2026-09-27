@@ -62,20 +62,23 @@ app.use("*", async (c, next) => {
 ///// Application Routes /////
 
 // combined app route middleware
-const staticLoginCheckMiddleware = every(redirectToDashIfLogin, cachePublicMiddleware, ssgServe());
+const ssgServePublic = every(cachePublicMiddleware, ssgServe());
 const ssgServePrivate = every(cachePrivateMiddleware, ssgServe());
 
 // Dashboard route
 app.get("/dashboard", redirectLoginIfLogout, ssgServePrivate, (c) => c.html(<Dashboard ctx={c} />));
 
 // Login route
-app.get("/login", staticLoginCheckMiddleware, (c) => c.html(<Login ctx={c} />));
+app.get("/login", ssgServePublic, (c) => c.html(<Login ctx={c} />));
+
+// Login/Dashboard route (redirects if logged in, otherwise asks for login)
+app.get("/app", redirectToDashIfLogin, cachePrivateMiddleware, (c) => c.redirect("/login"));
 
 // Signup route
-app.get("/signup", staticLoginCheckMiddleware, (c) => c.html(<Signup ctx={c} />));
+app.get("/signup", ssgServePublic, (c) => c.html(<Signup ctx={c} />));
 
 // Forgot Password route
-app.get("/forgot", staticLoginCheckMiddleware, (c) => c.html(<ForgotPassword ctx={c} />));
+app.get("/forgot", ssgServePublic, (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
 app.get("/reset", redirectToDashIfLogin, ssgServePrivate, (c) => c.html(<ResetPassword ctx={c} />));

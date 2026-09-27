@@ -16,7 +16,7 @@ export default function NavTags(_props?: BaseElementProps) {
         <nav>
           <ul>
             <li><a role="button" href="/signup">Sign Up</a></li>
-            <li><a role="button" class="login secondary" href="/login">Login</a></li>
+            <li><a role="button" class="login secondary" href="/app">Dashboard</a></li>
           </ul>
         </nav>
       </div>
