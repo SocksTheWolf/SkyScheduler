@@ -31,7 +31,10 @@ import { has, isAltEditableType, isUUIDValid } from "./helpers";
 import { deleteEmbedsFromR2 } from "./r2Query";
 import { floorGivenTime } from "./time";
 
-export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
+export const getPostsForUser = async (c: AllContext, attempts: number = 0): Promise<Post[]|null> => {
+  if (attempts >= 3) {
+    return null;
+  }
   try {
     const userId: UserIdType = c.get("userId");
     const db: DBProcessor = c.get("db");
@@ -49,8 +52,9 @@ export const getPostsForUser = async (c: AllContext): Promise<Post[]|null> => {
 
       return results.map((itm) => new Post(itm));
     }
-  } catch(err: unknown) {
-    console.error("Failed to get posts for user, session could not be fetched " + String(err));
+  } catch (err: unknown) {
+    console.error("Failed to get posts for user: " + String(err));
+    return await getPostsForUser(c, attempts + 1);
   }
   return null;
 };
