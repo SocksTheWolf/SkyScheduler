@@ -92,7 +92,7 @@
     "prettier": "3.9.6",
     "smol-toml": "^1.9.0",
     "typed-htmx": "^0.3.1",
-    "wrangler": "^4.148.0"
+    "wrangler": "^4.149.0"
   },
   "overrides": {
     "@actions/github": {
@@ -103,9 +103,6 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
-    },
-    "miniflare": {
-      "sharp": "0.35.5"
     }
   },
   "optionalDependencies": {
