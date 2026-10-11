@@ -65,8 +65,8 @@
     "types": "generates wrangler types"
   },
   "dependencies": {
-    "@atproto/api": "^0.20.44",
-    "@atproto/xrpc": "^0.8.11",
+    "@atproto/api": "^0.21.0",
+    "@atproto/xrpc": "^0.8.14",
     "@hono/standard-validator": "^0.4.0",
     "better-auth": "^1.7.4",
     "date-fns": "^4.4.0",
