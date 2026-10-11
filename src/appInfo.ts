@@ -61,5 +61,5 @@ export const SOURCE_URL: string = "https://github.com/SocksTheWolf/skyscheduler"
 
 // leave blank to not expose a tipping url.
 export const SERVICE_TIP_URL: string = "https://ko-fi.com/socksthewolf/tip";
-export const FUNDING_STATS_KEY: string = "skyscheduler.work";
+export const FUNDING_STATS_KEY: string = "skyscheduler";
 export const PROGRESS_TOTAL: number = 10;
