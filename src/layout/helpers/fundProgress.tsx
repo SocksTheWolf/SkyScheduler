@@ -1,4 +1,4 @@
-import { PROGRESS_TOTAL, FUNDING_STATS_KEY } from "../../appInfo";
+import { APP_NAME, FUNDING_STATS_KEY, PROGRESS_TOTAL } from "../../appInfo";
 import type { AllContext, BaseElementProps } from "../../types";
 import { TipLink } from "./tipLink";
 
@@ -12,7 +12,8 @@ export async function FundingProgress(props: BaseElementProps) {
   const totalAmount: string = PROGRESS_TOTAL.toFixed(2);
   const progressBarTooltip = `$${curProgress}/$${totalAmount} for this month`;
   return (<div class="fundsBox">
-    <span data-tooltip={progressBarTooltip}>Server Bills Progress:</span>
+    <span data-tooltip={progressBarTooltip}>Server Bills Progress:</span><br />
+    <small>(Mention <code>{APP_NAME}</code> on any tips)</small>
     <div role="group">
       <span>$0</span>
       <progress class="fundsProgress" value={curProgress} max={totalAmount} />
