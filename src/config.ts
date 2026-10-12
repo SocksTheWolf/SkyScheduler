@@ -23,6 +23,13 @@ export const SHOW_SUPPORT_PROGRESS_BAR: boolean = true;
 // if we should truncate posted content
 export const TRUNCATE_POSTED_CONTENT: boolean = false;
 
+/** Fetch settings **/
+/* ------------------ */
+// how many times can getPostsForUser loop in on itself before it fails?
+// this would likely not be necessary if read replicas was on, but support isn't there yet.
+// should be higher than 1, but less than 5, ideally.
+export const MAX_USER_POST_FETCH_ATTEMPTS: number = 3;
+
 /** Default PDS Settings **/
 /* ---------------------- */
 // What is the default PDS to use (if one cannot be inferred for an user)

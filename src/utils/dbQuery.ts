@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { APP_NAME } from "../appInfo";
 import { Post } from "../classes/post";
 import { RepostInfo } from "../classes/repost";
+import { MAX_USER_POST_FETCH_ATTEMPTS } from "../config";
 import { mediaFiles, posts, repostCounts, reposts } from "../db/app.schema";
 import { accounts, users } from "../db/auth.schema";
 import { AccountStatus, PostLabel, RepostType, TimeShape } from "../enums";
@@ -32,7 +33,7 @@ import { deleteEmbedsFromR2 } from "./r2Query";
 import { floorGivenTime } from "./time";
 
 export const getPostsForUser = async (c: AllContext, attempts: number = 0): Promise<Post[]|null> => {
-  if (attempts >= 3) {
+  if (attempts >= MAX_USER_POST_FETCH_ATTEMPTS) {
     return null;
   }
   try {
