@@ -80,7 +80,7 @@
     "just-split": "^3.2.0",
     "just-truncate": "^2.2.0",
     "just-unique": "^4.2.0",
-    "uuid": "^14.0.2",
+    "uuid": "^14.0.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -90,7 +90,7 @@
     "drizzle-orm": "^0.45.3",
     "minify": "^15.3.1",
     "prettier": "3.9.6",
-    "smol-toml": "^1.9.0",
+    "smol-toml": "^1.9.1",
     "typed-htmx": "^0.3.1",
     "wrangler": "^4.149.0"
   },
@@ -103,6 +103,9 @@
     },
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
+    },
+    "css-tree": {
+      "source-map-js": "^1.2.2"
     }
   },
   "optionalDependencies": {
