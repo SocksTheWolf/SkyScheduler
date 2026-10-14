@@ -5,7 +5,7 @@ import { existsSync } from "fs";
 import fs, { readdir, rm, stat, unlink } from "fs/promises";
 import path from "path";
 import { USE_STATIC_HTML } from "../../src/config";
-import * as app from "../../src/index";
+import * as app from "../../src/main";
 import type { HonoBase } from "../../src/types";
 import { debug, error, lineBreak, log } from "./console";
 

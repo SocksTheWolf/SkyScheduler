@@ -1,6 +1,7 @@
 import { every } from "hono/combine";
 import type { BaseContext, NextMiddleware } from "../types";
 import { hasAuth, pullAuthData } from "./auth";
+import { sessionMiddleware } from "./session";
 
 async function goHomeIfLogout(c: BaseContext, next: NextMiddleware) {
   if (!c.get("ssg")) {
@@ -11,4 +12,4 @@ async function goHomeIfLogout(c: BaseContext, next: NextMiddleware) {
   await next();
 }
 
-export const redirectHomeIfLogout = every(pullAuthData, goHomeIfLogout);
+export const redirectHomeIfLogout = every(sessionMiddleware, pullAuthData, goHomeIfLogout);

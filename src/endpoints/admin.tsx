@@ -1,11 +1,13 @@
 import { Hono } from "hono";
 import { authAdminOnlyMiddleware } from "../middleware/adminOnly";
+import { sessionMiddleware } from "../middleware/session";
 import type { HonoBase } from "../types";
 import { getAllAbandonedMedia } from "../utils/db/file";
 import { runMaintenanceUpdates, updateSetDIDForAllUsers } from "../utils/db/maintain";
 import { cleanupAbandonedFiles, cleanUpPostsTask, schedulePostTask } from "../utils/scheduler";
 
 export const admin = new Hono<HonoBase>();
+admin.use(sessionMiddleware);
 admin.use(authAdminOnlyMiddleware);
 
 // Admin Maintenance Cleanup

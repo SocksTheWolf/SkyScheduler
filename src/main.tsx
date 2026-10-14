@@ -3,12 +3,13 @@ import { every } from "hono/combine";
 import { csrf } from "hono/csrf";
 import { disableSSG } from "hono/ssg";
 import { SITE_URL } from "./appInfo";
-import { createAuth, processAuthRoute } from "./auth";
+import { processAuthRoute } from "./auth";
 import { ScheduledContext } from "./classes/context";
 import { account } from "./endpoints/account";
 import { admin } from "./endpoints/admin";
 import { post } from "./endpoints/post";
 import { preview } from "./endpoints/preview";
+import { setup } from "./endpoints/setup";
 import { FundingProgress } from "./layout/helpers/fundProgress";
 import { blankAuthEnv } from "./middleware/auth";
 import { cachePrivateMiddleware, cachePublicMiddleware } from "./middleware/cacheControl";
@@ -17,6 +18,7 @@ import { cspHelper } from "./middleware/cspHelper";
 import { redirectToDashIfLogin } from "./middleware/redirectDash";
 import { redirectLoginIfLogout } from "./middleware/redirectLogin";
 import { secureHeadersMiddleware } from "./middleware/secureHeaders";
+import { sessionMiddleware } from "./middleware/session";
 import { ssgGenMiddleware, ssgServe } from "./middleware/ssg";
 import Dashboard from "./pages/dashboard";
 import ForgotPassword from "./pages/forgot";
@@ -27,58 +29,36 @@ import ResetPassword from "./pages/reset";
 import Signup from "./pages/signup";
 import TermsOfService from "./pages/tos";
 import type { HonoBase, QueueTaskData } from "./types";
-import { getDrizzle } from "./utils/db/get";
 import { processQueue } from "./utils/queues/queueHandler";
 import { handleSchedule } from "./utils/scheduler";
-import { setupAccounts } from "./utils/setup";
 
 const app = new Hono<HonoBase>();
 app.use(blankAuthEnv);
 app.use(csrf({ origin: SITE_URL }), secureHeadersMiddleware, cspHelper, corsHelperMiddleware);
 app.use(ssgGenMiddleware);
 
+///// SSG Middlewares /////
+const ssgServePrivate = every(cachePrivateMiddleware, ssgServe());
+const ssgServePublic = every(cachePublicMiddleware, ssgServe());
+
 ///// Static Pages /////
 app.all("/", cachePublicMiddleware, ssgServe({ page: "index" }), (c) =>
   c.html(<Homepage ctx={c} />)
 );
-app.get("/tos", cachePublicMiddleware, ssgServe(), (c) => c.html(<TermsOfService ctx={c} />));
-app.get("/privacy", cachePublicMiddleware, ssgServe(), (c) => c.html(<PrivacyPolicy ctx={c} />));
+app.get("/tos", ssgServePublic, (c) => c.html(<TermsOfService ctx={c} />));
+app.get("/privacy", ssgServePublic, (c) => c.html(<PrivacyPolicy ctx={c} />));
+app.get("/login", ssgServePublic, (c) => c.html(<Login ctx={c} />));
+app.get("/signup", ssgServePublic, (c) => c.html(<Signup ctx={c} />));
+app.get("/forgot", ssgServePublic, (c) => c.html(<ForgotPassword ctx={c} />));
 app.get("/funding", cachePublicMiddleware, disableSSG(), (c) => c.html(<FundingProgress ctx={c} />));
 
-///// Inline Middleware /////
-// Middleware for authentication/sessions
-app.use("*", async (c, next) => {
-  if (c.get("db") === undefined || c.get("db") === null) {
-    // technically this type won't match because we fully define the schema here
-    // but I don't care, it should be fine anyways.
-
-    // @ts-ignore
-    c.set("db", getDrizzle(c.env.DB));
-  }
-  c.set("auth", createAuth(c));
-  await next();
-});
-
 ///// Application Routes /////
-
-// combined app route middleware
-const ssgServePublic = every(cachePublicMiddleware, ssgServe());
-const ssgServePrivate = every(cachePrivateMiddleware, ssgServe());
 
 // Dashboard route
 app.get("/dashboard", redirectLoginIfLogout, ssgServePrivate, (c) => c.html(<Dashboard ctx={c} />));
 
-// Login route
-app.get("/login", ssgServePublic, (c) => c.html(<Login ctx={c} />));
-
 // Login/Dashboard route (redirects if logged in, otherwise asks for login)
 app.get("/app", redirectToDashIfLogin, cachePrivateMiddleware, (c) => c.redirect("/login"));
-
-// Signup route
-app.get("/signup", ssgServePublic, (c) => c.html(<Signup ctx={c} />));
-
-// Forgot Password route
-app.get("/forgot", ssgServePublic, (c) => c.html(<ForgotPassword ctx={c} />));
 
 // Reset Password route
 app.get("/reset", redirectToDashIfLogin, ssgServePrivate, (c) => c.html(<ResetPassword ctx={c} />));
@@ -88,8 +68,8 @@ app.use(cachePrivateMiddleware, disableSSG());
 
 // Handle better-auth routes manually
 // This makes (nearly) everything run on the server, rather than the client
-//app.all("/api/auth/*", async (c) => processAuthRoute(c));
-app.all("/api/auth/reset-password/*", async (c) => processAuthRoute(c));
+//app.all("/api/auth/*", sessionMiddleware, async (c) => processAuthRoute(c));
+app.all("/api/auth/reset-password/*", sessionMiddleware, async (c) => processAuthRoute(c));
 
 // Account routes
 app.route("/account", account);
@@ -103,17 +83,17 @@ app.route("/admin", admin);
 // Image preview routes
 app.route("/preview", preview);
 
+// Setup route
+app.route("/setup", setup);
+
 // Reset Password Confirm route
-app.get("/reset-password/:id", (c) => {
+app.get("/reset-password/:id", sessionMiddleware, (c) => {
   // Alternatively you can just URL rewrite this in cloudflare and it'll look
   // 100x times better.
   const { id } = c.req.param();
   // the default is 302, but we'll force it for future proofing
   return c.redirect(`/api/auth/reset-password/${id}?callbackURL=%2Freset`, 302);
 });
-
-// Setup Application route
-app.get("/setup", async (c) => await setupAccounts(c));
 
 ///// Internal Application Exports /////
 

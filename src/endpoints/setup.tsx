@@ -1,9 +1,14 @@
-import type { BaseContext } from "../types";
-import { getUserDID, getUserPDS } from "./bsky/bskyUser";
-import { doesAdminExist } from "./db/userinfo";
-import { has } from "./helpers";
+import { Hono } from "hono";
+import { sessionMiddleware } from "../middleware/session";
+import type { HonoBase } from "../types";
+import { getUserDID, getUserPDS } from "../utils/bsky/bskyUser";
+import { doesAdminExist } from "../utils/db/userinfo";
+import { has } from "../utils/helpers";
 
-export const setupAccounts = async (c: BaseContext) => {
+export const setup = new Hono<HonoBase>();
+setup.use(sessionMiddleware);
+
+setup.get("/", async (c) => {
   if (await doesAdminExist(c))
     return c.html("already created", 500);
 
@@ -39,4 +44,4 @@ export const setupAccounts = async (c: BaseContext) => {
     return c.redirect("/");
   else
     return c.html("failure", 403);
-}
+});

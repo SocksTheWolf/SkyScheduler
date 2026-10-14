@@ -10,6 +10,7 @@ import { RepostDataPopover } from "../layout/repostEditor";
 import { authMiddleware, authMiddlewareHTML } from "../middleware/auth";
 import { maintainMiddleware, maintainMiddlewareHTML } from "../middleware/maintenanceMode";
 import { rateLimit } from "../middleware/rateLimit";
+import { sessionMiddleware } from "../middleware/session";
 import type {
   CreateObjectResponse, CreatePostQueryResponse,
   DeleteResponse, EditPostChanges, HonoBase
@@ -32,6 +33,7 @@ import { FileDeleteSchema } from "../validation/mediaSchema";
 import { EditSchema } from "../validation/postSchema";
 
 export const post = new Hono<HonoBase>();
+post.use(sessionMiddleware);
 
 // Create media upload
 post.post("/upload", authMiddleware, maintainMiddleware, async (c) => {

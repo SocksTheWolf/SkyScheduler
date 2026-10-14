@@ -11,6 +11,7 @@ import { ViolationNoticeBar } from "../layout/violationsBar";
 import { authMiddlewareHTML, pullAuthData } from "../middleware/auth";
 import { maintainMiddleware, maintainMiddlewareHTML } from "../middleware/maintenanceMode";
 import { rateLimit } from "../middleware/rateLimit";
+import { sessionMiddleware } from "../middleware/session";
 import { verifyTurnstile } from "../middleware/turnstile";
 import type { AccountUpdatePayload, BaseContext, HonoBase, LooseObj } from "../types";
 import { checkIfCanDMUser } from "../utils/bsky/bskyMessage";
@@ -29,6 +30,8 @@ import { LoginSchema } from "../validation/loginSchema";
 import { SignupSchema } from "../validation/signupSchema";
 
 export const account = new Hono<HonoBase>();
+account.use(sessionMiddleware);
+
 interface ServerValidationError {
   message: string;
 }

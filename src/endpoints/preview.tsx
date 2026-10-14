@@ -3,12 +3,15 @@ import isEmpty from "just-is-empty";
 import { PREVENT_NON_IMAGE_PREVIEWS } from "../config";
 import { BSKY_IMG_MIME_TYPES } from "../limits";
 import { hasAuth, pullAuthData } from "../middleware/auth";
+import { sessionMiddleware } from "../middleware/session";
 import type { HonoBase } from "../types";
 import { FileContentSchema } from "../validation/mediaSchema";
 
 export const preview = new Hono<HonoBase>();
+preview.use(sessionMiddleware);
 
 preview.get("/file/:id", pullAuthData, async (c) => {
+  console.log("in preview");
   if (!hasAuth(c)) {
     return c.redirect("/thumbs/missing.png", 303);
   }
