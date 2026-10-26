@@ -106,9 +106,6 @@
     },
     "css-tree": {
       "source-map-js": "^1.2.2"
-    },
-    "miniflare": {
-      "undici": "^7.30.1"
     }
   },
   "optionalDependencies": {
