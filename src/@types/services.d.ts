@@ -10,7 +10,7 @@ interface PLCDirectoryResponse {
   service?: PDSService[];
 }
 
-// And this is a fix for D1Result marking success as a "true"
+// And this is a fix for D1Result marking success as a "true" in the types (incorrect)
 // instead of the boolean that it should be according to docs.
 interface ProperD1Result extends Omit<D1Result, "success"> {
   success: boolean;

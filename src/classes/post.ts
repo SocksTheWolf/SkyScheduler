@@ -7,6 +7,7 @@ import { has } from "../utils/helpers";
 import type { RepostInfo } from "./repost";
 
 // This is a real copy of the schema
+// TODO: Figure out a better way to reflect the schema from the DB
 interface DBPost {
   uuid: string;
   content: string;

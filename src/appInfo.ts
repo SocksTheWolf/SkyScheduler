@@ -5,7 +5,7 @@
 
 // Name of the application
 export const APP_NAME: string = "SkyScheduler";
-export const APP_HOSTNAME_INFO = {
+export const APP_HOSTNAME_INFO: AppHostnameConfig = {
   // all the hostnames the site can be accessed from
   hostnames: [
     "skyscheduler.work",

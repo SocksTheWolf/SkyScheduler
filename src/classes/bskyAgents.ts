@@ -1,4 +1,4 @@
-// this file is used to handle atpagents and their reuse during cron/queues
+// this file is used to handle atpagents (poorly named) and their reuse during cron/queues
 // this is done because logging into PDSes across tasks can be extremely
 // expensive time wise.
 import type { ComAtprotoServerCreateSession } from "@atproto/api";
