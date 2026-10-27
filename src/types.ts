@@ -124,6 +124,13 @@ export interface PostStatus {
   got: number;
 }
 
+// Thumbnail Handling
+export interface ThumbData {
+  success: boolean;
+  data?: Blob;
+  encoding?: string;
+}
+
 /// APP RESPONSES
 export interface CreateObjectResponse {
   ok: boolean;

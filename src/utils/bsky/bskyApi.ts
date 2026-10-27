@@ -15,7 +15,6 @@ import type { Repost } from "../../classes/repost";
 import { USE_DEPRECATED_SIZE_PARSE } from "../../config";
 import { AccountStatus, EmbedDataType, PostLabel } from "../../enums";
 import {
-  BSKY_IMG_SIZE_LIMIT,
   MAX_ALT_TEXT, MAX_EMBEDS_PER_POST
 } from "../../limits";
 import type {
@@ -23,7 +22,7 @@ import type {
   BskyImageRecordData, BskyMediaAspectRatio, BskyRecordWrapper,
   BskyVideoRecordData, BskyWebLinkRecordData,
   PostRecordResponse,
-  PostStatus, WebAssociatedRef
+  PostStatus, ThumbData, WebAssociatedRef
 } from "../../types";
 import type { atpRecordURICaptures } from "../../validation/regexCases";
 import { atpRecordURI } from "../../validation/regexCases";
@@ -33,6 +32,7 @@ import {
 } from "../db/data";
 import { getUsernameForUserId } from "../db/userinfo";
 import { createViolationForUser } from "../db/violations";
+import { fetchThumb } from "../fetch/thumbs";
 import { getEnumKeyByValue, has } from "../helpers";
 import { deleteEmbedsFromR2 } from "../r2Query";
 import { getAgentFeedRecord, getAgentListRecord, getAgentPostRecords } from "./bskyRecord";
@@ -192,32 +192,14 @@ const makePostRaw = async (c: AllContext, content: Post, agent: AtProtoAgent): P
 
           // Attempt to fetch the thumbnail
           if (!isEmpty(currentEmbed.content)) {
-            try {
-              const thumbnail = await fetch(currentEmbed.content);
-              if (thumbnail.ok) {
-                let imageBlob = await thumbnail.blob();
-                let thumbEncode = thumbnail.headers.get("content-type") ?? "image/png";
-                if (imageBlob.size > BSKY_IMG_SIZE_LIMIT) {
-                  // Resize the thumbnail because while the blob service will accept
-                  // embed thumbnails of any size it will fail when you try to make the post record
-                  // with the error that the post record is invalid.
-                  const imgTransform = (await c.env.IMAGES.input(imageBlob.stream() as ReadableStream<Uint8Array>)
-                    .transform({width: 1280, height: 720, fit: "scale-down"})
-                    .output({ format: "image/jpeg", quality: 85 })).response();
-                  if (imgTransform.ok) {
-                    thumbEncode = "image/jpeg";
-                    imageBlob = await imgTransform.blob();
-                  } else {
-                    throw Error("could not image transform thumbnail");
-                  }
-                }
-                const uploadImg = await agent.uploadBlob(imageBlob, { encoding: thumbEncode });
+            const thumbData: ThumbData = await fetchThumb(c, currentEmbed.content);
+            if (thumbData.success) {
+              try {
+                const uploadImg = await agent.uploadBlob(thumbData.data, { encoding: thumbData.encoding });
                 externalData.thumb = uploadImg.data.blob;
-              } else {
-                console.warn(`Failed thumbnail for ${currentEmbed.content}, proceeding with no thumb.`);
+              } catch (thumbErr: unknown) {
+                console.warn(`Thumbnail failed for embed ${currentEmbed.content} got err: ${String(thumbErr)}`);
               }
-            } catch (err: unknown) {
-              console.warn(`Thumbnail failed for embed ${currentEmbed.content} got err: ` + String(err));
             }
           }
           mediaEmbeds = { type: EmbedDataType.WebLink, data: externalData };

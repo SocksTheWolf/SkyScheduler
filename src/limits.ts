@@ -102,7 +102,8 @@ export const BSKY_IMG_MIME_TYPES: string[] = [
 ];
 
 // Used for human readable display
-export const BSKY_IMG_FILE_EXTS_STR: string = ["png", "jpg", "jpeg", "bmp", "webp", "heic", "svg"].join(", ");
+export const BSKY_IMG_FILE_EXTS: string[] = ["png", "jpg", "jpeg", "bmp", "webp", "heic", "svg"];
+export const BSKY_IMG_FILE_EXTS_STR: string = BSKY_IMG_FILE_EXTS.join(", ");
 
 // BSky limits that are inferred
 export const BSKY_MIN_USERNAME_LENGTH: number = 4;
