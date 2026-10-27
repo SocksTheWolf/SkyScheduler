@@ -42,6 +42,6 @@ preview.get("/file/:id", pullAuthData, async (c) => {
     return c.body(await fetchedFile.blob(), 200, { "Content-Type": contentType });
   } catch (err: unknown) {
     console.error(`Failed to fetch preview of: ${id} with error ${String(err)}`);
-    return c.redirect("/thumbs/network.png", 303);
+    return c.redirect("/thumbs/network.png", 307);
   }
 });

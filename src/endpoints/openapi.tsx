@@ -765,7 +765,7 @@ openapiRoutes.get("/preview/file/:id", describeRoute({
       description: "auth cannot be verified"
     },
     307: {
-      description: "preview cannot be displayed due to site settings"
+      description: "preview cannot be displayed due to settings or temporary outage"
     },
     401: {
       description: "not logged in"
