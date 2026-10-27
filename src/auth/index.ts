@@ -76,8 +76,11 @@ function createAuth(c?: AllContext) {
       "/request-password-reset",
       "/revoke-sessions",
     ],
+    // despite not using emails, this needs to be present to allow for password resets
+    // we send reset links via BSKY DMs
     emailAndPassword: {
       enabled: true,
+      // allow sends even if email is invalid
       requireEmailVerification: false,
       sendResetPassword: async ({user, url, token}, _request) => {
         const sendLocation: DestinationLetter = {
@@ -149,10 +152,14 @@ function createAuth(c?: AllContext) {
       changeEmail: {
         enabled: false,
       },
+      // Instead of giving direct access to delete user, we process it on server level
+      // which is more secure, and allows us to verify the user wants this, and clear
+      // user data more completely to fulfill GDPR requirements.
       deleteUser: {
         enabled: false,
       },
     },
+    // store session state in secure, expiring redis caches
     secondaryStorage: {
       get: async (key: string) => {
         return await env!.KV.get(key);
@@ -186,6 +193,7 @@ function createAuth(c?: AllContext) {
       debugLogs: false,
     }),
     account: {
+      // Disable any social account links, we'd implement this on our own instead
       accountLinking: {
         enabled: false,
       },
@@ -204,6 +212,8 @@ function createAuth(c?: AllContext) {
         handler: waitUntil,
       },
       database: {
+        // we validate our own schema, do not run more than once
+        // also better-auth's schema is properly backwards compatible
         validateSchema: false
       }
     },
