@@ -11,6 +11,18 @@ permissions:
   deployments: write
 
 jobs:
+  other_tangled:
+    runs-on: ubuntu-latest
+    if: ${{ true }}
+    environment: tangled
+    steps:
+      - name: Tangled
+        uses: socksthewolf/to-tangled@main
+        with:
+          repo: ${{ vars.MIRROR_REPO }}
+          ssh-key: ${{ secrets.KEY }}
+
   update_tangled:
+    if: ${{ false }}
     uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml@main
     secrets: inherit
