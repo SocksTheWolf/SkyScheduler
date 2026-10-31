@@ -88,6 +88,10 @@ export const MAX_LENGTH: number = 300;
 // https://github.com/bluesky-social/social-app/blob/b38013a12ff22a3ebd3075baa0d98bc96302a316/src/lib/constants.ts#L69
 export const MAX_ALT_TEXT: number = 2000;
 
+// External image limit value via
+// https://github.com/bluesky-social/social-app/blob/a13550674cdaff56c5294b780d9d5f956dfde5c7/lexicons/app/bsky/embed/external.json#L72
+export const BSKY_THUMB_SIZE_LIMIT_IN_MB: number = 1;
+
 // Image limit values via
 // https://github.com/bluesky-social/social-app/blob/b236f274c3524a0e091a12741b6b3855ae9283ef/src/lib/constants.ts#L102
 export const BSKY_IMG_SIZE_LIMIT_IN_MB: number = 2;
@@ -154,6 +158,7 @@ export const BSKY_VIDEO_FILES_STR: string = ((GIF_UPLOAD_ALLOWED) ?
 export const R2_FILE_SIZE_LIMIT_IN_MB: number = 100;
 export const R2_FILE_SIZE_LIMIT: number = R2_FILE_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_IMG_SIZE_LIMIT: number = BSKY_IMG_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
+export const BSKY_THUMB_SIZE_LIMIT: number = BSKY_THUMB_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_SIZE_LIMIT_IN_MB: number = Math.min(R2_FILE_SIZE_LIMIT_IN_MB, BSKY_VIDEO_MAX_SIZE_IN_MB);
 export const BSKY_VIDEO_SIZE_LIMIT: number = BSKY_VIDEO_SIZE_LIMIT_IN_MB * MB_TO_BYTES;
 export const BSKY_VIDEO_LENGTH_LIMIT: number = BSKY_VIDEO_MAX_DURATION * TO_SEC;

@@ -1,5 +1,5 @@
 import isEmpty from "just-is-empty";
-import { BSKY_IMG_FILE_EXTS, BSKY_IMG_SIZE_LIMIT } from "../../limits";
+import { BSKY_IMG_FILE_EXTS, BSKY_THUMB_SIZE_LIMIT } from "../../limits";
 import type { AllContext, ThumbData } from "../../types";
 
 export const fetchThumb = async (c: AllContext, url: string): Promise<ThumbData> => {
@@ -15,7 +15,7 @@ export const fetchThumb = async (c: AllContext, url: string): Promise<ThumbData>
   if (thumbnail.ok) {
     response.data = await thumbnail.blob();
     response.encoding = thumbnail.headers.get("content-type") ?? "image/png";
-    if (response.data.size > BSKY_IMG_SIZE_LIMIT) {
+    if (response.data.size > BSKY_THUMB_SIZE_LIMIT) {
       // Resize the thumbnail because while the blob service will accept
       // embed thumbnails of any size it will fail when you try to make the post record
       // with the error that the post record is invalid.
