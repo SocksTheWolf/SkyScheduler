@@ -13,7 +13,7 @@ permissions:
 jobs:
   other_tangled:
     runs-on: ubuntu-latest
-    if: ${{ true }}
+    if: ${{ false }}
     environment: tangled
     steps:
       - name: Tangled
@@ -23,6 +23,6 @@ jobs:
           ssh-key: ${{ secrets.KEY }}
 
   update_tangled:
-    if: ${{ false }}
+    if: ${{ true }}
     uses: socksthewolf/workflows/.github/workflows/deploy_tangled.yml@main
     secrets: inherit
