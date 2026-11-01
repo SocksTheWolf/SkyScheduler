@@ -1,0 +1,44 @@
+.ec-event-title {
+  font-size: 1.2em !important;
+  font-weight: normal !important;
+  color: var(--ec-event-text-color) !important;
+}
+
+.ec-title, .ec-event-title { margin-bottom: 0px !important; }
+.ec-event {
+  padding: 2px !important;
+}
+.ec-event-body {
+  display: block !important;
+}
+.ec-day-grid .ec-event-title {
+  display: grid;
+  white-space: unset !important;
+}
+.ec-button {
+  background-color: var(--ec-button-active-bg-color) !important;
+  border-color: var(--ec-button-active-border-color) !important;
+}
+.ec-button.ec-active {
+  background-color: var(--pico-background-color) !important;
+  border-color: var(--pico-border-color) !important;
+}
+#calendarDialog article {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.repostEvent {
+  h4::before {
+    content: "";
+    width: 22px;
+    height: 20px;
+    background-image: url("/icons/repost.svg");
+    margin-right: 3px;
+    display: inline-block;
+  }
+  border-color: #00f200;
+}
+
+.calendarDialogHeader {
+  display: inline;
+}

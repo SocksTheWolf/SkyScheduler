@@ -176,6 +176,13 @@ function easySetup(url, successMessage, successLocation, customDelay=0) {
   });
 }
 
+function getRandomHSLColor() {
+  const hue = Math.floor(Math.random() * 256);
+  const sat = Math.floor(Math.random() * 101);
+  const lum = 40 + Math.floor(Math.random() * 11);
+  return `hsl(${hue}, ${sat}%, ${lum}%)`;
+}
+
 document.addEventListener("rateLimitNotice", function(ev) {
   pushToast(ev.detail.value, false);
 });

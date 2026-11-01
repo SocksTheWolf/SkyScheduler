@@ -215,6 +215,7 @@ skyscheduler/
 - [`pico`](https://github.com/Yohn/PicoCSS) - styling, tabs, modals
 - [`mingcute`](https://github.com/mingcute-design/mingcute-icons) - most icons
 - [`just-has`](https://github.com/angus-c/just#just-has) - parsing Bluesky data
+- [`event-calendar`](https://github.com/vkurko/calendar) - visual representations of post times/dates
 
 ## Contributions
 

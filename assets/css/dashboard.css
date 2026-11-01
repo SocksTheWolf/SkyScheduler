@@ -79,6 +79,10 @@
   display: none;
 }
 
+#openCalendarButton {
+  background-color: chocolate;
+}
+
 @media (max-width: 510px) {
   .scrollBtn {
     display: inline !important;
@@ -109,7 +113,7 @@
   line-height: unset;
 }
 
-.deletePostsButton {
+.deletePostsButton, .right {
   float: right !important;
 }
 

@@ -13,4 +13,6 @@ export const thirdPartyDependencies = {
   // Pico Tabs
   PicoTabs: false,
   contentTabs: false,
+  // Calendar
+  EventCalendar: false,
 };

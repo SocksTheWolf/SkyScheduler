@@ -14,6 +14,7 @@ interface BaseLayoutProps extends BaseElementProps {
   title: string;
   noIndex?: boolean;
   mainClass?: string;
+  defaultPico?: boolean;
   interactivity?: ScriptInclusionLevel;
   preloads?: PreloadRules[];
   nonce?: string;
@@ -56,7 +57,7 @@ export const BaseLayout = (props: BaseLayoutProps) => {
       {props.interactivity === ScriptInclusionLevel.NonInteractive ? <FirefoxFOUCFix /> : null}
     </head>
     <body>
-      <container class="pico">
+      <container class={props.defaultPico === false ? undefined : "pico"}>
         <main class={props.mainClass}>
           {props.children}
         </main>

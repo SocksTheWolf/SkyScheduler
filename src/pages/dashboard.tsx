@@ -1,11 +1,13 @@
 import { APP_NAME, DASHBOARD_TAG_LINE } from "../appInfo";
 import { SHOW_SUPPORT_PROGRESS_BAR } from "../config";
 import { ScriptInclusionLevel } from "../enums";
+import CalendarButton from "../layout/buttons/calendar";
 import LogoutButton from "../layout/buttons/logout";
 import RefreshPostsButton from "../layout/buttons/refresh";
 import ScrollToContent from "../layout/buttons/scroll";
 import SettingsButton from "../layout/buttons/settings";
 import AltTextDialog from "../layout/dialogs/altTextDialog";
+import CalendarDialog from "../layout/dialogs/calendarDialog";
 import SettingsDialog from "../layout/dialogs/settingsDialog";
 import FooterCopyright from "../layout/helpers/footer";
 import LogoImage from "../layout/helpers/logo";
@@ -21,7 +23,7 @@ export default function Dashboard(props: BaseElementProps) {
     return (<b class="btn-error">Failed: Server Error</b>);
 
   const ctx: AllContext = props.ctx;
-  return (
+  return (<>
     <BaseLayout
         title="Dashboard"
         nonce={ctx.get("secureHeadersNonce")}
@@ -45,6 +47,9 @@ export default function Dashboard(props: BaseElementProps) {
                 <RefreshPostsButton />
                 <SettingsButton />
                 <ScrollToContent />
+              </center>
+              <center>
+                <CalendarButton />
               </center>
               <hr class="hideOnMobile" />
               <h5>Post List:</h5>
@@ -76,7 +81,8 @@ export default function Dashboard(props: BaseElementProps) {
       </div>
       <AltTextDialog />
       <SettingsDialog />
-      <script type="text/javascript" src={dashboardScriptStr} nonce={ctx.get("secureHeadersNonce")}></script>
+      <CalendarDialog />
     </BaseLayout>
-  );
+    <script type="text/javascript" src={dashboardScriptStr} nonce={ctx.get("secureHeadersNonce")}></script>
+  </>);
 };

@@ -13,7 +13,10 @@ export const minifyOptions = {
           "translateErrorObject",
           "openAltText",
           "openPostAltEditor",
-          "updateUsername"
+          "updateUsername",
+          "calendarSchedule",
+          "calendarDateFormatter",
+          "getRandomHSLColor"
         ]
       }
     }

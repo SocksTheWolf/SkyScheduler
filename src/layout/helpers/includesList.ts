@@ -35,9 +35,11 @@ const dashboardDefaultPreloads: PreloadRules[] = [
   { href: "/dep/has.min.js", type: "script" },
   { type: "script", href: "/dep/dropzone.min.js" },
   { type: "style", href: "/dep/dropzone.min.css" },
+  { type: "style", href: "/dep/event-calendar.min.css"},
   { type: "style", href: "/dep/tribute.min.css" },
   { type: "style", href: dependModsStyleStr },
   { type: "script", href: "/dep/tribute.min.js" },
+  { href: "/dep/event-calendar.min.js", type: "script" }
 ];
 
 export function getScriptsForInteractivity(interactiveLevel?: ScriptInclusionLevel): PreloadRules[] {

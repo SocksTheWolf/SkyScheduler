@@ -45,6 +45,7 @@ export default function Homepage(props?: BaseElementProps) {
               <li>Post <span tabindex={0} data-tooltip={`images and video (up to ${R2_FILE_SIZE_LIMIT_IN_MB} MB)`}>media</span> with
                 content labels and full support for alt text</li>
               <li>Edit the content of posts <i>and</i> alt text before publish</li>
+              <li>Calendar view for a nice visual representation of your current post schedule</li>
               <li>Publish entire threads with up to {MAX_POSTS_PER_THREAD} child posts per thread</li>
               <li>Automatically retweet <u>anything</u> over a {explainRepostTimeInterval()} interval of your choice up to {MAX_REPOST_INTERVAL} times
                 for a maximum of {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
