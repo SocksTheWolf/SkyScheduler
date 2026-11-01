@@ -20,7 +20,7 @@ const PublishedRepostSchema = z.object({
   }).trim()
     .regex(postRecordURI, "url is not a valid post record link")
     .nonoptional("a valid url was not provided"),
-  content: z.xor([
+  content: z.union([
       z.string().trim().max(MAX_REPOST_TITLE_LENGTH, "repost title is too long"),
       z.string().trim().regex(repostContentRecord)
     ], "invalid repost title").optional(),
