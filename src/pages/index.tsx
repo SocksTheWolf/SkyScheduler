@@ -50,7 +50,7 @@ export default function Homepage(props?: BaseElementProps) {
               <li>Automatically retweet <u>anything</u> over a {explainRepostTimeInterval()} interval of your choice up to {MAX_REPOST_INTERVAL} times
                 for a maximum of {MAX_REPOST_IN_HOURS-1} hours (or {MAX_REPOST_DAYS} days)</li>
               <ul>
-                <li><small>Even content that's wasn't originally made on {APP_NAME}</small></li>
+                <li><small>Even content that wasn't originally made on {APP_NAME}</small></li>
               </ul>
             </ul>
           </p>
