@@ -25,13 +25,8 @@ updates:
           - "jiti"
           - "typed-htmx"
           - "@types/*"
-      openapi:
-        patterns:
-          - "hono-openapi"
-          - "@hono/standard-validator"
       app:
         patterns:
-          - "hono"
           - "date-fns"
           - "drizzle-*"
           - "image-dimensions"
@@ -66,3 +61,6 @@ updates:
           - "version-update:semver-major"
       # We only use prettier for some nice formatting, ignore otherwise.
       - dependency-name: "prettier"
+      # Ignore hono-openapi, we only use it for building the openapi files in development
+      - dependency-name: "hono-openapi"
+      - dependency-name: "@hono/standard-validator"
