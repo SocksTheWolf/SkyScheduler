@@ -55,7 +55,7 @@ export async function cspHelper(c: BaseContext, next: NextMiddleware) {
 
     if (hasReportURL) {
       secPolicy["connect-src"].push(`https://${APP_HOSTNAME_INFO.csp}`);
-      CSPDefinitionHeader += `report-to report-csp; report-uri ${APP_HOSTNAME_INFO.csp} `;
+      CSPDefinitionHeader += `report-to report-csp; report-uri ${APP_HOSTNAME_INFO.csp}; `;
       c.res.headers.set("Reporting-Endpoints", `report-csp=${APP_HOSTNAME_INFO.csp}`);
     }
 
